@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 5
+Sheet 1 6
 Title ""
 Date ""
 Rev ""
@@ -36,5 +36,11 @@ S 3750 775  900  350
 U 61DF74A0
 F0 "Card Edge" 50
 F1 "Card Edge.sch" 50
+$EndSheet
+$Sheet
+S 1025 1425 1100 400 
+U 634ECC15
+F0 "Logic" 51
+F1 "Logic.sch" 51
 $EndSheet
 $EndSCHEMATC
