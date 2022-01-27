@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr B 17000 11000
 encoding utf-8
-Sheet 5 6
+Sheet 5 8
 Title ""
 Date ""
 Rev ""
@@ -242,7 +242,7 @@ Wire Wire Line
 	4125 7250 3075 7250
 Wire Wire Line
 	4125 7350 2975 7350
-Text GLabel 950  7450 0    39   BiDi ~ 0
+Text GLabel 950  7450 0    50   BiDi ~ 0
 _VPA
 Wire Wire Line
 	4125 7650 3575 7650
@@ -252,13 +252,13 @@ Wire Wire Line
 	4025 7800 950  7800
 Wire Wire Line
 	4025 7900 950  7900
-Text GLabel 925  7575 0    39   BiDi ~ 0
+Text GLabel 925  7575 0    50   BiDi ~ 0
 E
-Text GLabel 950  7700 0    39   BiDi ~ 0
+Text GLabel 950  7700 0    50   BiDi ~ 0
 _VMA
-Text GLabel 950  7800 0    39   BiDi ~ 0
+Text GLabel 950  7800 0    50   BiDi ~ 0
 _RESET
-Text GLabel 950  7900 0    39   Output ~ 0
+Text GLabel 950  7900 0    50   Output ~ 0
 _HALT
 Wire Wire Line
 	4125 8150 950  8150
@@ -1022,12 +1022,12 @@ $Comp
 L 74xx:74LS05 U300
 U 4 1 6234EB07
 P 1675 7225
-F 0 "U300" H 1675 7542 50  0000 C CNN
-F 1 "74HCT05" H 1675 7451 50  0000 C CNN
+F 0 "U300" H 1700 6925 50  0000 C CNN
+F 1 "74HCT05" H 1675 7000 50  0000 C CNN
 F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 1675 7225 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS05" H 1675 7225 50  0001 C CNN
 	4    1675 7225
-	1    0    0    -1  
+	-1   0    0    1   
 $EndComp
 Wire Wire Line
 	925  6275 2875 6275
@@ -2035,20 +2035,6 @@ Wire Wire Line
 	14250 3400 15025 3400
 Wire Wire Line
 	14350 2825 14350 3575
-Wire Bus Line
-	1250 3825 1250 4075
-Wire Bus Line
-	5300 1300 5300 8000
-Wire Bus Line
-	4650 8400 4650 10025
-Wire Bus Line
-	12225 975  12225 5500
-Wire Bus Line
-	10350 1300 10350 5500
-Wire Bus Line
-	6250 2575 6250 10225
-Wire Bus Line
-	8100 2575 8100 10025
 Connection ~ 14350 3575
 Wire Wire Line
 	14350 3575 15025 3575
@@ -2065,4 +2051,18 @@ F 3 "" H 14050 2425 50  0001 C CNN
 $EndComp
 Text Notes 13675 4300 0    51   ~ 0
 Not all these jumpers will make it to the final version.\nJ301 - 2MEG Shorted/4MEG Open\nJ302 - A2000 Shorted/B2000 Open\nJ303 - Do not configure RAM Shorted/Autoconfigure RAM Open\nJ404 - AMIX Shorted/AmigaOS Open
+Wire Bus Line
+	1250 3825 1250 4075
+Wire Bus Line
+	5300 1300 5300 8000
+Wire Bus Line
+	4650 8400 4650 10025
+Wire Bus Line
+	12225 975  12225 5500
+Wire Bus Line
+	10350 1300 10350 5500
+Wire Bus Line
+	6250 2575 6250 10225
+Wire Bus Line
+	8100 2575 8100 10025
 $EndSCHEMATC

@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 4 6
+Sheet 4 8
 Title ""
 Date ""
 Rev ""
@@ -129,19 +129,6 @@ F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 2275 1275 50  0001 C CNN
 $EndComp
 $Comp
 L 74xx:74LS04 U?
-U 2 1 6363485A
-P 2275 1825
-AR Path="/61DF74A0/6363485A" Ref="U?"  Part="3" 
-AR Path="/6209FB19/6363485A" Ref="U307"  Part="2" 
-F 0 "U307" H 2275 1508 50  0000 C CNN
-F 1 "74HCT04" H 2275 1599 50  0000 C CNN
-F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 2275 1825 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 2275 1825 50  0001 C CNN
-	2    2275 1825
-	1    0    0    -1  
-$EndComp
-$Comp
-L 74xx:74LS04 U?
 U 4 1 636358AA
 P 2275 2425
 AR Path="/61DF74A0/636358AA" Ref="U?"  Part="3" 
@@ -151,6 +138,48 @@ F 1 "74HCT04" H 2275 2199 50  0000 C CNN
 F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 2275 2425 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 2275 2425 50  0001 C CNN
 	4    2275 2425
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS05 U?
+U 2 1 61F394C8
+P 3250 1275
+AR Path="/61DF74A0/61F394C8" Ref="U?"  Part="4" 
+AR Path="/634ECC15/61F394C8" Ref="U?"  Part="1" 
+AR Path="/6209FB19/61F394C8" Ref="U300"  Part="2" 
+F 0 "U300" H 3250 1592 50  0000 C CNN
+F 1 "74HCT05" H 3250 1501 50  0000 C CNN
+F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 3250 1275 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS05" H 3250 1275 50  0001 C CNN
+	2    3250 1275
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS05 U?
+U 5 1 61F3D66D
+P 3250 2300
+AR Path="/61DF74A0/61F3D66D" Ref="U?"  Part="4" 
+AR Path="/634ECC15/61F3D66D" Ref="U?"  Part="1" 
+AR Path="/6209FB19/61F3D66D" Ref="U300"  Part="5" 
+F 0 "U300" H 3250 2617 50  0000 C CNN
+F 1 "74HCT05" H 3250 2526 50  0000 C CNN
+F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 3250 2300 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS05" H 3250 2300 50  0001 C CNN
+	5    3250 2300
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS05 U?
+U 6 1 61F3E9BB
+P 3250 2850
+AR Path="/61DF74A0/61F3E9BB" Ref="U?"  Part="4" 
+AR Path="/634ECC15/61F3E9BB" Ref="U?"  Part="1" 
+AR Path="/6209FB19/61F3E9BB" Ref="U300"  Part="6" 
+F 0 "U300" H 3250 3167 50  0000 C CNN
+F 1 "74HCT05" H 3250 3076 50  0000 C CNN
+F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 3250 2850 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS05" H 3250 2850 50  0001 C CNN
+	6    3250 2850
 	1    0    0    -1  
 $EndComp
 $EndSCHEMATC

@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr B 17000 11000
 encoding utf-8
-Sheet 3 6
+Sheet 3 8
 Title ""
 Date ""
 Rev ""
@@ -98,7 +98,7 @@ D14
 Text Label 5025 3800 2    50   ~ 0
 D15
 Text Notes 12400 9650 0    236  ~ 0
-MEMORY
+EXPANDED MEMORY
 Text Notes 14225 9150 2    118  ~ 0
 If I only had a brain.
 $Comp
@@ -2049,6 +2049,10 @@ Wire Notes Line
 	6300 10375 6300 6850
 Wire Notes Line
 	6300 6850 1575 6850
+Text Notes 1850 7950 0    157  ~ 0
+ROMs
+Text Notes 8275 2250 0    157  ~ 0
+32 MEGABYTES
 Wire Bus Line
 	2025 10250 4725 10250
 Wire Bus Line
@@ -2081,6 +2085,4 @@ Wire Bus Line
 	8100 975  8100 3700
 Wire Bus Line
 	13950 1025 13950 6075
-Text Notes 1850 7950 0    157  ~ 0
-ROMs
 $EndSCHEMATC

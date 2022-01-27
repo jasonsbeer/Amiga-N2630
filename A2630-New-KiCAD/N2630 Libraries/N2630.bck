@@ -12,10 +12,21 @@ K TTL BUS 3State
 F http://www.ti.com/lit/gpn/sn74LS245
 $ENDCMP
 #
+$CMP 74HCT574
+D 8-bit Register, 3-state outputs
+K TTL REG DFF DFF8 3State
+F http://www.ti.com/lit/gpn/sn74HCT574
+$ENDCMP
+#
 $CMP CXO_DIP8
 D CMOS Crystal Clock Oscillator, DIP8-style metal package
 K Crystal Clock Oscillator
 F https://abracon.com/Oscillators/ACH.pdf
+$ENDCMP
+#
+$CMP CY74FCT821T
+D 10-BIT Bit Bus Interface
+F https://www.ti.com/lit/ds/symlink/cy74fct821t.pdf?HQS=dis-dk-null-digikeymode-dsf-pf-null-wwe&ts=1616853456129
 $ENDCMP
 #
 $CMP DELAYLINE
