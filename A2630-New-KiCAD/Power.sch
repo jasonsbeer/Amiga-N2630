@@ -142,20 +142,6 @@ F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 2275 2425 50  0001 C CNN
 $EndComp
 $Comp
 L 74xx:74LS05 U?
-U 2 1 61F394C8
-P 3250 1275
-AR Path="/61DF74A0/61F394C8" Ref="U?"  Part="4" 
-AR Path="/634ECC15/61F394C8" Ref="U?"  Part="1" 
-AR Path="/6209FB19/61F394C8" Ref="U300"  Part="2" 
-F 0 "U300" H 3250 1592 50  0000 C CNN
-F 1 "74HCT05" H 3250 1501 50  0000 C CNN
-F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 3250 1275 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS05" H 3250 1275 50  0001 C CNN
-	2    3250 1275
-	1    0    0    -1  
-$EndComp
-$Comp
-L 74xx:74LS05 U?
 U 5 1 61F3D66D
 P 3250 2300
 AR Path="/61DF74A0/61F3D66D" Ref="U?"  Part="4" 

@@ -637,7 +637,7 @@ U 1 1 61D8AE9D
 P 14175 4075
 F 0 "U201" H 14175 5840 50  0000 C CNN
 F 1 "MC68882" H 14175 5749 50  0000 C CNN
-F 2 "Package_LCC:PLCC-68" H 14175 4375 50  0001 C CNN
+F 2 "Package_LCC:PLCC-68_THT-Socket" H 14175 4375 50  0001 C CNN
 F 3 "http://bitsavers.trailing-edge.com/components/motorola/68000/MC68881_MC68882_Floating-Point_Coprocessor_Users_Manual_1ed_1987.pdf" H 14175 4375 50  0001 C CNN
 	1    14175 4075
 	1    0    0    -1  
