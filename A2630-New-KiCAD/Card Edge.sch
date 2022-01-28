@@ -271,11 +271,11 @@ Wire Wire Line
 Wire Wire Line
 	4125 8550 950  8550
 Wire Wire Line
-	4100 8650 950  8650
+	4125 8650 950  8650
 Wire Wire Line
 	4125 8750 950  8750
 Wire Wire Line
-	4100 8850 950  8850
+	4125 8850 950  8850
 Text GLabel 950  8350 0    50   BiDi ~ 0
 _ABG
 Text GLabel 950  8450 0    50   BiDi ~ 0
@@ -1209,9 +1209,9 @@ Text Label 12125 5500 2    51   ~ 0
 A1
 Text Label 12125 5400 2    51   ~ 0
 A2
-Text Label 12125 5300 2    51   ~ 0
+Text Label 12100 5200 2    51   ~ 0
 A3
-Text Label 12125 5200 2    51   ~ 0
+Text Label 12100 5300 2    51   ~ 0
 A4
 Text Label 12125 5100 2    51   ~ 0
 A5
@@ -1388,9 +1388,9 @@ Text Label 10450 5500 0    51   ~ 0
 AA1
 Text Label 10450 5400 0    51   ~ 0
 AA2
-Text Label 10450 5300 0    51   ~ 0
-AA3
 Text Label 10450 5200 0    51   ~ 0
+AA3
+Text Label 10450 5300 0    51   ~ 0
 AA4
 Text Label 10450 5100 0    51   ~ 0
 AA5

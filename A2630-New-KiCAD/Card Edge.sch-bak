@@ -271,11 +271,11 @@ Wire Wire Line
 Wire Wire Line
 	4125 8550 950  8550
 Wire Wire Line
-	4100 8650 950  8650
+	4125 8650 950  8650
 Wire Wire Line
 	4125 8750 950  8750
 Wire Wire Line
-	4100 8850 950  8850
+	4125 8850 950  8850
 Text GLabel 950  8350 0    50   BiDi ~ 0
 _ABG
 Text GLabel 950  8450 0    50   BiDi ~ 0
