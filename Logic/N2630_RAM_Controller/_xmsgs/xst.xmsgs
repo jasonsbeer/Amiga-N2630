@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT: This is an internal file that has been generated
+     by the Xilinx ISE software.  Any direct editing or
+     changes made to this file may result in unpredictable
+     behavior or data corruption.  It is strongly advised that
+     users do not edit the contents of this file. -->
+<messages>
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">37</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">38</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">39</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">40</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">41</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">42</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">43</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">44</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">47</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">48</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">49</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3010" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">52</arg>. Entity <arg fmt="%s" index="3">RAM_Controller_Main</arg> does not exist.
+</msg>
+
+<msg type="warning" file="HDLParsers" num="3481" delta="new" >Library <arg fmt="%s" index="1">work</arg> has no units. Did not save reference file &quot;<arg fmt="%s" index="2">xst/work/hdllib.ref</arg>&quot; for it.
+</msg>
+
+</messages>
+

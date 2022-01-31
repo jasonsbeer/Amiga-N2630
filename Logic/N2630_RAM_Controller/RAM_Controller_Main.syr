@@ -1,0 +1,103 @@
+Release 14.7 - xst P.20131013 (lin64)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+--> 
+Parameter TMPDIR set to xst/projnav.tmp
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.03 secs
+ 
+--> 
+Parameter xsthdpdir set to xst
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.03 secs
+ 
+--> 
+Reading design: RAM_Controller_Main.prj
+
+TABLE OF CONTENTS
+  1) Synthesis Options Summary
+  2) HDL Compilation
+  3) Design Hierarchy Analysis
+  4) HDL Analysis
+  5) HDL Synthesis
+     5.1) HDL Synthesis Report
+  6) Advanced HDL Synthesis
+     6.1) Advanced HDL Synthesis Report
+  7) Low Level Synthesis
+  8) Partition Report
+  9) Final Report
+
+=========================================================================
+*                      Synthesis Options Summary                        *
+=========================================================================
+---- Source Parameters
+Input File Name                    : "RAM_Controller_Main.prj"
+Input Format                       : mixed
+Ignore Synthesis Constraint File   : NO
+
+---- Target Parameters
+Output File Name                   : "RAM_Controller_Main"
+Output Format                      : NGC
+Target Device                      : XC9500XL CPLDs
+
+---- Source Options
+Top Module Name                    : RAM_Controller_Main
+Automatic FSM Extraction           : YES
+FSM Encoding Algorithm             : Auto
+Safe Implementation                : No
+Mux Extraction                     : Yes
+Resource Sharing                   : YES
+
+---- Target Options
+Add IO Buffers                     : YES
+MACRO Preserve                     : YES
+XOR Preserve                       : YES
+Equivalent register Removal        : YES
+
+---- General Options
+Optimization Goal                  : Speed
+Optimization Effort                : 1
+Keep Hierarchy                     : Yes
+Netlist Hierarchy                  : As_Optimized
+RTL Output                         : Yes
+Hierarchy Separator                : /
+Bus Delimiter                      : <>
+Case Specifier                     : Maintain
+Verilog 2001                       : YES
+
+---- Other Options
+Clock Enable                       : YES
+wysiwyg                            : NO
+
+=========================================================================
+
+
+=========================================================================
+*                          HDL Compilation                              *
+=========================================================================
+Compiling vhdl file "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd" in Library work.
+ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd" Line 37. Unexpected symbol read: _.
+ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd" Line 38. Unexpected symbol read: _.
+ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd" Line 39. Unexpected symbol read: _.
+ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd" Line 40. Unexpected symbol read: _.
+ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd" Line 41. Unexpected symbol read: _.
+ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd" Line 42. Unexpected symbol read: _.
+ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd" Line 43. Unexpected symbol read: _.
+ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd" Line 44. Unexpected symbol read: _.
+ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd" Line 47. Unexpected symbol read: _.
+ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd" Line 48. Unexpected symbol read: _.
+ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd" Line 49. Unexpected symbol read: _.
+ERROR:HDLParsers:3010 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd" Line 52. Entity RAM_Controller_Main does not exist.
+WARNING:HDLParsers:3481 - Library work has no units. Did not save reference file "xst/work/hdllib.ref" for it.
+--> 
+
+
+Total memory usage is 481456 kilobytes
+
+Number of errors   :   12 (   0 filtered)
+Number of warnings :    1 (   0 filtered)
+Number of infos    :    0 (   0 filtered)
+
