@@ -11,5 +11,23 @@
 <msg type="info" file="ProjectMgmt" num="1061" ><arg fmt="%s" index="1">Parsing VHDL file &quot;/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd&quot; into library work</arg>
 </msg>
 
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">170</arg>. <arg fmt="%s" index="3">Syntax error near &quot;!&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">174</arg>. <arg fmt="%s" index="3">Syntax error near &quot;=&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">180</arg>. <arg fmt="%s" index="3">Syntax error near &quot;=&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">181</arg>. <arg fmt="%s" index="3">Syntax error near &quot;#&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">182</arg>. <arg fmt="%s" index="3">Syntax error near &quot;#&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">191</arg>. <arg fmt="%s" index="3">Syntax error near &quot;=&quot;.</arg>
+</msg>
+
 </messages>
 

@@ -517,7 +517,7 @@ Wire Bus Line
 Wire Bus Line
 	11100 9775 11100 8725
 Text GLabel 15825 8725 2    50   BiDi ~ 0
-A(31:0)
+A[31..0]
 Wire Wire Line
 	13625 5025 13325 5025
 Wire Wire Line
@@ -914,7 +914,7 @@ Entry Wire Line
 Entry Wire Line
 	14950 5725 15050 5825
 Text GLabel 15825 8450 2    50   BiDi ~ 0
-D(31:0)
+D[31..0]
 Text Label 14925 3025 2    50   ~ 0
 D31
 Text Label 14925 6125 2    50   ~ 0

@@ -218,8 +218,6 @@ Wire Wire Line
 	3275 4400 3200 4400
 Wire Wire Line
 	3200 4400 3200 5475
-Text Notes 2475 5550 0    236  ~ 0
-PAL HERE
 $Comp
 L 74xx:74LS174 U302
 U 1 1 635AD4A3
@@ -307,7 +305,7 @@ Entry Wire Line
 Entry Wire Line
 	1625 7100 1525 7000
 Text GLabel 1175 5875 0    51   Input ~ 0
-D(31:0)
+D[31..0]
 Entry Bus Bus
 	1425 5875 1525 5975
 Text Label 1625 6600 0    51   ~ 0
@@ -716,4 +714,10 @@ Wire Bus Line
 	1525 5975 1525 7000
 Wire Bus Line
 	3325 5875 3325 6900
+Text Label 3200 5475 1    50   ~ 0
+_S7MDIS_DFF
+Text Notes 5025 4050 2    118  ~ 0
+STATE MACHINE
+Text Notes 5650 6075 2    118  ~ 0
+THESE ARE IN THE CPLD!
 $EndSCHEMATC

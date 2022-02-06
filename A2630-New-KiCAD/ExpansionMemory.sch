@@ -16,7 +16,7 @@ $EndDescr
 Text GLabel 1300 4200 0    50   Input ~ 0
 CPUCLK_A
 Text GLabel 1350 900  0    50   BiDi ~ 0
-D(31..0)
+D[31..0]
 Text GLabel 1300 4650 0    50   Input ~ 0
 EM0R_W
 Text Label 5300 6200 2    50   ~ 0
@@ -590,9 +590,9 @@ Entry Bus Bus
 Entry Bus Bus
 	12225 4350 12325 4250
 Text GLabel 11425 4350 0    50   BiDi ~ 0
-D(31:0)
+D[31..0]
 Text GLabel 11500 1150 0    50   Input ~ 0
-A(31:0)
+A[31..0]
 Wire Wire Line
 	14425 3675 14300 3675
 Wire Wire Line
@@ -1139,7 +1139,7 @@ Entry Wire Line
 Entry Bus Bus
 	5400 1000 5300 900 
 Text GLabel 1350 1100 0    50   BiDi ~ 0
-EM(12..0)
+EMA(12..0)
 Entry Bus Bus
 	3100 1200 3000 1100
 Text Label 9300 6200 2    50   ~ 0
@@ -1963,6 +1963,14 @@ Text Notes 4000 1750 0    118  ~ 0
 BANK0
 Text Notes 8000 1800 0    118  ~ 0
 BANK1
+Text Notes 10850 5500 0    118  ~ 0
+JN Notes: put row address on the EMA bus \nand signal RAS. This is 68030 addresses A14:2. \nPut column address on the EMA bus and signal \nCAS. These are 68030 addresses A24:15.
+Text GLabel 1300 4300 0    50   Input ~ 0
+EM0CLKE
+Text GLabel 15600 7300 2    50   Input ~ 0
+EM1CLKE
+Text Notes 750  2150 0    118  ~ 0
+BANK0 = First 64MB\nBANK1 = Second 64MB
 Wire Bus Line
 	1350 1100 7100 1100
 Wire Bus Line
@@ -1987,12 +1995,4 @@ Wire Bus Line
 	9400 900  9400 7600
 Wire Bus Line
 	5400 1000 5400 7600
-Text Notes 10850 5500 0    118  ~ 0
-JN Notes: put row address on the EMA bus \nand signal RAS. This is 68030 addresses A14:2. \nPut column address on the EMA bus and signal \nCAS. These are 68030 addresses A24:15.
-Text GLabel 1300 4300 0    50   Input ~ 0
-EM0CLKE
-Text GLabel 15600 7300 2    50   Input ~ 0
-EM1CLKE
-Text Notes 750  2150 0    118  ~ 0
-BANK0 = First 64MB\nBANK1 = Second 64MB
 $EndSCHEMATC

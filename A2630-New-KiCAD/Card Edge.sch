@@ -384,8 +384,6 @@ Wire Wire Line
 Connection ~ 2700 3275
 Wire Wire Line
 	2525 3475 3025 3475
-Wire Wire Line
-	3025 3475 3025 1175
 $Comp
 L power:GND #PWR0128
 U 1 1 61EE0159
@@ -419,8 +417,6 @@ Wire Wire Line
 	3575 7650 3575 7575
 Wire Wire Line
 	3575 7575 925  7575
-Text Notes 2625 1175 0    157  ~ 0
-PAL HERE
 $Comp
 L N2630:74FCT646 U701
 U 1 1 61F7549C
@@ -696,7 +692,7 @@ Entry Wire Line
 Wire Bus Line
 	6250 10225 975  10225
 Text GLabel 975  10225 0    51   BiDi ~ 0
-D(31:0)
+D[31..0]
 Entry Wire Line
 	6250 2575 6350 2475
 Wire Wire Line
@@ -1137,8 +1133,6 @@ Entry Wire Line
 	12125 2525 12225 2425
 Wire Bus Line
 	15925 975  12225 975 
-Entry Wire Line
-	12225 5500 12125 5600
 Wire Wire Line
 	12125 5600 11775 5600
 Wire Wire Line
@@ -1202,22 +1196,18 @@ Entry Wire Line
 Entry Wire Line
 	12125 3975 12225 3875
 Text GLabel 15925 975  2    51   BiDi ~ 0
-A(31:0)
-Text Label 12125 5600 2    51   ~ 0
-A0
-Text Label 12125 5500 2    51   ~ 0
-A1
-Text Label 12125 5400 2    51   ~ 0
-A2
-Text Label 12100 5200 2    51   ~ 0
-A3
-Text Label 12100 5300 2    51   ~ 0
-A4
-Text Label 12125 5100 2    51   ~ 0
-A5
-Text Label 12125 5000 2    51   ~ 0
-A6
+A[31..0]
 Text Label 12125 4900 2    51   ~ 0
+A2
+Text Label 12125 5200 2    51   ~ 0
+A3
+Text Label 12125 5300 2    51   ~ 0
+A4
+Text Label 12125 5500 2    51   ~ 0
+A5
+Text Label 12125 5400 2    51   ~ 0
+A6
+Text Label 12125 5100 2    51   ~ 0
 A7
 Text Label 12125 4075 2    51   ~ 0
 A8
@@ -1231,9 +1221,9 @@ Text Label 12125 3675 2    51   ~ 0
 A12
 Text Label 12125 3575 2    51   ~ 0
 A13
-Text Label 12125 3475 2    51   ~ 0
-A14
 Text Label 12125 3375 2    51   ~ 0
+A14
+Text Label 12125 3475 2    51   ~ 0
 A15
 Text Label 12125 2525 2    51   ~ 0
 A16
@@ -1247,9 +1237,9 @@ Text Label 12125 2125 2    51   ~ 0
 A20
 Text Label 12125 2025 2    51   ~ 0
 A21
-Text Label 12125 1925 2    51   ~ 0
-A22
 Text Label 12125 1825 2    51   ~ 0
+A22
+Text Label 12125 1925 2    51   ~ 0
 A23
 $Comp
 L N2630:74HCT245 U705
@@ -1314,8 +1304,6 @@ Entry Wire Line
 	10450 5400 10350 5300
 Entry Wire Line
 	10450 5500 10350 5400
-Entry Wire Line
-	10450 5600 10350 5500
 Wire Bus Line
 	10350 1300 5300 1300
 Entry Wire Line
@@ -1382,21 +1370,19 @@ Entry Wire Line
 	10450 2325 10350 2225
 Entry Wire Line
 	10450 2425 10350 2325
-Text Label 10450 5600 0    51   ~ 0
-AA0
-Text Label 10450 5500 0    51   ~ 0
+Text Label 10450 5000 0    51   ~ 0
 AA1
-Text Label 10450 5400 0    51   ~ 0
+Text Label 10450 4900 0    51   ~ 0
 AA2
 Text Label 10450 5200 0    51   ~ 0
 AA3
 Text Label 10450 5300 0    51   ~ 0
 AA4
-Text Label 10450 5100 0    51   ~ 0
+Text Label 10450 5500 0    51   ~ 0
 AA5
-Text Label 10450 5000 0    51   ~ 0
+Text Label 10450 5400 0    51   ~ 0
 AA6
-Text Label 10450 4900 0    51   ~ 0
+Text Label 10450 5100 0    51   ~ 0
 AA7
 Text Label 10450 4075 0    51   ~ 0
 AA8
@@ -1410,9 +1396,9 @@ Text Label 10450 3675 0    51   ~ 0
 AA12
 Text Label 10450 3575 0    51   ~ 0
 AA13
-Text Label 10450 3475 0    51   ~ 0
-AA14
 Text Label 10450 3375 0    51   ~ 0
+AA14
+Text Label 10450 3475 0    51   ~ 0
 AA15
 Text Label 10450 2525 0    51   ~ 0
 AA16
@@ -1426,9 +1412,9 @@ Text Label 10450 2125 0    51   ~ 0
 AA20
 Text Label 10450 2025 0    51   ~ 0
 AA21
-Text Label 10450 1925 0    51   ~ 0
-AA22
 Text Label 10450 1825 0    51   ~ 0
+AA22
+Text Label 10450 1925 0    51   ~ 0
 AA23
 Wire Wire Line
 	4025 8100 5200 8100
@@ -2051,6 +2037,12 @@ F 3 "" H 14050 2425 50  0001 C CNN
 $EndComp
 Text Notes 13675 4300 0    51   ~ 0
 Not all these jumpers will make it to the final version.\nJ301 - 2MEG Shorted/4MEG Open\nJ302 - A2000 Shorted/B2000 Open\nJ303 - Do not configure RAM Shorted/Autoconfigure RAM Open\nJ404 - AMIX Shorted/AmigaOS Open
+NoConn ~ 10450 5600
+Text Label 12125 5000 2    51   ~ 0
+A1
+NoConn ~ 12125 5600
+Text Notes 12400 5600 0    50   ~ 0
+There is no A0 on the 68000 (Amiga 2000)\nThus, it is not connected here.
 Wire Bus Line
 	1250 3825 1250 4075
 Wire Bus Line
@@ -2058,11 +2050,13 @@ Wire Bus Line
 Wire Bus Line
 	4650 8400 4650 10025
 Wire Bus Line
-	12225 975  12225 5500
+	12225 975  12225 5400
 Wire Bus Line
-	10350 1300 10350 5500
+	10350 1300 10350 5400
 Wire Bus Line
 	6250 2575 6250 10225
 Wire Bus Line
 	8100 2575 8100 10025
+Text Label 3025 3475 2    50   ~ 0
+CLK7M
 $EndSCHEMATC

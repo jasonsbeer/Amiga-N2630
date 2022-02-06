@@ -238,7 +238,7 @@ $EndComp
 Wire Bus Line
 	2700 8150 1000 8150
 Text GLabel 1000 8150 0    50   Input ~ 0
-A(31:0)
+A[31..0]
 Text Label 2800 4950 0    50   ~ 0
 A2
 Text Label 2800 5050 0    50   ~ 0
@@ -1799,7 +1799,7 @@ Wire Wire Line
 	4470 8350 1000 8350
 Connection ~ 4470 7700
 Text GLabel 1000 8350 0    51   Input ~ 0
-AL
+_AS
 Text Notes 12210 2570 0    118  ~ 0
 BANK0 = First 2 megabytes\nBANK1 = Second 2 megabytes
 Wire Bus Line

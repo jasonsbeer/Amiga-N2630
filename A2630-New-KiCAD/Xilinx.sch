@@ -800,7 +800,7 @@ Entry Wire Line
 Entry Wire Line
 	10610 3475 10510 3375
 Text GLabel 15185 1425 2    50   Input ~ 0
-A(31..0)
+A[31..0]
 Text Label 13410 3475 2    50   ~ 0
 A31
 Text Label 13410 3575 2    50   ~ 0
