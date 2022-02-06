@@ -43,10 +43,10 @@ entity N2630_Main is
 			  _RESET : in STD_LOGIC;
 			  _HALT : in STD_LOGIC;
 			  B2000 : in STD_LOGIC;
-			  _ABGACK : in STD_LOGIC;
-			  S_7MDIS : in STD_LOGIC;
+			  _ABGACK : in STD_LOGIC;			  
 			  _S7MDIS : in STD_LOGIC;
-			  _ASEN : in STD_LOGIC;			   
+			  _ASEN : in STD_LOGIC;
+			  _VPA : in STD_LOGIC;			  
 			  
 			  D : inout STD_LOGIC_VECTOR (20 downto 16);
 			  _DTACK : inout STD_LOGIC;			  
@@ -54,7 +54,9 @@ entity N2630_Main is
 			  _ABR : inout STD_LOGIC;
 			  _BGACK : inout STD_LOGIC:='Z';
 			  
-			  --_AAS : out STD_LOGIC;
+			  _AAS : out STD_LOGIC;
+			  TRISTATE : out STD_LOGIC:='0';
+			  _ASDELAY : out STD_LOGIC:='1';
 			  _BOSS : out STD_LOGIC:='1';
 			  _CSROM : out  STD_LOGIC:='1';
 			  _UUBE : out STD_LOGIC:='1';
@@ -73,8 +75,9 @@ entity N2630_Main is
 			  _CSROM : out STD_LOGIC:='1';
 			  CLK7M : out STD_LOGIC:='0';
 			  SCLK : out STD_LOGIC:='0';
-			  S7MDIS_DFF : out STD_LOGIC:='0'
-			  
+			  _S7MDIS_DFF : out STD_LOGIC:='1';
+			  DSACKEN : out STD_LOGIC:='1'; --The FF code wants the output inverted, so we are starting in the active state
+			  IVMA : out STD_LOGIC:='1' --The FF code wants the output inverted, so we are starting in the active state
 			  
 			  );		
 			  
@@ -97,6 +100,10 @@ architecture Behavioral of N2630_Main is
 	SIGNAL _REGRESET : STD_LOGIC:='Z'; --FOR U303 flip flop
 	
 	SIGNAL _EXTERN : STD_LOGIC:='1'; --Pull low when daughter OR FPU is being accessed
+	SIGNAL cycend : STD_LOGIC:='0';
+	SIGNAL _dsen : STD_LOGIC:='1';
+	SIGNAL _edtack : STD_LOGIC:='0'; --The FF code wants the output inverted, so we are starting in the active state
+	SIGNAL s_7mdis : STD_LOGIC; 
 	
 	SIGNAL _CLK7M : STD_LOGIC:='0'; --Inverted 7MHz clock, for consistency for now
 	--SIGNAL CLK7M, SCLK : STD_LOGIC:='0'; --7MHz clock	
@@ -139,7 +146,7 @@ begin
 
 	SCLK <= '1'
 		WHEN
-			( CDAC = '1' AND CLK14M = '1' AND CLK7M = '0' AND S_7MDIS = '1' )
+			( CDAC = '1' AND CLK14M = '1' AND CLK7M = '0' AND s_7mdis = '1' )
 			--CDAC & P14M & !N7M & SN7MDIS
 		OR
 			( CDAC = '0' AND CLK14M = '1' AND CLK7M = '1' AND _S7MDIS = '1' )
@@ -149,38 +156,194 @@ begin
 			
 	-- END CLOCKS --
 	
+	-- Delay Lines --
+	
+	--TRANSPORT is the keyword for mimicing a delay line
+	--The delay lines on the A2630 are 100ns per tap...part A447-0100-02
+	_ASDELAY <= transport _AS after 100 ns;
+	
+	
+	--TRISTATE is an output used to tristate all signals that go to the 68000
+	--bus. This is done on powerup before BOSS is asserted and whenever a DMA
+	--device has control of the A2000 Bus.  We want tristate when we're not 
+	--BOSS, or when we are BOSS but we're being DMAed. U305
+	
+	TRISTATE <= '1'
+		WHEN
+			( _BOSS = '1' )
+			--!BOSS
+		OR
+			( _BOSS = '0' AND _BGACK = '0' )
+			--BOSS & BGACK
+		ELSE
+			'1';	
+			
+	--Initially, the logic here enabled IVMA during (!A3 & A2 & !A1 & A0 & VPA).
+	--This is the proper time to have VMA come out, just about when the 68000 
+	--would bring it out, actually slightly sooner since this PAL releases it on
+	--the wrong 7M edge.  The main problem with this scheme is that if VPA falls 
+	--in the case that's just prior to that enabling term (what I call CASE 3 
+	--in my timing), the I/O cycle should be held off until the next E cycle.
+	--The 68000 does this, but the above IVMA would run that cycle right away.
+	--The fix to this used here moves the IVMA equation up by one clock cycle,
+	--assuring that a CASE 3 VPA will be delayed.  This adds a potential problem
+	--in that IVMA would is asserted sooner than a 68000 would assert it.  We
+	--know this is no problem for 8520 devices, and /VPA driven devices aren't
+	--supported under autoconfig, so we should be OK here.
+	--
+	--VMA = valid memory address
+	--VPA = valid peripheral address
+  
+	--IVMA
+	--U506 FF, clocked by A7M
+	PROCESS ( A7M ) BEGIN
+		IF (RISING_EDGE (A7M)) THEN
+			IVMA <= '0'
+			--!IVMA.D
+			WHEN
+				( A(3 downto 0) = "0000" AND _VPA = '0' )
+				--!A3 & !A2 & !A1 & !A0 & VPA
+			OR
+				( IVMA = '0' AND A(3) = '0' )
+				--!IVMA & !A3
+			ELSE
+				'1';
+		END IF;
+	END PROCESS;
+
+	--EDTACK
+	--This was "!A3 & A2 & A1 & !A0 & !IVMA", but I think that may make
+	--the cycle end too early.  So I'm pushing it up by one clock.
+	--U506 DFF clocked by A7M
+
+	PROCESS ( A7M ) BEGIN
+		IF (RISING_EDGE (A7M)) THEN			
+			_edtack <= 1
+			WHEN
+				A ( 3 downto 0) = "0111" AND IVMA = '0'
+				--!EDTACK.D	= !A3 & A2 & A1 & A0 & !IVMA
+			ELSE
+				'0';
+		END IF;
+	END PROCESS;		
+			
+	--This creates the DSACK go-ahead for all slow, 16 bit cycles.  These are,
+	--in order, A2000 DTACK, 68xx/65xx emulation DTACK, and ROM or config
+	--register access.
+	--U505 DFF, clocked by SCLK
+	
+	PROCESS ( SCLK ) BEGIN
+		IF ( RISING_EDGE(SCLK)) THEN
+			DSACKEN <= '0'
+			WHEN
+				( _dsen = '1' AND cycend = '1' AND EXTERN = '0' AND _DTACK = '0' )
+				--!DSACKEN.D = !DSEN & CYCEND & !EXTERN &   DTACK
+			OR
+				( _dsen = '1' AND cycend = '1' AND EXTERN = '0' and _edtack ='0' )
+				--!DSACKEN.D = !DSEN & CYCEND & !EXTERN &  EDTACK
+			OR
+				( _dsen = '1' AND cycend = '1' AND EXTERN = '0' AND _ONBOARD = '0' )
+				--!DSACKEN.D = !DSEN & CYCEND & !EXTERN & ONBOARD
+			ELSE
+				'1';
+		END IF;
+	END PROCESS;
+				
+	--CYCEND				
+	--This one marks the end of a slow cycle 
+	--U505 DFF clocked by SCLK
+	PROCESS ( SCLK ) BEGIN
+		IF (RISING_EDGE(SCLK)) THEN
+			cycend <= '1'
+			WHEN
+				_DSACKEN = '1' AND cycend =  '0'
+				--!CYCEND.D = !DSACKEN & CYCEND
+				--the output is inverted so we look for !cycend here
+			ELSE
+				'0';
+		END IF;
+	END PROCESS;
+	
+	
+	--_AAS
+	--68000 style address strobe. Again, this only becomes active when the
+	--TRISTATE signal is negated and the memory cycle is for an offboard
+	--resource. Meaning, we want to talk to something on the A2000. U501
+	
+	PROCESS ( _ASEN ) BEGIN
+		IF 
+			( TRISTATE = '0' AND (_ONBOARD = '1' OR ( TWOMEG = '0' AND FOURMEG = '0' ) OR _EXTERN = '1' ))
+			--offboard = !(ONBOARD # MEMSEL # EXTERN)
+			--.OE = !TRISTATE & offboard
+			--This checks to see if we are not in tristate and not addressing a resource on the A2630
+			THEN		
+				IF
+					( _ASEN = '0' AND cycend = '0' AND _EXTERN = '1' )
+					--ASEN & !CYCEND & !EXTERN
+					THEN
+						_AAS <= '0';	
+					ELSE
+						_AAS <= '1';
+				END IF;
+			ELSE
+				_AAS <= 'Z';				
+		END IF;
+	END PROCESS;
+	
+	--MEMLOCK is used to lock out the 68000 state machine during a fast 
+	--system cycle, which is basically either an on-board memory cycle
+	--or an EXTERN cycle.  Additionally, the 68000 state machine uses
+	--this same mechanism to end it's own cycle, so CYCEND also gets
+	--included. U305
+
+	_MEMLOCK <= '0' 
+		WHEN
+			( AUTOCONFIG_DONE = '1' AND ( TWOMEG = '1' OR FOURMEG = '1' ))
+			--access & CONFIGED
+		OR
+			( _AS = '1' )
+			--!AS
+		OR
+			( _EXTERN = '0' )
+			--EXTERN
+		OR
+			( cycend = '1' )
+			--CYCEND
+		ELSE
+			'1';			
+	
 	--Here's the EXTERN logic.  The EXTERN signal is used to qualify unusual
 	--memory accesses.  There are two kinds, CPU space and daughterboard
 	--space.  CPU space is given by the function codes.  Daughterboard space
 	--is defined to be a processor access with EXTSEL asserted.  DMA devices 
 	--can't get to daughterboard space.
 
-	EXTERN <= '1'
+	_EXTERN <= '0'
 		WHEN
 			( FC(2 downto 0) = x"7" AND _BGACK = '1' )
 			--cpuspace & !BGACK
 		--OR
 			--EXTSEL & !BGACK
-			--ESXTSEL comes from the daughter card!
+			--EXTSEL comes from the daughter card!
 		ELSE
-			'0';
+			'1';
 			
-	--This one marks the end of a slow cycle U505 clocked by SCLK
-
-	!CYCEND.D	= !DSACKEN & CYCEND;
-			
+	--_DSEN
 	--Here we enable data strobe to the A2000.  Are we properly considering
-	--the R/W line here?  EXTERN qualification included here too. U505
-	!DSEN.D		= ASEN & !EXTERN & CYCEND;
+	--the R/W line here?  EXTERN qualification included here too. 
+	--U505 Clocked by SCLK
+	PROCESS ( SCLK ) BEGIN
+		IF (RISING_EDGE(SCLK)) THEN
+			_dsen <= '0'
+			WHEN
+				_ASEN = '0' AND _EXTERN = '1' AND cycend = '1'
+				--ASEN & !EXTERN & CYCEND
+			ELSE
+				'1';
+		END IF;
+	END PROCESS;
 	
-	--This creates the DSACK go-ahead for all slow, 16 bit cycles.  These are,
-	--in order, A2000 DTACK, 68xx/65xx emulation DTACK, and ROM or config
-	--register access. U505
-
-	!DSACKEN.D	= !DSEN & CYCEND & !EXTERN &   DTACK
-		# !DSEN & CYCEND & !EXTERN &  EDTACK
-		# !DSEN & CYCEND & !EXTERN & ONBOARD;
-			
+	--_S7MDIS_DFF
 	--This one disables the rising edge clock.  It's latched externally.
 	--I qualify with EXTERN as well, to help make sure this state machine
 	--doesn't get started for special cycles.  Since ASEN isn't qualified
@@ -188,15 +351,31 @@ begin
 	--qualified with EXTERN too.
 	--ORIGINAL PAL U505, FLIP FLOP, CLOCKED BY SCLK, NO RESET. This is the D input of U503
 
-	S7MDIS_DFF	= !DSEN & ASEN & !EXTERN & DSACKEN;
+	PROCESS ( SCLK ) BEGIN
+		IF (RISING_EDGE (SCLK)) THEN
+			_S7MDIS_DFF <= '0'
+			WHEN
+				( _dsen = '1' AND _ASEN = '0' AND EXTERN = '0' AND DSACKEN = '1' )
+				--_S7MDIS_DFF	= !DSEN & ASEN & !EXTERN & DSACKEN;
+			ELSE
+				'1';
+		END IF;
+	END PROCESS;
 	
-	
-	
-
-
-
-		
-	
+	--This one disables the falling edge clock.  This is similarly qualified
+	--with EXTERN.
+	--ORIGINAL PAL U505, FLIP FLOP, CLOCKED BY SCLK, NO RESET.
+	PROCESS ( SCLK ) BEGIN
+		IF (RISING_EDGE (SCLK)) THEN
+			s_7mdis <= '0'
+			WHEN
+				_ASEN = '0' AND EXTERN = '0' AND cycend = '1'
+				--S_7MDIS.D = ASEN & !EXTERN & CYCEND;
+			ELSE
+				'1';
+		END IF;
+	END PROCESS;
+				
 
 	--ROMCLK U301 PAL
 	--THIS IS USED TO CLOCK THE U303 D FLIP FLOP
@@ -261,11 +440,13 @@ begin
 
 	PROCESS (_7MCLK) BEGIN
 		IF (RISING_EDGE(_7MCLK)) THEN 
-			_REGRESET <= NOT _REGRESET			
-				WHEN
-					( JMODE = '0' AND _HALT = '0' AND _RESET = '0' )
-				OR
-					( JMODE = '1' AND _RESET = '0' );
+			_REGRESET <= '0'		
+			WHEN
+				( JMODE = '0' AND _HALT = '0' AND _RESET = '0' )
+			OR
+				( JMODE = '1' AND _RESET = '0' )
+			ELSE
+				'1';
 		END IF;
 	END PROCESS;
 			
@@ -342,7 +523,7 @@ begin
 	--activated.
 	--ORIGINAL PAL U504
 	
-	--not a flip flot
+	--not a flip flop
 	BOSS:PROCESS(_RESET, CLK) BEGIN
 	
 		IF _BOSS = '1' THEN		
@@ -669,6 +850,7 @@ begin
 	
 	--ARE WE TRYING TO ACCESS SOMETHING ON THE A2630?	
 	--LOOKS TO BE ONLY AT STARTUP AS THIS ONLY CONSIDERS ROM ACCESS OR AUTOCONFIG
+	--ALSO USED WHEN THE A2630 WANTS TO TALK TO SOMETHING ON THE A2000
 	_ONBOARD <= '0'
 		WHEN
 			( HIROM = '1' AND PHANTOMHI = '0' AND R_W = '0' AND _AS ='0' )
