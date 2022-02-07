@@ -1,0 +1,690 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT: This is an internal file that has been generated
+     by the Xilinx ISE software.  Any direct editing or
+     changes made to this file may result in unpredictable
+     behavior or data corruption.  It is strongly advised that
+     users do not edit the contents of this file. -->
+<messages>
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">38</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">39</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">42</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">43</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">44</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">46</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">47</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">48</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">49</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">52</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">53</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">54</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">55</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">57</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">59</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">60</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">61</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">62</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">63</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">64</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">65</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">66</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">67</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">68</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">69</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">70</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">71</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1202" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">71</arg>. Redeclaration of symbol <arg fmt="%s" index="3">DTACK</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">73</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">74</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">75</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1202" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">75</arg>. Redeclaration of symbol <arg fmt="%s" index="3">CSROM</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">78</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3010" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">86</arg>. Entity <arg fmt="%s" index="3">N2630_Main</arg> does not exist.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">88</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">STD_LOGIC</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">88</arg>. <arg fmt="%s" index="3">STD_LOGIC</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">89</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">STD_LOGIC_VECTOR</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">89</arg>. <arg fmt="%s" index="3">STD_LOGIC_VECTOR</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">96</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">100</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">102</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">104</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">105</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">108</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">128</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">BASIS7M</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">130</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">133</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">133</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">C3</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">138</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">CLK7M</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">138</arg>. <arg fmt="%s" index="3">BASIS7M</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">139</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">139</arg>. <arg fmt="%s" index="3">CLK7M</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">140</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">CLK14M</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">140</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">CDAC</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">140</arg>. <arg fmt="%s" index="3">CDAC</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">147</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">SCLK</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">149</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">149</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">149</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">149</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">152</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">152</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">152</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">152</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">152</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">163</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">163</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">ASDELAY</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">163</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3313" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">163</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">AS</arg>&apos;.  Should it be: <arg fmt="%s" index="4">uS, pS, nS, mS, iS, fS or bS</arg>?
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">163</arg>. <arg fmt="%s" index="3">AS</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">171</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">TRISTATE</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">173</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">173</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">176</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">176</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">176</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">176</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">199</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">A7M</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">199</arg>. <arg fmt="%s" index="3">A7M</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">201</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">IVMA</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="164" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">203</arg>. <arg fmt="%s" index="3">parse error, unexpected WHEN, expecting SEMICOLON</arg>
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">204</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="warning" file="HDLParsers" num="1406" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">199</arg>. No sensitivity list and no wait in the process
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">219</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">A7M</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">219</arg>. <arg fmt="%s" index="3">A7M</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">221</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">221</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">edtack</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="164" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">222</arg>. <arg fmt="%s" index="3">parse error, unexpected WHEN, expecting SEMICOLON</arg>
+</msg>
+
+<msg type="warning" file="HDLParsers" num="1406" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">219</arg>. No sensitivity list and no wait in the process
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">235</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">SCLK</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">235</arg>. <arg fmt="%s" index="3">SCLK</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">237</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">DSACKEN</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="164" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">238</arg>. <arg fmt="%s" index="3">parse error, unexpected WHEN, expecting SEMICOLON</arg>
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">239</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">239</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">242</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">242</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">245</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">245</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="warning" file="HDLParsers" num="1406" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">235</arg>. No sensitivity list and no wait in the process
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">255</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">SCLK</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">255</arg>. <arg fmt="%s" index="3">SCLK</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">257</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">cycend</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="164" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">258</arg>. <arg fmt="%s" index="3">parse error, unexpected WHEN, expecting SEMICOLON</arg>
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">259</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="warning" file="HDLParsers" num="1406" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">255</arg>. No sensitivity list and no wait in the process
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">273</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">273</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">ASEN</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">273</arg>. <arg fmt="%s" index="3">ASEN</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">275</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">275</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">275</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">275</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">275</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">275</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">275</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">281</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">281</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">281</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">281</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">281</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">284</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3313" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">284</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">AAS</arg>&apos;.  Should it be: <arg fmt="%s" index="4">AbS</arg>?
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">286</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">286</arg>. <arg fmt="%s" index="3">AAS</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">289</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="warning" file="HDLParsers" num="1406" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">273</arg>. No sensitivity list and no wait in the process
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">299</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">299</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">MEMLOCK</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">301</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">301</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">301</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">304</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">304</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">307</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">307</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">310</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">321</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">321</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">EXTERN</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">323</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">323</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">323</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">335</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">SCLK</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">335</arg>. <arg fmt="%s" index="3">SCLK</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">337</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">337</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">dsen</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="164" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">338</arg>. <arg fmt="%s" index="3">parse error, unexpected WHEN, expecting SEMICOLON</arg>
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">339</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">339</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="warning" file="HDLParsers" num="1406" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">335</arg>. No sensitivity list and no wait in the process
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">354</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">SCLK</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">354</arg>. <arg fmt="%s" index="3">SCLK</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">356</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">356</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">S7MDIS_DFF</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="164" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">357</arg>. <arg fmt="%s" index="3">parse error, unexpected WHEN, expecting SEMICOLON</arg>
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">358</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">358</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="warning" file="HDLParsers" num="1406" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">354</arg>. No sensitivity list and no wait in the process
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">368</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">SCLK</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">368</arg>. <arg fmt="%s" index="3">SCLK</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">370</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">s_7mdis</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="164" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">371</arg>. <arg fmt="%s" index="3">parse error, unexpected WHEN, expecting SEMICOLON</arg>
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">372</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="warning" file="HDLParsers" num="1406" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">368</arg>. No sensitivity list and no wait in the process
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">382</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">ROMCLK</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">384</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">384</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">384</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">384</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">384</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">384</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">386</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">386</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">386</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">393</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">RAMCLK</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">395</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">395</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">395</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">395</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">395</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">395</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">398</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">398</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="808" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">398</arg>. <arg fmt="%s" index="3">=</arg> can not have such operands in this context.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">407</arg>. <arg fmt="%s" index="3">ROMCLK</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">407</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">407</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">REGRESET</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">407</arg>. <arg fmt="%s" index="3">REGRESET</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">408</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">409</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">PHANTOMLO</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">410</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">PHANTOMHI</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">411</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">ROMCONF</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">412</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">RSTENB</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">413</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">JMODE</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">414</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">MODE68K</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">415</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">RISING_EDGE</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">415</arg>. <arg fmt="%s" index="3">RISING_EDGE</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">416</arg>. <arg fmt="%s" index="3">PHANTOMLO</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">416</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">D</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">416</arg>. <arg fmt="%s" index="3">D</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">417</arg>. <arg fmt="%s" index="3">PHANTOMHI</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">418</arg>. <arg fmt="%s" index="3">ROMCONF</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">419</arg>. <arg fmt="%s" index="3">RSTENB</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">420</arg>. <arg fmt="%s" index="3">JMODE</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">421</arg>. <arg fmt="%s" index="3">MODE68K</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="warning" file="HDLParsers" num="1406" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">407</arg>. No sensitivity list and no wait in the process
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">426</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">RAMCLK</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">426</arg>. <arg fmt="%s" index="3">RAMCLK</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">426</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">426</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">CPURESET</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">426</arg>. <arg fmt="%s" index="3">CPURESET</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">427</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">428</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">RAMCONF</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">429</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">RISING_EDGE</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">429</arg>. <arg fmt="%s" index="3">RISING_EDGE</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">430</arg>. <arg fmt="%s" index="3">RAMCONF</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="error" file="HDLParsers" num="3312" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">430</arg>. Undefined symbol &apos;<arg fmt="%s" index="3">ROMCONF</arg>&apos;.
+</msg>
+
+<msg type="error" file="HDLParsers" num="1209" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">430</arg>. <arg fmt="%s" index="3">ROMCONF</arg>: Undefined symbol (last report in this block)
+</msg>
+
+<msg type="warning" file="HDLParsers" num="1406" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">426</arg>. No sensitivity list and no wait in the process
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">441</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="164" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">441</arg>. <arg fmt="%s" index="3">parse error, unexpected INTEGER_LITERAL, expecting IDENTIFIER or STRING_LITERAL</arg>
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">442</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">443</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">445</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">445</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="error" file="HDLParsers" num="163" delta="new" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd</arg>&quot; Line <arg fmt="%d" index="2">447</arg>. Unexpected symbol read: <arg fmt="%s" index="3">_</arg>.
+</msg>
+
+<msg type="warning" file="HDLParsers" num="3481" delta="new" >Library <arg fmt="%s" index="1">work</arg> has no units. Did not save reference file &quot;<arg fmt="%s" index="2">xst/work/hdllib.ref</arg>&quot; for it.
+</msg>
+
+</messages>
+
