@@ -5,14 +5,14 @@ Parameter TMPDIR set to /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/x
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.04 secs
+Total CPU time to Xst completion: 0.02 secs
  
 --> 
 Parameter xsthdpdir set to /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/xst
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.04 secs
+Total CPU time to Xst completion: 0.02 secs
  
 --> 
 WARNING:Xst:3164 - Option "-debug" found multiple times in the command line. Only the first occurence is considered.
@@ -22,62 +22,18 @@ WARNING:Xst:3164 - Option "-debug" found multiple times in the command line. Onl
 =========================================================================
 Compiling vhdl file "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" in Library work.
 Entity <n2630_main> compiled.
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 484. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 510. Undefined symbol 'ABR'.
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 511. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 528. Undefined symbol 'BOSS'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 528. BOSS: Undefined symbol (last report in this block)
-ERROR:HDLParsers:1401 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 545. Object nSTERM of mode OUT can not be read.
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 572. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 628. 31 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 628. 28 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 631. 31 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 631. 28 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 634. 31 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 634. 28 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 637. 31 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 637. 28 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 640. 31 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 640. 28 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 652. 31 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 652. 28 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 661. 31 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 661. 28 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 669. 31 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 669. 28 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 678. 31 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3367 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 678. 28 is not included in the index range, 20 downto 16, of array D.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 698. Undefined symbol 'A'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 698. A: Undefined symbol (last report in this block)
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 738. Undefined symbol 'A'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 738. A: Undefined symbol (last report in this block)
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 775. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 782. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 791. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 801. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 812. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 817. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 822. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 827. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 836. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 898. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 912. Unexpected symbol read: _.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 912. Undefined symbol 'ADOEH'.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 914. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 924. Unexpected symbol read: _.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 924. Undefined symbol 'ADOEL'.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 926. = can not have such operands in this context.
+Entity <N2630_Main> (Architecture <Behavioral>) compiled.
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.06 secs
+Total CPU time to Xst completion: 0.04 secs
  
 --> 
 
 
-Total memory usage is 470396 kilobytes
+Total memory usage is 470636 kilobytes
 
-Number of errors   :   45 (   0 filtered)
+Number of errors   :    0 (   0 filtered)
 Number of warnings :    1 (   0 filtered)
 Number of infos    :    0 (   0 filtered)
 

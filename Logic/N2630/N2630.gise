@@ -53,11 +53,11 @@
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="InputChanged"/>
       <status xil_pn:value="OutputChanged"/>
+      <status xil_pn:value="OutputRemoved"/>
       <outfile xil_pn:name="N2630_Main.lso"/>
       <outfile xil_pn:name="N2630_Main.prj"/>
       <outfile xil_pn:name="N2630_Main.syr"/>
       <outfile xil_pn:name="N2630_Main.xst"/>
-      <outfile xil_pn:name="N2630_Main_vhdl.prj"/>
       <outfile xil_pn:name="N2630_Main_xst.xrpt"/>
       <outfile xil_pn:name="_xmsgs/xst.xmsgs"/>
       <outfile xil_pn:name="webtalk_pn.xml"/>

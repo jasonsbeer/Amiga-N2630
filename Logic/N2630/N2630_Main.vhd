@@ -51,13 +51,14 @@ entity N2630_Main is
 			  nCPURESET : in STD_LOGIC;
 			  
 			  D : inout STD_LOGIC_VECTOR (20 downto 16);
+			  DAC : inout STD_LOGIC_VECTOR (31 downto 28);
 			  nDTACK : inout STD_LOGIC;			  
 			  nABG : inout STD_LOGIC;
 			  nABR : inout STD_LOGIC;
 			  nBGACK : inout STD_LOGIC:='Z';
 			  RAMCONF : inout STD_LOGIC;
 			  
-			  nAAS : out STD_LOGIC;
+			  nAAS : inout STD_LOGIC:='1'; --Amiga (2000) Address Strobe
 			  TRISTATE : inout STD_LOGIC:='0';
 			  nASDELAY : out STD_LOGIC:='1';
 			  nBOSS : inout STD_LOGIC:='1';
@@ -70,7 +71,7 @@ entity N2630_Main is
 			  nOE1 : out STD_LOGIC:='1';
 			  nWE0 : out STD_LOGIC:='1';
 			  nWE1 : out STD_LOGIC:='1';
-			  nSTERM : out STD_LOGIC:='1';
+			  nSTERM : inout STD_LOGIC:='1';
 			  ADDIR : out STD_LOGIC:='1';
 			  nADDEH : out STD_LOGIC:='1';
 			  nADDEL : out STD_LOGIC:='1';
@@ -79,7 +80,9 @@ entity N2630_Main is
 			  nS7MDIS_DFF : out STD_LOGIC:='1';
 			  nDSACKEN : inout STD_LOGIC:='1'; --The FF code wants the output inverted, so we are starting in the active state
 			  IVMA : inout STD_LOGIC:='1'; --The FF code wants the output inverted, so we are starting in the active state
-			  nMEMLOCK : out STD_LOGIC:='1' --MEMLOCK is used in the state machine
+			  nMEMLOCK : out STD_LOGIC:='1'; --MEMLOCK is used in the state machine
+			  nADOEH : out STD_LOGIC:='1'; --Amiga Data Out Enable High
+			  nADOEL : out STD_LOGIC:='1' --Amiga Data Out Enable Low
 			  
 			  );		
 			  
@@ -480,13 +483,18 @@ begin
 
 	PROCESS (n_clk7m) BEGIN
 		IF (RISING_EDGE(n_clk7m)) THEN 
-			n_regreset <= '0'		
-			WHEN
-				( JMODE = '0' AND nHALT = '0' AND nRESET = '0' )
-			OR
-				( JMODE = '1' AND nRESET = '0' )
+			IF (( JMODE = '0' AND nHALT = '0' AND nRESET = '0') OR ( JMODE = '1' AND nRESET = '0' )) THEN
+				n_regreset <= '0'	;
 			ELSE
-				'1';
+				n_regreset <= '1'	;
+			END IF;
+--			n_regreset <= '0'		
+--			WHEN
+--				( JMODE = '0' AND nHALT = '0' AND nRESET = '0' )
+--			OR
+--				( JMODE = '1' AND nRESET = '0' )
+--			ELSE
+--				'1';
 		END IF;
 	END PROCESS;
 			
@@ -506,16 +514,16 @@ begin
 		IF ( MODE68K = '1' OR nBOSS = '0' ) THEN		
 			nABR <= '1'; 
 			
-		ELSIF ( nRESET = '1' AND nBOSS = '1' ) THEN		
-			ABR <= '0'
-				WHEN
-					( RISING_EDGE(CLK) AND nAS = '1' AND MODE68K = '0' )
-					--I'm using nAS in place of nAAS...which is basically a delayed address strobe
-					--I'm trying to make my own delay by waiting for the next rising clock edge
-					--nAS asserts on the falling edge, so this waits until the clock's rising edge,
-					--essentially delaying it after nAS unasserts
-				OR
-					( nABR = '1' AND MODE68K = '0' );
+		ELSIF ( nRESET = '1' AND nBOSS = '1' ) THEN	
+			IF (( RISING_EDGE(CLK) AND nAAS = '1' AND MODE68K = '0' )OR	( nABR = '1' AND MODE68K = '0' )) THEN
+				nABR <= '0';
+			END IF;
+		
+--			nABR <= '0'
+--				WHEN
+--					( RISING_EDGE(CLK) AND nAAS = '1' AND MODE68K = '0' )
+--				OR
+--					( nABR = '1' AND MODE68K = '0' );
 		END IF;
 		
 	END PROCESS REQUESTBUS;
@@ -525,7 +533,7 @@ begin
 	--Original PAL U501
 	
 	PROCESS(nRESET, CLK) BEGIN
-		IF BOSS = '1' THEN
+		IF nBOSS = '1' THEN
 			nBGACK <= 'Z';
 		ELSE
 			nBGACK <= nABGACK;
@@ -566,25 +574,33 @@ begin
 	--not a flip flop
 	BOSS:PROCESS(nRESET, CLK) BEGIN
 	
-		IF nBOSS = '1' THEN		
-			
-			nBOSS <= '0' 				
-				WHEN 
-					( RISING_EDGE(CLK) AND nAS = '1' AND nABG = '0' AND nDTACK = '1' 
-					AND HALT = '1' AND nRESET = '1' AND B2000 = '1' AND MODE68K = '0' )
-					--nABG = 0 means the Amiga is trying to grant us the bus
-					--I'm using nAS and rising_edge(clk) in place of nAAS...which is basically a delayed address strobe
-				OR
-					( nHALT = '1' AND MODE68K = '0' )
-				OR
-					( nRESET = '1' AND MODE68K = '0' )
-				OR
-					( B2000 = '0' AND HALT = '1' AND nRESET = '1' ) --This is for the original A2000
-				ELSE
-					'1'; 
+		IF nBOSS = '1' THEN	
+			IF (( RISING_EDGE(CLK) AND nAAS = '1' AND nABG = '0' AND nDTACK = '1' 
+				AND nHALT = '1' AND nRESET = '1' AND B2000 = '1' AND MODE68K = '0' )
+				OR ( nHALT = '1' AND MODE68K = '0' )
+				OR	( nRESET = '1' AND MODE68K = '0' )
+				OR	( B2000 = '0' AND nHALT = '1' AND nRESET = '1' )) --This is for the original A2000
+			THEN
+				nBOSS <= '0';
+			ELSE
+				nBOSS <= '1';
+					
+--			nBOSS <= '0' 				
+--				WHEN 
+--					( RISING_EDGE(CLK) AND nAAS = '1' AND nABG = '0' AND nDTACK = '1' 
+--					AND HALT = '1' AND nRESET = '1' AND B2000 = '1' AND MODE68K = '0' )
+--					--nABG = 0 means the Amiga is trying to grant us the bus
+--				OR
+--					( nHALT = '1' AND MODE68K = '0' )
+--				OR
+--					( nRESET = '1' AND MODE68K = '0' )
+--				OR
+--					( B2000 = '0' AND HALT = '1' AND nRESET = '1' ) --This is for the original A2000
+--				ELSE
+--					'1'; 
 					
 			END IF;
-			
+		END IF;			
 	END PROCESS BOSS;	
 
 	----------------
@@ -625,19 +641,19 @@ begin
 				CASE AL(6 downto 1) IS
 					
 					--offset $00
-					WHEN "000000" => D(31 downto 28) <= "1110"; --er_type: Zorro 2 card without BOOT ROM
+					WHEN "000000" => DAC(31 downto 28) <= "1110"; --er_type: Zorro 2 card without BOOT ROM
 				
 					--offset $02
-					WHEN "000001" => D(31 downto 28) <= "0111"; --er_type: 4MB
+					WHEN "000001" => DAC(31 downto 28) <= "0111"; --er_type: 4MB
 					
 					--offset $04
-					WHEN "000010" => D(31 downto 28) <= "1010"; --Product Number Hi Nibble, we are stealing the A2630 product number
+					WHEN "000010" => DAC(31 downto 28) <= "1010"; --Product Number Hi Nibble, we are stealing the A2630 product number
 					
 					--offset $06
-					WHEN "000011" => D(31 downto 28) <= "1000"; --Product Number Lo Nibble				
+					WHEN "000011" => DAC(31 downto 28) <= "1000"; --Product Number Lo Nibble				
 					
 					--offset $08
-					WHEN "000100" => D(31 downto 28) <= "0010"; --er_flags: I/O device, can't be shut up, reserved, reserved
+					WHEN "000100" => DAC(31 downto 28) <= "0010"; --er_flags: I/O device, can't be shut up, reserved, reserved
 					
 					--offset $0A
 					--WHEN "000101" => D(31 downto 28) <= "0000"; --er_flags: Reserved, must be zeroes
@@ -649,7 +665,7 @@ begin
 					--WHEN "000111" => D(31 downto 28) <= "0000"; --Reserved: must be zeroes	
 					
 					--offset $10
-					WHEN "001000" => D(31 downto 28) <= "0100"; --Product Number, high nibble hi byte. Just for fun, lets put C= in here!
+					WHEN "001000" => DAC(31 downto 28) <= "0100"; --Product Number, high nibble hi byte. Just for fun, lets put C= in here!
 					
 					--offset $12
 					--WHEN "001001" => D(31 downto 28) <= "0000"; --Product Number, low nibble hi byte. Just for fun, lets put C= in here!
@@ -658,7 +674,7 @@ begin
 					--WHEN "001010" => D(31 downto 28) <= "0000"; --Product Number, high nibble low byte. Just for fun, lets put C= in here!
 					
 					--offset $16
-					WHEN "001011" => D(31 downto 28) <= "0100"; --Product Number, low nibble low byte. Just for fun, lets put C= in here!
+					WHEN "001011" => DAC(31 downto 28) <= "0100"; --Product Number, low nibble low byte. Just for fun, lets put C= in here!
 					
 					--offset $18
 					--WHEN "001100" => D(31 downto 28) <= "0000"; --Serial number byte 0 high nibble
@@ -666,7 +682,7 @@ begin
 					--offset $1A
 					--WHEN "001101" => D(31 downto 28) <= "0000"; --Serial number byte 0 low nibble				
 					
-					WHEN OTHERS => D(31 downto 28) <= "0000"; --Reserved offsets and unused offset values are all zeroes
+					WHEN OTHERS => DAC(31 downto 28) <= "0000"; --Reserved offsets and unused offset values are all zeroes
 					
 				END CASE;
 				
@@ -675,7 +691,7 @@ begin
 			
 				IF ( AL(6 downto 1) = x"48" ) THEN
 					--I DON'T KNOW WHAT TO DO WITH THIS...WE PROBABLY DON'T NEED IT
-					BASEADDRESS <= D(31 downto 28); --This is written to our device from the Amiga
+					BASEADDRESS <= DAC(31 downto 28); --This is written to our device from the Amiga
 					autoconfig_done <= '1'; --Autoconfig process is done!
 				END IF;
 			
@@ -695,13 +711,13 @@ begin
 	
 	HIROM <= '1'
 		WHEN
-			A(23 downto 16) >= x"f80000" AND A(23 downto 16) <= x"f8ffff"
+			AH(23 downto 16) >= x"f80000" AND AH(23 downto 16) <= x"f8ffff"
 		ELSE
 			'0';
 			
 	LOROM <= '1'
 		WHEN
-			A(23 downto 16) >= x"000000" AND A(23 downto 16) <= x"00ffff"
+			AH(23 downto 16) >= x"000000" AND AH(23 downto 16) <= x"00ffff"
 		ELSE
 			'0';
 
@@ -735,21 +751,21 @@ begin
 	
 	TWOMEG <= '1' 
 		WHEN
-			A(31 downto 21) = "01000000000" --A21 IS LOW IN THE FIRST 2 MEGS
+			AH(31 downto 21) = "01000000000" --A21 IS LOW IN THE FIRST 2 MEGS
 		ELSE
 			'0';
 			
 	FOURMEG <= '1'
 		WHEN
-			A(31 downto 21) = "01000000001" --A21 IS HIGH IN THE SECOND 2 MEGS
+			AH(31 downto 21) = "01000000001" --A21 IS HIGH IN THE SECOND 2 MEGS
 		ELSE
 			'0';	
 			
-	EIGHTMEG <= '1'
-		WHEN
-			A(31 downto 22) = "0100000001" --A22 IS HIGH IN THE SECOND 4 MEGS
-		ELSE
-			'0';
+--	EIGHTMEG <= '1'
+--		WHEN
+--			AH(31 downto 22) = "0100000001" --A22 IS HIGH IN THE SECOND 4 MEGS
+--		ELSE
+--			'0';
 
 	--THIS IS THE RAM IN THE ZORRO 2 SPACE (UP TO 8 MEGABYTES)
 	--WE DIRECT THE RAM SIGNALING BASED ON WHAT THE 68030 IS ASKING FOR
@@ -771,71 +787,87 @@ begin
 			
 			--ENABLE THE VARIOUS BYTES ON THE SRAM DEPENDING ON WHAT THE CPU IS ASKING FOR
 			
-			nUUBE <= '0' --UPPER UPPER BYTE ENABLE (D31..24)
-				WHEN
-					R_W = '1' --THIS IS A READ CYCLE
-				OR	
-					(R_W = '0' AND A(1 downto 0) = "00")
-				ELSE '1';
+			--UPPER UPPER BYTE ENABLE (D31..24)
+			IF (( R_W = '1' ) 
+				OR (R_W = '0' AND AL(1 downto 0) = "00")) 
+			THEN			
+				nUUBE <= '0'; 
+			ELSE 
+				nUUBE <= '1';
+			END IF;
 			
-			nUMBE <= '0' --UPPER MIDDLE BYTE ENABLE (D23..16)
-				WHEN
-					R_W = '1'
-				OR 
-					(R_W = '0' AND ( A(1 downto 0) = "01" OR 
-					( A(1) = '0' AND SIZ(0) = '0' ) OR 
-					( A(1) = '0' AND SIZ(1) = '1' )))
-				ELSE '1';
+			--UPPER MIDDLE BYTE (D23..16)
+			IF (( R_W = '1' ) 
+				OR ( R_W = '0' AND (( AL(1 downto 0) = "01" )
+				OR ( AL(1) = '0' AND SIZ(0) = '0' ) 
+				OR ( AL(1) = '0' AND SIZ(1) = '1' )))) 
+			THEN
+				nUMBE <= '0';
+			ELSE
+				nUMBE <= '1';
+			END IF;
+			
+			--LOWER MIDDLE BYTE (D15..8)
+			IF (( R_W = '1' )
+				OR ( R_W = '0' AND (( AL(1 downto 0) = "10" ) 
+				OR ( AL(1) = '0' AND SIZ(0) = '0' AND SIZ(1) = '0' ) 
+				OR	( AL(1) = '0' AND SIZ(0) = '1' AND SIZ(1) = '1' ) 
+				OR ( AL(0) = '1' AND AL(1) = '0' AND SIZ(0) = '0' ))))
+			THEN
+				nLMBE <= '0';
+			ELSE
+				nLMBE <= '1';
+			END IF;
 				
-			nLMBE <= '0' --LOWER MIDDLE BYTE (D15..8)
-				WHEN
-					R_W = '1'
-				OR 
-					(R_W = '0' AND ( A(1 downto 0) = "10" OR 
-					( A(1) = '0' AND SIZ(0) = '0' AND SIZ(1) = '0' ) OR 
-					( A(1) = '0' AND SIZ(0) = '1' AND SIZ(1) = '1' ) OR 
-					( A(0) = '1' AND A(1) = '0' AND SIZ(0) = '0' )))
-				ELSE '1';
+			--LOWER LOWER BYTE (D7..0)
+			IF (( R_W = '1' )
+				OR	( R_W = '0' AND ( AL(1 downto 0) = "11" 
+				OR (AL(0) = '1' AND SIZ(0) = '1' AND SIZ(1) = '1') 
+				OR	(SIZ(0) = '0' AND SIZ(1) = '0') 
+				OR	(AL(1) = '1' AND SIZ(1) ='1'))))
+			THEN
+				nLLBE <= '0';
+			ELSE
+				nLLBE <= '1';
+			END IF;
 				
-			nLLBE <= '0' --LOWER LOWER BYTE (D7..0)
-				WHEN
-					R_W = '1'
-				OR
-					(R_W = '0' AND ( A(1 downto 0) = "11" OR 
-					(A(0) = '1' AND SIZ(0) = '1' AND SIZ(1) = '1') OR
-					(SIZ(0) = '0' AND SIZ(1) = '0') OR
-					(A(1) = '1' AND SIZ(1) ='1')))
-				ELSE '1';
 				
 			--OUTPUT ENABLE OR WRITE ENABLE DEPENDING ON THE CPU REQUEST
-			nOE0 <= '0' --BANK0
-				WHEN
-					R_W = '1' AND TWOMEG = '1'
-				ELSE '1';
+			IF R_W = '1' AND TWOMEG = '1' THEN			
+				nOE0 <= '0'; --BANK0
+			ELSE
+				nOE0 <= '1';
+			END IF;
 			
-			nOE1 <= '0' -- BANK1
-				WHEN
-					R_W = '1' AND FOURMEG = '1'
-				ELSE '1';
+			IF R_W = '1' AND FOURMEG = '1' THEN
+				nOE1 <= '0'; -- BANK1
+			ELSE
+				nOE1 <= '1';
+			END IF;
+			
+			IF R_W = '0' AND TWOMEG = '1' THEN
+				nWE0 <= '0'; -- BANK0
+			ELSE
+				nWE0 <= '1';
+			END IF;
 				
-			nWE0 <= '0' -- BANK0
-				WHEN
-					R_W = '0' AND TWOMEG = '1'
-				ELSE '1';
-				
-			nWE1 <= '0' -- BANK1
-				WHEN
-					R_W = '0' AND FOURMEG = '1'
-				ELSE '1';	
+			IF R_W = '0' AND FOURMEG = '1' THEN
+				nWE1 <= '0'; -- BANK1
+			ELSE
+				nWE1 <= '1';
+			END IF;
+			
+			--NEED TO FIGURE OUT HOW TO DEAL WITH DSACK FOR 16 BIT TRANSFERS FROM A2000
 				
 			--nSTERM = Bus response signal that indicates a port size of 32 bits and
 			--that data may be latched on the next falling clock edge. Synchronous transfer.
 			--STERM is only used on the daughterboard of the A2630. The A2630 card uses DSACKx for terminiation.
 			--We should be OK here as we are using fast SRAM and can use the 2 clock cycle read/write
-			nSTERM <= '0'
-				WHEN
-					TWOMEG = '1' OR FOURMEG = '1'
-				ELSE '1';
+			IF TWOMEG = '1' OR FOURMEG = '1' THEN
+				nSTERM <= '0';
+			ELSE
+				nSTERM <= '1';
+			END IF;
 				
 					
 			--ecs (EXTERNAL CYCLE START) HOW DOES THAT FIT IN? it doesn't
@@ -893,9 +925,9 @@ begin
 	--ALSO USED WHEN THE A2630 WANTS TO TALK TO SOMETHING ON THE A2000
 	n_onboard <= '0'
 		WHEN
-			( HIROM = '1' AND PHANTOMHI = '0' AND R_W = '0' AND nAS ='0' )
+			( HIROM = '1' AND PHANTOMHI = '0' AND R_W = '0' AND nAS = '0' )
 		OR
-			( LOWROM = '1' AND PHANTOMLO = '0'  AND R_W = '0' AND nAS ='0' )
+			( LOROM = '1' AND PHANTOMLO = '0'  AND R_W = '0' AND nAS = '0' )
 		OR
 			( AUTOCONFIGSPACE = '1' AND nAS ='0' AND RAMCONF = '0' )
 			--iscauto = autocon & AS & !RAMCONF &  AUTO 
@@ -909,24 +941,24 @@ begin
 			'1';
 
 	--_ADOEH = ENABLE D(31..16)
-	_ADOEH <= '0'
+	nADOEH <= '0'
 		WHEN
-			( nBOSS = '0' AND nBGACK = '0' AND (TWOMEG = '1' OR FOURMEG = '1') AND nAS = '0' AND A(1) = '0' )
+			( nBOSS = '0' AND nBGACK = '0' AND (TWOMEG = '1' OR FOURMEG = '1') AND nAAS = '0' AND AL(1) = '0' )
 			--BOSS &  BGACK &  MEMSEL & AAS & !A1
 		OR
-			( nBOSS = '0' AND nBGACK = '0' AND (TWOMEG = '1' OR FOURMEG = '1') AND nAS = '0' AND n_onboard = '1' )
+			( nBOSS = '0' AND nBGACK = '0' AND (TWOMEG = '1' OR FOURMEG = '1') AND nAAS = '0' AND n_onboard = '1' )
 			--BOSS & !BGACK & !MEMSEL &  AS & !ONBOARD & !EXTERN;
 			--EXTERN tells us if we are accessing expansion memory...not doing that right now
 		ELSE
 			'1';
 			
-		--_ADOEL = ENABLE D(15..0)
-		_ADOEL <= '0'
-			WHEN 
-				( nBOSS = '0' AND nBGACK = '0' AND (TWOMEG = '1' OR FOURMEG = '1') AND nAS = '0' AND A(1) = '1' )
-				-- BOSS &  BGACK &  MEMSEL & AAS &  A1
-			ELSE
-			'1';
+	--_ADOEL = ENABLE D(15..0)
+	nADOEL <= '0'
+		WHEN 
+			( nBOSS = '0' AND nBGACK = '0' AND (TWOMEG = '1' OR FOURMEG = '1') AND nAAS = '0' AND AL(1) = '1' )
+			-- BOSS &  BGACK &  MEMSEL & AAS &  A1
+		ELSE
+		'1';
 
 end Behavioral;
 
