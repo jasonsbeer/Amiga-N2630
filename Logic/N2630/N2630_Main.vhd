@@ -60,7 +60,7 @@ entity N2630_Main is
 			  
 			  nAAS : inout STD_LOGIC:='1'; --Amiga (2000) Address Strobe
 			  TRISTATE : inout STD_LOGIC:='0';
-			  nASDELAY : out STD_LOGIC:='1';
+			  nASDELAY : inout STD_LOGIC:='1';
 			  nBOSS : inout STD_LOGIC:='1';
 			  nCSROM : out  STD_LOGIC:='1';
 			  nUUBE : out STD_LOGIC:='1';
@@ -82,7 +82,9 @@ entity N2630_Main is
 			  IVMA : inout STD_LOGIC:='1'; --The FF code wants the output inverted, so we are starting in the active state
 			  nMEMLOCK : out STD_LOGIC:='1'; --MEMLOCK is used in the state machine
 			  nADOEH : out STD_LOGIC:='1'; --Amiga Data Out Enable High
-			  nADOEL : out STD_LOGIC:='1' --Amiga Data Out Enable Low
+			  nADOEL : out STD_LOGIC:='1'; --Amiga Data Out Enable Low
+			  nDSACK0 : out STD_LOGIC:='1'; --68030 Data Strobe ACK 0
+			  nDSACK1 : out STD_LOGIC:='1' --68030 Data Strobe ACK 1
 			  
 			  );		
 			  
@@ -97,7 +99,7 @@ architecture Behavioral of N2630_Main is
 	SIGNAL FOURMEG : STD_LOGIC:='0'; --Are we in the second 2 megabyte address space?
 	SIGNAL EIGHTMEG : STD_LOGIC:='0'; --Aare we in the second 4 megabyte address space
 
-	SIGNAL AUTOCONFIGSPACE : STD_LOGIC:='0';
+	SIGNAL autoconfigspace : STD_LOGIC:='0';
 	SIGNAL n_onboard : STD_LOGIC:='1';
 	SIGNAL HIROM : STD_LOGIC:='0';
 	SIGNAL LOROM : STD_LOGIC:='0';
@@ -107,6 +109,14 @@ architecture Behavioral of N2630_Main is
 	
 	SIGNAL n_extern : STD_LOGIC:='1'; --Pull low when daughter OR FPU is being accessed
 	SIGNAL cycend : STD_LOGIC:='0';
+	SIGNAL memsel : STD_LOGIC:='0';
+	SIGNAL cycledone  : STD_LOGIC:='0';
+	SIGNAL dmadtack : STD_LOGIC:='0';
+	SIGNAL n_aasq : STD_LOGIC:='1';
+	SIGNAL n_aas80 : STD_LOGIC:='1';
+	SIGNAL n_aas40 : STD_LOGIC:='1';
+	SIGNAL dmaaccess : STD_LOGIC:='0';
+	SIGNAL cpudtack : STD_LOGIC:='0';
 	SIGNAL nDSEN : STD_LOGIC:='1';
 	SIGNAL n_edtack : STD_LOGIC:='0'; --The FF code wants the output inverted, so we are starting in the active state
 	SIGNAL s_7mdis : STD_LOGIC; 
@@ -294,9 +304,9 @@ begin
 	--TRISTATE signal is negated and the memory cycle is for an offboard
 	--resource. Meaning, we want to talk to something on the A2000. U501
 	
-	PROCESS ( nASEN ) BEGIN
+	PROCESS ( TRISTATE ) BEGIN
 		IF 
-			( TRISTATE = '0' AND (n_onboard = '1' OR ( TWOMEG = '0' AND FOURMEG = '0' ) OR n_extern = '1' ))
+			( TRISTATE = '0' AND (n_onboard = '1' OR MEMSEL = '0' OR n_extern = '1' ))
 			--offboard = !(ONBOARD # MEMSEL # EXTERN)
 			--.OE = !TRISTATE & offboard
 			--This checks to see if we are not in tristate and not addressing a resource on the A2630
@@ -507,39 +517,25 @@ begin
 	--First, we must request the bus on power up/reset
 	--ABR is the Amiga bus request output. This signal is only asserted 
 	--on powerup in order to get the bus so that we can assert BOSS, 
-	--and it won't be asserted if MODE68K is asserted.	
+	--and it won't be asserted if MODE68K is asserted.	Original PAL 
 	
-	REQUESTBUS:PROCESS(nRESET, CLK) BEGIN
-	
-		IF ( MODE68K = '1' OR nBOSS = '0' ) THEN		
-			nABR <= '1'; 
-			
-		ELSIF ( nRESET = '1' AND nBOSS = '1' ) THEN	
-			IF (( RISING_EDGE(CLK) AND nAAS = '1' AND MODE68K = '0' )OR	( nABR = '1' AND MODE68K = '0' )) THEN
-				nABR <= '0';
-			END IF;
-		
---			nABR <= '0'
---				WHEN
---					( RISING_EDGE(CLK) AND nAAS = '1' AND MODE68K = '0' )
---				OR
---					( nABR = '1' AND MODE68K = '0' );
-		END IF;
-		
-	END PROCESS REQUESTBUS;
+	nABR <= 
+		'Z' WHEN nRESET = '0' OR MODE68K = '1' OR nBOSS='0' ELSE --INVERSE OF !RESET & !BOSS & !MODE68K
+		'0' WHEN ( nRESET = '1' AND nAAS = '1' AND nBOSS = '1' AND MODE68K = '0' ) OR --!RESET & AAS & !BOSS & !MODE68K
+			 ( nRESET = '1' AND nABR = '0' AND nBOSS = '1' AND MODE68K = '0' ) --!RESET & ABR & !BOSS & !MODE68K
+		ELSE
+			'1';	
 	
 	--nBGACK (Bus Grant Acknowledge)
 	--We keep nABGACK disconnected from nBGACK until we are BOSS.
 	--Original PAL U501
 	
-	PROCESS(nRESET, CLK) BEGIN
-		IF nBOSS = '1' THEN
-			nBGACK <= 'Z';
+	nBGACK <= 'Z'
+		WHEN 
+			nBOSS = '1' 
 		ELSE
-			nBGACK <= nABGACK;
-		END IF;
-	END PROCESS;
-	
+			nABGACK;
+		
 	--nDTACK
 	--This is the DTACK generator for DMA access to on-board memory.  It
 	--waits until we're in a cycle, and then a fixed delay from RAS, to `
@@ -550,7 +546,7 @@ begin
 	nDTACK <= '0'
 		WHEN
 			--nDTACK = BGACK & MEMSEL & AAS & STERM;
-			nBGACK = '0' AND nAS = '0' AND nSTERM = '0' AND (TWOMEG = '1' OR FOURMEG = '1')
+			nBGACK = '0' AND nAS = '0' AND nSTERM = '0' AND MEMSEL = '1'
 		ELSE
 			'1';
 		
@@ -570,38 +566,18 @@ begin
 	--hold BOSS on the B2000 until either a full reset or the 68K mode is
 	--activated.
 	--ORIGINAL PAL U504
-	
-	--not a flip flop
-	BOSS:PROCESS(nRESET, CLK) BEGIN
-	
-		IF nBOSS = '1' THEN	
-			IF (( RISING_EDGE(CLK) AND nAAS = '1' AND nABG = '0' AND nDTACK = '1' 
-				AND nHALT = '1' AND nRESET = '1' AND B2000 = '1' AND MODE68K = '0' )
-				OR ( nHALT = '1' AND MODE68K = '0' )
-				OR	( nRESET = '1' AND MODE68K = '0' )
-				OR	( B2000 = '0' AND nHALT = '1' AND nRESET = '1' )) --This is for the original A2000
-			THEN
-				nBOSS <= '0';
-			ELSE
-				nBOSS <= '1';
-					
---			nBOSS <= '0' 				
---				WHEN 
---					( RISING_EDGE(CLK) AND nAAS = '1' AND nABG = '0' AND nDTACK = '1' 
---					AND HALT = '1' AND nRESET = '1' AND B2000 = '1' AND MODE68K = '0' )
---					--nABG = 0 means the Amiga is trying to grant us the bus
---				OR
---					( nHALT = '1' AND MODE68K = '0' )
---				OR
---					( nRESET = '1' AND MODE68K = '0' )
---				OR
---					( B2000 = '0' AND HALT = '1' AND nRESET = '1' ) --This is for the original A2000
---				ELSE
---					'1'; 
-					
-			END IF;
-		END IF;			
-	END PROCESS BOSS;	
+		
+	nBOSS <= 
+		'0' WHEN ( nABG = '0' AND nAAS = '1' AND nDTACK = '1' AND nHALT = '1' AND nRESET = '1' AND B2000 = '1' AND MODE68K = '0' ) OR
+			 --ABG & !AAS & !DTACK & !HALT & !RESET & B2000 & !MODE68K 
+			 ( nHALT = '1' AND MODE68K = '0' AND nBOSS = '0' ) OR
+			 --!HALT & !MODE68K & BOSS
+			 ( nRESET = '1' AND MODE68K = '0' AND nBOSS = '0' ) OR
+			  --!RESET & !MODE68K & BOSS
+			 ( B2000 = '0' AND nHALT = '1' AND nRESET = '1' )
+			 --!B2000 & !HALT & !RESET
+		 ELSE
+			'1';
 
 	----------------
 	-- AUTOCONFIG --
@@ -615,15 +591,12 @@ begin
 	--https://archive.org/details/amiga-hardware-reference-manual-3rd-edition
 	
 	--ARE WE IN THE AUTOCONFIG ADDRESS SPACE?
-	PROCESS (nAS) BEGIN
-		IF 
-			AH(23 downto 16) = x"E8" AND nAS = '0' 
-		THEN
-			AUTOCONFIGSPACE <= '1';
+	
+	autoconfigspace <= '1'
+		WHEN 
+			AH(23 downto 16) = x"E8" AND nAS = '0'
 		ELSE
-			AUTOCONFIGSPACE <= '0';
-		END IF;
-	END PROCESS;	
+			'0';
 
 	AUTOCONFIG : PROCESS (CLK, nRESET)
 		BEGIN
@@ -635,7 +608,7 @@ begin
 			BASEADDRESS <= x"0";
 		
 		ELSIF RISING_EDGE(CLK) AND autoconfig_done = '0' THEN
-			IF ( AUTOCONFIGSPACE = '1' AND R_W = '1') THEN
+			IF ( autoconfigspace = '1' AND R_W = '1') THEN
 				--THIS IS THE AUTOCONFIG BASE ADDRESS
 				
 				CASE AL(6 downto 1) IS
@@ -720,27 +693,13 @@ begin
 			AH(23 downto 16) >= x"000000" AND AH(23 downto 16) <= x"00ffff"
 		ELSE
 			'0';
-
-	ROM_ENABLE:PROCESS( nAS ) BEGIN
-
-		IF (R_W = '1' AND nAS = '0') THEN
-			--This is a read cycle
-			IF (HIROM = '1' AND PHANTOMHI = '0') THEN 
-				--High memory rom space, where ROMs normally reside when available.
-				nCSROM <= '0';
-			ELSIF ( LOROM = '1' AND PHANTOMLO = '0') THEN 
-				--Low memory ROM space, used for mapping of ROMs on reset.
-				nCSROM <= '0';		
-			ELSE
-				--We are not in the ROM address spaces
-				nCSROM <= '1';
-			END IF;
+			
+	nCSROM <= '0'
+		WHEN 
+			( R_W = '1' AND nAS = '0' AND HIROM = '1' AND PHANTOMHI = '0' ) OR
+			( R_W = '1' AND nAS = '0' AND LOROM = '1' AND PHANTOMLO = '0' )
 		ELSE
-			--We are not in a read cycle
-			nCSROM <= '1';
-		END IF;
-
-	END PROCESS ROM_ENABLE;
+			'1';
 
 	---------------
 	-- RAM STUFF --
@@ -778,7 +737,106 @@ begin
 	--68030: Negate nAS and nDS
 	--A2630: Negate nSTERM
 
-	--the values in the process statement will trigger the process when one of them changes
+	--We need to use nDSACKx to end memory access due to the fact that we need to deal with 
+	--access by WORD from the A2000 DMA. This would be from DMA cards on the zorro 2 bus.
+	--The chipset only uses CHIP ram.
+	
+	--The standard qualification for a CPU memory cycle.  We have to wait
+	--until refresh is arbitrated, and make sure we're selected and it's
+	--not an EXTSELal cycle. U600
+
+	cpudtack	<= '1'
+		WHEN
+			nBGACK = '1' AND MEMSEL = '1' AND nASDELAY = '0' AND nAS ='0' --AND EXTSEL = '0'
+			--!BGACK & !REFACK & MEMSEL & ASDELAY &  AS & !EXTSEL;
+			--EXTSEL comes from the daughtercard
+		ELSE
+			'0';
+			
+	--dsackdly - This signal is part of the CPUDTACK (CPU Data Transfer ACK), which I beleive is related to the refresh or DRAM timing
+	--so, I'm going to ignore it for now
+	
+	--The standard qualification for a DMA memory cycle.  This is much the
+	--same as the CPU cycle, only it obeys the 68000 comparible signals
+	--instead of 68030 signals.  The DMA cycle can DTACK early, since we
+	--know the minimum clock period is more than the DRAM access time.	
+	
+	--dmadtack	= dmaaccess & AAS80;
+	
+	--dmacycle	= dmaaccess & AAS40 & !DMADELAY;
+	
+	dmaaccess <= '1'
+		WHEN
+			nBGACK = '0' AND MEMSEL = '1' AND nAAS = '0'
+			--dmaaccess	=  BGACK & !REFACK & MEMSEL & AAS;
+		ELSE
+			'0';
+			
+	--These next lines make us delayed and synchronized versions of the 
+	--68000 compatible address strobe, used to handle refresh arbitration
+	--and synchronization during DMA. U600, clocked by CPUCLK, no reset
+	--These are d-type FFs
+	
+	--AASQ.D	= BGACK & AAS;
+	PROCESS ( CLK ) BEGIN
+		IF ( RISING_EDGE(CLK) ) THEN
+			IF ( nBGACK = '0' and nAAS = '0' ) THEN
+				n_aasq <= '0';
+			ELSE
+				n_aasq <= '1';
+			END IF;
+		END IF;
+	END PROCESS;
+
+	--AAS40.D = BGACK & AAS & AASQ;
+	PROCESS ( CLK ) BEGIN
+		IF ( RISING_EDGE(CLK) ) THEN
+			IF ( nBGACK = '0' AND nAAS = '0' AND n_aasq = '0' ) THEN
+				n_aas40 <= '0';
+			ELSE
+				n_aas40 <= '1';
+			END IF;
+		END IF;
+	END PROCESS;
+
+	--AAS80.D = BGACK & AAS & AASQ & AAS40;
+	PROCESS ( CLK ) BEGIN
+		IF ( RISING_EDGE(CLK) ) THEN
+			IF ( nBGACK = '0' AND nAAS = '0' AND n_aasq = '0' AND n_aas40 = '0' ) THEN
+				n_aas80 <= '0';
+			ELSE
+				n_aas80 <= '1';
+			END IF;
+		END IF;
+	END PROCESS;
+	
+	dmadtack <= '1'
+		WHEN 
+			dmaaccess = '1' AND n_aas80 = '0'
+		ELSE
+			'0';	
+			
+	--This indicates when a cycle is complete.
+	cycledone <= '1'
+		WHEN
+			cpudtack = '1' AND dmadtack = '1'
+		ELSE
+			'0';
+
+	--These are the cycle termination signals.  They're really both the
+	--same, and both driven, indicating that we are, in fact, a 32 bit
+	--wide port.  They go hi-Z when we're not selecting memory, so that
+	--other DSACK sources (FPU and the slow bus stuff) can get their
+	--chance to terminate.
+	
+	nDSACK0 <= 'Z' WHEN memsel = '0' ELSE
+		'1' WHEN memsel = '1' AND cycledone = '0' ELSE
+		'0' WHEN memsel = '1' AND cycledone = '1';
+	
+	nDSACK1 <= 'Z' WHEN memsel = '0' ELSE
+		'1' WHEN memsel = '1' AND cycledone = '0' ELSE
+		'0' WHEN memsel = '1' AND cycledone = '1';
+
 
 	RAM_ACCESS:PROCESS ( nAS, R_W, nDS ) BEGIN
 
@@ -829,8 +887,7 @@ begin
 				nLLBE <= '0';
 			ELSE
 				nLLBE <= '1';
-			END IF;
-				
+			END IF;				
 				
 			--OUTPUT ENABLE OR WRITE ENABLE DEPENDING ON THE CPU REQUEST
 			IF R_W = '1' AND TWOMEG = '1' THEN			
@@ -861,13 +918,16 @@ begin
 				
 			--nSTERM = Bus response signal that indicates a port size of 32 bits and
 			--that data may be latched on the next falling clock edge. Synchronous transfer.
-			--STERM is only used on the daughterboard of the A2630. The A2630 card uses DSACKx for terminiation.
-			--We should be OK here as we are using fast SRAM and can use the 2 clock cycle read/write
-			IF TWOMEG = '1' OR FOURMEG = '1' THEN
-				nSTERM <= '0';
-			ELSE
-				nSTERM <= '1';
-			END IF;
+			--STERM is only used on the daughterboard of the A2630. The A2630 card uses DSACKx for terminiation,
+			--which may be due to the 32 <-> 16 bit transfers when DMA'ing
+			
+			--IF TWOMEG = '1' OR FOURMEG = '1' THEN
+			--	nSTERM <= '0';
+			--ELSE
+			--	nSTERM <= '1';
+			--END IF;
+			
+			
 				
 					
 			--ecs (EXTERNAL CYCLE START) HOW DOES THAT FIT IN? it doesn't
@@ -883,7 +943,7 @@ begin
 			
 		ELSE 
 			--DEACTIVATE ALL THE RAM STUFF
-			nSTERM <= '1';
+			--nSTERM <= '1';
 			
 			nUUBE <= '1';
 			nUMBE <= '1';
@@ -929,10 +989,10 @@ begin
 		OR
 			( LOROM = '1' AND PHANTOMLO = '0'  AND R_W = '0' AND nAS = '0' )
 		OR
-			( AUTOCONFIGSPACE = '1' AND nAS ='0' AND RAMCONF = '0' )
+			( autoconfigspace = '1' AND nAS ='0' AND RAMCONF = '0' )
 			--iscauto = autocon & AS & !RAMCONF &  AUTO 
 		OR
-			( AUTOCONFIGSPACE = '1' AND nAS ='0' AND ROMCONF = '0' )
+			( autoconfigspace = '1' AND nAS ='0' AND ROMCONF = '0' )
 			--ICSAUTO (OR) autocon & AS & !ROMCONF & !AUTO
 			--AUTO = should I autoconfig? Yes, always autoconfig, so we don't include that
 		OR
@@ -946,7 +1006,7 @@ begin
 			( nBOSS = '0' AND nBGACK = '0' AND (TWOMEG = '1' OR FOURMEG = '1') AND nAAS = '0' AND AL(1) = '0' )
 			--BOSS &  BGACK &  MEMSEL & AAS & !A1
 		OR
-			( nBOSS = '0' AND nBGACK = '0' AND (TWOMEG = '1' OR FOURMEG = '1') AND nAAS = '0' AND n_onboard = '1' )
+			( nBOSS = '0' AND nBGACK = '0' AND (TWOMEG = '1' OR FOURMEG = '1') AND nAS = '0' AND n_onboard = '1' )
 			--BOSS & !BGACK & !MEMSEL &  AS & !ONBOARD & !EXTERN;
 			--EXTERN tells us if we are accessing expansion memory...not doing that right now
 		ELSE

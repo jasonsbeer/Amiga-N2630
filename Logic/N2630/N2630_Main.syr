@@ -5,14 +5,14 @@ Parameter TMPDIR set to xst/projnav.tmp
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.04 secs
+Total CPU time to Xst completion: 0.03 secs
  
 --> 
 Parameter xsthdpdir set to xst
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.04 secs
+Total CPU time to Xst completion: 0.03 secs
  
 --> 
 Reading design: N2630_Main.prj
@@ -79,239 +79,203 @@ wysiwyg                            : NO
 *                          HDL Compilation                              *
 =========================================================================
 Compiling vhdl file "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" in Library work.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 38. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 39. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 42. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 43. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 44. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 46. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 47. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 48. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 49. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 52. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 53. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 54. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 55. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 57. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 59. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 60. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 61. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 62. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 63. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 64. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 65. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 66. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 67. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 68. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 69. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 70. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 71. Unexpected symbol read: _.
-ERROR:HDLParsers:1202 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 71. Redeclaration of symbol DTACK.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 73. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 74. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 75. Unexpected symbol read: _.
-ERROR:HDLParsers:1202 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 75. Redeclaration of symbol CSROM.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 78. Unexpected symbol read: _.
-ERROR:HDLParsers:3010 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 86. Entity N2630_Main does not exist.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 88. Undefined symbol 'STD_LOGIC'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 88. STD_LOGIC: Undefined symbol (last report in this block)
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 89. Undefined symbol 'STD_LOGIC_VECTOR'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 89. STD_LOGIC_VECTOR: Undefined symbol (last report in this block)
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 96. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 100. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 102. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 104. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 105. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 108. Unexpected symbol read: _.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 128. Undefined symbol 'BASIS7M'.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 130. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 133. = can not have such operands in this context.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 133. Undefined symbol 'C3'.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 138. Undefined symbol 'CLK7M'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 138. BASIS7M: Undefined symbol (last report in this block)
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 139. Unexpected symbol read: _.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 139. CLK7M: Undefined symbol (last report in this block)
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 140. Undefined symbol 'CLK14M'.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 140. Undefined symbol 'CDAC'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 140. CDAC: Undefined symbol (last report in this block)
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 147. Undefined symbol 'SCLK'.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 149. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 149. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 149. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 149. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 152. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 152. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 152. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 152. Unexpected symbol read: _.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 152. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 163. Unexpected symbol read: _.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 163. Undefined symbol 'ASDELAY'.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 163. Unexpected symbol read: _.
-ERROR:HDLParsers:3313 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 163. Undefined symbol 'AS'.  Should it be: uS, pS, nS, mS, iS, fS or bS?
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 163. AS: Undefined symbol (last report in this block)
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 171. Undefined symbol 'TRISTATE'.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 173. Unexpected symbol read: _.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 173. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 176. Unexpected symbol read: _.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 176. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 176. Unexpected symbol read: _.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 176. = can not have such operands in this context.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 199. Undefined symbol 'A7M'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 199. A7M: Undefined symbol (last report in this block)
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 201. Undefined symbol 'IVMA'.
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 203. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 204. Unexpected symbol read: _.
-WARNING:HDLParsers:1406 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 199. No sensitivity list and no wait in the process
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 219. Undefined symbol 'A7M'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 219. A7M: Undefined symbol (last report in this block)
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 221. Unexpected symbol read: _.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 221. Undefined symbol 'edtack'.
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 222. parse error, unexpected WHEN, expecting SEMICOLON
-WARNING:HDLParsers:1406 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 219. No sensitivity list and no wait in the process
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 235. Undefined symbol 'SCLK'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 235. SCLK: Undefined symbol (last report in this block)
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 237. Undefined symbol 'DSACKEN'.
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 238. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 239. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 239. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 242. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 242. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 245. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 245. Unexpected symbol read: _.
-WARNING:HDLParsers:1406 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 235. No sensitivity list and no wait in the process
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 255. Undefined symbol 'SCLK'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 255. SCLK: Undefined symbol (last report in this block)
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 257. Undefined symbol 'cycend'.
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 258. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 259. Unexpected symbol read: _.
-WARNING:HDLParsers:1406 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 255. No sensitivity list and no wait in the process
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 273. Unexpected symbol read: _.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 273. Undefined symbol 'ASEN'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 273. ASEN: Undefined symbol (last report in this block)
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 275. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 275. Unexpected symbol read: _.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 275. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 275. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 275. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 275. Unexpected symbol read: _.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 275. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 281. Unexpected symbol read: _.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 281. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 281. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 281. Unexpected symbol read: _.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 281. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 284. Unexpected symbol read: _.
-ERROR:HDLParsers:3313 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 284. Undefined symbol 'AAS'.  Should it be: AbS?
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 286. Unexpected symbol read: _.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 286. AAS: Undefined symbol (last report in this block)
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 289. Unexpected symbol read: _.
-WARNING:HDLParsers:1406 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 273. No sensitivity list and no wait in the process
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 299. Unexpected symbol read: _.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 299. Undefined symbol 'MEMLOCK'.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 301. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 301. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 301. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 304. Unexpected symbol read: _.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 304. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 307. Unexpected symbol read: _.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 307. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 310. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 321. Unexpected symbol read: _.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 321. Undefined symbol 'EXTERN'.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 323. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 323. Unexpected symbol read: _.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 323. = can not have such operands in this context.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 335. Undefined symbol 'SCLK'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 335. SCLK: Undefined symbol (last report in this block)
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 337. Unexpected symbol read: _.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 337. Undefined symbol 'dsen'.
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 338. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 339. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 339. Unexpected symbol read: _.
-WARNING:HDLParsers:1406 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 335. No sensitivity list and no wait in the process
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 354. Undefined symbol 'SCLK'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 354. SCLK: Undefined symbol (last report in this block)
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 356. Unexpected symbol read: _.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 356. Undefined symbol 'S7MDIS_DFF'.
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 357. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 358. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 358. Unexpected symbol read: _.
-WARNING:HDLParsers:1406 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 354. No sensitivity list and no wait in the process
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 368. Undefined symbol 'SCLK'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 368. SCLK: Undefined symbol (last report in this block)
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 370. Undefined symbol 's_7mdis'.
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 371. parse error, unexpected WHEN, expecting SEMICOLON
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 372. Unexpected symbol read: _.
-WARNING:HDLParsers:1406 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 368. No sensitivity list and no wait in the process
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 382. Undefined symbol 'ROMCLK'.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 384. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 384. Unexpected symbol read: _.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 384. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 384. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 384. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 384. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 386. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 386. Unexpected symbol read: _.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 386. = can not have such operands in this context.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 393. Undefined symbol 'RAMCLK'.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 395. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 395. Unexpected symbol read: _.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 395. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 395. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 395. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 395. = can not have such operands in this context.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 398. Unexpected symbol read: _.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 398. = can not have such operands in this context.
-ERROR:HDLParsers:808 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 398. = can not have such operands in this context.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 407. ROMCLK: Undefined symbol (last report in this block)
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 407. Unexpected symbol read: _.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 407. Undefined symbol 'REGRESET'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 407. REGRESET: Undefined symbol (last report in this block)
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 408. Unexpected symbol read: _.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 409. Undefined symbol 'PHANTOMLO'.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 410. Undefined symbol 'PHANTOMHI'.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 411. Undefined symbol 'ROMCONF'.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 412. Undefined symbol 'RSTENB'.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 413. Undefined symbol 'JMODE'.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 414. Undefined symbol 'MODE68K'.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 415. Undefined symbol 'RISING_EDGE'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 415. RISING_EDGE: Undefined symbol (last report in this block)
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 416. PHANTOMLO: Undefined symbol (last report in this block)
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 416. Undefined symbol 'D'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 416. D: Undefined symbol (last report in this block)
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 417. PHANTOMHI: Undefined symbol (last report in this block)
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 418. ROMCONF: Undefined symbol (last report in this block)
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 419. RSTENB: Undefined symbol (last report in this block)
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 420. JMODE: Undefined symbol (last report in this block)
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 421. MODE68K: Undefined symbol (last report in this block)
-WARNING:HDLParsers:1406 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 407. No sensitivity list and no wait in the process
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 426. Undefined symbol 'RAMCLK'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 426. RAMCLK: Undefined symbol (last report in this block)
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 426. Unexpected symbol read: _.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 426. Undefined symbol 'CPURESET'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 426. CPURESET: Undefined symbol (last report in this block)
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 427. Unexpected symbol read: _.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 428. Undefined symbol 'RAMCONF'.
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 429. Undefined symbol 'RISING_EDGE'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 429. RISING_EDGE: Undefined symbol (last report in this block)
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 430. RAMCONF: Undefined symbol (last report in this block)
-ERROR:HDLParsers:3312 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 430. Undefined symbol 'ROMCONF'.
-ERROR:HDLParsers:1209 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 430. ROMCONF: Undefined symbol (last report in this block)
-WARNING:HDLParsers:1406 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 426. No sensitivity list and no wait in the process
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 441. Unexpected symbol read: _.
-ERROR:HDLParsers:164 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 441. parse error, unexpected INTEGER_LITERAL, expecting IDENTIFIER or STRING_LITERAL
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 442. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 443. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 445. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 445. Unexpected symbol read: _.
-ERROR:HDLParsers:163 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" Line 447. Unexpected symbol read: _.
-WARNING:HDLParsers:3481 - Library work has no units. Did not save reference file "xst/work/hdllib.ref" for it.
+Architecture behavioral of Entity n2630_main is up to date.
+
+=========================================================================
+*                     Design Hierarchy Analysis                         *
+=========================================================================
+Analyzing hierarchy for entity <N2630_Main> in library <work> (architecture <behavioral>).
+
+
+=========================================================================
+*                            HDL Analysis                               *
+=========================================================================
+Analyzing Entity <N2630_Main> in library <work> (Architecture <behavioral>).
+WARNING:Xst:819 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" line 307: One or more signals are missing in the process sensitivity list. To enable synthesis of FPGA/CPLD hardware, XST will assume that all necessary signals are present in the sensitivity list. Please note that the result of the synthesis may differ from the initial design specification. The missing signals are:
+   <n_onboard>, <memsel>, <n_extern>, <nASEN>, <cycend>
+WARNING:Xst:795 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" line 355: Size of operands are different : result is <false>.
+WARNING:Xst:795 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" line 435: Size of operands are different : result is <false>.
+WARNING:Xst:795 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" line 446: Size of operands are different : result is <false>.
+WARNING:Xst:795 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" line 662: Size of operands are different : result is <false>.
+WARNING:Xst:1639 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" line 682: Size of operands are different, smallest operand is adjusted.
+WARNING:Xst:1639 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" line 682: Size of operands are different, smallest operand is adjusted.
+WARNING:Xst:1639 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" line 688: Size of operands are different, smallest operand is adjusted.
+WARNING:Xst:1639 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" line 688: Size of operands are different, smallest operand is adjusted.
+WARNING:Xst:819 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" line 694: One or more signals are missing in the process sensitivity list. To enable synthesis of FPGA/CPLD hardware, XST will assume that all necessary signals are present in the sensitivity list. Please note that the result of the synthesis may differ from the initial design specification. The missing signals are:
+   <R_W>, <HIROM>, <PHANTOMHI>, <LOROM>, <PHANTOMLO>
+WARNING:Xst:2095 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" line 854: Size of operands are different : result is <true>.
+WARNING:Xst:819 - "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd" line 852: One or more signals are missing in the process sensitivity list. To enable synthesis of FPGA/CPLD hardware, XST will assume that all necessary signals are present in the sensitivity list. Please note that the result of the synthesis may differ from the initial design specification. The missing signals are:
+   <autoconfig_done>, <AL>, <SIZ>, <TWOMEG>, <FOURMEG>
+INFO:Xst:2679 - Register <nS7MDIS_DFF> in unit <N2630_Main> has a constant value of 1 during circuit operation. The register is replaced by logic.
+INFO:Xst:2679 - Register <s_7mdis> in unit <N2630_Main> has a constant value of 1 during circuit operation. The register is replaced by logic.
+INFO:Xst:2679 - Register <autoconfig_done> in unit <N2630_Main> has a constant value of 0 during circuit operation. The register is replaced by logic.
+INFO:Xst:2679 - Register <BASEADDRESS> in unit <N2630_Main> has a constant value of 0000 during circuit operation. The register is replaced by logic.
+INFO:Xst:2679 - Register <nDSACKEN> in unit <N2630_Main> has a constant value of 1 during circuit operation. The register is replaced by logic.
+Entity <N2630_Main> analyzed. Unit <N2630_Main> generated.
+
+
+=========================================================================
+*                           HDL Synthesis                               *
+=========================================================================
+
+Performing bidirectional port resolution...
+INFO:Xst:2561 - Always blocking tristate driving signal <nAAS> in unit <N2630_Main> is removed.
+
+Synthesizing Unit <N2630_Main>.
+    Related source file is "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.vhd".
+WARNING:Xst:647 - Input <SIZ> is never used. This port will be preserved and left unconnected if it belongs to a top-level block or it belongs to a sub-block and the hierarchy of this sub-block is preserved.
+WARNING:Xst:647 - Input <FC> is never used. This port will be preserved and left unconnected if it belongs to a top-level block or it belongs to a sub-block and the hierarchy of this sub-block is preserved.
+WARNING:Xst:1306 - Output <nADDEH> is never assigned.
+WARNING:Xst:1306 - Output <nADDEL> is never assigned.
+WARNING:Xst:646 - Signal <n_edtack> is assigned but never used. This unconnected signal will be trimmed during the optimization process.
+WARNING:Xst:646 - Signal <nDSEN> is assigned but never used. This unconnected signal will be trimmed during the optimization process.
+WARNING:Xst:653 - Signal <memsel> is used but never assigned. This sourceless signal will be automatically connected to value 0.
+WARNING:Xst:646 - Signal <RSTENB> is assigned but never used. This unconnected signal will be trimmed during the optimization process.
+WARNING:Xst:1780 - Signal <EIGHTMEG> is never used or assigned. This unconnected signal will be trimmed during the optimization process.
+WARNING:Xst:646 - Signal <BASEADDRESS> is assigned but never used. This unconnected signal will be trimmed during the optimization process.
+    Found 4-bit register for signal <DAC>.
+    Found 1-bit tristate buffer for signal <nABR>.
+    Found 1-bit tristate buffer for signal <nBGACK>.
+    Found 1-bit register for signal <RAMCONF>.
+    Found 1-bit register for signal <IVMA>.
+    Found 1-bit tristate buffer for signal <nDSACK0>.
+    Found 1-bit tristate buffer for signal <nDSACK1>.
+    Found 1-bit xor2 for signal <c1c3xor>.
+    Found 1-bit xor2 for signal <CLK14M>.
+    Found 1-bit register for signal <cycend>.
+    Found 24-bit comparator greatequal for signal <HIROM$cmp_ge0000> created at line 682.
+    Found 24-bit comparator lessequal for signal <HIROM$cmp_le0000> created at line 682.
+    Found 1-bit register for signal <JMODE>.
+    Found 24-bit comparator lessequal for signal <LOROM$cmp_le0000> created at line 688.
+    Found 1-bit register for signal <MODE68K>.
+    Found 1-bit register for signal <n_aas40>.
+    Found 1-bit register for signal <n_aas80>.
+    Found 1-bit register for signal <n_aasq>.
+    Found 1-bit register for signal <n_regreset>.
+    Found 1-bit register for signal <PHANTOMHI>.
+    Found 1-bit register for signal <PHANTOMLO>.
+    Found 1-bit register for signal <ROMCONF>.
+    Summary:
+	inferred   6 D-type flip-flop(s).
+	inferred   3 Comparator(s).
+	inferred   2 Xor(s).
+	inferred   4 Tristate(s).
+Unit <N2630_Main> synthesized.
+
+
+=========================================================================
+HDL Synthesis Report
+
+Macro Statistics
+# Registers                                            : 13
+ 1-bit register                                        : 12
+ 4-bit register                                        : 1
+# Comparators                                          : 3
+ 24-bit comparator greatequal                          : 1
+ 24-bit comparator lessequal                           : 2
+# Tristates                                            : 4
+ 1-bit tristate buffer                                 : 4
+# Xors                                                 : 2
+ 1-bit xor2                                            : 2
+
+=========================================================================
+
+=========================================================================
+*                       Advanced HDL Synthesis                          *
+=========================================================================
+
+
+=========================================================================
+Advanced HDL Synthesis Report
+
+Macro Statistics
+# Registers                                            : 6
+ Flip-Flops                                            : 6
+
+=========================================================================
+
+=========================================================================
+*                         Low Level Synthesis                           *
+=========================================================================
+WARNING:Xst:2170 - Unit N2630_Main : the following signal(s) form a combinatorial loop: nBOSS, nBOSS_and0001, nBOSS_or0000.
+WARNING:Xst:2170 - Unit N2630_Main : the following signal(s) form a combinatorial loop: n_onboard_or0000, n_onboard_and0004, nADOEH, nADOEH_or0001, nADOEH_and0001.
+WARNING:Xst:2170 - Unit N2630_Main : the following signal(s) form a combinatorial loop: ROMCLK.
+WARNING:Xst:2170 - Unit N2630_Main : the following signal(s) form a combinatorial loop: ramclk.
+
+Optimizing unit <N2630_Main> ...
+  implementation constraint: INIT=r	 : JMODE
+  implementation constraint: INIT=r	 : PHANTOMLO
+  implementation constraint: INIT=s	 : IVMA
+  implementation constraint: INIT=r	 : cycend
+  implementation constraint: INIT=r	 : ROMCONF
+  implementation constraint: INIT=r	 : MODE68K
+  implementation constraint: INIT=r	 : PHANTOMHI
+
+=========================================================================
+*                           Partition Report                            *
+=========================================================================
+
+Partition Implementation Status
+-------------------------------
+
+  No Partitions were found in this design.
+
+-------------------------------
+
+=========================================================================
+*                            Final Report                               *
+=========================================================================
+Final Results
+RTL Top Level Output File Name     : N2630_Main.ngr
+Top Level Output File Name         : N2630_Main
+Output Format                      : NGC
+Optimization Goal                  : Speed
+Keep Hierarchy                     : Yes
+Target Technology                  : XC9500XL CPLDs
+Macro Preserve                     : YES
+XOR Preserve                       : YES
+Clock Enable                       : YES
+wysiwyg                            : NO
+
+Design Statistics
+# IOs                              : 85
+
+Cell Usage :
+# BELS                             : 210
+#      AND2                        : 40
+#      AND3                        : 15
+#      AND4                        : 7
+#      AND5                        : 1
+#      AND6                        : 2
+#      AND7                        : 1
+#      AND8                        : 1
+#      GND                         : 1
+#      INV                         : 119
+#      OR2                         : 19
+#      OR3                         : 1
+#      VCC                         : 1
+#      XOR2                        : 2
+# FlipFlops/Latches                : 13
+#      FD                          : 3
+#      FDC                         : 6
+#      FDCE                        : 4
+# IO Buffers                       : 76
+#      IBUF                        : 45
+#      IOBUFE                      : 2
+#      OBUF                        : 27
+#      OBUFE                       : 2
+=========================================================================
+
+
+Total REAL time to Xst completion: 2.00 secs
+Total CPU time to Xst completion: 2.01 secs
+ 
 --> 
 
 
-Total memory usage is 481524 kilobytes
+Total memory usage is 511212 kilobytes
 
-Number of errors   :  216 (   0 filtered)
-Number of warnings :   11 (   0 filtered)
-Number of infos    :    0 (   0 filtered)
+Number of errors   :    0 (   0 filtered)
+Number of warnings :   26 (   0 filtered)
+Number of infos    :    6 (   0 filtered)
 

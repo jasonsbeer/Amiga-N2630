@@ -1,0 +1,191 @@
+Release 14.7 ngdbuild P.20131013 (lin64)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+
+Command Line: /mnt/work/ISE/14.7/ISE_DS/ISE/bin/lin64/unwrapped/ngdbuild
+-intstyle ise -dd _ngo -uc Main-Constraints.ucf -p xc9572xl-TQ100-10
+N2630_Main.ngc N2630_Main.ngd
+
+Reading NGO file
+"/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.ngc" ...
+Gathering constraint information from source properties...
+Done.
+
+Annotating constraints to design from ucf file "Main-Constraints.ucf" ...
+Resolving constraint associations...
+Checking Constraint Associations...
+ERROR:ConstraintSystem:59 - Constraint <NET	"A<16>"	LOC = "P"	;>
+   [Main-Constraints.ucf(1)]: NET "A<16>" not found.  Please verify that:
+   1. The specified design element actually exists in the original design.
+   2. The specified object is spelled correctly in the constraint source file.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET	"A<16>"	LOC = "P"	;> [Main-Constraints.ucf(1)]' could not be found and
+   so the Locate constraint will be removed.
+
+ERROR:ConstraintSystem:59 - Constraint <NET	"A<17>"	LOC = "P"	;>
+   [Main-Constraints.ucf(2)]: NET "A<17>" not found.  Please verify that:
+   1. The specified design element actually exists in the original design.
+   2. The specified object is spelled correctly in the constraint source file.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET	"A<17>"	LOC = "P"	;> [Main-Constraints.ucf(2)]' could not be found and
+   so the Locate constraint will be removed.
+
+ERROR:ConstraintSystem:59 - Constraint <NET	"A<18>"	LOC = "P"	;>
+   [Main-Constraints.ucf(3)]: NET "A<18>" not found.  Please verify that:
+   1. The specified design element actually exists in the original design.
+   2. The specified object is spelled correctly in the constraint source file.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET	"A<18>"	LOC = "P"	;> [Main-Constraints.ucf(3)]' could not be found and
+   so the Locate constraint will be removed.
+
+ERROR:ConstraintSystem:59 - Constraint <NET	"A<19>"	LOC = "P"	;>
+   [Main-Constraints.ucf(4)]: NET "A<19>" not found.  Please verify that:
+   1. The specified design element actually exists in the original design.
+   2. The specified object is spelled correctly in the constraint source file.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET	"A<19>"	LOC = "P"	;> [Main-Constraints.ucf(4)]' could not be found and
+   so the Locate constraint will be removed.
+
+ERROR:ConstraintSystem:59 - Constraint <NET	"A<20>"	LOC = "P"	;>
+   [Main-Constraints.ucf(5)]: NET "A<20>" not found.  Please verify that:
+   1. The specified design element actually exists in the original design.
+   2. The specified object is spelled correctly in the constraint source file.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET	"A<20>"	LOC = "P"	;> [Main-Constraints.ucf(5)]' could not be found and
+   so the Locate constraint will be removed.
+
+ERROR:ConstraintSystem:59 - Constraint <NET	"A<21>"	LOC = "P"	;>
+   [Main-Constraints.ucf(6)]: NET "A<21>" not found.  Please verify that:
+   1. The specified design element actually exists in the original design.
+   2. The specified object is spelled correctly in the constraint source file.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET	"A<21>"	LOC = "P"	;> [Main-Constraints.ucf(6)]' could not be found and
+   so the Locate constraint will be removed.
+
+ERROR:ConstraintSystem:59 - Constraint <NET	"A<22>"	LOC = "P"	;>
+   [Main-Constraints.ucf(7)]: NET "A<22>" not found.  Please verify that:
+   1. The specified design element actually exists in the original design.
+   2. The specified object is spelled correctly in the constraint source file.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET	"A<22>"	LOC = "P"	;> [Main-Constraints.ucf(7)]' could not be found and
+   so the Locate constraint will be removed.
+
+ERROR:ConstraintSystem:59 - Constraint <NET	"A<23>"	LOC = "P"	;>
+   [Main-Constraints.ucf(8)]: NET "A<23>" not found.  Please verify that:
+   1. The specified design element actually exists in the original design.
+   2. The specified object is spelled correctly in the constraint source file.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET	"A<23>"	LOC = "P"	;> [Main-Constraints.ucf(8)]' could not be found and
+   so the Locate constraint will be removed.
+
+WARNING:ConstraintSystem:119 - Constraint <NET "PHANTOMHI"	LOC = "P" ;>
+   [Main-Constraints.ucf(10)]: This constraint cannot be distributed from the
+   design objects matching 'NET "PHANTOMHI"' because those design objects do not
+   contain or drive any instances of the correct type.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET "PHANTOMHI"	LOC = "P" ;> [Main-Constraints.ucf(10)]' could not be found
+   and so the Locate constraint will be removed.
+
+WARNING:ConstraintSystem:119 - Constraint <NET "PHANTOMLO"	LOC = "P" ;>
+   [Main-Constraints.ucf(11)]: This constraint cannot be distributed from the
+   design objects matching 'NET "PHANTOMLO"' because those design objects do not
+   contain or drive any instances of the correct type.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET "PHANTOMLO"	LOC = "P" ;> [Main-Constraints.ucf(11)]' could not be found
+   and so the Locate constraint will be removed.
+
+ERROR:ConstraintSystem:59 - Constraint <NET "_AS"	LOC = "P" ;>
+   [Main-Constraints.ucf(13)]: NET "_AS" not found.  Please verify that:
+   1. The specified design element actually exists in the original design.
+   2. The specified object is spelled correctly in the constraint source file.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET "_AS"	LOC = "P" ;> [Main-Constraints.ucf(13)]' could not be found and
+   so the Locate constraint will be removed.
+
+ERROR:ConstraintSystem:59 - Constraint <NET "_BOSS"	LOC = "P" ;>
+   [Main-Constraints.ucf(15)]: NET "_BOSS" not found.  Please verify that:
+   1. The specified design element actually exists in the original design.
+   2. The specified object is spelled correctly in the constraint source file.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET "_BOSS"	LOC = "P" ;> [Main-Constraints.ucf(15)]' could not be found and
+   so the Locate constraint will be removed.
+
+ERROR:ConstraintSystem:59 - Constraint <NET "_ABG"	LOC = "P" ;>
+   [Main-Constraints.ucf(16)]: NET "_ABG" not found.  Please verify that:
+   1. The specified design element actually exists in the original design.
+   2. The specified object is spelled correctly in the constraint source file.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET "_ABG"	LOC = "P" ;> [Main-Constraints.ucf(16)]' could not be found and
+   so the Locate constraint will be removed.
+
+ERROR:ConstraintSystem:59 - Constraint <NET "_AAS" 	LOC = "P" ;>
+   [Main-Constraints.ucf(17)]: NET "_AAS" not found.  Please verify that:
+   1. The specified design element actually exists in the original design.
+   2. The specified object is spelled correctly in the constraint source file.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET "_AAS" 	LOC = "P" ;> [Main-Constraints.ucf(17)]' could not be found and
+   so the Locate constraint will be removed.
+
+ERROR:ConstraintSystem:59 - Constraint <NET "FC0"	LOC = "P" ;>
+   [Main-Constraints.ucf(19)]: NET "FC0" not found.  Please verify that:
+   1. The specified design element actually exists in the original design.
+   2. The specified object is spelled correctly in the constraint source file.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET "FC0"	LOC = "P" ;> [Main-Constraints.ucf(19)]' could not be found and
+   so the Locate constraint will be removed.
+
+ERROR:ConstraintSystem:59 - Constraint <NET "FC1"	LOC = "P" ;>
+   [Main-Constraints.ucf(20)]: NET "FC1" not found.  Please verify that:
+   1. The specified design element actually exists in the original design.
+   2. The specified object is spelled correctly in the constraint source file.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET "FC1"	LOC = "P" ;> [Main-Constraints.ucf(20)]' could not be found and
+   so the Locate constraint will be removed.
+
+ERROR:ConstraintSystem:59 - Constraint <NET "FC2"	LOC = "P" ;>
+   [Main-Constraints.ucf(21)]: NET "FC2" not found.  Please verify that:
+   1. The specified design element actually exists in the original design.
+   2. The specified object is spelled correctly in the constraint source file.
+
+WARNING:ConstraintSystem - A target design object for the Locate constraint
+   '<NET "FC2"	LOC = "P" ;> [Main-Constraints.ucf(21)]' could not be found and
+   so the Locate constraint will be removed.
+
+Done...
+
+Checking expanded design ...
+
+Partition Implementation Status
+-------------------------------
+
+  No Partitions were found in this design.
+
+-------------------------------
+
+NGDBUILD Design Results Summary:
+  Number of errors:    15
+  Number of warnings:  19
+
+Total memory usage is 388336 kilobytes
+
+Total REAL time to NGDBUILD completion:  1 sec
+Total CPU time to NGDBUILD completion:   1 sec
+
+One or more errors were found during NGDBUILD.  No NGD file will be written.
+
+Writing NGDBUILD log file "N2630_Main.bld"...
