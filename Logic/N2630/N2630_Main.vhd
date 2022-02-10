@@ -259,20 +259,6 @@ begin
 			ELSE
 				nDSACKEN <= '1';
 			END IF;
-			
-			
---			DSACKEN <= '0'
---			WHEN
---				( nDSen = '1' AND cycend = '1' AND EXTERN = '0' AND nDTACK = '0' )
---				--!DSACKEN.D = !DSEN & CYCEND & !EXTERN &   DTACK
---			OR
---				( nDSen = '1' AND cycend = '1' AND EXTERN = '0' and n_edtack ='0' )
---				--!DSACKEN.D = !DSEN & CYCEND & !EXTERN &  EDTACK
---			OR
---				( nDSen = '1' AND cycend = '1' AND EXTERN = '0' AND n_onboard = '0' )
---				--!DSACKEN.D = !DSEN & CYCEND & !EXTERN & ONBOARD
---			ELSE
---				'1';
 		END IF;
 	END PROCESS;
 				
@@ -286,18 +272,9 @@ begin
 				cycend <= '1';
 			ELSE
 				cycend <= '0';
-			END IF;
-			
---			cycend <= '1'
---			WHEN
---				nDSACKEN = '1' AND cycend =  '0'
---				--!CYCEND.D = !DSACKEN & CYCEND
---				--the output is inverted so we look for !cycend here
---			ELSE
---				'0';
+			END IF;			
 		END IF;
-	END PROCESS;
-	
+	END PROCESS;	
 	
 	--nAAS
 	--68000 style address strobe. Again, this only becomes active when the
@@ -485,10 +462,10 @@ begin
 	END PROCESS;
 	
 	--n_regreset
-	--	This is a special reset used to reset the configuration registers.  If
-	-- JMODE (Johann's special mode) is active, we can reset the registers
-	-- with the CPU.  Otherwise, the registers can only be reset with a cold
-	-- reset asserted.
+	--This is a special reset used to reset the configuration registers.  If
+	--JMODE (Johann's special mode) is active, we can reset the registers
+	--with the CPU.  Otherwise, the registers can only be reset with a cold
+	--reset asserted.
 	--Original PAL U504 (16R6A flip flop, according to data sheet is triggered on rising edge, schematics show falling edge?)
 
 	PROCESS (n_clk7m) BEGIN
@@ -540,13 +517,12 @@ begin
 	--This is the DTACK generator for DMA access to on-board memory.  It
 	--waits until we're in a cycle, and then a fixed delay from RAS, to `
 	--account for any refresh that must take place.	
-	--Original PAL U501
-	--We don't need a RAS delay...cause we're using SRAM
+	--Original PAL U501. nSTERM comes from the daughtercard only.
 
 	nDTACK <= '0'
 		WHEN
 			--nDTACK = BGACK & MEMSEL & AAS & STERM;
-			nBGACK = '0' AND nAS = '0' AND nSTERM = '0' AND MEMSEL = '1'
+			nBGACK = '0' AND nAAS = '0' AND nSTERM = '0' AND MEMSEL = '1'
 		ELSE
 			'1';
 		
@@ -597,82 +573,75 @@ begin
 			AH(23 downto 16) = x"E8" AND nAS = '0'
 		ELSE
 			'0';
-
-	AUTOCONFIG : PROCESS (CLK, nRESET)
-		BEGIN
-		
-		IF nRESET = '0' THEN
-			--THE COMPUTER IS IN RESET
-			--PUT THE AUTOCONFIG SETTINGS BACK TO NOT CONFIGURED
-			autoconfig_done <= '0';
-			BASEADDRESS <= x"0";
-		
-		ELSIF RISING_EDGE(CLK) AND autoconfig_done = '0' THEN
-			IF ( autoconfigspace = '1' AND R_W = '1') THEN
-				--THIS IS THE AUTOCONFIG BASE ADDRESS
-				
-				CASE AL(6 downto 1) IS
-					
-					--offset $00
-					WHEN "000000" => DAC(31 downto 28) <= "1110"; --er_type: Zorro 2 card without BOOT ROM
-				
-					--offset $02
-					WHEN "000001" => DAC(31 downto 28) <= "0111"; --er_type: 4MB
-					
-					--offset $04
-					WHEN "000010" => DAC(31 downto 28) <= "1010"; --Product Number Hi Nibble, we are stealing the A2630 product number
-					
-					--offset $06
-					WHEN "000011" => DAC(31 downto 28) <= "1000"; --Product Number Lo Nibble				
-					
-					--offset $08
-					WHEN "000100" => DAC(31 downto 28) <= "0010"; --er_flags: I/O device, can't be shut up, reserved, reserved
-					
-					--offset $0A
-					--WHEN "000101" => D(31 downto 28) <= "0000"; --er_flags: Reserved, must be zeroes
-					
-					--offset $0C
-					--WHEN "000110" => D(31 downto 28) <= "0000"; --Reserved: must be zeroes				
-					
-					--offset $0E
-					--WHEN "000111" => D(31 downto 28) <= "0000"; --Reserved: must be zeroes	
-					
-					--offset $10
-					WHEN "001000" => DAC(31 downto 28) <= "0100"; --Product Number, high nibble hi byte. Just for fun, lets put C= in here!
-					
-					--offset $12
-					--WHEN "001001" => D(31 downto 28) <= "0000"; --Product Number, low nibble hi byte. Just for fun, lets put C= in here!
-					
-					--offset $14
-					--WHEN "001010" => D(31 downto 28) <= "0000"; --Product Number, high nibble low byte. Just for fun, lets put C= in here!
-					
-					--offset $16
-					WHEN "001011" => DAC(31 downto 28) <= "0100"; --Product Number, low nibble low byte. Just for fun, lets put C= in here!
-					
-					--offset $18
-					--WHEN "001100" => D(31 downto 28) <= "0000"; --Serial number byte 0 high nibble
-					
-					--offset $1A
-					--WHEN "001101" => D(31 downto 28) <= "0000"; --Serial number byte 0 low nibble				
-					
-					WHEN OTHERS => DAC(31 downto 28) <= "0000"; --Reserved offsets and unused offset values are all zeroes
-					
-				END CASE;
-				
-			--Is this one our base address?
-			ELSIF (R_W = '0' AND nDS = '0' AND nAS = '0' AND autoconfig_done = '0') THEN
 			
-				IF ( AL(6 downto 1) = x"48" ) THEN
-					--I DON'T KNOW WHAT TO DO WITH THIS...WE PROBABLY DON'T NEED IT
-					BASEADDRESS <= DAC(31 downto 28); --This is written to our device from the Amiga
-					autoconfig_done <= '1'; --Autoconfig process is done!
+	autoconfig_done <= '0' WHEN nRESET = '0';
+	BASEADDRESS <= x"0" WHEN nRESET = '0';
+			
+	--Here it is in all its glory...the AUTOCONFIG sequence
+	PROCESS ( CLK ) BEGIN
+		IF ( FALLING_EDGE (CLK) ) THEN
+			IF ( autoconfigspace = '1' AND autoconfig_done = '0' ) THEN
+				IF ( R_W = '1' ) THEN
+					CASE AL(6 downto 1) IS
+
+						--offset $00
+						WHEN "000000" => DAC(31 downto 28) <= "1110"; --er_type: Zorro 2 card without BOOT ROM
+
+						--offset $02
+						WHEN "000001" => DAC(31 downto 28) <= "0111"; --er_type: 4MB
+
+						--offset $04
+						WHEN "000010" => DAC(31 downto 28) <= "1010"; --Product Number Hi Nibble, we are stealing the A2630 product number
+
+						--offset $06
+						WHEN "000011" => DAC(31 downto 28) <= "1000"; --Product Number Lo Nibble				
+
+						--offset $08
+						WHEN "000100" => DAC(31 downto 28) <= "0010"; --er_flags: I/O device, can't be shut up, reserved, reserved
+
+						--offset $0A
+						--WHEN "000101" => D(31 downto 28) <= "0000"; --er_flags: Reserved, must be zeroes
+
+						--offset $0C
+						--WHEN "000110" => D(31 downto 28) <= "0000"; --Reserved: must be zeroes				
+
+						--offset $0E
+						--WHEN "000111" => D(31 downto 28) <= "0000"; --Reserved: must be zeroes	
+
+						--offset $10
+						WHEN "001000" => DAC(31 downto 28) <= "0100"; --Product Number, high nibble hi byte. Just for fun, lets put C= in here!
+
+						--offset $12
+						--WHEN "001001" => D(31 downto 28) <= "0000"; --Product Number, low nibble hi byte. Just for fun, lets put C= in here!
+
+						--offset $14
+						--WHEN "001010" => D(31 downto 28) <= "0000"; --Product Number, high nibble low byte. Just for fun, lets put C= in here!
+
+						--offset $16
+						WHEN "001011" => DAC(31 downto 28) <= "0100"; --Product Number, low nibble low byte. Just for fun, lets put C= in here!
+
+						--offset $18
+						--WHEN "001100" => D(31 downto 28) <= "0000"; --Serial number byte 0 high nibble
+
+						--offset $1A
+						--WHEN "001101" => D(31 downto 28) <= "0000"; --Serial number byte 0 low nibble				
+
+						WHEN OTHERS => DAC(31 downto 28) <= "0000"; --Reserved offsets and unused offset values are all zeroes
+
+					END CASE;
+					
+				--Is this one our base address? If yes, we are done with AUTOCONFIG
+				ELSIF ( R_W = '0' AND nDS = '0' ) THEN			
+					IF ( AL(6 downto 1) = x"48" ) THEN
+						--I DON'T KNOW WHAT TO DO WITH THIS...WE PROBABLY DON'T NEED IT
+						BASEADDRESS <= DAC(31 downto 28); --This is written to our device from the Amiga
+						autoconfig_done <= '1'; --Autoconfig process is done!
+					END IF;			
 				END IF;
-			
 			END IF;
-					
-		END IF;	
-
-	END PROCESS AUTOCONFIG;
+		END IF;
+	END PROCESS;
+	
 	
 	----------------
 	-- ROM ENABLE --
@@ -837,126 +806,91 @@ begin
 		'1' WHEN memsel = '1' AND cycledone = '0' ELSE
 		'0' WHEN memsel = '1' AND cycledone = '1';
 
+	--OUTPUT ENABLE OR WRITE ENABLE DEPENDING ON THE CPU REQUEST
+	nOE0 <= '0' WHEN R_W = '1' AND TWOMEG = '1' ELSE '1';
+	nOE1 <= '0' WHEN R_W = '1' AND FOURMEG = '1' ELSE '1';
+	nWE0 <= '0' WHEN R_W = '0' AND TWOMEG = '1' ELSE '1';
+	nWE1 <= '0' WHEN R_W = '0' AND FOURMEG = '1' ELSE '1';			
 
-	RAM_ACCESS:PROCESS ( nAS, R_W, nDS ) BEGIN
+	RAM_ACCESS:PROCESS ( CLK ) BEGIN
+		
+		IF ( FALLING_EDGE (CLK) ) THEN
 
-		IF (autoconfig_done = '1' AND FC(2 downto 0) /= x"7" AND nAS = '0' AND nDS = '0') THEN
-			--$7 = CPU SPACE...we do not want to interject ourselves when the CPU is taking care of it's own business		
-			
-			--ENABLE THE VARIOUS BYTES ON THE SRAM DEPENDING ON WHAT THE CPU IS ASKING FOR
-			
-			--UPPER UPPER BYTE ENABLE (D31..24)
-			IF (( R_W = '1' ) 
-				OR (R_W = '0' AND AL(1 downto 0) = "00")) 
-			THEN			
-				nUUBE <= '0'; 
+			IF (autoconfig_done = '1' AND FC(2 downto 0) /= x"7" AND nAS = '0') THEN
+				--$7 = CPU SPACE...we do not want to interject ourselves when the CPU is taking care of it's own business		
+
+				--ENABLE THE VARIOUS BYTES ON THE SRAM DEPENDING ON WHAT THE CPU IS ASKING FOR
+
+				--UPPER UPPER BYTE ENABLE (D31..24)
+				IF (( R_W = '1' ) 
+					OR (R_W = '0' AND AL(1 downto 0) = "00") AND nDS = '0') 
+				THEN			
+					nUUBE <= '0'; 
+				ELSE 
+					nUUBE <= '1';
+				END IF;
+
+				--UPPER MIDDLE BYTE (D23..16)
+				IF (( R_W = '1' ) 
+					OR ( R_W = '0' AND (( AL(1 downto 0) = "01"  AND nDS = '0')
+					OR ( AL(1) = '0' AND SIZ(0) = '0'  AND nDS = '0') 
+					OR ( AL(1) = '0' AND SIZ(1) = '1'  AND nDS = '0')))) 
+				THEN
+					nUMBE <= '0';
+				ELSE
+					nUMBE <= '1';
+				END IF;
+
+				--LOWER MIDDLE BYTE (D15..8)
+				IF (( R_W = '1' )
+					OR ( R_W = '0' AND (( AL(1 downto 0) = "10"  AND nDS = '0') 
+					OR ( AL(1) = '0' AND SIZ(0) = '0' AND SIZ(1) = '0'  AND nDS = '0') 
+					OR	( AL(1) = '0' AND SIZ(0) = '1' AND SIZ(1) = '1'  AND nDS = '0') 
+					OR ( AL(0) = '1' AND AL(1) = '0' AND SIZ(0) = '0'  AND nDS = '0'))))
+				THEN
+					nLMBE <= '0';
+				ELSE
+					nLMBE <= '1';
+				END IF;
+
+				--LOWER LOWER BYTE (D7..0)
+				IF (( R_W = '1' )
+					OR	( R_W = '0' AND ( AL(1 downto 0) = "11"  AND nDS = '0' )
+					OR 	(AL(0) = '1' AND SIZ(0) = '1' AND SIZ(1) = '1' AND nDS = '0') 
+					OR	(SIZ(0) = '0' AND SIZ(1) = '0' AND nDS = '0') 
+					OR	(AL(1) = '1' AND SIZ(1) ='1' AND nDS = '0'))))
+				THEN
+					nLLBE <= '0';
+				ELSE
+					nLLBE <= '1';
+				END IF;	
+
+				--nSTERM = Bus response signal that indicates a port size of 32 bits and
+				--that data may be latched on the next falling clock edge. Synchronous transfer.
+				--STERM is only used on the daughterboard of the A2630. The A2630 card uses DSACKx for terminiation,
+				--which may be due to the 32 <-> 16 bit transfers when DMA'ing
+
+				--IF TWOMEG = '1' OR FOURMEG = '1' THEN
+				--	nSTERM <= '0';
+				--ELSE
+				--	nSTERM <= '1';
+				--END IF;
+
+				--CACHE GOES IN HERE SOMEWHERE
+				--_CBREQ _CBACK WE ARE NOT USING ANY CACHE MEMORY
+				--DBEN external data buffers - not needed
+
 			ELSE 
-				nUUBE <= '1';
-			END IF;
-			
-			--UPPER MIDDLE BYTE (D23..16)
-			IF (( R_W = '1' ) 
-				OR ( R_W = '0' AND (( AL(1 downto 0) = "01" )
-				OR ( AL(1) = '0' AND SIZ(0) = '0' ) 
-				OR ( AL(1) = '0' AND SIZ(1) = '1' )))) 
-			THEN
-				nUMBE <= '0';
-			ELSE
-				nUMBE <= '1';
-			END IF;
-			
-			--LOWER MIDDLE BYTE (D15..8)
-			IF (( R_W = '1' )
-				OR ( R_W = '0' AND (( AL(1 downto 0) = "10" ) 
-				OR ( AL(1) = '0' AND SIZ(0) = '0' AND SIZ(1) = '0' ) 
-				OR	( AL(1) = '0' AND SIZ(0) = '1' AND SIZ(1) = '1' ) 
-				OR ( AL(0) = '1' AND AL(1) = '0' AND SIZ(0) = '0' ))))
-			THEN
-				nLMBE <= '0';
-			ELSE
-				nLMBE <= '1';
-			END IF;
-				
-			--LOWER LOWER BYTE (D7..0)
-			IF (( R_W = '1' )
-				OR	( R_W = '0' AND ( AL(1 downto 0) = "11" 
-				OR (AL(0) = '1' AND SIZ(0) = '1' AND SIZ(1) = '1') 
-				OR	(SIZ(0) = '0' AND SIZ(1) = '0') 
-				OR	(AL(1) = '1' AND SIZ(1) ='1'))))
-			THEN
-				nLLBE <= '0';
-			ELSE
-				nLLBE <= '1';
-			END IF;				
-				
-			--OUTPUT ENABLE OR WRITE ENABLE DEPENDING ON THE CPU REQUEST
-			IF R_W = '1' AND TWOMEG = '1' THEN			
-				nOE0 <= '0'; --BANK0
-			ELSE
-				nOE0 <= '1';
-			END IF;
-			
-			IF R_W = '1' AND FOURMEG = '1' THEN
-				nOE1 <= '0'; -- BANK1
-			ELSE
-				nOE1 <= '1';
-			END IF;
-			
-			IF R_W = '0' AND TWOMEG = '1' THEN
-				nWE0 <= '0'; -- BANK0
-			ELSE
-				nWE0 <= '1';
-			END IF;
-				
-			IF R_W = '0' AND FOURMEG = '1' THEN
-				nWE1 <= '0'; -- BANK1
-			ELSE
-				nWE1 <= '1';
-			END IF;
-			
-			--NEED TO FIGURE OUT HOW TO DEAL WITH DSACK FOR 16 BIT TRANSFERS FROM A2000
-				
-			--nSTERM = Bus response signal that indicates a port size of 32 bits and
-			--that data may be latched on the next falling clock edge. Synchronous transfer.
-			--STERM is only used on the daughterboard of the A2630. The A2630 card uses DSACKx for terminiation,
-			--which may be due to the 32 <-> 16 bit transfers when DMA'ing
-			
-			--IF TWOMEG = '1' OR FOURMEG = '1' THEN
-			--	nSTERM <= '0';
-			--ELSE
-			--	nSTERM <= '1';
-			--END IF;
-			
-			
-				
-					
-			--ecs (EXTERNAL CYCLE START) HOW DOES THAT FIT IN? it doesn't
-			
-			--DSACK0 AND 1 GO IN HERE SOMEWHERE (PORT SIZE ACK) these are for asynchronise data transfer
-			--since dsackx is only used in asynchronise transfers, I don't think we need it here?
-			--We are using STERM and only doing synchronous transfers cuz the sram is fast enough to handle the transfer in 2 clock cycles
-			--Anyhow, put DASCKx both low to indicate 32 bit port transfer terminiation (transfer is complete)
-			
-			--CACHE GOES IN HERE SOMEWHERE
-			--_CBREQ _CBACK WE ARE NOT USING ANY CACHE MEMORY
-			--DBEN external data buffers - not needed
-			
-		ELSE 
-			--DEACTIVATE ALL THE RAM STUFF
-			--nSTERM <= '1';
-			
-			nUUBE <= '1';
-			nUMBE <= '1';
-			nLMBE <= '1';
-			nLLBE <= '1';
-			
-			nOE0 <= '1';
-			nOE1 <= '1';
-			nWE0 <= '1';
-			nWE1 <= '1';	
-			
-		END IF;		
+				--DEACTIVATE ALL THE RAM STUFF
+				--nSTERM <= '1';
 
+				nUUBE <= '1';
+				nUMBE <= '1';
+				nLMBE <= '1';
+				nLLBE <= '1';	
+
+			END IF;	
+		END IF;
 	END PROCESS RAM_ACCESS;
 	
 	----------------------------
