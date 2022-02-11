@@ -1,0 +1,165 @@
+
+		PARTNO	  XXXXX ;
+		NAME	  U501;
+		DATE	  September 25, 1988;
+		REV	  6;
+		DESIGNER  Haynie ;
+		COMPANY   Commodore ;
+		ASSEMBLY  312828 ;
+		LOCATION  U501;
+
+/************************************************************************/
+/*									*/
+/*  A2630 	UDS and LDS generation. Amiga AS generation, 68000	*/
+/*  		RW generation, DRAM WRITE generation, 68000 DTACK 	*/
+/*		generation, and 68030 BGACK arbitration.		*/
+/*									*/
+/************************************************************************/
+/*  Allowable Target Device Types: 20L8A 				*/
+/************************************************************************/
+/*  Free Pins: 15(I/O)							*/
+/************************************************************************/
+/*  HISTORY								*/
+/*	DBH Nov  1:	Qualified /AAS for offboard accesses		*/
+/*	DBH Feb 22:	Qualified other motherboard signals		*/
+/*	DBH Mar  8:	First 68030 specific version			*/
+/*	DBH Mar  8:	Added CPUACC to AS inhibit terms		*/  
+/*	DBH Mar 12:	Fixed data strobes for 68030 caching		*/
+/*	DBH Mar 12:	Removed AAS qualifier from OVR			*/
+/*	DBH Mar 12:	BGACK now only changes during non-cycle		*/
+/*	DBH Apr 18:	Removed CPUACC, now implicit in AS		*/
+/*	DBH Apr 18:	Removed BGACK qualifier, fixed elsewhere	*/
+/*	DBH May  3:	Added EXTERN qualifier for specials		*/
+/*	DBH May  3:	Doing TS externally now				*/
+/*	DBH Sep 25:	Revision for Rev 3 PCB				*/
+/************************************************************************/
+
+/**  Inputs  **/
+
+PIN 1		=  A0		;	/* Address line 0 */
+PIN 2		= !CYCEND	;	/* Cycle end */
+PIN 3		= !DSEN		;	/* Data strobe enable */
+PIN 4		= !BOSS		;	/* We are the boss of the buss */
+PIN [5..6]	=  [SIZ0..1]	;	/* Data size bits */
+PIN 7		=  TRISTATE	;	/* Bus tristate control */
+PIN 8		=  RW		;	/* processor read write */
+PIN 9		= !ONBOARD	;	/* Access was to onboard device */
+PIN 10		= !MEMSEL	;	/* Memory selected */
+PIN 11		= !STERM	;	/* Cycle ends for 68030 */
+PIN 13		= !ABGACK	;	/* Amiga bus request */
+PIN 14		= !ASEN		;	/* Adress strobe enable delayed */
+PIN 23		= !EXTERN	;	/* Special or daughterboard access */
+
+/**  Outputs  **/
+
+PIN 16		= !LDS		;	/* Lower data strobe */
+PIN 17		= !AAS		;	/* Amiga adress strobe */
+PIN 18		=  ARW		;	/* 68000 bus RW */
+PIN 19		= !UDS		;	/* Upper data strobe */
+PIN 20		= !BGACK	;	/* Buss grant signal */
+PIN 21		=  DTACK	;	/* Amiga's Data Xfer Ack */
+PIN 22		= !OVR		;	/* Override */
+
+/** Declarations and Intermediate Variable Definitions **/
+
+RULES:
+ALL MY INTERNAL SIGNALS ARE ACTIVE HIGH
+ALL MY INTERNAL SIGNALS ARE IN lowercase
+ALL EXTERNAL SIGNALS ARE IN UPPERCASE
+ALL ACTIVE LOW SIGNALS ARE PRECEEDED BY n
+ALL ACTIVE HIGH SIGNALS HAVE NO PREFIX
+
+THE ORIGINAL PAL CODE IS THE FIRST LINE(S)
+WITH THE PROPOSED VHDL CODE ON THE FOLLOWING LINES
+
+USEFUL CONVERSION GRID FOR LOGIC STATES 'CAUSE IT CAN BE A MESS!
+
+            PIN SIGNAL
+          --------------
+          |  !  |  -   |
+------------------------
+D S |     | NOT |   -  |
+E T |  !  | NOT |  NOT |
+S A |     |  1  |   0  |
+I T |-----|-------------
+R E |     | NOT |   -  |
+E   |  -  |  -  |   -  |
+D   |     |  0  |   1  |
+------------------------
+
+
+rds		=  ASEN & !CYCEND &  RW & !EXTERN;
+SIGNAL rds : STD_LOGIC:='0';
+rds <= '1' WHEN nASEN = '0' AND nCYCEND = '1' AND RnW = '1' AND nEXTERN = '1' ELSE '0';
+
+wds		=  DSEN & !CYCEND & !RW;
+SIGNAL wds : STD_LOGIC:='0';
+wds <= '1' WHEN nDSEN = '0' AND nCYCEND = '1' AND RnW = '0' ELSE ''0;
+
+as		=  ASEN & !CYCEND & !EXTERN;
+SIGNAL as : STD_LOGIC:='0';
+as <= '1' WHEN nASEN = '0' AND nCYCEND = '1' AND nEXTERN = '1' ELSE '0';
+
+offboard	= !(ONBOARD # MEMSEL # EXTERN);
+SIGNAL offboard : STD_LOGIC:='0';
+offboard <= '1' WHEN (nONBOARD = '1' OR nMEMSEL = '1' OR nEXTERN = '1') ELSE '0';
+
+/**  Logic Equations  **/
+
+/* 68000 style data strobes.  These are kept in tri-state when the 
+   TRISTATE signal is active, or when we're not "offboard".  For 68030
+   caching, we must always return 16 bits on reads, regardless of the
+   state of A0, SIZ1, or SIZ2.  Since the CAS PAL for onboard memory
+   was full when this feature of the 68030 was considered, I kludge
+   a fix here.  If the memory access is a normal offboard access, UDS
+   looks normal.  If the memory access is not offboard, the then UDS
+   reflects the state of the CPU's R/W line.  */
+
+UDS		= wds & !A0
+		# rds ;
+nUDS <= '0' WHEN wds = '1' AND A(0) = '0' AND nTRISTATE = '0' AND offboard = '1' ELSE 'Z';
+
+LDS		= wds & SIZ1
+		# wds & !SIZ0
+		# wds & A0
+		# rds ;
+nLDS <= '0' WHEN nTRISTATE = '0' AND offboard = '1' AND ((wds = '1' AND nSIZ1 = '0') OR (wds = '1' AND SIZ0 = '1') OR (wds = '1' AND A(0) = '1') OR rds = '1') ELSE 'Z';
+
+/* 68000 style address strobe. Again, this only becomes active when the
+   TRISTATE signal is negated and the memory cycle is for an offboard
+   resource.
+ */
+AAS		= as ;
+nAAS <= '0' WHEN as = '1' AND nTRISTATE = '0' AND offboard = '1' ELSE 'Z';
+
+/* This signal is the Amiga bus RW line. This signal tristates when we are 
+   not yet boss and when there is a DMA device active, or during an
+   onboard cycle. 
+*/
+ARW		= RW ;
+ARnW <= RnW WHEN nTRISTATE = '0' AND offboard = '1' ELSE 'Z';
+
+/* The OVR signal must be asserted whenever on-board memory is selected
+   during a DMA cycle.  It tri-states GARY's DTACK output, allowing
+   one to be created by our memory logic. */
+
+OVR		= BGACK & MEMSEL;
+OVR.OE		= BGACK & MEMSEL;
+nOVR <= '0' WHEN nBGACK = '0' AND nMEMSEL = '0' ELSE 'Z';
+
+/* This is the DTACK generator for DMA access to on-board memory.  It
+   waits until we're in a cycle, and then a fixed delay from RAS, to `
+   account for any refresh that must take place. */
+
+DTACK		= BGACK & MEMSEL & AAS & STERM;
+nDTACK <= '0' WHEN nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' AND nSTERM = '0' ELSE '1'
+
+DO WE NEED STERM HERE?
+
+/* We keep ABGACK disconnected from BGACK until we are BOSS.  */
+
+BGACK		= ABGACK;
+BGACK.OE	= BOSS;
+nBGACK <= '0' WHEN nABGACK = '0' AND nBOSS = '0' ELSE '1' WHEN nABGACK = '1' AND nBOSS = '0' ELSE 'Z';
+
+[UDS, LDS, ARW, AAS].OE = !TRISTATE & offboard ;
