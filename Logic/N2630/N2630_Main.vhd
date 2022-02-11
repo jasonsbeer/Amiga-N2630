@@ -1,14 +1,13 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Engineer: Jason Neus
 -- 
 -- Create Date:    16:16:25 01/14/2022 
--- Design Name: 
+-- Design Name: 	 
 -- Module Name:    N2630_Main - Behavioral 
 -- Project Name: 
--- Target Devices: 
+-- Target Devices: xc9572XL TQ100
 -- Tool versions: 
--- Description: 
+-- Description: All the PAL logic needed from the original A2630
 --
 -- Dependencies: 
 --
@@ -32,7 +31,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity N2630_Main is
-    Port ( AH : in  STD_LOGIC_VECTOR (31 downto 16); --68030 Address High Bits
+    Port ( AH : in  STD_LOGIC_VECTOR (31 downto 13); --68030 Address High Bits
 			  AL : in STD_LOGIC_VECTOR (6 downto 0); --68030 Address Low Bits
 			  FC : in STD_LOGIC_VECTOR (2 downto 0);
 			  SIZ : in STD_LOGIC_VECTOR (1 downto 0);           
@@ -49,6 +48,7 @@ entity N2630_Main is
 			  nASEN : in STD_LOGIC;
 			  nVPA : in STD_LOGIC;	
 			  nCPURESET : in STD_LOGIC;
+			  nSENSE : in STD_LOGIC;
 			  
 			  D : inout STD_LOGIC_VECTOR (20 downto 16);
 			  DAC : inout STD_LOGIC_VECTOR (31 downto 28);
@@ -84,7 +84,11 @@ entity N2630_Main is
 			  nADOEH : out STD_LOGIC:='1'; --Amiga Data Out Enable High
 			  nADOEL : out STD_LOGIC:='1'; --Amiga Data Out Enable Low
 			  nDSACK0 : out STD_LOGIC:='1'; --68030 Data Strobe ACK 0
-			  nDSACK1 : out STD_LOGIC:='1' --68030 Data Strobe ACK 1
+			  nDSACK1 : out STD_LOGIC:='1'; --68030 Data Strobe ACK 1
+			  nCIIN : out STD_LOGIC:='1'; --68030 cache enable
+			  nBERR : out STD_LOGIC:='Z'; --68030 Bus ERRor
+			  nFPUCS : out STD_LOGIC:='1'; --FPU chip select
+			  nAVEC : out STD_LOGIC:='1' --68030 Auto Vector
 			  
 			  );		
 			  
@@ -97,7 +101,7 @@ architecture Behavioral of N2630_Main is
 
 	SIGNAL TWOMEG : STD_LOGIC:='0'; --Are we in the first 2 megabyte address space?
 	SIGNAL FOURMEG : STD_LOGIC:='0'; --Are we in the second 2 megabyte address space?
-	SIGNAL EIGHTMEG : STD_LOGIC:='0'; --Aare we in the second 4 megabyte address space
+	--SIGNAL EIGHTMEG : STD_LOGIC:='0'; --Are we in the second 4 megabyte address space
 
 	SIGNAL autoconfigspace : STD_LOGIC:='0';
 	SIGNAL n_onboard : STD_LOGIC:='1';
@@ -130,6 +134,17 @@ architecture Behavioral of N2630_Main is
 	SIGNAL PHANTOMHI,ROMCONF,RSTENB,JMODE,MODE68K : STD_LOGIC:='0';
 	
 	SIGNAL c1c3xor : STD_LOGIC:='0'; --This holds the XOR value for nC1 and C3
+	
+	SIGNAL chipram : STD_LOGIC:='0';
+	SIGNAL ciaspace : STD_LOGIC:='0';
+	SIGNAL chipregs : STD_LOGIC:='0';
+	SIGNAL iospace	 : STD_LOGIC:='0';
+	SIGNAL userdata : STD_LOGIC:='0';
+	SIGNAL superdata : STD_LOGIC:='0';
+	SIGNAL interuptack : STD_LOGIC:='0';
+	SIGNAL cpuspace : STD_LOGIC:='0';
+	SIGNAL coppercom : STD_LOGIC:='0';
+	SIGNAL mc68881 : STD_LOGIC:='0';
 
 begin
 	
@@ -331,7 +346,7 @@ begin
 
 	n_extern <= '0'
 		WHEN
-			( FC(2 downto 0) = x"7" AND nBGACK = '1' )
+			( cpuspace = '1' AND nBGACK = '1' )
 			--cpuspace & !BGACK
 		--OR
 			--EXTSEL & !BGACK
@@ -351,13 +366,6 @@ begin
 			ELSE
 				nDSen <= '1';
 			END IF;
-		
---			nDSen <= '0'
---			WHEN
---				nASEN = '0' AND n_extern = '1' AND cycend = '1'
---				--ASEN & !EXTERN & CYCEND
---			ELSE
---				'1';
 		END IF;
 	END PROCESS;
 	
@@ -377,12 +385,6 @@ begin
 			ELSE
 				nS7MDIS_DFF <= '1';
 			END IF;
---			nS7MDIS_DFF <= '0'
---			WHEN
---				( nDSen = '1' AND nASEN = '0' AND EXTERN = '0' AND nDSACKEN = '1' )
---				--nS7MDIS_DFF	= !DSEN & ASEN & !EXTERN & DSACKEN;
---			ELSE
---				'1';
 		END IF;
 	END PROCESS;
 	
@@ -397,12 +399,6 @@ begin
 			ELSE
 				s_7mdis <= '1';
 			END IF;
---			s_7mdis <= '0'
---			WHEN
---				nASEN = '0' AND EXTERN = '0' AND cycend = '1'
---				--S_7MDIS.D = ASEN & !EXTERN & CYCEND;
---			ELSE
---				'1';
 		END IF;
 	END PROCESS;
 				
@@ -475,13 +471,6 @@ begin
 			ELSE
 				n_regreset <= '1'	;
 			END IF;
---			n_regreset <= '0'		
---			WHEN
---				( JMODE = '0' AND nHALT = '0' AND nRESET = '0' )
---			OR
---				( JMODE = '1' AND nRESET = '0' )
---			ELSE
---				'1';
 		END IF;
 	END PROCESS;
 			
@@ -805,6 +794,46 @@ begin
 	nDSACK1 <= 'Z' WHEN memsel = '0' ELSE
 		'1' WHEN memsel = '1' AND cycledone = '0' ELSE
 		'0' WHEN memsel = '1' AND cycledone = '1';
+		
+	--This is the cache control signal.  We want the cache enabled when we're
+	--in memory, but it can't go for CHIP memory, since Agnus can also write
+	--to that memory.  Expansion bus memory, $C00000 memory, and ROM are prime
+	--targets for caching.  CHIP RAM, all chip registers, and the space we leave
+	--aside for I/O devices shouldn't be cached.  This isn't prefect, as it's
+	--certainly possible to place I/O devices in the normal expansion space, or
+	--RAM in the I/O space.  Note that we always want to cache program, just not
+	--always data.  The "wanna be cached" term doesn't fit, so here's the 
+	--"don't wanna be cached" terms, with inversion.
+	
+	--field cpuaddr	= [A23..13] ;			/* Normal CPU space stuff */
+	chipram <= '1' WHEN AH(23 downto 13) >= x"000000" AND AH(23 downto 13) <= x"1fffff" ELSE '0';	
+	--chipram		= (cpuaddr:[000000..1fffff]) ;    /* All Chip RAM */
+	--busspace	= (cpuaddr:[200000..9fffff]) ;    /* Main expansion bus */
+	ciaspace <= '1' WHEN AH(23 downto 13) >= x"a00000" AND AH(23 downto 13) <= x"bfffff" ELSE '0';
+	--ciaspace	= (cpuaddr:[a00000..bfffff]) ;    /* VPA decode */
+	--extraram	= (cpuaddr:[c00000..cfffff]) ;    /* Motherboard RAM */
+	chipregs <= '1' WHEN AH(23 downto 13) >= x"d00000" AND AH(23 downto 13) <= x"dfffff" ELSE '0';
+	--chipregs	= (cpuaddr:[d00000..dfffff]) ;    /* Custom chip registers */
+	iospace <= '1' WHEN AH(23 downto 13) >= x"e80000" AND AH(23 downto 13) <= x"efffff" ELSE '0';
+	--iospace		= (cpuaddr:[e80000..efffff]) ;    /* I/O expansion bus */
+	--romspace	= (cpuaddr:[f80000..ffffff]) ;    /* All ROM */
+	
+	userdata	<= '1' WHEN FC( 2 downto 0 ) = x"1" ELSE '0'; --(cpustate:1)
+	superdata <= '1' WHEN FC( 2 downto 0 ) = x"5" ELSE '0'; --(cpustate:5)
+	cpuspace <= '1' WHEN FC(2 downto 0) /= x"7" ELSE '0'; --(cpustate:7)
+	
+	nCIIN <= '1' 
+		WHEN
+			(chipram = '1' AND ( userdata = '1' OR superdata = '1' )) OR
+			--!CACHE = chipram & (userdata # superdata) & !EXTSEL
+			ciaspace = '1' OR
+			--ciaspace & !EXTSEL
+			chipregs = '1' OR
+			--chipregs & !EXTSEL
+			iospace = '1'
+			--iospace & !EXTSEL
+		ELSE
+			'0';
 
 	--OUTPUT ENABLE OR WRITE ENABLE DEPENDING ON THE CPU REQUEST
 	nOE0 <= '0' WHEN R_W = '1' AND TWOMEG = '1' ELSE '1';
@@ -816,14 +845,14 @@ begin
 		
 		IF ( FALLING_EDGE (CLK) ) THEN
 
-			IF (autoconfig_done = '1' AND FC(2 downto 0) /= x"7" AND nAS = '0') THEN
+			IF (autoconfig_done = '1' AND cpuspace = '0' AND nAS = '0') THEN
 				--$7 = CPU SPACE...we do not want to interject ourselves when the CPU is taking care of it's own business		
 
 				--ENABLE THE VARIOUS BYTES ON THE SRAM DEPENDING ON WHAT THE CPU IS ASKING FOR
 
 				--UPPER UPPER BYTE ENABLE (D31..24)
 				IF (( R_W = '1' ) 
-					OR (R_W = '0' AND AL(1 downto 0) = "00") AND nDS = '0') 
+					OR (R_W = '0' AND AL(1 downto 0) = "00" AND nDS = '0')) 
 				THEN			
 					nUUBE <= '0'; 
 				ELSE 
@@ -832,9 +861,9 @@ begin
 
 				--UPPER MIDDLE BYTE (D23..16)
 				IF (( R_W = '1' ) 
-					OR ( R_W = '0' AND (( AL(1 downto 0) = "01"  AND nDS = '0')
+					OR ( R_W = '0' AND AL(1 downto 0) = "01"  AND nDS = '0')
 					OR ( AL(1) = '0' AND SIZ(0) = '0'  AND nDS = '0') 
-					OR ( AL(1) = '0' AND SIZ(1) = '1'  AND nDS = '0')))) 
+					OR ( AL(1) = '0' AND SIZ(1) = '1'  AND nDS = '0')) 
 				THEN
 					nUMBE <= '0';
 				ELSE
@@ -843,10 +872,10 @@ begin
 
 				--LOWER MIDDLE BYTE (D15..8)
 				IF (( R_W = '1' )
-					OR ( R_W = '0' AND (( AL(1 downto 0) = "10"  AND nDS = '0') 
+					OR ( R_W = '0' AND AL(1 downto 0) = "10"  AND nDS = '0') 
 					OR ( AL(1) = '0' AND SIZ(0) = '0' AND SIZ(1) = '0'  AND nDS = '0') 
 					OR	( AL(1) = '0' AND SIZ(0) = '1' AND SIZ(1) = '1'  AND nDS = '0') 
-					OR ( AL(0) = '1' AND AL(1) = '0' AND SIZ(0) = '0'  AND nDS = '0'))))
+					OR ( AL(0) = '1' AND AL(1) = '0' AND SIZ(0) = '0'  AND nDS = '0'))
 				THEN
 					nLMBE <= '0';
 				ELSE
@@ -855,10 +884,10 @@ begin
 
 				--LOWER LOWER BYTE (D7..0)
 				IF (( R_W = '1' )
-					OR	( R_W = '0' AND ( AL(1 downto 0) = "11"  AND nDS = '0' )
-					OR 	(AL(0) = '1' AND SIZ(0) = '1' AND SIZ(1) = '1' AND nDS = '0') 
+					OR	( R_W = '0' AND ( AL(1 downto 0) = "11"  AND nDS = '0' ))
+					OR (AL(0) = '1' AND SIZ(0) = '1' AND SIZ(1) = '1' AND nDS = '0') 
 					OR	(SIZ(0) = '0' AND SIZ(1) = '0' AND nDS = '0') 
-					OR	(AL(1) = '1' AND SIZ(1) ='1' AND nDS = '0'))))
+					OR	(AL(1) = '1' AND SIZ(1) ='1' AND nDS = '0'))
 				THEN
 					nLLBE <= '0';
 				ELSE
@@ -940,9 +969,8 @@ begin
 			( nBOSS = '0' AND nBGACK = '0' AND (TWOMEG = '1' OR FOURMEG = '1') AND nAAS = '0' AND AL(1) = '0' )
 			--BOSS &  BGACK &  MEMSEL & AAS & !A1
 		OR
-			( nBOSS = '0' AND nBGACK = '0' AND (TWOMEG = '1' OR FOURMEG = '1') AND nAS = '0' AND n_onboard = '1' )
+			( nBOSS = '0' AND nBGACK = '0' AND (TWOMEG = '1' OR FOURMEG = '1') AND nAS = '0' AND n_onboard = '1' AND n_extern = '1' )
 			--BOSS & !BGACK & !MEMSEL &  AS & !ONBOARD & !EXTERN;
-			--EXTERN tells us if we are accessing expansion memory...not doing that right now
 		ELSE
 			'1';
 			
@@ -953,6 +981,48 @@ begin
 			-- BOSS &  BGACK &  MEMSEL & AAS &  A1
 		ELSE
 		'1';
+		
+	---------------	
+	-- INTERUPTS --
+	---------------
+	
+	--This forces all interrupts to be serviced by autovectoring.  None
+	--of the built-in devices supply their own vectors, and the system is
+	--generally incompatible with supplied vectors, so this shouldn't be
+	--a problem working all the time.  During DMA we don't want any AVEC
+	--generation, in case the DMA device is like a Boyer HD and doesn't
+	--drive the function codes properly.
+	
+	interuptack <= '1' WHEN AH( 19 downto 16 ) = x"f0000" ELSE '0';
+
+	nAVEC <= '0'
+		WHEN
+			cpuspace =  '1' AND interuptack = '1' AND nBGACK = '1'
+			--AVEC = cpuspace & interruptack & !BGACK;
+		ELSE
+			'1';
+			
+	--This selects the 68881 or 68882 math chip, as long as there's no DMA 
+	--going on.  If the chip isn't there, we want a bus error generated to 
+	--force an F-line emulation exception.  Add in AS as a qualifier here
+	--if the PAL ever turns out too slow to make FPUCS before AS.
+
+	coppercom <= '1' WHEN AH( 19 downto 16 ) = x"20000" ELSE '0';
+	mc68881 <= '1' WHEN AH( 15 downto 13 ) = x"2000" ELSE '0';
+	
+	nFPUCS <= '0'
+		WHEN
+			cpuspace = '1' AND coppercom = '1' AND mc68881 = '1' AND nBGACK = '1'
+			--FPUCS = cpuspace & coppercom & mc68881 & !BGACK;
+		ELSE
+			'1';
+
+	nBERR <= '0'
+		WHEN 
+			cpuspace = '1' AND coppercom = '1' AND mc68881 = '1' AND nSENSE = '1' AND nBGACK = '1'
+			--BERR = cpuspace & coppercom & mc68881 & !SENSE & !BGACK;
+		ELSE
+			'Z';	
 
 end Behavioral;
 

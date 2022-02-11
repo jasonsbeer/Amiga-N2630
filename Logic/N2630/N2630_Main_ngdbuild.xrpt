@@ -5,7 +5,7 @@
     The structure and the elements are likely to change over the next few releases.
     This means code written to parse this file will need to be revisited each subsequent release.-->
 
-  <application stringID="NgdBuild" timeStamp="Wed Feb  9 20:36:19 2022">
+  <application stringID="NgdBuild" timeStamp="Thu Feb 10 19:33:45 2022">
     <section stringID="User_Env">
       <table stringID="User_EnvVar">
         <column stringID="variable"/>
@@ -74,33 +74,31 @@
         <item dataType="int" stringID="NGDBUILD_NUM_INFOS" value="0"/>
       </section>
       <section stringID="NGDBUILD_PRE_UNISIM_SUMMARY">
-        <item dataType="int" stringID="NGDBUILD_NUM_AND2" value="40"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_AND3" value="15"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_AND4" value="7"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_AND2" value="67"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_AND3" value="20"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_AND4" value="14"/>
         <item dataType="int" stringID="NGDBUILD_NUM_AND5" value="1"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_FD" value="3"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_FD" value="8"/>
         <item dataType="int" stringID="NGDBUILD_NUM_FDC" value="6"/>
         <item dataType="int" stringID="NGDBUILD_NUM_FDCE" value="4"/>
         <item dataType="int" stringID="NGDBUILD_NUM_GND" value="1"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_IBUF" value="45"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_INV" value="119"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_OBUF" value="27"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_OR2" value="19"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_OR3" value="1"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_IBUF" value="46"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_INV" value="175"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_OBUF" value="30"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_OR2" value="23"/>
         <item dataType="int" stringID="NGDBUILD_NUM_VCC" value="1"/>
         <item dataType="int" stringID="NGDBUILD_NUM_XOR2" value="2"/>
       </section>
       <section stringID="NGDBUILD_POST_UNISIM_SUMMARY">
-        <item dataType="int" stringID="NGDBUILD_NUM_AND2" value="40"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_AND3" value="15"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_AND4" value="7"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_AND2" value="67"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_AND3" value="20"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_AND4" value="14"/>
         <item dataType="int" stringID="NGDBUILD_NUM_AND5" value="1"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_GND" value="10"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_IBUF" value="47"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_INV" value="119"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_OBUF" value="27"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_OR2" value="19"/>
-        <item dataType="int" stringID="NGDBUILD_NUM_OR3" value="1"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_GND" value="15"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_IBUF" value="48"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_INV" value="175"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_OBUF" value="30"/>
+        <item dataType="int" stringID="NGDBUILD_NUM_OR2" value="23"/>
         <item dataType="int" stringID="NGDBUILD_NUM_VCC" value="1"/>
         <item dataType="int" stringID="NGDBUILD_NUM_XOR2" value="2"/>
       </section>
