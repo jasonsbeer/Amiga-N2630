@@ -1,0 +1,215 @@
+
+		PARTNO	  XXXXX ;
+		NAME	  U306;
+		DATE	  May 24, 1988 ;
+		REV	  9 ;
+		DESIGNER  Haynie ;
+		COMPANY   Commodore ;
+		ASSEMBLY  xxxxxxx ;
+		LOCATION  U306;
+
+/************************************************************************/
+/*									*/
+/*  A2630	FPU chip select, Avec generation, Extern		*/
+/*		generation, and data cache control.			*/
+/*									*/
+/************************************************************************/
+/*  Allowable Target Device Types: 20L8B 				*/
+/************************************************************************/
+/*  Free Pins: NONE							*/
+/************************************************************************/
+/*  HISTORY								*/
+/*	DBH Mar  5:	New, based on U306-10 and U307-13 for A2620.	*/
+/*	DBH Mar  5:	Added CPUACC output for A2000 bus control.	*/
+/*	DBH Mar 10:	What, we're only caching CHIP RAM data?	 Fixed.	*/
+/*	DBH Apr 18:	Added logic for split address strobe; the 	*/
+/*			system PAS doesn't show CPU space cycles.	*/
+/*	DBH May  3:	Added EXTERN logic here and on system		*/
+/*			board.  Works like AS split, only faster.	*/
+/*	DBH May  3:	Added BGACK qualifier to EXTERN.		*/
+/*	DBH May  5:	Qualified mapping with A24.			*/
+/*	DBH May 24:	Changed A24 to EXTSEL, input only.		*/
+/************************************************************************/
+
+/**  Inputs  **/
+
+PIN [1..3]	= [FC2..0]	;	/* Function control from the '030 */
+PIN 4		= !BGACK	;	/* Bus Grant Acknowledge */
+PIN 5		= !SENSE	;	/* Is there a 68881/68882? */
+PIN [6..11]	= [A21..16]	;	/* CPU Address A21-16 */
+PIN [13,14]	= [A15,A14]	;	/* CPU Address A15-14 */
+PIN [19,20]	= [A22,A23]	;	/* CPU Address A22-23 */
+PIN 23		= A13		;	/* CPU Address A13 */
+PIN 21		= EXTSEL	;	/* External memory board selected */
+
+/**  Outputs  **/
+
+PIN 15		= !FPUCS	;	/* Floating point unit chip select */
+PIN 16		= !AVEC		;	/* Avec for a interrupt cycle */
+PIN 17		= !BERR		;	/* Bus error iff !SENSE & FPUCS */
+PIN 18		= CACHE	 	;	/* 68030 cache enable */
+PIN 22		= !EXTERN	;	/* A CPU or daughter access */
+
+/** Declarations and Intermediate Variable Definitions **/
+RULES:
+ALL MY INTERNAL SIGNALS ARE ACTIVE HIGH
+ALL MY INTERNAL SIGNALS ARE IN lowercase
+ALL EXTERNAL SIGNALS ARE IN UPPERCASE
+ALL ACTIVE LOW SIGNALS ARE PRECEEDED BY n
+ALL ACTIVE HIGH SIGNALS HAVE NO PREFIX
+
+THE ORIGINAL PAL CODE IS THE FIRST LINE(S)
+WITH THE PROPOSED VHDL CODE ON THE FOLLOWING LINES
+
+USEFUL CONVERSION GRID FOR LOGIC STATES 'CAUSE IT CAN BE A MESS!
+
+            PIN SIGNAL
+          --------------
+          |  !  |  -   |
+------------------------
+D S |     | NOT |   -  |
+E T |  !  | NOT |  NOT |
+S A |     |  1  |   0  |
+I T |-----|-------------
+R E |     | NOT |   -  |
+E   |  -  |  -  |   -  |
+D   |     |  0  |   1  |
+------------------------
+
+field cpustate	= [FC2..0] ;			/* CPU state types */
+SIGNAL cpustate : STD_LOGIC_VECTOR ( 2 downto 0 ):= (others => '0');
+cpustate <= FC ( 2 downto 0 );
+
+cpuspace	= (cpustate:7) ;		    /* CPU */
+SIGNAL cpuspace : STD_LOGIC := '0';
+cpuspace <= '1' WHEN cpustate = x"7" ELSE '0';
+
+userdata	= (cpustate:1) ;		    /* User data */
+SIGNAL userdata : STD_LOGIC := '0';
+userdata <= '1' WHEN cpustate = x"1" ELSE '0';
+
+userprog	= (cpustate:2) ;		    /* User program */
+SIGNAL userprog : STD_LOGIC := '0';
+userprog <= '1' WHEN cpustate = x"2" ELSE '0';
+
+superdata	= (cpustate:5) ;		    /* Supervisor data */
+SIGNAL superdata : STD_LOGIC := '0';
+superdata <= '1' WHEN cpustate = x"5" ELSE '0';
+
+superprog	= (cpustate:6) ;		    /* Supervisor program */
+SIGNAL superprog : STD_LOGIC := '0';
+superprog <= '1' WHEN cpustate = x"6" ELSE '0';
+
+normspace	= (cpustate:[1,2,5,6]) ;	    /* Normal CPU access */
+SIGNAL normspace : STD_LOGIC:='0';
+normspace <= 1 WHEN ( cpustate = x"1" OR cpustate = x"2" OR cpustate = x"5" OR cpustate = x"6" ) ELSE '0';
+
+field spacetype	= [A19..16] ;			/* CPU space type */
+SIGNAL spacetype : STD_LOGIC_VECTOR ( 19 downto 16 ) := (others => '0');
+spacetype <= A( 19 downto 16 );
+
+interruptack	= (spacetype:f0000) ;		    /* Interrupt acknowledge */
+SIGNAL interruptack : STD_LOGIC:='0';
+interruptack <= '1' WHEN spacetype = x"f0000" ELSE '0';
+
+coppercom	= (spacetype:20000) ;		    /* Coprocessor */
+SIGNAL coppercom : STD_LOGIC:='0';
+coppercom <= '1' WHEN spacetype = x"20000" ELSE '0';
+
+breakpoint	= (spacetype:00000) ;		    /* Breakpoint acknowledge */
+SIGNAL breakpoint : STD_LOGIC:='0';
+breakpoint <= '1' WHEN spacetype = x"00000" ELSE '0';
+
+field copperid	= [A15..13] ;			/* Copper types */
+SIGNAL copperid : STD_LOGIC_VECTOR ( 15 downto 13 ) := (others => '0');
+copperid <= A( 15 downto 13 );
+
+mc68881		= (copperid:2000) ;
+SIGNAL mc68881 : STD_LOGIC:='0';
+mc68881 <= '1' WHEN copperid = x"2000" ELSE '0';
+
+field cpuaddr	= [A23..13] ;			/* Normal CPU space stuff */
+SIGNAL cpuaddr : STD_LOGIC_VECTOR ( 23 downto 13 ):= ( others => '0');
+cpuaddr <= A( 23 downto 13 );
+
+chipram		= (cpuaddr:[000000..1fffff]) ;    /* All Chip RAM */
+SIGNAL chipram : STD_LOGIC:='0';
+chipram <= '1' WHEN cpuaddr => x"000000" AND cpuaddr <= x"1fffff" ELSE '0';
+
+busspace	= (cpuaddr:[200000..9fffff]) ;    /* Main expansion bus */
+SIGNAL busspace : STD_LOGIC:='0';
+busspace <= '1' WHEN cpuaddr => x"200000" AND cpuaddr <= x"9fffff" ELSE '0';
+
+ciaspace	= (cpuaddr:[a00000..bfffff]) ;    /* VPA decode */
+SIGNAL ciaspace : STD_LOGIC:='0';
+ciaspace <= '1' WHEN cpuaddr => x"a00000" AND cpuaddr <= x"bfffff" ELSE '0';
+
+extraram	= (cpuaddr:[c00000..cfffff]) ;    /* Motherboard RAM */
+SIGNAL extraram : STD_LOGIC:='0';
+extraram <= '1' WHEN cpuaddr => x"c00000" AND cpuaddr <= x"cfffff" ELSE '0';
+
+chipregs	= (cpuaddr:[d00000..dfffff]) ;    /* Custom chip registers */
+SIGNAL chipregs : STD_LOGIC:='0';
+chipregs <= '1' WHEN cpuaddr => x"d00000" AND cpuaddr <= x"dfffff" ELSE '0';
+
+iospace		= (cpuaddr:[e80000..efffff]) ;    /* I/O expansion bus */
+SIGNAL iospace : STD_LOGIC:='0';
+iospace <= '1' WHEN cpuaddr => x"e80000" AND cpuaddr <= x"efffff" ELSE '0';
+
+romspace	= (cpuaddr:[f80000..ffffff]) ;    /* All ROM */
+SIGNAL romspace : STD_LOGIC:='0';
+romspace <= '1' WHEN cpuaddr => x"f80000" AND cpuaddr <= x"ffffff" ELSE '0';
+
+
+/**  Logic Equations  **/
+
+/* This selects the 68881 or 68882 math chip, as long as there's no DMA 
+   going on.  If the chip isn't there, we want a bus error generated to 
+   force an F-line emulation exception.  Add in AS as a qualifier here
+   if the PAL ever turns out too slow to make FPUCS before AS. */
+
+FPUCS		= cpuspace & coppercom & mc68881 & !BGACK;
+nFPUCS < '0' WHEN ( cpuspace = '1' AND coppercom = '1' AND mc68881 = '1' AND nBGACK = '1' ) ELSE '1';
+
+BERR		= cpuspace & coppercom & mc68881 & !SENSE & !BGACK;
+BERR.OE		= cpuspace & coppercom & mc68881 & !SENSE & !BGACK;
+nBERR <= '0' WHEN ( cpuspace = '1' AND coppercom = '1' AND mc68881 = '1' AND nBGACK = '1' AND nSENSE = '1' ) ELSE 'Z';
+
+IS THERE A PULLUP ON SENSE? YES!!!! RP201
+
+
+/* This forces all interrupts to be serviced by autovectoring.  None
+   of the built-in devices supply their own vectors, and the system is
+   generally incompatible with supplied vectors, so this shouldn't be
+   a problem working all the time.  During DMA we don't want any AVEC
+   generation, in case the DMA device is like a Boyer HD and doesn't
+   drive the function codes properly.  */
+
+AVEC		= cpuspace & interruptack & !BGACK;
+nAVEC <= '0' WHEN ( cpuspace = '1' AND interruptack = '1' AND nBGACK = '1' ) ELSE '0';
+
+/* This is the cache control signal.  We want the cache enabled when we're
+   in memory, but it can't go for CHIP memory, since Agnus can also write
+   to that memory.  Expansion bus memory, $C00000 memory, and ROM are prime
+   targets for caching.  CHIP RAM, all chip registers, and the space we leave
+   aside for I/O devices shouldn't be cached.  This isn't prefect, as it's
+   certainly possible to place I/O devices in the normal expansion space, or
+   RAM in the I/O space.  Note that we always want to cache program, just not
+   always data.  The "wanna be cached" term doesn't fit, so here's the 
+   "don't wanna be cached" terms, with inversion. */
+
+!CACHE		= chipram & (userdata # superdata) & !EXTSEL
+		# ciaspace & !EXTSEL
+		# chipregs & !EXTSEL
+		# iospace & !EXTSEL;
+nCIIN < = '1' WHEN ( chipram = '1' AND ( userdata = '1' OR superdata = '1' ) AND EXTSEL = '0' ) OR ( ciaspace = '1' AND EXTSEL = '0' ) OR ( chipregs = '1' AND EXTSEL = '0' ) OR ( iospace = '1' AND EXTSEL = '0' ) ELSE '0';
+
+/* Here's the EXTERN logic.  The EXTERN signal is used to qualify unusual
+   memory accesses.  There are two kinds, CPU space and daughterboard
+   space.  CPU space is given by the function codes.  Daughterboard space
+   is defined to be a processor access with EXTSEL asserted.  DMA devices 
+   can't get to daughterboard space.  */
+
+EXTERN		= cpuspace & !BGACK
+		# EXTSEL & !BGACK ;
+nEXTERN <= '0' WHEN ( cpuspace = '1' AND nBGACK = '1' ) OR ( EXTSEL = '1' AND nBGACK = '1' )
