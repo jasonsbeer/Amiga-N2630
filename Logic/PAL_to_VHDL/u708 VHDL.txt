@@ -1,0 +1,147 @@
+
+		PARTNO	  XXXXX ;
+		NAME	  U708;
+		DATE	  March 28, 1988;
+		REV	  6;
+		DESIGNER  Haynie ;
+		COMPANY   Commodore ;
+		ASSEMBLY  312828 ;
+		LOCATION  U603;
+
+/************************************************************************/
+/*									*/
+/*  A2630 	System and state clock generator			*/
+/*									*/
+/************************************************************************/
+/*  Allowable Target Device Types: 16L8B 				*/
+/************************************************************************/
+/*  Free Pins: NONE							*/
+/************************************************************************/
+/*  HISTORY								*/
+/*	DBH Sep 26:	New, replaced discrete on A2630R2.		*/
+/*	DBH Sep 26:	Polarity of 14M clocks corrected.		*/
+/*	DBH Sep 26:	Tried A7M instead of N7M in SCLK.		*/
+/*	DBH Oct 14:	Going back to N7M again				*/
+/*	DBH Mar  9:	Changed MA8 polarity for Rev 4.			*/
+/*	DBH Mar 28:	Changed banking mechanics, added special clocks	*/
+/*			for Rev 4.					*/
+/************************************************************************/
+
+/**  Inputs  **/
+
+PIN 1		=  CDAC		;	/* 7.16 MHz clock, 90 degree */
+PIN 2		= !C1		;	/* 3.58 MHz clock */
+PIN 3		= !C3		;	/* 3.58 MHz clock, 90 degree */
+PIN 4		=  B2000	;	/* Are we a B2000? */
+PIN 5		= !S7MDIS	;	/* Disable used in state clock */
+PIN 6		=  SN7MDIS	;	/* Disable used in state clock */
+PIN 7		=  MUX		;	/* DRAM address multiplex */ JN - NOT CONNECTED!
+PIN 8		=  A7M		;	/* 7.16 MHz clock from 68000 */
+PIN 9		=  A2		;	/* CPU address */ JN - NOT CONNECTED!
+PIN 11		=  A3		;	/* CPU address */ JN - NOT CONNECTED!
+
+/**  Outputs  **/
+
+PIN 12		=  P7M		;	/* 7.16 MHz clock */
+PIN 13		= !N7M		;	/* 7.16 MHz clock, 180 degree */
+PIN 14		=  P14M	;	/* 14.3 MHz clock */
+PIN 15		= !N14M	;	/* 14.3 MHz clock, 180 degree */
+PIN 16		=  MA8		;	/* Multiplexed address for DRAM */
+PIN 17		=  IPLCLK	;	/* Interrupt latch clock */
+PIN 18		=  DSCLK	;	/* DSACK enable clock */
+PIN 19		=  SCLK	;	/* State machine clock */
+
+/** Declarations and Intermediate Variable Definitions **/
+
+
+RULES:
+ALL MY INTERNAL SIGNALS ARE ACTIVE HIGH
+ALL MY INTERNAL SIGNALS ARE IN lowercase
+ALL EXTERNAL SIGNALS ARE IN UPPERCASE
+ALL ACTIVE LOW SIGNALS ARE PRECEEDED BY n
+ALL ACTIVE HIGH SIGNALS HAVE NO PREFIX
+
+THE ORIGINAL PAL CODE IS THE FIRST LINE(S)
+WITH THE PROPOSED VHDL CODE ON THE FOLLOWING LINES
+
+USEFUL CONVERSION GRID FOR LOGIC STATES 'CAUSE IT CAN BE A MESS!
+
+            PIN SIGNAL
+          --------------
+          |  !  |  -   |
+------------------------
+D S |     | NOT |   -  |
+E T |  !  | NOT |  NOT |
+S A |     |  1  |   0  |
+I T |-----|-------------
+R E |     | NOT |   -  |
+E   |  -  |  -  |   -  |
+D   |     |  0  |   1  |
+------------------------
+
+
+
+
+/* Here I define the 7MHz basis clock used to make many other clocks.
+   On the A2620 I used a set of jumpers to let you change the clocking
+   around for A2000 vs. B2000.  Here it's all done based on the B2000 
+   setting jumper.  On a B2000, we gets the 7MHz from the Coprocessor 
+   Slot.  On an A2000, I'll make it from C1 and C3. */
+ 
+basis7M		=  B2000 & A7M
+		# !B2000 & (!C1 $ C3);
+SIGNAL basis7m <= '1' WHEN ( B2000 = '1' AND A7M ) OR ( B2000 = '0' AND (nC1 = '1' OR nC3 = '0' ) ELSE '0';
+
+/**  Logic Equations  **/
+
+/* The address multiplexing for MA8, the high order address, depends on
+   whether we're a 4 meg system or a two meg system.  A 4 meg system
+   gets A12 and A21 muxed, and A3 becomes a bank select.  A 2 meg system
+   muxes A12 and A3, as there are only two banks.  */
+   
+   JN - THESE SIGNALS ARE NOT CONNECTED IN THE REV 9 BOARD!
+
+MA8		=  MUX & A2
+		# !MUX & A3;
+
+/* The 7MHz clock lines are pretty simple.  I make 'em both here to keep 
+   them consistent with each other and all other clocks derived from the
+   motherboard. */
+
+P7M		=  basis7M;
+P7M <= basis7M;
+
+N7M		=  basis7M;
+N7M <= basis7m;
+
+/* The 14MHz clock lines are pretty simple too.  I make 'em both here to 
+   keep them consistent with each other and all other clocks derived from 
+   the motherboard. */
+
+P14M		=   basis7M $ CDAC;
+P14M <= '1' WHEN basis7m AND CDAC = '1' ELSE '0';
+
+N14M		=   basis7M $ CDAC;
+N14M <= '1' WHEN basis7m AND CDAC = '1' ELSE '0';
+
+/* This clock is used to gate a DSACK request. */
+
+DSCLK		= !basis7M;
+nDSCLK <= NOT basis7m;
+
+/* This clock is used to latch the interrupt lines between the motherboard
+   and the 68030.  If this isn't done, you'll get phantom interrupts
+   that you probably won't even notice in AmigaOS, but can be fatal to
+   time critical interrupt code in UNIX and possibly even AmigaOS. */
+
+IPLCLK		=  basis7M;
+IPLCLK <= basis7m;
+
+/* This is the state machine clock.  This is basically a 14MHz clock, 
+   but some of it's edges are suppressed.  This lets the 68000 state
+   machine just skip the unimportant clock edges in the 68000 cycle
+   and just concentrate on the interesting edges. */
+
+SCLK		=  CDAC & P14M & !N7M & SN7MDIS
+		# !CDAC & P14M &  N7M & !S7MDIS;
+SCLK <= '1' WHEN (CDAC = '1' AND P14M = '1' AND N7M = '0' AND SN7MDIS = '1') OR (CDAC = '0' AND P14M = '1' AND N7M '1' AND nS7MDIS = '1') ELSE '0';
