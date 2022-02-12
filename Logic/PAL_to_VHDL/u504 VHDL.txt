@@ -111,9 +111,11 @@ REGRESET.D	= !JMODE & HALT & RESET
 		#  JMODE & RESET;
 PROCESS ( nCLK7M ) BEGIN
    IF RISING_EDGE (nCLK7M) THEN
-      nREGRESET <= '0' WHEN ( JMODE = '0' AND nHALT = '0' AND nRESET = '0' ) OR (JMODE = '1' AND nRESET = '0' )
-   ELSE
-      nREGRESET = '1';
+      nREGRESET <= '0' 
+         WHEN 
+	    ( JMODE = '0' AND nHALT = '0' AND nRESET = '0' ) OR (JMODE = '1' AND nRESET = '0' )
+         ELSE
+            '1';
    END IF;
 END PROCESS;
 
@@ -127,26 +129,81 @@ END PROCESS;
    as to make it automatically synced. */
 
 ESYNC.D		= E & B2000;
+PROCESS ( nCLK7M ) BEGIN
+   IF RISING_EDGE (nCLK7M) THEN
+      esync <= '1' 
+         WHEN 
+	    E = '1' AND B2000 = '1'
+         ELSE
+	    '0';
+   END IF;
+END PROCESS;
 
 /* Here's the 68xx/65xx family state counter.  The counter bits A0 .. A3 are 
    used by both the 6800 cycle logic and the DRAM refresh logic. The 6800 
    cycle logic uses the counter to generate the E clock and VMA and to sync 
    DTACK to the E clock.  The DRAM refresh logic uses the counter as the 
    first phase in a larger counter. */
+   
+NOTE THESE ARE NOT THE 680x0 BUS
 
 !A0.D		=  A0 & sync;
+PROCESS ( nCLK7M ) BEGIN
+   IF RISING_EDGE (nCLK7M) THEN
+   	A0 <= '0'
+	   WHEN
+	      A0 = '1' AND sync = '1'
+	   ELSE
+	      '1';
+   END IF;
+END PROCESS;
 
 !A1.D		= !A1 & !A0 
 		#  A1 &  A0 
 		#  A3 
 		# !sync;
+PROCESS ( nCLK7M ) BEGIN
+   IF RISING_EDGE (nCLK7M) THEN
+      A1 <= '0'
+         WHEN
+	    ( A1 = '0' AND A0 = '0' ) OR
+	    ( A1 = '1' AND A0 = '1' ) OR
+	    ( A3 = 1 ) OR
+	    ( sync = '0' )
+	 ELSE
+	    '1';
+   END IF;
+END PROCESS;
 
 !A2.D		= !A2 & !A0 
 		# !A2 & !A1
 		#  A2 &  A1 & A0
 		# !sync;
+PROCESS ( nCLK7M ) BEGIN
+   IF RISING_EDGE (nCLK7M) THEN
+      A2 <= '0'
+         WHEN
+	    ( A2 = '0' AND A0 = '0' ) OR
+	    ( A2 = '0' AND A1 = '0' ) OR
+	    ( A2 = '1' AND A1 = '1' AND A0 = '1' ) OR
+	    ( sync = '0' )
+	 ELSE
+	    '1';
+   END IF;
+END PROCESS;
 
 !A3.D		= !A3 & !A2 & sync
 		# !A1 &  A0 & sync
 		# !A3 & !A0 & sync;
+PROCESS ( nCLK7M ) BEGIN
+   IF RISING_EDGE (nCLK7M) THEN
+      A3 <= '0'
+         WHEN
+	    ( A3 = '0' AND A2 = '0' AND sync = '1' ) OR
+	    ( A1 = '0' AND A0 = '1' AND sync = '1' ) OR
+	    ( A3 = '0' AND A0 = '0' AND sync = '1' ) 
+	 ELSE
+	    '1';
+   END IF;
+END PROCESS;
 
