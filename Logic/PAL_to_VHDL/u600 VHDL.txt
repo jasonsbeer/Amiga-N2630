@@ -1,0 +1,186 @@
+
+		PARTNO	  390411-03 ;
+		NAME	  U600;
+		DATE	  May 3, 1990;
+		REV	  03;
+		DESIGNER  Haynie ;
+		COMPANY   Commodore ;
+		ASSEMBLY  312288 ;
+		LOCATION  U600;
+
+/************************************************************************/
+/*									*/
+/*  A2630	RAS and burst generation machine			*/
+/*									*/
+/************************************************************************/
+/*  Allowable Target Device Types: 20R4-10 				*/
+/************************************************************************/
+/*  Free Pins: NONE							*/
+/************************************************************************/
+/*  HISTORY							  	*/
+/*	DBH Mar  8:	New for A2630R5, based on U600 for Rev 4.	*/
+/*	DBH Mar  9:	Fixed DMA bug.					*/
+/*	DBH Mar 13:	Tuned DMA access as much as possible.		*/
+/*	EG  Jun 19:	Added second *RAS line				*/
+/*	DBH May  3:	Enhanced AAS* glitch rejection.			*/
+/************************************************************************/
+
+/**  Inputs **/ 
+
+PIN 2		= !ASDELAY	;	/* AS plus arbitration delay */
+PIN 3		= !AS		;	/* 68030 address strobe */
+PIN 4		= !AAS		;	/* 68000 address strobe */
+PIN 5		= !BGACK	;	/* Bus grant acknowledge */
+PIN 6		= !EXTSEL	;	/* EXTSEL qualifier for specials */
+PIN 7		= !MEMSEL	;	/* The CPU is accessing our RAM */
+PIN 8		= !REFACK	;	/* It's a refresh cycle */
+PIN 9		= !REFRAS	;	/* RAS for refresh */
+PIN 10		= !CHARGE	;	/* RAS Precharge wait */
+PIN 11		= !DMADELAY	;	/* Don't start a DMA memory cycle. */
+PIN 14		= !ROFF	;	/* RAS off qualifier */
+PIN 23		= !DSACKDLY	;	/* Delay for starting DSACKs */
+
+/**  Outputs **/
+
+PIN 22		= !DSACK0	;	/* Cycle terminator. */
+PIN 21		= !ERAS	;	/* Unbuffered RAS */
+PIN 19		= !AASQ	;	/* AAS sampled by !CPUCLK */
+PIN 16 	= !BRAS	;	/* Unbuffered RAS */
+PIN 15		= !DSACK1	;	/* Cycle terminator. */
+
+/**  Used internally */
+
+PIN 18		= !AAS40	;	/* AASQ + Tclk */
+PIN 17		= !AAS80	;	/* AAS40 + Tclk */
+
+/** Declarations and Intermediate Variable Definitions **/
+
+
+RULES:
+ALL MY INTERNAL SIGNALS ARE ACTIVE HIGH
+ALL MY INTERNAL SIGNALS ARE IN lowercase
+ALL EXTERNAL SIGNALS ARE IN UPPERCASE
+ALL ACTIVE LOW SIGNALS ARE PRECEEDED BY n
+ALL ACTIVE HIGH SIGNALS HAVE NO PREFIX
+
+THE ORIGINAL PAL CODE IS THE FIRST LINE(S)
+WITH THE PROPOSED VHDL CODE ON THE FOLLOWING LINES
+
+USEFUL CONVERSION GRID FOR LOGIC STATES 'CAUSE IT CAN BE A MESS!
+
+            PIN SIGNAL
+          --------------
+          |  !  |  -   |
+------------------------
+D S |     | NOT |   -  |
+E T |  !  | NOT |  NOT |
+S A |     |  1  |   0  |
+I T |-----|-------------
+R E |     | NOT |   -  |
+E   |  -  |  -  |   -  |
+D   |     |  0  |   1  |
+------------------------
+
+
+/* The standard qualification for a CPU memory cycle.  We have to wait
+   until refresh is arbitrated, and make sure we're selected and it's
+   not an EXTSELal cycle. */
+
+cpucycle	= !BGACK & !REFACK & MEMSEL & ASDELAY &  AS & !EXTSEL;
+SIGNAL cpucycle : STD_LOGIC:='0';
+cpucycle <= '1' WHEN nBAGACK = '1' AND nMEMSEL = '0' AND nASDELAY = '0' AND nAS = '0' AND nEXTSEL = '1' ELSE '0';
+REFACK IS DRAM REFRESH ACK...I DON'T CARE ABOUT DRAM STUFF HERE...AT THE MOMENT
+
+
+cpudtack	= cpucycle & DSACKDLY;
+SIGNAL cpudtack : STD_LOGIC:='0';
+cpudtack <= '1' WHEN cpucycle = '1' AND nDSACKDLY = '0' ELSE '0';
+
+/* The standard qualification for a DMA memory cycle.  This is much the
+   same as the CPU cycle, only it obeys the 68000 comparible signals
+   instead of 68030 signals.  The DMA cycle can DTACK early, since we
+   know the minimum clock period is more than the DRAM access time. */
+
+dmaaccess	=  BGACK & !REFACK & MEMSEL & AAS;
+SIGNAL dmaaccess : STD_LOGIC:='0';
+dmaaccess <= '1' WHEN nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' ELSE '0';
+
+dmadtack	= dmaaccess & AAS80;
+SIGNAL dmadtack : STD_LOGIC:='0';
+dmadtack <= '1' WHEN dmaaccess = '1' AND n_aas80 = '0' ELSE '0';
+
+dmacycle	= dmaaccess & AAS40 & !DMADELAY;
+SIGNAL dmacycle : STD_LOGIC:='0';
+dmacycle <= '1' WHEN dmaccess = '1' AND n_aas40 = '0' AND nDMADELAY = '1' ELSE '0';
+ 
+/* This indicates when a cycle is complete. */
+
+cycledone	= cpudtack # dmadtack;
+SIGNAL cycledone : STD_LOGIC:='0';
+cycledone <= '1' WHEN cpudtack = '1' AND dmadtack = '1' ELSE '0';
+
+/**  Logic Equations related to the refresh arbitration logic **/
+
+/* These next lines make us delayed and synchronized versions of the 
+   68000 compatible address strobe, used to handle refresh arbitration
+   and synchronization during DMA. */
+
+AASQ.D		= BGACK & AAS;
+PROCESS ( CPUCLK ) BEGIN
+   IF RISING_EDGE ( CPUCLK ) THEN
+      nAASQ <= '0' WHEN nBGACK = '0' AND nAAS = '1' ELSE '1';
+   END IF;
+END PROCESS;
+
+AAS40.D		= BGACK & AAS & AASQ;
+SIGNAL n_aas40 : STD_LOGIC:='1';
+PROCESS ( CPUCLK ) BEGIN
+   IF RISING_EDGE ( CPUCLK ) THEN
+      n_aas40 <= '1' WHEN nBGACK = '0' AND nAAS = '1' AND nAASQ = '0' ELSE '0';
+   END IF;
+END PROCESS;
+
+AAS80.D		= BGACK & AAS & AASQ & AAS40;
+SIGNAL n_aas80 : STD_LOGIC:='1';
+PROCESS ( CPUCLK ) BEGIN
+   IF RISING_EDGE ( CPUCLK ) THEN
+      n_aas80 <= '1' WHEN nBGACK = '0' AND nAAS = '1' AND  nAASQ = '0' AND n_aas80 = '1' ELSE '0';
+   END IF;
+END PROCESS;
+
+/* This is the basic RAS enable.  If it's a refresh cycle, we just go
+   ahead.  If it's the start of a standard CPU cycle, we wait until
+   we're done charging, and then go.  We continue until switched off
+   by ROFF and the end of the cycle.  If it's a DMA cycle, we go on
+   ahead, since the time between DMA cycles is enough to assure Trp. */
+   
+/* JN-BRAS DRIVES THE MUX SIGNAL TO SELECT ADDRESS LINES AT U100, 101, 104.
+   IT IS DELAYED 20ms IN THE DELAY LINE U604.
+   ERAS IS THE RAS SIGNAL USED TO DRIVE THE PAGE MODE ZIPS AND IS NOT DELAYED 
+   ACCORDING TO WHAT I SEE BELOW, THEY ARE EXACTLY THE SAME LOGIC. */
+   
+DON'T NEED THIS DRAM STUFF
+
+ERAS		= cpucycle & !CHARGE
+		# cpucycle & ERAS & !ROFF
+		# dmacycle
+		# REFRAS;
+
+BRAS		= cpucycle & !CHARGE
+		# cpucycle & ERAS & !ROFF
+		# dmacycle
+		# REFRAS;
+
+/* These are the cycle termination signals.  They're really both the
+   same, and both driven, indicating that we are, in fact, a 32 bit
+   wide port.  They go hi-Z when we're not selecting memory, so that
+   other DSACK sources (FPU and the slow bus stuff) can get their
+   chance to terminate. */
+
+DSACK0		= cycledone;
+DSACK0.OE	= MEMSEL;
+nDSACK0 <= '0' WHEN cycledone = '1' AND nMEMSEL = '0' ELSE '0' WHEN cycledone = '0' AND nMEMSEL = '0' ELSE 'Z';
+
+DSACK1		= cycledone;
+DSACK1.OE	= MEMSEL;
+nDSACK1 <= nDSACK0;
