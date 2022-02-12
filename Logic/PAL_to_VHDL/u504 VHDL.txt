@@ -100,7 +100,14 @@ BOSS		= ABG & !AAS & !DTACK & !HALT & !RESET & B2000 & !MODE68K
 		#  !HALT & !MODE68K & BOSS
 		# !RESET & !MODE68K & BOSS
 		# !B2000 & !HALT & !RESET;
-nBOSS <= '0' WHEN ( nABG = '0' AND nAAS ='1' AND nDTACK = '1' AND nHALT = '1' AND nRESET = '1' AND B2000 = '1' AND MODE68K = '0' ) OR (nHALT = '1' AND MODE68K = '0' AND nBOSS = '0' ) OR (nRESET = '1' AND MODE68K = '0' AND nBOSS = '0' ) OR (B2000 = '0' AND nHALT ='1' AND nRESET ='1')
+nBOSS <= '0' 
+   WHEN 
+      ( nABG = '0' AND nAAS ='1' AND nDTACK = '1' AND nHALT = '1' AND nRESET = '1' AND B2000 = '1' AND MODE68K = '0' ) OR 
+      (nHALT = '1' AND MODE68K = '0' AND nBOSS = '0' ) OR 
+      (nRESET = '1' AND MODE68K = '0' AND nBOSS = '0' ) OR 
+      (B2000 = '0' AND nHALT ='1' AND nRESET ='1')
+   ELSE
+      '1';
 
 /* This is a special reset used to reset the configuration registers.  If
    JMODE (Johann's special mode) is active, we can reset the registers
