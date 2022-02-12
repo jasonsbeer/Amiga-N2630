@@ -97,8 +97,8 @@ nS7MDIS <= '0' WHEN DSEN = '0' AND nASEN = '0' AND nEXTERN = '1' AND nDSACKEN = 
    with EXTERN. */
 
 S_7MDIS.D	= ASEN & !EXTERN & CYCEND;
-PROCESS ( CLK7M ) BEGIN
-   IF RISING_EDGE (CLK7M) THEN
+PROCESS ( SCLK ) BEGIN
+   IF RISING_EDGE (SCLK) THEN
       nS_7MDIS <= '0' 
          WHEN 
             nASEN = '0' AND nEXTERN = '1' AND CYCEND = '1'
@@ -112,8 +112,8 @@ END PROCESS;
    the R/W line here?  EXTERN qualification included here too. */
 
 !DSEN.D		= ASEN & !EXTERN & CYCEND;
-PROCESS ( CLK7M ) BEGIN
-   IF RISING_EDGE (CLK7M) THEN
+PROCESS ( SCLK ) BEGIN
+   IF RISING_EDGE (SCLK) THEN
       DSEN <= '0' 
          WHEN 
             nASEN = '0' AND nEXTERN = '1' AND CYCEND = '1'
@@ -129,8 +129,8 @@ END PROCESS;
 !DSACKEN.D	= !DSEN & CYCEND & !EXTERN &   DTACK
 		# !DSEN & CYCEND & !EXTERN &  EDTACK
 		# !DSEN & CYCEND & !EXTERN & ONBOARD;
-PROCESS ( CLK7M ) BEGIN
-   IF RISING_EDGE (CLK7M) THEN
+PROCESS ( SCLK ) BEGIN
+   IF RISING_EDGE (SCLK) THEN
       nDSAKEN <= '1' 
          WHEN 
             (DSEN = '0' AND nEXTERN = '1' AND CYCEND = '1' AND nDTACK = '0') OR
@@ -144,8 +144,8 @@ END PROCESS;
 /* This one marks the end of a slow cycle */
 
 !CYCEND.D	= !DSACKEN & CYCEND;
-PROCESS ( CLK7M ) BEGIN
-   IF RISING_EDGE (CLK7M) THEN
+PROCESS ( SCLK ) BEGIN
+   IF RISING_EDGE (SCLK) THEN
       CYCEND <= '0' 
          WHEN 
             nDSACKEN = '1' AND CYCEND = '1'
