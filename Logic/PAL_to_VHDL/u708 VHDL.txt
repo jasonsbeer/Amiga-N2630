@@ -90,7 +90,7 @@ D   |     |  0  |   1  |
  
 basis7M		=  B2000 & A7M
 		# !B2000 & (!C1 $ C3);
-SIGNAL basis7m <= '1' WHEN ( B2000 = '1' AND A7M ) OR ( B2000 = '0' AND (nC1 = '1' OR nC3 = '0' ) ELSE '0';
+SIGNAL basis7m <= '1' WHEN ( B2000 = '1' AND A7M = '1' ) OR ( B2000 = '0' AND (nC1 = '1' OR nC3 = '0' ) ELSE '0';
 
 /**  Logic Equations  **/
 
