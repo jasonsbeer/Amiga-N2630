@@ -1,0 +1,5 @@
+set -tmpdir "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_LOW/xst/projnav.tmp"
+set -xsthdpdir "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_LOW/xst"
+elaborate
+-ifn MAIN.prj
+-ifmt mixed
