@@ -32,6 +32,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity MAIN is
 	Port 
 	( 
+		--45 pins used
 		nABG : IN STD_LOGIC; --AMIGA BUS GRANT
 		nHALT : IN STD_LOGIC; --_HALT SIGNAL
 		nRESET : IN STD_LOGIC; --_RESET SIGNAL
@@ -47,6 +48,9 @@ entity MAIN is
 		nC3 : IN STD_LOGIC; --AMIGA _C3 CLOCK
 		CDAC : IN STD_LOGIC; --AMIGA CDAC CLOCK
 		nAS : IN STD_LOGIC; --68030 ADDRESS STROBE
+		ARnW : IN STD_LOGIC; --68000 READ/WRITE
+		nVPA : IN STD_LOGIC; --68000 VALID PERIPHERAL ADDRESS
+		JMODE : IN STD_LOGIC; --JOHANN'S SPECIAL MODE! WHO IS JOHANN AND WHY DOES HE GET HIS OWN MODE? LUCKY!
 		
 		
 		P7M : INOUT STD_LOGIC; --7MHZ CLOCK
@@ -60,11 +64,21 @@ entity MAIN is
 		nEXTERN : INOUT STD_LOGIC; --ARE WE ACCESSING EXTERNAL MEMORY OR FPU?
 		SCLK : INOUT STD_LOGIC; --STATE MACHINE CLOCK
 		nMEMSEL : INOUT STD_LOGIC; --ARE WE SELECTING MEMORY ON BOARD? FIRST 4 (8) MEGABYTES
-		SN7MDIS : INOUT STD_LOGIC;
-		nS7MDIS : INOUT STD_LOGIC;
-		nABR : INOUT STD_LOGIC;
-		nONBOARD : INOUT STD_LOGIC;
-		nDSACKEN : INOUT STD_LOGIC
+		SN7MDIS : INOUT STD_LOGIC; --STATE MACHINE CLOCK 
+		nS7MDIS : INOUT STD_LOGIC; --STATE MACHINE CLOCK
+		nABR : INOUT STD_LOGIC; -- AMIGA BUS REQUEST
+		nONBOARD : INOUT STD_LOGIC; --ARE WE USING RESOURCES ON THE 2630?
+		nDSACKEN : INOUT STD_LOGIC; --DSACKn ENABLE
+		E : INOUT STD_LOGIC; --6800 E CLOCK
+		nIVMA : INOUT STD_LOGIC; --VALID MEMORY ADDRESS
+		
+		nDSCLK : OUT STD_LOGIC; --GATE DSACKn REQUEST
+		IPLCLK : OUT STD_LOGIC; --CLOCK TO LATCH IPL SIGNALS
+		RnW : OUT STD_LOGIC; --68030 READ/WRTIE
+		DSEN : OUT STD_LOGIC; --68000 DATA STROBE ENABLE
+		nDSACKDIS : OUT STD_LOGIC; --DSACK DISABLE
+		nEDTACK : OUT STD_LOGIC;
+		nREGRESET : OUT STD_LOGIC --PART OF RESET LOOP "FIX"
 			  
 	);
 end MAIN;
@@ -84,7 +98,9 @@ architecture Behavioral of MAIN is
 	SIGNAL cpustate : STD_LOGIC_VECTOR ( 2 downto 0 ):= (others => '0'); --Derived from FC(2..0)
 	SIGNAL basis7m : STD_LOGIC:='0';
 	SIGNAL p14m : STD_LOGIC:='0'; --14mhz clock
-
+	SIGNAL sca : STD_LOGIC_VECTOR ( 3 downto 0 ); --STATE COUNTER
+	SIGNAL sync : STD_LOGIC:='0';
+	SIGNAL esync : STD_LOGIC:='0';
 
 begin
 	
@@ -125,6 +141,17 @@ begin
 			(CDAC = '0' AND p14m = '1' AND n7M = '1' AND nS7MDIS = '1') 
 		ELSE '0';
 		
+	--This clock is used to gate a DSACK request.
+
+	nDSCLK <= NOT basis7m;
+
+	--This clock is used to latch the interrupt lines between the motherboard
+	--and the 68030.  If this isn't done, you'll get phantom interrupts
+	--that you probably won't even notice in AmigaOS, but can be fatal to
+	--time critical interrupt code in UNIX and possibly even AmigaOS.
+
+	IPLCLK <= basis7m;
+		
 	----------------------------
 	-- INTERNAL SIGNAL DEFINE --
 	----------------------------
@@ -133,6 +160,30 @@ begin
 	offboard <= '1' WHEN (nONBOARD = '1' OR nMEMSEL = '1' OR nEXTERN = '1') ELSE '0';
 	cpuspace <= '1' WHEN cpustate = x"7" ELSE '0';
 	cpustate <= FC ( 2 downto 0 );
+	
+	--ESYNC is simply a one clock delay of E. It is used by the counter to do 
+	--edge detection.  When a high to low transition of the E clock is detected,
+	--the counter is forced to a known state. This allows an absolute count to 
+	--be used for VMA and peripheral DTACK.  This sync-up is only required when
+	--the board is in a B2000, since that board will be receiving E from the 
+	--motherboard.  On an A2000, the E clock is absent (because the processor 
+	--is pulled) and thus WE create the E clock, and can create it in such a way
+	--as to make it automatically synced.
+
+	--ESYNC.D		= E & B2000;
+	PROCESS ( N7M ) BEGIN
+		IF RISING_EDGE (N7M) THEN
+			IF 
+				E = '1' AND B2000 = '1'
+			THEN
+				esync <= '1';
+			ELSE
+				esync <= '0';
+			END IF;
+		END IF;
+	END PROCESS;
+	
+	sync <= '1' WHEN ESYNC = '0' OR E = '1' ELSE '0'; --sync		= !ESYNC # E;
 	
 	---------------------
 	-- REQUEST THE BUS --
@@ -260,6 +311,201 @@ begin
 				nCYCEND <= '0'; 
 			ELSE
 				nCYCEND <= '1';
+			END IF;
+		END IF;
+	END PROCESS;
+	
+	-----------------------
+	-- READ/WRITE SIGNAL --
+	-----------------------
+	
+	--Logic Equations related to the DMA to RAM interface U505
+	
+	RnW <= ARnW WHEN nBGACK = '0' ELSE 'Z';
+	
+	------------------------
+	-- DATA STROBE ENABLE --
+	------------------------
+	
+	--Here we enable data strobe to the A2000.  Are we properly considering
+	--the R/W line here?  EXTERN qualification included here too. U505
+
+	PROCESS ( SCLK ) BEGIN
+		IF RISING_EDGE (SCLK) THEN
+			IF nASEN = '0' AND nEXTERN = '1' AND nCYCEND = '1' THEN
+				DSEN <= '0' ;
+			ELSE
+				DSEN <= '1';
+			END IF;
+		END IF;
+	END PROCESS;
+	
+	-------------------------
+	-- DSACK LATCH DISABLE --
+	-------------------------
+	
+	--This is used to disable the DSACK latch.  EXTERN here is basically 
+	--extra insurance that no board-generated DSACK will come out for 
+	--these special cycles. JN: NO EXTERN IN THE EQUATION...MUST BE AN OLD NOTE
+
+	--DSACKDIS	= !AS ;
+	nDSACKDIS <= '0' WHEN nAS = '1';
+	
+	------------------
+	-- 6800 E CLOCK --
+	------------------
+	
+	E <= '1' WHEN sca(2) = '1' ELSE '0' WHEN sca(2) = '0' ELSE 'Z' WHEN B2000 = '0';
+	
+	--------------------------
+	-- VALID MEMORY ADDRESS --
+	--------------------------
+	
+	--Initially, the logic here enabled IVMA during (!A3 & A2 & !A1 & A0 & VPA).
+	--This is the proper time to have VMA come out, just about when the 68000 
+	--would bring it out, actually slightly sooner since this PAL releases it on
+	--the wrong 7M edge.  The main problem with this scheme is that if VPA falls 
+	--in the case that's just prior to that enabling term (what I call CASE 3 
+	--in my timing), the I/O cycle should be held off until the next E cycle.
+	--The 68000 does this, but the above IVMA would run that cycle right away.
+	--The fix to this used here moves the IVMA equation up by one clock cycle,
+	--assuring that a CASE 3 VPA will be delayed.  This adds a potential problem
+	--in that IVMA would is asserted sooner than a 68000 would assert it.  We
+	--know this is no problem for 8520 devices, and /VPA driven devices aren't
+	--supported under autoconfig, so we should be OK here.
+  
+	--!IVMA.D		=   !A3 & !A2 & !A1 & !A0 & VPA	# !IVMA & !A3;
+	PROCESS ( P7M ) BEGIN
+		IF RISING_EDGE ( P7M ) THEN
+			IF 
+				( sca(3) = '0' AND sca(2) = '0' AND sca(1) = '0' AND sca(0) = '0' AND nVPA = '0' ) OR
+				( nIVMA = '0' AND sca(3) = '0' ) 
+			THEN		
+				nIVMA <= '0';
+			ELSE
+				nIVMA <= '1';
+			END IF;
+		END IF;
+	END PROCESS;
+	
+	-------------
+	-- EDT ACK --
+	-------------
+	
+	--This was "!A3 & A2 & A1 & !A0 & !IVMA", but I think that may make
+	--the cycle end too early.  So I'm pushing it up by one clock. U506
+
+	--!EDTACK.D	= !A3 & A2 & A1 & A0 & !IVMA;
+	PROCESS ( P7M ) BEGIN
+		IF RISING_EDGE ( P7M ) THEN
+			IF 
+				( sca(3) = '0' AND sca(2) = '1' AND sca(1) = '1' AND sca(0) = '1' AND nIVMA = '0' ) 
+			THEN
+				nEDTACK <= '0';
+			ELSE
+				nEDTACK <= '1';
+			END IF;
+		END IF;
+	END PROCESS;
+	
+	-------------------
+	-- STATE COUNTER --
+	-------------------
+	
+	--Here's the 68xx/65xx family state counter.  The counter bits A0 .. A3 are 
+	--used by the 6800 cycle logic. The 6800 cycle logic uses the counter to 
+	--generate the E clock and VMA and to sync DTACK to the E clock.  U504
+   
+	--NOTE THESE ARE NOT THE 680x0 BUS
+	--SINCE THIS A 4 BIT COUNTER (QUALIFIED BY SYNC?), WE CAN PROBABLY DO SOMETHING MORE SIMPLE IN VHDL
+	
+	--LIKE THIS, BUT LETS GET THE LOGIC JUST WORKING FIRST
+	--signal sca : std_logic_vector(3 downto 0)
+	--	process(n7M)
+	--begin
+	-- if (rising_edge(n7m)) then sca <= sca + 1;
+	-- end if;
+	--end process;
+
+	--!A0.D		=  A0 & sync;
+	PROCESS ( n7M ) BEGIN
+		IF RISING_EDGE (n7M) THEN
+			IF 
+				sca(0) = '1' AND sync = '1' 
+			THEN 
+				sca(0) <= '0';
+			ELSE
+				sca(0) <= '1';
+			END IF;
+		END IF;
+	END PROCESS;
+
+	--!A1.D		= !A1 & !A0 #  A1 &  A0 #  A3 # !sync;
+	PROCESS ( n7M ) BEGIN
+		IF RISING_EDGE (n7M) THEN
+			IF 
+				( sca(1) = '0' AND sca(0) = '0' ) OR
+				( sca(1) = '1' AND sca(0) = '1' ) OR
+				( sca(3) = '1' ) OR
+				( sync = '0' )
+			THEN		
+				sca(1) <= '0';
+			ELSE
+				sca(1) <= '0';
+			END IF;
+		END IF;
+	END PROCESS;
+
+	--!A2.D		= !A2 & !A0 # !A2 & !A1	#  A2 &  A1 & A0 # !sync;
+	PROCESS ( n7M ) BEGIN
+		IF RISING_EDGE (n7M) THEN
+			IF
+				( sca(2) = '0' AND sca(0) = '0' ) OR
+				( sca(2) = '0' AND sca(1) = '0' ) OR
+				( sca(2) = '1' AND sca(1) = '1' AND sca(0) = '1' ) OR
+				( sync = '0' )
+			THEN		
+				sca(2) <= '0';
+			ELSE
+				sca(2) <= '1';
+			END IF;
+		END IF;
+	END PROCESS;
+
+	--!A3.D		= !A3 & !A2 & sync # !A1 &  A0 & sync # !A3 & !A0 & sync;
+	PROCESS ( n7M ) BEGIN
+		IF RISING_EDGE (n7M) THEN
+			IF
+				( sca(3) = '0' AND sca(2) = '0' AND sync = '1' ) OR
+				( sca(1) = '0' AND sca(0) = '1' AND sync = '1' ) OR
+				( sca(3) = '0' AND sca(0) = '0' AND sync = '1' ) 
+			THEN		
+				sca(3) <= '0';
+			ELSE
+				sca(3) <= '1';
+			END IF;
+		END IF;
+	END PROCESS;
+	
+	--------------
+	-- REGRESET --
+	--------------
+	
+	--This is a special reset used to reset the configuration registers.  If
+	--JMODE (Johann's special mode) is active, we can reset the registers
+	--with the CPU.  Otherwise, the registers can only be reset with a cold
+	--reset asserted. U504
+
+	--REGRESET.D	= !JMODE & HALT & RESET			#  JMODE & RESET;
+	PROCESS ( n7M ) BEGIN
+		IF RISING_EDGE (n7M) THEN
+			IF 
+				( JMODE = '0' AND nHALT = '0' AND nRESET = '0' ) OR 
+				( JMODE = '1' AND nRESET = '0' )
+			THEN		
+				nREGRESET <= '0';
+			ELSE
+				nREGRESET <= '1';
 			END IF;
 		END IF;
 	END PROCESS;

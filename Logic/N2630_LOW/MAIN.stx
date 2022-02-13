@@ -22,7 +22,7 @@ WARNING:Xst:3164 - Option "-debug" found multiple times in the command line. Onl
 =========================================================================
 Compiling vhdl file "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_LOW/MAIN.vhd" in Library work.
 Entity <main> compiled.
-Entity <MAIN> (Architecture <Behavioral>) compiled.
+Entity <main> (Architecture <behavioral>) compiled.
 
 
 Total REAL time to Xst completion: 0.00 secs
@@ -31,7 +31,7 @@ Total CPU time to Xst completion: 0.04 secs
 --> 
 
 
-Total memory usage is 470144 kilobytes
+Total memory usage is 470284 kilobytes
 
 Number of errors   :    0 (   0 filtered)
 Number of warnings :    1 (   0 filtered)
