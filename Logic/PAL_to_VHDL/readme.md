@@ -1,1 +1,1 @@
-This was my first run through to convert the PAL logic, writeen in ABEL, to VHDL. There are a few errors, but everything is here for reference, if needed. The final VHDL logic implementation can be found on the "LOW" and "HIGH" logic files.
+This was my first run through to convert the PAL logic, writen in ABEL, to VHDL. There are a few errors, but everything is here for reference, if needed. The final VHDL logic implementation can be found on the "LOW" and "HIGH" logic files.
