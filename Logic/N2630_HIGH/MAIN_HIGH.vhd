@@ -53,6 +53,7 @@ entity MAIN_HIGH is
 		AUTO : IN STD_LOGIC; --SHOULD I AUTOCONFIG?
 		--ROMCONF : IN STD_LOGIC; --ROM HAS BEEN CONFIGURED
 		--RAMCONF : IN STD_LOGIC; --RAM HAS BEEN CONFIGURED
+	    	TWOMEG : IN STD_LOGIC; --LOW LOGIC FOR 2MB CONFIGURATION, HIGH FOR 4MB
 		
 	 
 		DAC : INOUT STD_LOGIC_VECTOR (31 downto 28):= "ZZZZ"; --DATA BUS FOR THE AUTOCONFIG PROCESS
@@ -184,7 +185,7 @@ begin
 	----------------
 
 	--We have three boards we need to autoconfig, in this order
-	--1. The 68030 board itself with BOOT ROM
+	--1. The 68030 board itself
 	--2. The 68030 base memory (up to 8MB) without BOOT ROM in the Zorro 2 space
 	--3. The expansion memory (up to 112MB) in the Zorro 3 space	
 
@@ -222,58 +223,57 @@ begin
 
 						--offset $00
 						WHEN "000000" => 
-							D_ZORRO2RAM <= "1110"; --er_type: Zorro 2 card without BOOT ROM
+							D_2630 <= "1110"; 
+							D_ZORRO2RAM <= "1110"; --er_type: Zorro 2 card without BOOT ROM, LINK TO MEM POOL
+							D_ZORRO3RAM <= "1010"; --er_type: Zorro 3 card without BOOT ROM, LINK TO MEM POOL
 
 						--offset $02
 						WHEN "000001" => 
-							D_ZORRO2RAM <= "0111"; --er_type: 4MB
+							D_2630 <= "0111";
+							D_ZORRO2RAM <= "011" & TWOMEG; --er_type: NEXT BOARD NOT RELATED 2MB OR 4MB
+							D_ZORRO3RAM <= "0011"; --NEXT BOARD NOT RELATED, 128MB
 
-						--offset $04
+						--offset $04 INVERTED
 						WHEN "000010" => 
+							D_2630 <= "1010";
 							D_ZORRO2RAM <= "1010"; --Product Number Hi Nibble, we are stealing the A2630 product number
+							D_ZORRO3RAM <= "1010";
 
-						--offset $06
+						--offset $06 INVERTED
 						WHEN "000011" => 
-							D_ZORRO2RAM <= "1000"; --Product Number Lo Nibble				
+							D_2630 <= "1110";
+							D_ZORRO2RAM <= "1110"; --Product Number Lo Nibble
+							D_ZORRO3RAM <= "1111";
 
-						--offset $08
+						--offset $08 INVERTED
 						WHEN "000100" => 
-							D_ZORRO2RAM <= "0010"; --er_flags: I/O device, can't be shut up, reserved, reserved
+							D_2630 <= "1111"; --CAN'T BE SHUT UP
+							D_ZORRO2RAM <= "1011"; --er_flags: I/O device, can be shut up, reserved, reserved
+							D_ZORRO3RAM <= "0101"; --MEMORY DEVICE, CAN BE SHUT UP, Z3 SIZE
 
-						--offset $0A
-						--WHEN "000101" => D(31 downto 28) <= "0000"; --er_flags: Reserved, must be zeroes
-
-						--offset $0C
-						--THE A2630 CONFIGURES THIS NIBBLE AS "1000" WHEN UNIX, "0000" WHEN AMIGA OS
+						--offset $0C INVERTED
+						--THE A2630 CONFIGURES THIS NIBBLE AS "0111" WHEN UNIX, "1111" WHEN AMIGA OS
 						WHEN "000110" => 
-							D_2630 <= NOT OSMODE & "000"; 
-							D_ZORRO2RAM <= "0000"; --Reserved: must be zeroes				
+							D_2630 <= OSMODE & "111"; 
+							D_ZORRO2RAM <= "1111"; --Reserved: must be zeroes
+							D_ZORRO3RAM <= "1111";
 
-						--offset $0E
-						--WHEN "000111" => D(31 downto 28) <= "0000"; --Reserved: must be zeroes	
+						--offset $12 INVERTED
+						WHEN "001001" => 
+							D_2630 <= "1111";
+							D_ZORRO2RAM <= "1101"; --MANUFACTURER Number, high byte, low nibble hi byte. Just for fun, lets put C= in here!
+							D_ZORRO3RAM <= "1101";
 
-						--offset $10
-						WHEN "001000" => 
-							D_ZORRO2RAM <= "0100"; --Product Number, high nibble hi byte. Just for fun, lets put C= in here!
-
-						--offset $12
-						--WHEN "001001" => D(31 downto 28) <= "0000"; --Product Number, low nibble hi byte. Just for fun, lets put C= in here!
-
-						--offset $14
-						--WHEN "001010" => D(31 downto 28) <= "0000"; --Product Number, high nibble low byte. Just for fun, lets put C= in here!
-
-						--offset $16
+						--offset $16 INVERTED
 						WHEN "001011" => 
-							D_ZORRO2RAM <= "0100"; --Product Number, low nibble low byte. Just for fun, lets put C= in here!
-
-						--offset $18
-						--WHEN "001100" => D(31 downto 28) <= "0000"; --Serial number byte 0 high nibble
-
-						--offset $1A
-						--WHEN "001101" => D(31 downto 28) <= "0000"; --Serial number byte 0 low nibble				
+							D_2630 <= "1111";
+							D_ZORRO2RAM <= "1101"; --MANUFACTURER Number, low nibble low byte. Just for fun, lets put C= in here!
+							D_ZORRO3RAM <= "1101";
 
 						WHEN OTHERS => 
-							D_ZORRO2RAM <= "0000"; --Reserved offsets and unused offset values are all zeroes
+							D_2630 <= "1111";
+							D_ZORRO2RAM <= "1111"; --INVERTED...Reserved offsets and unused offset values are all zeroes
+							D_ZORRO3RAM <= "1111";
 
 					END CASE;
 					
@@ -300,9 +300,10 @@ begin
 						END IF;
 						
 						IF ((AUTO = '0') OR autoconfigcomplete_ZORRO2RAM = '1') THEN
-							--We always autoconfig the 2630 ROM, so do that no matter what
+							--We always autoconfig the 2630, so do that no matter what
 							--AUTO is driven by a jumper on the board, if it is logic 0, the user does not want to use the 
-							--on board Zorro 2 RAM. Thus, we will stop after the 2630 ROM is autoconfiged.
+							--on board RAM. Thus, we will stop after the 2630 is autoconfiged.
+							--PROBABLY NEED A DIFFERENT CONSIDERATION FOR Z3 RAM
 							CONFIGED <= '1'; 
 						END IF;
 						
