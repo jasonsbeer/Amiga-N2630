@@ -45,8 +45,8 @@ entity MAIN_HIGH is
 		nSENSE : IN STD_LOGIC; --6888x PRESENCE
 		--EXTSEL : IN STD_LOGIC; --IS THE EXPANSION RAM SELECTED?
 		OSMODE : IN STD_LOGIC; --HIGH FOR AMIGA OS, LOW FOR UNIX
-		--PHANTOMHI : IN STD_LOGIC; --PHANTOM HI DATA
-		--PHANTOMLO : IN STD_LOGIC; --PHANTOM LO DATA
+		PHANTOMHI : IN STD_LOGIC; --PHANTOM HI DATA
+		PHANTOMLO : IN STD_LOGIC; --PHANTOM LO DATA
 		nBOSS : IN STD_LOGIC; --ARE WE BOSS?
 		nCPURESET : IN STD_LOGIC; --RESET FOR THE 68030
 		RESENB : IN STD_LOGIC; -- RESET ENABLED
@@ -59,7 +59,7 @@ entity MAIN_HIGH is
 		DAC : INOUT STD_LOGIC_VECTOR (31 downto 28):= "ZZZZ"; --DATA BUS FOR THE AUTOCONFIG PROCESS
 		CONFIGED : INOUT STD_LOGIC; --HAS AUTOCONFIG COMPLETED?
 		nRESET : INOUT STD_LOGIC; --QUALIFIED SYSTEM RESET SIGNAL 
-		--nROMCLK : INOUT STD_LOGIC; --CLOCK FOR U303
+		ROMCLK : INOUT STD_LOGIC; --CLOCK FOR U303
 	 
 	 	nFPUCS : OUT STD_LOGIC; --FPU CHIP SELECT
 		nBERR : OUT STD_LOGIC; --BUS ERROR
@@ -156,15 +156,15 @@ begin
 	--High memory rom space, where ROMs normally reside when available.
 	hirom <= '1' WHEN AH( 23 downto 15 ) >= "111110000" AND AH( 23 downto 15 ) <= "111110001" ELSE '0'; --addr:[f80000..f8ffff]	
 	--icsrom		= hirom & !PHANHI & readcycle		# lorom & !PHANLO & readcycle;
-	--icsrom <= '1' WHEN ( hirom = '1' AND PHANTOMHI = '0' AND readcycle = '1' ) OR ( lorom = '1' AND PHANTOMLO = '0' AND readcycle = '1' ) ELSE '0';
-	icsrom <= '1' WHEN ( hirom = '1' AND RnW = '1' AND nAS = '0' ) OR ( lorom = '1' AND RnW = '1' AND nAS = '0' ) ELSE '0';
+	icsrom <= '1' WHEN ( hirom = '1' AND PHANTOMHI = '0' AND readcycle = '1' ) OR ( lorom = '1' AND PHANTOMLO = '0' AND readcycle = '1' ) ELSE '0';
+	--icsrom <= '1' WHEN ( hirom = '1' AND RnW = '1' AND nAS = '0' ) OR ( lorom = '1' AND RnW = '1' AND nAS = '0' ) ELSE '0';
 	--romaddr		= addr:40;
 	--romaddr <= '1' WHEN AL(6 downto 1) = "100000" ELSE '0'; --01000000
 	--ramaddr		= addr:48;
 	--ramaddr <= '1' WHEN AL(6 downto 1) = "100100" ELSE '0'; --01001000
 	
 	
-	--readcycle <= '1' WHEN RnW = '1' AND nAS = '0' ELSE '0';
+	readcycle <= '1' WHEN RnW = '1' AND nAS = '0' ELSE '0';
 	
 	--CSAUTO		= icsauto		# CSAUTO & AS;
 	--csauto <= '1' WHEN ( icsauto = '1' ) OR ( csauto = '0' AND nAS = '0') ELSE '0';
@@ -200,7 +200,7 @@ begin
 		ELSE
 			'0';	
 
-	--THIS CODE BASICALLY DUMPS THE AUTOCONFIG DATA ON TO D(31..28) DEPENDING ON WHAT WE ARE AUTOCONFIGing	
+	--THIS CODE DUMPS THE AUTOCONFIG DATA ON TO D(31..28) DEPENDING ON WHAT WE ARE AUTOCONFIGing	
 	DAC(31 downto 28) <= 
 		D_2630 WHEN autoconfigcomplete_2630 = '0' AND autoconfigspace ='1' AND CONFIGED = '0' ELSE
 		D_ZORRO2RAM WHEN autoconfigcomplete_ZORRO2RAM = '0' AND autoconfigspace ='1' AND CONFIGED = '0' ELSE
@@ -402,10 +402,11 @@ begin
 	-- CLOCKS FOR FF U302 AND U303 --
 	---------------------------------
 	
-	--I DON'T KNOW...THIS ALL LOOKS LIKE AUTOCONFIG STUFF...I DON'T NEED THE AUTOCONFIG LOGIC...
+	--I DON'T KNOW...SOME OF THIS LOOKS LIKE AUTOCONFIG STUFF...I DON'T NEED THE AUTOCONFIG LOGIC...
 	
 	--ROMCLK		= writecycle & romaddr & !CONFIGED		# ROMCLK & DS;
-	--nROMCLK <= '0' WHEN ( writecycle = '1' AND romaddr = '1' AND CONFIGED = '0' ) OR ( nROMCLK = '1' AND nDS = '0' ) ELSE '1';
+	--THIS GOES THROUGH AN INVERTING GATE IN THE A2630 (U307). NO NEED FOR THAT HERE, SO WE INVERT THE SIGNAL HERE!
+	ROMCLK <= '1' WHEN ( writecycle = '1' AND romaddr = '1' AND autoconfigcomplete_2630 = '0' ) OR ( nROMCLK = '1' AND nDS = '0' ) ELSE '0';
 
 	--RAMCLK		= writecycle & ramaddr & !ROMCLK		# !CPURESET & RAMCLK;	
 	--nRAMCLK <= '0' WHEN ( writecycle = '1' AND ramaddr = '1' AND nROMCLK = '1' ) OR (nCPURESET = '1' AND nROMCLK = '1' ) ELSE '1';
