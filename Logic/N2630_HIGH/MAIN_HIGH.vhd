@@ -322,6 +322,31 @@ begin
 	
 	--CSROM		= icsrom;
 	nCSROM <= '0' WHEN icsrom = '1' ELSE '1';
+			
+	---------------
+	-- RAM STUFF --
+	---------------
+
+	--THIS DETERMINES IF WE ARE IN THE FIRST OR SECOND 2 MEGS OF ADDRESS SPACE
+	--THIS IS ALL IN SECTION 12 OF THE 68030 MANUAL
+	
+	TWOMEG <= '1' 
+		WHEN
+			AH(31 downto 21) = "01000000000" --A21 IS LOW IN THE FIRST 2 MEGS
+		ELSE
+			'0';
+			
+	FOURMEG <= '1'
+		WHEN
+			AH(31 downto 21) = "01000000001" --A21 IS HIGH IN THE SECOND 2 MEGS
+		ELSE
+			'0';	
+			
+--	EIGHTMEG <= '1'
+--		WHEN
+--			AH(31 downto 22) = "0100000001" --A22 IS HIGH IN THE SECOND 4 MEGS
+--		ELSE
+--			'0';
 	
 	------------------------
 	-- 68030 CACHE ENABLE --
