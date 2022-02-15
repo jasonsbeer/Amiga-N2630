@@ -300,7 +300,9 @@ begin
 						END IF;
 						
 						IF ((AUTO = '0') OR autoconfigcomplete_ZORRO2RAM = '1') THEN
-							--Autoconfig process is done when we don't want to autoconfig the ram or the ram has been autoconfiged
+							--We always autoconfig the 2630 ROM, so do that no matter what
+							--AUTO is driven by a jumper on the board, if it is logic 0, the user does not want to use the 
+							--on board Zorro 2 RAM. Thus, we will stop after the 2630 ROM is autoconfiged.
 							CONFIGED <= '1'; 
 						END IF;
 						
