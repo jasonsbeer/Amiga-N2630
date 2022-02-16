@@ -34,7 +34,7 @@ use ieee.std_logic_unsigned.all;
 
 entity MAIN_HIGH is
     Port ( 
-		--59 PINS USED
+		--63 PINS USED
 	 
 		FC : IN STD_LOGIC_VECTOR (2 downto 0); --FCn FROM 68030
 		AL : IN STD_LOGIC_VECTOR (6 downto 0); --ADDRESS BUS BITS 6..1
@@ -52,7 +52,7 @@ entity MAIN_HIGH is
 		PHANTOMLO : IN STD_LOGIC; --PHANTOM LO DATA
 		nBOSS : IN STD_LOGIC; --ARE WE BOSS?
 		nCPURESET : IN STD_LOGIC; --RESET FOR THE 68030
-		RESENB : IN STD_LOGIC; -- RESET ENABLED
+		
 		AUTO : IN STD_LOGIC; --SHOULD I AUTOCONFIG?
 		--ROMCONF : IN STD_LOGIC; --ROM HAS BEEN CONFIGURED
 		--RAMCONF : IN STD_LOGIC; --RAM HAS BEEN CONFIGURED
@@ -529,26 +529,6 @@ begin
 
 	--AVEC		= cpuspace & interruptack & !BGACK;
 	nAVEC <= '0' WHEN (cpuspace = '1' AND interruptack = '1' AND nBGACK = '1') ELSE '1';
-	
-	
-	-----------
-	-- RESET --
-	-----------
-	
-	--The RESET output feeds to the /RST signal from the A2000
-	--motherboard.  Which in turn enables the assertion of the /BOSS
-	--line when you're on a B2000.  Which in turn creates the
-	--/CPURESET line.  Together these make the RESET output.	In
-	--order to eliminate the glitch on RESET that this loop makes,
-	--the RESENB input is gated into the creation of RESET.  What
-	--this implies is that the 68020 can't reset the system until
-	--we're RESENB, OK?.  Make sure to consider the effects of this
-	--gated reset on any special use of the ROM configuration register.
-	--Using JMODE it's possible to reset the ROM configuration register
-	--under CPU control, but not if the RESENB line is negated.
-	
-	--RESET		= BOSS & CPURESET & RESENB;
-	nRESET <= '0' WHEN nBOSS = '0' AND nCPURESET ='0' AND RESENB = '1' ELSE '1';
 
 
 	---------------------------------
