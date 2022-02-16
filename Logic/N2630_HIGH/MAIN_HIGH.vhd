@@ -192,10 +192,10 @@ begin
 	readcycle <= '1' WHEN RnW = '1' AND nAS = '0' ELSE '0';
 	
 	--CSAUTO		= icsauto		# CSAUTO & AS; CHIP SELECT FOR AUTOCONFIG
-	--csauto <= '1' WHEN ( icsauto = '1' ) OR ( csauto = '0' AND nAS = '0') ELSE '0';
+	csauto <= '1' WHEN ( icsauto = '1' ) OR ( csauto = '1' AND nAS = '0') ELSE '0';
 	
 	--writecycle	= CSAUTO & !PRW & DS & !CPURESET;
-	--writecycle <= '1' WHEN csauto = '1' AND RnW = '0' AND nDS ='0' AND nCPURESET = '1' ELSE '0';
+	writecycle <= '1' WHEN csauto = '1' AND RnW = '0' AND nDS ='0' AND nCPURESET = '1' ELSE '0';
 	--WRITECYCLE WHEN CSAUTO AND WRITE MODE AND DATA STROBE AND NOT CPURESET
 	--csauto IS WHEN WE ARE IN THE AUTOCONFIG PROCESS
 	
@@ -204,7 +204,12 @@ begin
 	--we're inhibiting autoconfiguration.
 
 	--icsauto		= autocon & AS & !RAMCONF &  AUTO 		# autocon & AS & !ROMCONF & !AUTO;
-	--icsauto <= '1' WHEN ( autoconfigspace = '1' AND nAS = '0' AND RAMCONF = '0' AND AUTO = '1' ) OR ( autoconfigspace = '1' AND nAS = '0' AND ROMCONF = '0' AND AUTO = '0' ) ELSE '0';
+	icsauto <= '1' 
+		WHEN 
+			( AUTO = '1' AND autoconfigspace = '1' AND nAS = '0' AND autoconfigcomplete_ZORRO2RAM = '0' ) OR 
+			( AUTO = '0' AND autoconfigspace = '1' AND nAS = '0' AND autoconfigcomplete_2630 = '0' ) 
+		ELSE 
+			'0';
 
 	--rds		=  ASEN & !CYCEND &  RW & !EXTERN;
 	rds <= '1' WHEN nASEN = '0' AND nCYCEND = '1' AND RnW = '1' AND nEXTERN = '1' ELSE '0';
@@ -537,7 +542,7 @@ begin
 	
 	--I DON'T KNOW...SOME OF THIS LOOKS LIKE AUTOCONFIG STUFF...I DON'T NEED THE AUTOCONFIG LOGIC...
 	
-	--ROMCLK		= writecycle & romaddr & !CONFIGED		# ROMCLK & DS;
+	
 	
 	--SEEMS THAT THIS CLOCKS U307 DURING THE AUTOCONFIG WRITE CYCLE BUT BEFORE THE 2360 AUTOCONFIG BASE ADDRESS IS ASSIGNED
 			
@@ -546,7 +551,8 @@ begin
 	--is looking for a "write" event? So I'm not sure this will ever fire...
 	
 	--THIS GOES THROUGH AN INVERTING GATE IN THE A2630 (U307). NO NEED FOR THAT, SO WE INVERT THE SIGNAL HERE!
-	ROMCLK <= '1' WHEN ( autoconfigwritecycle = '1' AND romaddr = '1' AND autoconfigcomplete_2630 = '0' and nCPURESET = '1' ) OR ( ROMCLK = '1' AND nDS = '0' ) ELSE '0';
+	--ROMCLK = writecycle & romaddr & !CONFIGED  #  ROMCLK & DS;
+	ROMCLK <= '1' WHEN ( writecycle = '1' AND romaddr = '1' AND autoconfigcomplete_2630 = '0' ) OR ( ROMCLK = '1' AND nDS = '0' ) ELSE '0';
 	--WRITECYCLE WHEN CSAUTO AND WRITE MODE AND DATA STROBE AND NOT CPURESET
 	--csauto IS WHEN WE ARE IN THE AUTOCONFIG PROCESS
 
