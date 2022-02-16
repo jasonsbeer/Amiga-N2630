@@ -34,7 +34,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity MAIN is
 	Port 
 	( 
-		--47 pins used
+		--48 pins used
 		nABG : IN STD_LOGIC; --AMIGA BUS GRANT
 		nHALT : IN STD_LOGIC; --_HALT SIGNAL
 		nRESET : IN STD_LOGIC; --_RESET SIGNAL
@@ -55,7 +55,7 @@ entity MAIN is
 		JMODE : IN STD_LOGIC; --JOHANN'S SPECIAL MODE! WHO IS JOHANN AND WHY DOES HE GET HIS OWN MODE? LUCKY!
 		MEMACCESS : STD_LOGIC; --WE ARE ACCESSING ON BOARD MEMORY
 		CONFIGED : STD_LOGIC; --IS AUTOCONFIG COMPLETE?
-		
+		RESENB : IN STD_LOGIC; -- RESET ENABLED
 		
 		P7M : INOUT STD_LOGIC; --7MHZ CLOCK
 		n7M : INOUT STD_LOGIC; --7MHZ CLOCK 180 DEGREE		
@@ -513,6 +513,25 @@ begin
 			END IF;
 		END IF;
 	END PROCESS;
+			
+	-----------
+	-- RESET --
+	-----------
+	
+	--The RESET output feeds to the /RST signal from the A2000
+	--motherboard.  Which in turn enables the assertion of the /BOSS
+	--line when you're on a B2000.  Which in turn creates the
+	--/CPURESET line.  Together these make the RESET output.	In
+	--order to eliminate the glitch on RESET that this loop makes,
+	--the RESENB input is gated into the creation of RESET.  What
+	--this implies is that the 68020 can't reset the system until
+	--we're RESENB, OK?.  Make sure to consider the effects of this
+	--gated reset on any special use of the ROM configuration register.
+	--Using JMODE it's possible to reset the ROM configuration register
+	--under CPU control, but not if the RESENB line is negated.
+	
+	--RESET		= BOSS & CPURESET & RESENB;
+	nRESET <= '0' WHEN nBOSS = '0' AND nCPURESET ='0' AND RESENB = '1' ELSE '1';
 
 end Behavioral;
 
