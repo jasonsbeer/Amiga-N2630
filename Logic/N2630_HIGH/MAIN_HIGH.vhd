@@ -21,6 +21,7 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use ieee.std_logic_unsigned.all;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -33,10 +34,12 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity MAIN_HIGH is
     Port ( 
+		--59 PINS USED
 	 
 		FC : IN STD_LOGIC_VECTOR (2 downto 0); --FCn FROM 68030
-		AL : IN STD_LOGIC_VECTOR (6 downto 1); --ADDRESS BUS BITS 6..1
+		AL : IN STD_LOGIC_VECTOR (6 downto 0); --ADDRESS BUS BITS 6..1
 		AH : IN STD_LOGIC_VECTOR (23 downto 13); --ADDRESS BUS BITS 23..16
+		SIZ : IN STD_LOGIC_VECTOR (1 downto 0); --SIZE BUS FROM 68030
 		CPUCLK : IN STD_LOGIC; --68030 CLOCK
 		nAS : IN STD_LOGIC; --680x0 ADDRESS STROBE
 		nDS : IN STD_LOGIC; --680x0 DATA STROBE
@@ -53,8 +56,14 @@ entity MAIN_HIGH is
 		AUTO : IN STD_LOGIC; --SHOULD I AUTOCONFIG?
 		--ROMCONF : IN STD_LOGIC; --ROM HAS BEEN CONFIGURED
 		--RAMCONF : IN STD_LOGIC; --RAM HAS BEEN CONFIGURED
-	    	TWOMEG : IN STD_LOGIC; --LOW LOGIC FOR 2MB CONFIGURATION, HIGH FOR 4MB
-		
+	   TWOMB : IN STD_LOGIC; --LOW LOGIC FOR 2MB CONFIGURATION, HIGH FOR 4MB
+		nEXTERN : IN STD_LOGIC; --EXTERNAL ACCESS (DAUGHTER OR FPU)
+		nCYCEND : IN STD_LOGIC; --CYCLE END
+		nDSEN : IN STD_LOGIC; --DATA STROBE ENABLE
+		nASEN: IN STD_LOGIC; --ADDRESS STROBE ENABLE
+		TRISTATE : IN STD_LOGIC; --TRISTATE WHEN WE DON'T HAVE THE BUS
+		nONBOARD : IN STD_LOGIC; --ARE WE USING RESOURCES ON THE 2630?
+		nMEMSEL : IN STD_LOGIC; --ARE WE SELECTING MEMORY ON BOARD? FIRST 4 (8) MEGABYTES
 	 
 		DAC : INOUT STD_LOGIC_VECTOR (31 downto 28):= "ZZZZ"; --DATA BUS FOR THE AUTOCONFIG PROCESS
 		CONFIGED : INOUT STD_LOGIC; --HAS AUTOCONFIG COMPLETED?
@@ -65,9 +74,19 @@ entity MAIN_HIGH is
 		nBERR : OUT STD_LOGIC; --BUS ERROR
 		nCIIN : OUT STD_LOGIC; --68030 CACHE ENABLE
 		nAVEC : OUT STD_LOGIC; --AUTO VECTORING
-		nCSROM : OUT STD_LOGIC --ROM CHIP SELECT		
+		nCSROM : OUT STD_LOGIC; --ROM CHIP SELECT		
 		--nRAMCLK : OUT STD_LOGIC --CLOCK FOR U302
-		
+		nOE0 : OUT STD_LOGIC; --SRAM OUTPUT ENABLE BANK 0
+		nOE1 : OUT STD_LOGIC; --SRAM OUTPUT ENABLE BANK 1
+		nWE0 : OUT STD_LOGIC; --SRAM WRITE ENABLE BANK 0
+		nWE1 : OUT STD_LOGIC; --SRAM WRITE ENABLE BANK 1
+		nUUBE : OUT STD_LOGIC; --UPPER UPPER BYTE ENABLE
+		nUMBE : OUT STD_LOGIC; --UPPER MIDDLE BYTE ENABLE
+		nLMBE : OUT STD_LOGIC; --LOWER MIDDLE BYTE ENABLE
+		nLLBE : OUT STD_LOGIC; --LOWER LOWER BYTE ENABLE
+		nMEMLOCK : OUT STD_LOGIC; --LOCK MEMORY DURING ACCESS FOR STATE MACHINE
+		nUDS : OUT STD_LOGIC; --68000 UPPER DATA STROBE
+		nLDS : OUT STD_LOGIC --68000 LOWER DATA STROBE
 		
 		);
 		
@@ -103,16 +122,22 @@ architecture Behavioral of MAIN_HIGH is
 	SIGNAL autoconfigcomplete_ZORRO2RAM : STD_LOGIC := '0'; --HAS 68030 BOARD BEEN AUTOCONFIGed?
 	SIGNAL autoconfigcomplete_ZORRO3RAM : STD_LOGIC := '0'; --HAS 68030 BOARD BEEN AUTOCONFIGed?
 	
+	SIGNAL twomeg : STD_LOGIC:='0'; --TWO MB RAM SPACE
+	SIGNAL fourmeg : STD_LOGIC:='0'; --FOUR MB RAM SPACE
+	
 	SIGNAL icsrom : STD_LOGIC:='0';
 	SIGNAL hirom : STD_LOGIC:='0';
 	SIGNAL lorom : STD_LOGIC:='0';
 	--SIGNAL addr : STD_LOGIC_VECTOR( 23 downto 15 ) := (others => '0'); --CONNECTED TO 68030 ADDRESS BUS
-	--SIGNAL readcycle : STD_LOGIC:='0';
-	--SIGNAL romaddr : STD_LOGIC := '0';
+	SIGNAL readcycle : STD_LOGIC:='0';
+	SIGNAL romaddr : STD_LOGIC := '0';
 	--SIGNAL ramaddr : STD_LOGIC := '0';
-	--SIGNAL writecycle : STD_LOGIC := '0';
+	SIGNAL autoconfigwritecycle : STD_LOGIC := '0';
 	--SIGNAL csauto : STD_LOGIC := '0';
 	--SIGNAL icsauto : STD_LOGIC:='0';
+	SIGNAL rds : STD_LOGIC:='0';
+	SIGNAL wds : STD_LOGIC:='0';
+	SIGNAL offboard : STD_LOGIC:='0';
 	
 	
 	SIGNAL EXTSEL : STD_LOGIC:='0'; --THIS IS A TEMPORARY MEASURE UNTIL WE IMPLEMENT THE EXPANSION MEMORY
@@ -159,17 +184,20 @@ begin
 	icsrom <= '1' WHEN ( hirom = '1' AND PHANTOMHI = '0' AND readcycle = '1' ) OR ( lorom = '1' AND PHANTOMLO = '0' AND readcycle = '1' ) ELSE '0';
 	--icsrom <= '1' WHEN ( hirom = '1' AND RnW = '1' AND nAS = '0' ) OR ( lorom = '1' AND RnW = '1' AND nAS = '0' ) ELSE '0';
 	--romaddr		= addr:40;
-	--romaddr <= '1' WHEN AL(6 downto 1) = "100000" ELSE '0'; --01000000
+	romaddr <= '1' WHEN AL(6 downto 1) = "100000" ELSE '0'; --01000000
 	--ramaddr		= addr:48;
 	--ramaddr <= '1' WHEN AL(6 downto 1) = "100100" ELSE '0'; --01001000
 	
 	
 	readcycle <= '1' WHEN RnW = '1' AND nAS = '0' ELSE '0';
 	
-	--CSAUTO		= icsauto		# CSAUTO & AS;
+	--CSAUTO		= icsauto		# CSAUTO & AS; CHIP SELECT FOR AUTOCONFIG
 	--csauto <= '1' WHEN ( icsauto = '1' ) OR ( csauto = '0' AND nAS = '0') ELSE '0';
+	
 	--writecycle	= CSAUTO & !PRW & DS & !CPURESET;
 	--writecycle <= '1' WHEN csauto = '1' AND RnW = '0' AND nDS ='0' AND nCPURESET = '1' ELSE '0';
+	--WRITECYCLE WHEN CSAUTO AND WRITE MODE AND DATA STROBE AND NOT CPURESET
+	--csauto IS WHEN WE ARE IN THE AUTOCONFIG PROCESS
 	
 	--This is the basic autoconfig chip select logic.  The special register
 	--always shows up first, the standard RAM register doesn't show up if 
@@ -178,7 +206,14 @@ begin
 	--icsauto		= autocon & AS & !RAMCONF &  AUTO 		# autocon & AS & !ROMCONF & !AUTO;
 	--icsauto <= '1' WHEN ( autoconfigspace = '1' AND nAS = '0' AND RAMCONF = '0' AND AUTO = '1' ) OR ( autoconfigspace = '1' AND nAS = '0' AND ROMCONF = '0' AND AUTO = '0' ) ELSE '0';
 
+	--rds		=  ASEN & !CYCEND &  RW & !EXTERN;
+	rds <= '1' WHEN nASEN = '0' AND nCYCEND = '1' AND RnW = '1' AND nEXTERN = '1' ELSE '0';
 
+	--wds		=  DSEN & !CYCEND & !RW;
+	wds <= '1' WHEN nDSEN = '0' AND nCYCEND = '1' AND RnW = '0' ELSE '0';
+	
+	--offboard	= !(ONBOARD # MEMSEL # EXTERN);
+	offboard <= '1' WHEN (nONBOARD = '1' OR nMEMSEL = '1' OR nEXTERN = '1') ELSE '0';
 
 	----------------
 	-- AUTOCONFIG --
@@ -280,6 +315,8 @@ begin
 				--Is this one our base address? If yes, we are done with AUTOCONFIG
 				ELSIF ( RnW = '0' AND nDS = '0' ) THEN	
 				
+					autoconfigwritecycle <= '1';
+				
 					IF ( AL(6 downto 1) = "100100" ) THEN
 					
 						IF ( autoconfigcomplete_2630 = '0' ) THEN
@@ -306,8 +343,13 @@ begin
 							--PROBABLY NEED A DIFFERENT CONSIDERATION FOR Z3 RAM
 							CONFIGED <= '1'; 
 						END IF;
+					
 						
-					END IF;			
+					END IF;
+					
+					ELSE
+						autoconfigwritecycle <= '0';
+					
 				END IF;
 			END IF;
 		END IF;
@@ -327,26 +369,112 @@ begin
 	-- RAM STUFF --
 	---------------
 
-	--THIS DETERMINES IF WE ARE IN THE FIRST OR SECOND 2 MEGS OF ADDRESS SPACE
-	--THIS IS ALL IN SECTION 12 OF THE 68030 MANUAL
-	
-	TWOMEG <= '1' 
+	--THIS DETERMINES IF WE ARE IN THE FIRST OR SECOND 2 MEGS OF ADDRESS SPACE	
+	--HOW DOES BASE ADDRESS FIGURE IN TO ALL THIS?
+	twomeg <= '1' 
 		WHEN
-			AH(31 downto 21) = "01000000000" --A21 IS LOW IN THE FIRST 2 MEGS
+			AH(23 downto 21) = baseaddress_ZORRO2RAM AND autoconfigcomplete_ZORRO2RAM = '1' --A21 IS LOW IN THE FIRST 2 MEGS
 		ELSE
 			'0';
 			
-	FOURMEG <= '1'
+	fourmeg <= '1'
 		WHEN
-			AH(31 downto 21) = "01000000001" --A21 IS HIGH IN THE SECOND 2 MEGS
+			AH(23 downto 21) = baseaddress_ZORRO2RAM + 1 AND TWOMB = '1' AND autoconfigcomplete_ZORRO2RAM = '1' --A21 IS HIGH IN THE SECOND 2 MEGS
 		ELSE
 			'0';	
 			
---	EIGHTMEG <= '1'
---		WHEN
---			AH(31 downto 22) = "0100000001" --A22 IS HIGH IN THE SECOND 4 MEGS
---		ELSE
---			'0';
+	--	EIGHTMEG <= '1'
+	--		WHEN
+	--			AH(31 downto 21) = "01000000011" --A22 IS HIGH IN THE SECOND 4 MEGS
+	--		ELSE
+	--			'0';
+	
+	--OUTPUT ENABLE OR WRITE ENABLE DEPENDING ON THE CPU REQUEST
+	nOE0 <= '0' WHEN RnW = '1' AND twomeg = '1' ELSE '1';
+	nOE1 <= '0' WHEN RnW = '1' AND fourmeg = '1' ELSE '1';
+	nWE0 <= '0' WHEN RnW = '0' AND twomeg = '1' ELSE '1';
+	nWE1 <= '0' WHEN RnW = '0' AND fourmeg = '1' ELSE '1';	
+	
+	--THIS IS ALL IN SECTION 12 OF THE 68030 MANUAL
+	RAM_ACCESS:PROCESS ( CPUCLK ) BEGIN
+		
+		IF ( FALLING_EDGE (CPUCLK) ) THEN
+
+			IF (autoconfigcomplete_ZORRO2RAM = '1' AND cpuspace = '0' AND nAS = '0') THEN		
+
+				--ENABLE THE VARIOUS BYTES ON THE SRAM DEPENDING ON WHAT THE CPU IS ASKING FOR
+
+				--UPPER UPPER BYTE ENABLE (D31..24)
+				IF (( RnW = '1' ) 
+					OR (RnW = '0' AND AL(1 downto 0) = "00" AND nDS = '0')) 
+				THEN			
+					nUUBE <= '0'; 
+				ELSE 
+					nUUBE <= '1';
+				END IF;
+
+				--UPPER MIDDLE BYTE (D23..16)
+				IF (( RnW = '1' ) 
+					OR ( RnW = '0' AND AL(1 downto 0) = "01"  AND nDS = '0')
+					OR ( AL(1) = '0' AND SIZ(0) = '0'  AND nDS = '0') 
+					OR ( AL(1) = '0' AND SIZ(1) = '1'  AND nDS = '0')) 
+				THEN
+					nUMBE <= '0';
+				ELSE
+					nUMBE <= '1';
+				END IF;
+
+				--LOWER MIDDLE BYTE (D15..8)
+				IF (( RnW = '1' )
+					OR ( RnW = '0' AND AL(1 downto 0) = "10"  AND nDS = '0') 
+					OR ( AL(1) = '0' AND SIZ(0) = '0' AND SIZ(1) = '0'  AND nDS = '0') 
+					OR	( AL(1) = '0' AND SIZ(0) = '1' AND SIZ(1) = '1'  AND nDS = '0') 
+					OR ( AL(0) = '1' AND AL(1) = '0' AND SIZ(0) = '0'  AND nDS = '0'))
+				THEN
+					nLMBE <= '0';
+				ELSE
+					nLMBE <= '1';
+				END IF;
+
+				--LOWER LOWER BYTE (D7..0)
+				IF (( RnW = '1' )
+					OR	( RnW = '0' AND ( AL(1 downto 0) = "11"  AND nDS = '0' ))
+					OR (AL(0) = '1' AND SIZ(0) = '1' AND SIZ(1) = '1' AND nDS = '0') 
+					OR	(SIZ(0) = '0' AND SIZ(1) = '0' AND nDS = '0') 
+					OR	(AL(1) = '1' AND SIZ(1) ='1' AND nDS = '0'))
+				THEN
+					nLLBE <= '0';
+				ELSE
+					nLLBE <= '1';
+				END IF;	
+
+				--nSTERM = Bus response signal that indicates a port size of 32 bits and
+				--that data may be latched on the next falling clock edge. Synchronous transfer.
+				--STERM is only used on the daughterboard of the A2630. The A2630 card uses DSACKx for terminiation,
+				--which may be due to the 32 <-> 16 bit transfers when DMA'ing
+
+				--IF TWOMEG = '1' OR FOURMEG = '1' THEN
+				--	nSTERM <= '0';
+				--ELSE
+				--	nSTERM <= '1';
+				--END IF;
+
+				--CACHE GOES IN HERE SOMEWHERE
+				--_CBREQ _CBACK WE ARE NOT USING ANY CACHE MEMORY
+				--DBEN external data buffers - not needed
+
+			ELSE 
+				--DEACTIVATE ALL THE RAM STUFF
+				--nSTERM <= '1';
+
+				nUUBE <= '1';
+				nUMBE <= '1';
+				nLMBE <= '1';
+				nLLBE <= '1';	
+
+			END IF;	
+		END IF;
+	END PROCESS RAM_ACCESS;
 	
 	------------------------
 	-- 68030 CACHE ENABLE --
@@ -430,11 +558,81 @@ begin
 	--I DON'T KNOW...SOME OF THIS LOOKS LIKE AUTOCONFIG STUFF...I DON'T NEED THE AUTOCONFIG LOGIC...
 	
 	--ROMCLK		= writecycle & romaddr & !CONFIGED		# ROMCLK & DS;
-	--THIS GOES THROUGH AN INVERTING GATE IN THE A2630 (U307). NO NEED FOR THAT HERE, SO WE INVERT THE SIGNAL HERE!
-	ROMCLK <= '1' WHEN ( writecycle = '1' AND romaddr = '1' AND autoconfigcomplete_2630 = '0' ) OR ( nROMCLK = '1' AND nDS = '0' ) ELSE '0';
+	
+	--SEEMS THAT THIS CLOCKS U307 DURING THE AUTOCONFIG WRITE CYCLE BUT BEFORE THE 2360 AUTOCONFIG BASE ADDRESS IS ASSIGNED
+	--THE ADDRESS romaddr x40 LINES UP WITH THE SERIAL NUMBER READ DURING AUTOCONFIG, BUT THAT MEANS NOTHING IN THIS CONTEXT
+	--DAVE MUST HAVE PICKED A POINT BEFORE THE AUTOCONFIG WAS COMPLETE TO LATCH THE DATA ON U307?
+	
+	--THIS GOES THROUGH AN INVERTING GATE IN THE A2630 (U307). NO NEED FOR THAT, SO WE INVERT THE SIGNAL HERE!
+	ROMCLK <= '1' WHEN ( autoconfigwritecycle = '1' AND romaddr = '1' AND autoconfigcomplete_2630 = '0' and nCPURESET = '1' ) OR ( ROMCLK = '1' AND nDS = '0' ) ELSE '0';
+	--WRITECYCLE WHEN CSAUTO AND WRITE MODE AND DATA STROBE AND NOT CPURESET
+	--csauto IS WHEN WE ARE IN THE AUTOCONFIG PROCESS
 
 	--RAMCLK		= writecycle & ramaddr & !ROMCLK		# !CPURESET & RAMCLK;	
 	--nRAMCLK <= '0' WHEN ( writecycle = '1' AND ramaddr = '1' AND nROMCLK = '1' ) OR (nCPURESET = '1' AND nROMCLK = '1' ) ELSE '1';
+	
+	-----------------
+	-- MEMORY LOCK --
+	-----------------
+	
+	--MEMLOCK is used to lock out the 68000 state machine during a fast 
+	--system cycle, which is basically either an on-board memory cycle
+	--or an EXTERN cycle.  Additionally, the 68000 state machine uses
+	--this same mechanism to end it's own cycle, so CYCEND also gets
+	--included. U305
+
+	nMEMLOCK <= '0' 
+		WHEN
+			( CONFIGED = '1' AND ( twomeg = '1' OR fourmeg = '1' ))
+			--access & CONFIGED
+		OR
+			( nAS = '1' )
+			--!AS
+		OR
+			( nEXTERN = '0' )
+			--EXTERN
+		OR
+			( nCYCEND = '1' )
+			--CYCEND
+		ELSE
+			'1';
+			
+	------------------		
+	-- DATA STROBES --
+	------------------
+					
+	--68000 style data strobes.  These are kept in tri-state when the 
+	--TRISTATE signal is active, or when we're not "offboard".  For 68030
+	--caching, we must always return 16 bits on reads, regardless of the
+	--state of A0, SIZ1, or SIZ2.  Since the CAS PAL for onboard memory
+	--was full when this feature of the 68030 was considered, I kludge
+	--a fix here.  If the memory access is a normal offboard access, UDS
+	--looks normal.  If the memory access is not offboard, the then UDS
+	--reflects the state of the CPU's R/W line. U501
+
+	--UDS		= wds & !A0		# rds ;
+	nUDS <= 'Z' 
+		WHEN 
+			TRISTATE = '1' OR offboard = '0'
+		ELSE '0'
+			WHEN
+				wds = '1' AND AL(0) = '0'
+		ELSE 
+			'1';
+
+	--LDS		= wds & SIZ1		# wds & !SIZ0		# wds & A0		# rds ;
+	nLDS <= 'Z'
+		WHEN
+			TRISTATE = '1' OR offboard = '0'
+		ELSE '0'
+			WHEN
+				((wds = '1' AND SIZ(1) = '1') OR 
+				(wds = '1' AND SIZ(0) = '0') OR 
+				(wds = '1' AND AL(0) = '1') OR
+				rds = '1')
+		ELSE 
+			'1';
+
 
 end Behavioral;
 
