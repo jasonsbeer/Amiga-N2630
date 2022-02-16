@@ -102,7 +102,6 @@ architecture Behavioral of MAIN_HIGH is
 	SIGNAL baseaddress : STD_LOGIC_VECTOR ( 2 downto 0 ):="000"; --BASE ADDRESS ASSIGNED FOR 2630
 	SIGNAL baseaddress_ZORRO2RAM : STD_LOGIC_VECTOR ( 2 downto 0 ):="000"; --BASE ADDRESS ASSIGNED FOR ZORRO 2 RAM
 	SIGNAL baseaddress_ZORRO3RAM : STD_LOGIC_VECTOR ( 2 downto 0 ):="000"; --BASE ADDRESS ASSIGNED FOR ZORRO 3 RAM
-	--SIGNAL baseramaddress : STD_LOGIC_VECTOR ( 2 downto 0 ):="000"; --BASE ADDRESS ASSIGNED FOR ZORRO 2 RAM SPACE
 	SIGNAL autoconfigspace : STD_LOGIC:='0'; --ARE WE IN THE AUTOCONFIG ADDRESS SPACE?
 	SIGNAL chipram : STD_LOGIC:='0';
 	SIGNAL ciaspace : STD_LOGIC:='0';
@@ -132,9 +131,9 @@ architecture Behavioral of MAIN_HIGH is
 	SIGNAL readcycle : STD_LOGIC:='0';
 	SIGNAL romaddr : STD_LOGIC := '0';
 	--SIGNAL ramaddr : STD_LOGIC := '0';
-	SIGNAL autoconfigwritecycle : STD_LOGIC := '0';
-	--SIGNAL csauto : STD_LOGIC := '0';
-	--SIGNAL icsauto : STD_LOGIC:='0';
+	--SIGNAL autoconfigwritecycle : STD_LOGIC := '0';
+	SIGNAL csauto : STD_LOGIC := '0';
+	SIGNAL icsauto : STD_LOGIC:='0';
 	SIGNAL rds : STD_LOGIC:='0';
 	SIGNAL wds : STD_LOGIC:='0';
 	SIGNAL offboard : STD_LOGIC:='0';
@@ -320,8 +319,6 @@ begin
 				--Is this one our base address? If yes, we are done with AUTOCONFIG
 				ELSIF ( RnW = '0' AND nDS = '0' ) THEN	
 				
-					autoconfigwritecycle <= '1';
-				
 					IF ( AL(6 downto 1) = "100100" ) THEN
 					
 						IF ( autoconfigcomplete_2630 = '0' ) THEN
@@ -347,14 +344,9 @@ begin
 							--on board RAM. Thus, we will stop after the 2630 is autoconfiged.
 							--PROBABLY NEED A DIFFERENT CONSIDERATION FOR Z3 RAM
 							CONFIGED <= '1'; 
-						END IF;
-					
+						END IF;					
 						
-					END IF;
-					
-					ELSE
-						autoconfigwritecycle <= '0';
-					
+					END IF;					
 				END IF;
 			END IF;
 		END IF;
