@@ -34,7 +34,7 @@ use ieee.std_logic_unsigned.all;
 
 entity MAIN_HIGH is
     Port ( 
-		--63 PINS USED
+		--62 PINS USED
 	 
 		FC : IN STD_LOGIC_VECTOR (2 downto 0); --FCn FROM 68030
 		AL : IN STD_LOGIC_VECTOR (6 downto 0); --ADDRESS BUS BITS 6..1
@@ -50,7 +50,7 @@ entity MAIN_HIGH is
 		OSMODE : IN STD_LOGIC; --HIGH FOR AMIGA OS, LOW FOR UNIX
 		PHANTOMHI : IN STD_LOGIC; --PHANTOM HI DATA
 		PHANTOMLO : IN STD_LOGIC; --PHANTOM LO DATA
-		nBOSS : IN STD_LOGIC; --ARE WE BOSS?
+		--nBOSS : IN STD_LOGIC; --ARE WE BOSS?
 		nCPURESET : IN STD_LOGIC; --RESET FOR THE 68030
 		
 		AUTO : IN STD_LOGIC; --SHOULD I AUTOCONFIG?
@@ -114,9 +114,9 @@ architecture Behavioral of MAIN_HIGH is
 	SIGNAL coppercom : STD_LOGIC:='0';
 	SIGNAL mc68881 : STD_LOGIC:='0';
 	
-	SIGNAL D_2630 : STD_LOGIC_VECTOR ( 3 downto 0 ):="0000";
-	SIGNAL D_ZORRO2RAM : STD_LOGIC_VECTOR ( 3 downto 0 ):="0000";
-	SIGNAL D_ZORRO3RAM : STD_LOGIC_VECTOR ( 3 downto 0 ):="0000";
+	SIGNAL D_2630 : STD_LOGIC_VECTOR ( 3 downto 0 ):="ZZZZ"; --This throws a "hinder the constant cleaning" error. IGNORE IT.
+	SIGNAL D_ZORRO2RAM : STD_LOGIC_VECTOR ( 3 downto 0 ):="ZZZZ";
+	SIGNAL D_ZORRO3RAM : STD_LOGIC_VECTOR ( 3 downto 0 ):="ZZZZ";
 	SIGNAL autoconfigcomplete_2630 : STD_LOGIC := '0'; --HAS 68030 BOARD BEEN AUTOCONFIGed?
 	SIGNAL autoconfigcomplete_ZORRO2RAM : STD_LOGIC := '0'; --HAS 68030 BOARD BEEN AUTOCONFIGed?
 	SIGNAL autoconfigcomplete_ZORRO3RAM : STD_LOGIC := '0'; --HAS 68030 BOARD BEEN AUTOCONFIGed?
@@ -129,6 +129,7 @@ architecture Behavioral of MAIN_HIGH is
 	SIGNAL lorom : STD_LOGIC:='0';
 	--SIGNAL addr : STD_LOGIC_VECTOR( 23 downto 15 ) := (others => '0'); --CONNECTED TO 68030 ADDRESS BUS
 	SIGNAL readcycle : STD_LOGIC:='0';
+	SIGNAL writecycle : STD_LOGIC:='0';
 	SIGNAL romaddr : STD_LOGIC := '0';
 	--SIGNAL ramaddr : STD_LOGIC := '0';
 	--SIGNAL autoconfigwritecycle : STD_LOGIC := '0';
@@ -250,10 +251,18 @@ begin
 	--Here it is in all its glory...the AUTOCONFIG sequence
 	PROCESS ( CPUCLK, nRESET ) BEGIN
 		IF nRESET = '0' THEN
+		
 			CONFIGED <= '0';
 			baseaddress <= "000";
 			baseaddress_ZORRO2RAM <= "000";
 			baseaddress_ZORRO3RAM <= "000";
+			autoconfigcomplete_2630 <= '0';
+			autoconfigcomplete_ZORRO2RAM <= '0';
+			autoconfigcomplete_ZORRO3RAM <= '0';
+			D_2630 <= "ZZZZ";
+			D_ZORRO2RAM <= "ZZZZ";
+			D_ZORRO3RAM <= "ZZZZ";
+			
 		ELSIF ( FALLING_EDGE (CPUCLK)) THEN
 			IF ( autoconfigspace = '1' AND CONFIGED = '0' ) THEN
 				IF ( RnW = '1' ) THEN
@@ -269,7 +278,7 @@ begin
 						--offset $02
 						WHEN "000001" => 
 							D_2630 <= "0111";
-							D_ZORRO2RAM <= "011" & TWOMEG; --er_type: NEXT BOARD NOT RELATED 2MB OR 4MB
+							D_ZORRO2RAM <= "011" & TWOMEG; --er_type: NEXT BOARD NOT RELATED, 2MB OR 4MB
 							D_ZORRO3RAM <= "0011"; --NEXT BOARD NOT RELATED, 128MB
 
 						--offset $04 INVERTED
@@ -290,10 +299,9 @@ begin
 							D_ZORRO2RAM <= "1011"; --er_flags: I/O device, can be shut up, reserved, reserved
 							D_ZORRO3RAM <= "0101"; --MEMORY DEVICE, CAN BE SHUT UP, Z3 SIZE
 
-						--offset $0C INVERTED
-						--THE A2630 CONFIGURES THIS NIBBLE AS "0111" WHEN UNIX, "1111" WHEN AMIGA OS
+						--offset $0C INVERTED						
 						WHEN "000110" => 
-							D_2630 <= OSMODE & "111"; 
+							D_2630 <= OSMODE & "111"; --THE A2630 CONFIGURES THIS NIBBLE AS "0111" WHEN UNIX, "1111" WHEN AMIGA OS
 							D_ZORRO2RAM <= "1111"; --Reserved: must be zeroes
 							D_ZORRO3RAM <= "1111";
 
@@ -344,6 +352,9 @@ begin
 							--on board RAM. Thus, we will stop after the 2630 is autoconfiged.
 							--PROBABLY NEED A DIFFERENT CONSIDERATION FOR Z3 RAM
 							CONFIGED <= '1'; 
+							D_2630 <= "ZZZZ";
+							D_ZORRO2RAM <= "ZZZZ";
+							D_ZORRO3RAM <= "ZZZZ";
 						END IF;					
 						
 					END IF;					
