@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr B 17000 11000
 encoding utf-8
-Sheet 2 8
+Sheet 2 9
 Title "N2630"
 Date ""
 Rev "1.0"
@@ -27,51 +27,51 @@ $EndComp
 $Comp
 L N2630:CXO_DIP8 X1
 U 1 1 61DA724A
-P 1725 7450
-F 0 "X1" H 1300 7800 50  0000 L CNN
-F 1 "25MHz" H 1300 7725 50  0000 L CNN
-F 2 "Oscillator:Oscillator_DIP-8" H 2175 7100 50  0001 C CNN
-F 3 "https://abracon.com/Oscillators/ACH.pdf" H 1625 7450 50  0001 C CNN
-F 4 "535-9175-5-ND" H 1725 7450 50  0001 C CNN "Digikey"
-	1    1725 7450
+P 1700 6700
+F 0 "X1" H 1275 7050 50  0000 L CNN
+F 1 "25MHz" H 1275 6975 50  0000 L CNN
+F 2 "Oscillator:Oscillator_DIP-8" H 2150 6350 50  0001 C CNN
+F 3 "https://abracon.com/Oscillators/ACH.pdf" H 1600 6700 50  0001 C CNN
+F 4 "535-9175-5-ND" H 1700 6700 50  0001 C CNN "Digikey"
+	1    1700 6700
 	1    0    0    -1  
 $EndComp
-NoConn ~ 1175 7450
+NoConn ~ 1150 6700
 $Comp
 L power:+5V #PWR0101
 U 1 1 61DABF9E
-P 1625 6975
-F 0 "#PWR0101" H 1625 6825 50  0001 C CNN
-F 1 "+5V" H 1640 7148 50  0000 C CNN
-F 2 "" H 1625 6975 50  0001 C CNN
-F 3 "" H 1625 6975 50  0001 C CNN
-	1    1625 6975
+P 1600 6225
+F 0 "#PWR0101" H 1600 6075 50  0001 C CNN
+F 1 "+5V" H 1615 6398 50  0000 C CNN
+F 2 "" H 1600 6225 50  0001 C CNN
+F 3 "" H 1600 6225 50  0001 C CNN
+	1    1600 6225
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR0102
 U 1 1 61DAC5C2
-P 1625 7900
-F 0 "#PWR0102" H 1625 7650 50  0001 C CNN
-F 1 "GND" H 1630 7727 50  0000 C CNN
-F 2 "" H 1625 7900 50  0001 C CNN
-F 3 "" H 1625 7900 50  0001 C CNN
-	1    1625 7900
+P 1600 7150
+F 0 "#PWR0102" H 1600 6900 50  0001 C CNN
+F 1 "GND" H 1605 6977 50  0000 C CNN
+F 2 "" H 1600 7150 50  0001 C CNN
+F 3 "" H 1600 7150 50  0001 C CNN
+	1    1600 7150
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	1625 7150 1625 6975
+	1600 6400 1600 6225
 Wire Wire Line
-	1625 7750 1625 7900
+	1600 7000 1600 7150
 $Comp
 L Device:R R204
 U 1 1 61DADC51
-P 2225 7450
-F 0 "R204" V 2018 7450 50  0000 C CNN
-F 1 "68" V 2109 7450 50  0000 C CNN
-F 2 "Resistor_SMD:R_0805_2012Metric" V 2155 7450 50  0001 C CNN
-F 3 "~" H 2225 7450 50  0001 C CNN
-	1    2225 7450
+P 2200 6700
+F 0 "R204" V 1993 6700 50  0000 C CNN
+F 1 "68" V 2084 6700 50  0000 C CNN
+F 2 "Resistor_SMD:R_0805_2012Metric" V 2130 6700 50  0001 C CNN
+F 3 "~" H 2200 6700 50  0001 C CNN
+	1    2200 6700
 	0    1    1    0   
 $EndComp
 $Comp
@@ -135,7 +135,7 @@ F 4 "296-31832-1-ND" H 3475 6400 50  0001 C CNN "Digikey"
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2075 7450 2025 7450
+	2050 6700 2000 6700
 Wire Wire Line
 	2575 7450 2375 7450
 Wire Wire Line
@@ -1845,24 +1845,24 @@ Wire Wire Line
 $Comp
 L Device:C CX1
 U 1 1 63BF4CCA
-P 750 7450
-F 0 "CX1" H 865 7496 50  0000 L CNN
-F 1 "0.01uF" H 865 7405 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0805_2012Metric" H 788 7300 50  0001 C CNN
-F 3 "~" H 750 7450 50  0001 C CNN
-	1    750  7450
+P 725 6700
+F 0 "CX1" H 840 6746 50  0000 L CNN
+F 1 "0.01uF" H 840 6655 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 763 6550 50  0001 C CNN
+F 3 "~" H 725 6700 50  0001 C CNN
+	1    725  6700
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	750  7300 750  6975
+	725  6550 725  6225
 Wire Wire Line
-	750  6975 1625 6975
-Connection ~ 1625 6975
+	725  6225 1600 6225
+Connection ~ 1600 6225
 Wire Wire Line
-	750  7600 750  7900
+	725  6850 725  7150
 Wire Wire Line
-	750  7900 1625 7900
-Connection ~ 1625 7900
+	725  7150 1600 7150
+Connection ~ 1600 7150
 $Comp
 L Device:C C206
 U 1 1 63D8051C
@@ -2035,6 +2035,307 @@ Wire Wire Line
 	4625 6575 4625 5725
 Wire Wire Line
 	4625 5725 1150 5725
+Text Label 6525 7100 2    50   ~ 0
+A8
+Text Label 6525 7200 2    50   ~ 0
+A9
+Text Label 6525 7300 2    50   ~ 0
+A10
+Text Label 6525 7400 2    50   ~ 0
+A11
+Text Label 6525 7500 2    50   ~ 0
+A12
+Text Label 6525 7600 2    50   ~ 0
+A13
+Text Label 6525 7700 2    50   ~ 0
+A14
+Text Label 6525 7800 2    50   ~ 0
+A15
+Text Label 6525 7900 2    50   ~ 0
+A16
+Text Label 6525 8000 2    50   ~ 0
+A17
+Text Label 6525 8100 2    50   ~ 0
+A18
+Text Label 6525 8200 2    50   ~ 0
+A19
+Text Label 6525 8300 2    50   ~ 0
+A20
+Text Label 6525 8400 2    50   ~ 0
+A21
+Text Label 6525 8500 2    50   ~ 0
+A22
+Text Label 6525 8600 2    50   ~ 0
+A23
+Text Label 6525 8700 2    50   ~ 0
+A24
+Text Label 6525 8800 2    50   ~ 0
+A25
+Text Label 6525 8900 2    50   ~ 0
+A26
+Text Label 6525 9000 2    50   ~ 0
+A27
+Text Label 6525 9100 2    50   ~ 0
+A28
+Text Label 6525 9200 2    50   ~ 0
+A29
+Text Label 6525 9300 2    50   ~ 0
+A30
+Text Label 6525 9400 2    50   ~ 0
+A31
+Entry Wire Line
+	6525 7200 6625 7300
+Entry Wire Line
+	6525 7800 6625 7900
+Entry Wire Line
+	6525 7700 6625 7800
+Entry Wire Line
+	6525 7600 6625 7700
+Entry Wire Line
+	6525 7500 6625 7600
+Entry Wire Line
+	6525 7400 6625 7500
+Entry Wire Line
+	6525 7300 6625 7400
+Entry Wire Line
+	6525 7900 6625 8000
+Entry Wire Line
+	6525 8000 6625 8100
+Entry Wire Line
+	6525 8100 6625 8200
+Entry Wire Line
+	6525 8200 6625 8300
+Entry Wire Line
+	6525 8300 6625 8400
+Entry Wire Line
+	6525 8400 6625 8500
+Entry Wire Line
+	6525 8500 6625 8600
+Entry Wire Line
+	6525 8600 6625 8700
+Entry Wire Line
+	6525 8700 6625 8800
+Entry Wire Line
+	6525 8800 6625 8900
+Entry Wire Line
+	6525 8900 6625 9000
+Entry Wire Line
+	6525 9000 6625 9100
+Entry Wire Line
+	6525 9100 6625 9200
+Entry Wire Line
+	6525 9200 6625 9300
+Entry Wire Line
+	6525 9300 6625 9400
+Entry Wire Line
+	6525 9400 6625 9500
+Wire Wire Line
+	6275 9400 6525 9400
+Wire Wire Line
+	6275 9300 6525 9300
+Wire Wire Line
+	6275 9200 6525 9200
+Wire Wire Line
+	6275 9100 6525 9100
+Wire Wire Line
+	6275 9000 6525 9000
+Wire Wire Line
+	6275 8900 6525 8900
+Wire Wire Line
+	6275 8800 6525 8800
+Wire Wire Line
+	6275 8700 6525 8700
+Wire Wire Line
+	6275 8600 6525 8600
+Wire Wire Line
+	6275 8500 6525 8500
+Wire Wire Line
+	6275 8400 6525 8400
+Wire Wire Line
+	6275 8300 6525 8300
+Wire Wire Line
+	6275 8200 6525 8200
+Wire Wire Line
+	6275 8100 6525 8100
+Wire Wire Line
+	6275 8000 6525 8000
+Wire Wire Line
+	6275 7900 6525 7900
+Wire Wire Line
+	6275 7700 6525 7700
+Wire Wire Line
+	6275 7800 6525 7800
+Wire Wire Line
+	6275 7600 6525 7600
+Wire Wire Line
+	6275 7500 6525 7500
+Wire Wire Line
+	6275 7400 6525 7400
+Wire Wire Line
+	6275 7300 6525 7300
+Wire Wire Line
+	6275 7200 6525 7200
+Wire Wire Line
+	6525 7100 6275 7100
+Entry Wire Line
+	6525 7100 6625 7200
+$Comp
+L Device:R_Network08 RP?
+U 1 1 622356FD
+P 6075 9000
+AR Path="/61D9C8DC/622356FD" Ref="RP?"  Part="1" 
+AR Path="/61EF4CC7/622356FD" Ref="RP?"  Part="1" 
+AR Path="/61D79EBC/622356FD" Ref="RN100"  Part="1" 
+F 0 "RN100" H 5825 9175 50  0000 L CNN
+F 1 "1K" H 6275 9175 50  0000 L CNN
+F 2 "Resistor_THT:R_Array_SIP9" V 6550 9000 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/31509/csc.pdf" H 6075 9000 50  0001 C CNN
+	1    6075 9000
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R_Network08 RP?
+U 1 1 62235703
+P 6075 8200
+AR Path="/61D9C8DC/62235703" Ref="RP?"  Part="1" 
+AR Path="/61EF4CC7/62235703" Ref="RP?"  Part="1" 
+AR Path="/61D79EBC/62235703" Ref="RN101"  Part="1" 
+F 0 "RN101" H 5825 8375 50  0000 L CNN
+F 1 "1K" H 6275 8375 50  0000 L CNN
+F 2 "Resistor_THT:R_Array_SIP9" V 6550 8200 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/31509/csc.pdf" H 6075 8200 50  0001 C CNN
+	1    6075 8200
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R_Network08 RP?
+U 1 1 62235709
+P 6075 7400
+AR Path="/61D9C8DC/62235709" Ref="RP?"  Part="1" 
+AR Path="/61EF4CC7/62235709" Ref="RP?"  Part="1" 
+AR Path="/61D79EBC/62235709" Ref="RN102"  Part="1" 
+F 0 "RN102" H 5800 7575 50  0000 L CNN
+F 1 "1K" H 6275 7575 50  0000 L CNN
+F 2 "Resistor_THT:R_Array_SIP9" V 6550 7400 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/31509/csc.pdf" H 6075 7400 50  0001 C CNN
+	1    6075 7400
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R_Network08 RP?
+U 1 1 622356F7
+P 6075 6600
+AR Path="/61D9C8DC/622356F7" Ref="RP?"  Part="1" 
+AR Path="/61EF4CC7/622356F7" Ref="RP?"  Part="1" 
+AR Path="/61D79EBC/622356F7" Ref="RN103"  Part="1" 
+F 0 "RN103" H 5825 6775 50  0000 L CNN
+F 1 "1K" H 6275 6775 50  0000 L CNN
+F 2 "Resistor_THT:R_Array_SIP9" V 6550 6600 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/31509/csc.pdf" H 6075 6600 50  0001 C CNN
+	1    6075 6600
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	6275 6300 6525 6300
+Wire Wire Line
+	6275 6400 6525 6400
+Wire Wire Line
+	6275 6500 6525 6500
+Wire Wire Line
+	6275 6600 6525 6600
+Wire Wire Line
+	6275 6700 6525 6700
+Wire Wire Line
+	6275 6800 6525 6800
+Wire Wire Line
+	6275 6900 6525 6900
+Wire Wire Line
+	6275 7000 6525 7000
+Entry Wire Line
+	6525 7000 6625 7100
+Entry Wire Line
+	6525 6900 6625 7000
+Entry Wire Line
+	6525 6800 6625 6900
+Entry Wire Line
+	6525 6700 6625 6800
+Entry Wire Line
+	6525 6600 6625 6700
+Entry Wire Line
+	6525 6500 6625 6600
+Entry Wire Line
+	6525 6400 6625 6500
+Entry Wire Line
+	6525 6300 6625 6400
+Text Label 6525 7000 2    50   ~ 0
+A7
+Text Label 6525 6900 2    50   ~ 0
+A6
+Text Label 6525 6800 2    50   ~ 0
+A5
+Text Label 6525 6700 2    50   ~ 0
+A4
+Text Label 6525 6600 2    50   ~ 0
+A3
+Text Label 6525 6500 2    50   ~ 0
+A2
+Text Label 6525 6400 2    50   ~ 0
+A1
+Text Label 6525 6300 2    50   ~ 0
+A0
+Wire Wire Line
+	5875 9400 5640 9400
+Connection ~ 5640 9400
+Wire Wire Line
+	5640 9400 5640 9640
+Wire Wire Line
+	5875 8600 5640 8600
+Connection ~ 5640 8600
+Wire Wire Line
+	5640 8600 5640 9400
+Wire Wire Line
+	5875 7800 5640 7800
+Wire Wire Line
+	5640 7800 5640 8600
+Wire Wire Line
+	5640 7800 5640 7000
+Wire Wire Line
+	5640 7000 5875 7000
+Connection ~ 5640 7800
+$Comp
+L power:GND #PWR?
+U 1 1 6289D1A9
+P 5640 9640
+F 0 "#PWR?" H 5640 9390 50  0001 C CNN
+F 1 "GND" H 5645 9467 50  0000 C CNN
+F 2 "" H 5640 9640 50  0001 C CNN
+F 3 "" H 5640 9640 50  0001 C CNN
+	1    5640 9640
+	1    0    0    -1  
+$EndComp
+$Comp
+L Jumper:Jumper_3_Open JP1
+U 1 1 62A4690D
+P 2225 7450
+F 0 "JP1" V 2271 7537 50  0000 L CNN
+F 1 "25/28" V 2180 7537 50  0000 L CNN
+F 2 "" H 2225 7450 50  0001 C CNN
+F 3 "~" H 2225 7450 50  0001 C CNN
+	1    2225 7450
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2225 7200 2225 7000
+Wire Wire Line
+	2225 7000 2350 7000
+Wire Wire Line
+	2350 7000 2350 6700
+Wire Wire Line
+	2225 7875 975  7875
+Text GLabel 975  7875 0    50   Input ~ 0
+28M
+Wire Wire Line
+	2225 7700 2225 7875
 Wire Bus Line
 	10125 8450 15825 8450
 Wire Bus Line

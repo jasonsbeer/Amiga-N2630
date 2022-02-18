@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr B 17000 11000
 encoding utf-8
-Sheet 5 8
+Sheet 5 9
 Title ""
 Date ""
 Rev ""
@@ -200,17 +200,7 @@ Wire Wire Line
 Wire Wire Line
 	4125 5850 3550 5850
 Wire Wire Line
-	4025 5900 3550 5900
-Wire Wire Line
-	4125 5950 3550 5950
-Wire Wire Line
 	4025 6000 925  6000
-Text Label 3550 5850 2    39   ~ 0
-_C3
-Text Label 3550 5900 2    39   ~ 0
-_CDAC
-Text Label 3550 5950 2    39   ~ 0
-_C1
 Text GLabel 925  6000 0    50   Input ~ 0
 _OVR
 Wire Wire Line
@@ -2043,6 +2033,42 @@ A1
 NoConn ~ 12125 5600
 Text Notes 12400 5600 0    50   ~ 0
 There is no A0 on the 68000 (Amiga 2000)\nThus, it is not connected here.
+Text GLabel 925  5625 0    50   Output ~ 0
+_C3
+Text GLabel 925  5725 0    50   Output ~ 0
+_CDAC
+Text GLabel 925  5825 0    50   Output ~ 0
+_C1
+Wire Wire Line
+	925  5625 3550 5625
+Wire Wire Line
+	3550 5625 3550 5850
+Wire Wire Line
+	3425 5900 3425 5725
+Wire Wire Line
+	3425 5725 925  5725
+Wire Wire Line
+	3425 5900 4025 5900
+Wire Wire Line
+	1475 5950 1475 5825
+Wire Wire Line
+	1475 5825 925  5825
+Wire Wire Line
+	1475 5950 4125 5950
+Text GLabel 1075 2225 0    50   Input ~ 0
+_CLK7M
+Wire Wire Line
+	1075 2225 3025 2225
+Wire Wire Line
+	3025 2225 3025 3475
+Wire Wire Line
+	4025 5600 3600 5600
+Wire Wire Line
+	3600 5600 3600 5450
+Wire Wire Line
+	3600 5450 925  5450
+Text GLabel 925  5450 0    50   Output ~ 0
+28M
 Wire Bus Line
 	1250 3825 1250 4075
 Wire Bus Line
@@ -2057,6 +2083,4 @@ Wire Bus Line
 	6250 2575 6250 10225
 Wire Bus Line
 	8100 2575 8100 10025
-Text Label 3025 3475 2    50   ~ 0
-CLK7M
 $EndSCHEMATC

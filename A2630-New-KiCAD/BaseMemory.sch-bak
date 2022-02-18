@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr B 17000 11000
 encoding utf-8
-Sheet 3 8
+Sheet 3 9
 Title ""
 Date ""
 Rev ""
@@ -1735,8 +1735,6 @@ F 3 "" H 8130 7560 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	8130 7560 8130 7490
-Text Notes 590  1650 0    118  ~ 0
-_OE0 = /DAS & R_W & /A20.. & (/LLBE || /LMBE || /UMBE || /UUBE)\n_OE1 = /DAS & R_W & A20 & /A21.. & (/LLBE || /LMBE || /UMBE || /UUBE)\n_WE0 = /DAS & /R_W & /A20.. & (/LLBE || /LMBE || /UMBE || /UUBE)\n_WE1 = /DAS & /R_W & A20 & /A21.. & (/LLBE || /LMBE || /UMBE || /UUBE)\n_AL = /LLBE || /LMBE || /UMBE || /UUBE\nxxBE terms in section 12.5.1 of 030 manual
 $Comp
 L 74xx:74LS74 #U409
 U 1 1 641C535C
@@ -1798,8 +1796,6 @@ Wire Wire Line
 Wire Wire Line
 	4470 8350 1000 8350
 Connection ~ 4470 7700
-Text GLabel 1000 8350 0    51   Input ~ 0
-_AS
 Text Notes 12210 2570 0    118  ~ 0
 BANK0 = First 2 megabytes\nBANK1 = Second 2 megabytes
 Wire Bus Line

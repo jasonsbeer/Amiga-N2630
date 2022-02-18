@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 8
+Sheet 1 9
 Title ""
 Date ""
 Rev ""
@@ -54,5 +54,11 @@ S 2475 1400 1000 400
 U 61EF4CC7
 F0 "Xilinx" 50
 F1 "Xilinx.sch" 50
+$EndSheet
+$Sheet
+S 4875 1450 925  350 
+U 62089831
+F0 "CPLD 1" 50
+F1 "CPLD1.sch" 50
 $EndSheet
 $EndSCHEMATC

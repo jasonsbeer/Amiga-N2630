@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr B 17000 11000
 encoding utf-8
-Sheet 7 8
+Sheet 7 9
 Title ""
 Date ""
 Rev ""
@@ -708,14 +708,16 @@ F 3 "" H 15375 3350 50  0001 C CNN
 	1    15375 3350
 	1    0    0    -1  
 $EndComp
+Text Label 3200 5475 1    50   ~ 0
+_S7MDIS_DFF
+Text Notes 5025 4050 2    118  ~ 0
+STATE MACHINE
+Text Notes 5650 6075 2    118  ~ 0
+THESE ARE IN THE CPLD!
 Wire Bus Line
 	1175 5875 3325 5875
 Wire Bus Line
 	1525 5975 1525 7000
 Wire Bus Line
 	3325 5875 3325 6900
-Text Label 3200 5475 1    50   ~ 0
-_S7MDIS_DFF
-Text Notes 5025 4050 2    118  ~ 0
-STATE MACHINE
 $EndSCHEMATC
