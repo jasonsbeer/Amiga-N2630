@@ -1,0 +1,282 @@
+Release 14.7 - xst P.20131013 (lin64)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+--> 
+Parameter TMPDIR set to xst/projnav.tmp
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.03 secs
+ 
+--> 
+Parameter xsthdpdir set to xst
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.03 secs
+ 
+--> 
+Reading design: MAIN_HIGH.prj
+
+TABLE OF CONTENTS
+  1) Synthesis Options Summary
+  2) HDL Compilation
+  3) Design Hierarchy Analysis
+  4) HDL Analysis
+  5) HDL Synthesis
+     5.1) HDL Synthesis Report
+  6) Advanced HDL Synthesis
+     6.1) Advanced HDL Synthesis Report
+  7) Low Level Synthesis
+  8) Partition Report
+  9) Final Report
+
+=========================================================================
+*                      Synthesis Options Summary                        *
+=========================================================================
+---- Source Parameters
+Input File Name                    : "MAIN_HIGH.prj"
+Input Format                       : mixed
+Ignore Synthesis Constraint File   : NO
+
+---- Target Parameters
+Output File Name                   : "MAIN_HIGH"
+Output Format                      : NGC
+Target Device                      : XC9500XL CPLDs
+
+---- Source Options
+Top Module Name                    : MAIN_HIGH
+Automatic FSM Extraction           : YES
+FSM Encoding Algorithm             : Auto
+Safe Implementation                : No
+Mux Extraction                     : Yes
+Resource Sharing                   : YES
+
+---- Target Options
+Add IO Buffers                     : YES
+MACRO Preserve                     : YES
+XOR Preserve                       : YES
+Equivalent register Removal        : YES
+
+---- General Options
+Optimization Goal                  : Speed
+Optimization Effort                : 1
+Keep Hierarchy                     : Yes
+Netlist Hierarchy                  : As_Optimized
+RTL Output                         : Yes
+Hierarchy Separator                : /
+Bus Delimiter                      : <>
+Case Specifier                     : Maintain
+Verilog 2001                       : YES
+
+---- Other Options
+Clock Enable                       : YES
+wysiwyg                            : NO
+
+=========================================================================
+
+
+=========================================================================
+*                          HDL Compilation                              *
+=========================================================================
+Compiling vhdl file "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_HIGH/MAIN_HIGH.vhd" in Library work.
+Entity <main_high> compiled.
+Entity <main_high> (Architecture <behavioral>) compiled.
+
+=========================================================================
+*                     Design Hierarchy Analysis                         *
+=========================================================================
+Analyzing hierarchy for entity <MAIN_HIGH> in library <work> (architecture <behavioral>).
+
+
+=========================================================================
+*                            HDL Analysis                               *
+=========================================================================
+Analyzing Entity <MAIN_HIGH> in library <work> (Architecture <behavioral>).
+Entity <MAIN_HIGH> analyzed. Unit <MAIN_HIGH> generated.
+
+
+=========================================================================
+*                           HDL Synthesis                               *
+=========================================================================
+
+Performing bidirectional port resolution...
+
+Synthesizing Unit <MAIN_HIGH>.
+    Related source file is "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_HIGH/MAIN_HIGH.vhd".
+WARNING:Xst:653 - Signal <EXTSEL> is used but never assigned. This sourceless signal will be automatically connected to value 0.
+    Found 1-bit register for signal <CONFIGED>.
+    Found 1-bit tristate buffer for signal <nBERR>.
+    Found 1-bit register for signal <nUUBE>.
+    Found 1-bit register for signal <nUMBE>.
+    Found 1-bit register for signal <nLMBE>.
+    Found 1-bit register for signal <nLLBE>.
+    Found 1-bit tristate buffer for signal <nUDS>.
+    Found 1-bit tristate buffer for signal <nLDS>.
+    Found 1-bit tristate buffer for signal <ARnW>.
+    Found 1-bit tristate buffer for signal <nOVR>.
+    Found 4-bit tristate buffer for signal <$mux0000>.
+    Found 1-bit register for signal <autoconfigcomplete_2630>.
+    Found 1-bit register for signal <autoconfigcomplete_ZORRO2RAM>.
+    Found 3-bit register for signal <baseaddress_ZORRO2RAM>.
+    Found 11-bit comparator lessequal for signal <chipram$cmp_le0000> created at line 156.
+    Found 11-bit comparator greatequal for signal <chipregs$cmp_ge0000> created at line 162.
+    Found 11-bit comparator lessequal for signal <chipregs$cmp_le0000> created at line 162.
+    Found 11-bit comparator greatequal for signal <ciaspace$cmp_ge0000> created at line 159.
+    Found 11-bit comparator lessequal for signal <ciaspace$cmp_le0000> created at line 159.
+    Found 4-bit tristate buffer for signal <D_2630>.
+    Found 4-bit tristate buffer for signal <D_ZORRO2RAM>.
+    Found 3-bit adder for signal <fourmeg$addsub0000> created at line 390.
+    Found 3-bit comparator equal for signal <fourmeg$cmp_eq0000> created at line 390.
+    Found 9-bit comparator greatequal for signal <hirom$cmp_ge0000> created at line 184.
+    Found 9-bit comparator lessequal for signal <hirom$cmp_le0000> created at line 184.
+    Found 11-bit comparator greatequal for signal <iospace$cmp_ge0000> created at line 164.
+    Found 11-bit comparator lessequal for signal <iospace$cmp_le0000> created at line 164.
+    Found 4-bit register for signal <Mtridata_D_2630> created at line 264.
+    Found 4-bit register for signal <Mtridata_D_ZORRO2RAM> created at line 265.
+    Found 1-bit register for signal <Mtrien_D_2630> created at line 264.
+    Found 1-bit register for signal <Mtrien_D_ZORRO2RAM> created at line 265.
+    Found 3-bit comparator equal for signal <twomeg$cmp_eq0000> created at line 384.
+    Summary:
+	inferred   5 D-type flip-flop(s).
+	inferred   1 Adder/Subtractor(s).
+	inferred  11 Comparator(s).
+	inferred  17 Tristate(s).
+Unit <MAIN_HIGH> synthesized.
+
+
+=========================================================================
+HDL Synthesis Report
+
+Macro Statistics
+# Adders/Subtractors                                   : 1
+ 3-bit adder                                           : 1
+# Registers                                            : 12
+ 1-bit register                                        : 9
+ 3-bit register                                        : 1
+ 4-bit register                                        : 2
+# Comparators                                          : 11
+ 11-bit comparator greatequal                          : 3
+ 11-bit comparator lessequal                           : 4
+ 3-bit comparator equal                                : 2
+ 9-bit comparator greatequal                           : 1
+ 9-bit comparator lessequal                            : 1
+# Tristates                                            : 8
+ 1-bit tristate buffer                                 : 5
+ 4-bit tristate buffer                                 : 3
+
+=========================================================================
+
+=========================================================================
+*                       Advanced HDL Synthesis                          *
+=========================================================================
+
+
+=========================================================================
+Advanced HDL Synthesis Report
+
+Macro Statistics
+# Adders/Subtractors                                   : 1
+ 3-bit adder                                           : 1
+# Registers                                            : 5
+ Flip-Flops                                            : 5
+# Comparators                                          : 2
+ 3-bit comparator equal                                : 2
+
+=========================================================================
+
+=========================================================================
+*                         Low Level Synthesis                           *
+=========================================================================
+WARNING:Xst:2170 - Unit MAIN_HIGH : the following signal(s) form a combinatorial loop: writecycle, ROMCLK_and0000, csauto, csauto_and0000, ROMCLK.
+
+Optimizing unit <MAIN_HIGH> ...
+  implementation constraint: IOB=auto	 : Mtrien_D_ZORRO2RAM
+  implementation constraint: IOB=auto	 : Mtrien_D_2630
+  implementation constraint: IOB=auto	 : Mtridata_D_2630<3>
+  implementation constraint: IOB=auto	 : Mtridata_D_2630<2>
+  implementation constraint: IOB=auto	 : Mtridata_D_2630<1>
+  implementation constraint: IOB=auto	 : Mtridata_D_2630<0>
+  implementation constraint: IOB=auto	 : Mtridata_D_ZORRO2RAM<3>
+  implementation constraint: IOB=auto	 : Mtridata_D_ZORRO2RAM<2>
+  implementation constraint: IOB=auto	 : Mtridata_D_ZORRO2RAM<1>
+  implementation constraint: IOB=auto	 : Mtridata_D_ZORRO2RAM<0>
+  implementation constraint: INIT=r	 : autoconfigcomplete_ZORRO2RAM
+  implementation constraint: INIT=r	 : autoconfigcomplete_2630
+  implementation constraint: INIT=r	 : baseaddress_ZORRO2RAM_2
+  implementation constraint: INIT=r	 : baseaddress_ZORRO2RAM_1
+  implementation constraint: INIT=r	 : baseaddress_ZORRO2RAM_0
+  implementation constraint: INIT=r	 : Mtrien_D_ZORRO2RAM
+  implementation constraint: INIT=r	 : Mtrien_D_2630
+WARNING:Xst:1426 - The value init of the FF/Latch Mtridata_D_2630_1 hinder the constant cleaning in the block MAIN_HIGH.
+   You should achieve better results by setting this init to 1.
+WARNING:Xst:2170 - Unit MAIN_HIGH : the following signal(s) form a combinatorial loop: ROMCLK_or000014, ROMCLK.
+
+=========================================================================
+*                           Partition Report                            *
+=========================================================================
+
+Partition Implementation Status
+-------------------------------
+
+  No Partitions were found in this design.
+
+-------------------------------
+
+=========================================================================
+*                            Final Report                               *
+=========================================================================
+Final Results
+RTL Top Level Output File Name     : MAIN_HIGH.ngr
+Top Level Output File Name         : MAIN_HIGH
+Output Format                      : NGC
+Optimization Goal                  : Speed
+Keep Hierarchy                     : Yes
+Target Technology                  : XC9500XL CPLDs
+Macro Preserve                     : YES
+XOR Preserve                       : YES
+Clock Enable                       : YES
+wysiwyg                            : NO
+
+Design Statistics
+# IOs                              : 67
+
+Cell Usage :
+# BELS                             : 415
+#      AND2                        : 79
+#      AND3                        : 38
+#      AND4                        : 19
+#      AND5                        : 1
+#      AND8                        : 4
+#      GND                         : 1
+#      INV                         : 207
+#      OR2                         : 45
+#      OR3                         : 11
+#      OR4                         : 1
+#      VCC                         : 1
+#      XOR2                        : 8
+# FlipFlops/Latches                : 20
+#      FD                          : 4
+#      FDCE                        : 14
+#      FDPE                        : 2
+# Tri-States                       : 8
+#      BUFE                        : 8
+# IO Buffers                       : 67
+#      IBUF                        : 43
+#      IOBUFE                      : 3
+#      OBUF                        : 15
+#      OBUFE                       : 6
+=========================================================================
+
+
+Total REAL time to Xst completion: 2.00 secs
+Total CPU time to Xst completion: 2.08 secs
+ 
+--> 
+
+
+Total memory usage is 512420 kilobytes
+
+Number of errors   :    0 (   0 filtered)
+Number of warnings :    4 (   0 filtered)
+Number of infos    :    0 (   0 filtered)
+

@@ -34,7 +34,7 @@ use ieee.std_logic_unsigned.all;
 
 entity MAIN_HIGH is
     Port ( 
-		--62 PINS USED
+		--64 PINS USED
 	 
 		FC : IN STD_LOGIC_VECTOR (2 downto 0); --FCn FROM 68030
 		AL : IN STD_LOGIC_VECTOR (6 downto 0); --ADDRESS BUS BITS 6..1
@@ -86,7 +86,9 @@ entity MAIN_HIGH is
 		nLLBE : OUT STD_LOGIC; --LOWER LOWER BYTE ENABLE
 		nMEMLOCK : OUT STD_LOGIC; --LOCK MEMORY DURING ACCESS FOR STATE MACHINE
 		nUDS : OUT STD_LOGIC; --68000 UPPER DATA STROBE
-		nLDS : OUT STD_LOGIC --68000 LOWER DATA STROBE
+		nLDS : OUT STD_LOGIC; --68000 LOWER DATA STROBE
+		ARnW : OUT STD_LOGIC; --68000 READ/WRITE SIGNAL
+		nOVR : OUT STD_LOGIC --OVERRIDE GARY DTACK
 		
 		);
 		
@@ -99,9 +101,9 @@ architecture Behavioral of MAIN_HIGH is
 	----------------------
 	
 	--All internal signals are active HIGH!
-	SIGNAL baseaddress : STD_LOGIC_VECTOR ( 2 downto 0 ):="000"; --BASE ADDRESS ASSIGNED FOR 2630
+	--SIGNAL baseaddress : STD_LOGIC_VECTOR ( 2 downto 0 ):="000"; --BASE ADDRESS ASSIGNED FOR 2630
 	SIGNAL baseaddress_ZORRO2RAM : STD_LOGIC_VECTOR ( 2 downto 0 ):="000"; --BASE ADDRESS ASSIGNED FOR ZORRO 2 RAM
-	SIGNAL baseaddress_ZORRO3RAM : STD_LOGIC_VECTOR ( 2 downto 0 ):="000"; --BASE ADDRESS ASSIGNED FOR ZORRO 3 RAM
+	--SIGNAL baseaddress_ZORRO3RAM : STD_LOGIC_VECTOR ( 2 downto 0 ):="000"; --BASE ADDRESS ASSIGNED FOR ZORRO 3 RAM
 	SIGNAL autoconfigspace : STD_LOGIC:='0'; --ARE WE IN THE AUTOCONFIG ADDRESS SPACE?
 	SIGNAL chipram : STD_LOGIC:='0';
 	SIGNAL ciaspace : STD_LOGIC:='0';
@@ -116,10 +118,10 @@ architecture Behavioral of MAIN_HIGH is
 	
 	SIGNAL D_2630 : STD_LOGIC_VECTOR ( 3 downto 0 ):="ZZZZ"; --This throws a "hinder the constant cleaning" error. IGNORE IT.
 	SIGNAL D_ZORRO2RAM : STD_LOGIC_VECTOR ( 3 downto 0 ):="ZZZZ";
-	SIGNAL D_ZORRO3RAM : STD_LOGIC_VECTOR ( 3 downto 0 ):="ZZZZ";
+	--SIGNAL D_ZORRO3RAM : STD_LOGIC_VECTOR ( 3 downto 0 ):="ZZZZ";
 	SIGNAL autoconfigcomplete_2630 : STD_LOGIC := '0'; --HAS 68030 BOARD BEEN AUTOCONFIGed?
 	SIGNAL autoconfigcomplete_ZORRO2RAM : STD_LOGIC := '0'; --HAS 68030 BOARD BEEN AUTOCONFIGed?
-	SIGNAL autoconfigcomplete_ZORRO3RAM : STD_LOGIC := '0'; --HAS 68030 BOARD BEEN AUTOCONFIGed?
+	--SIGNAL autoconfigcomplete_ZORRO3RAM : STD_LOGIC := '0'; --HAS 68030 BOARD BEEN AUTOCONFIGed?
 	
 	SIGNAL twomeg : STD_LOGIC:='0'; --TWO MB RAM SPACE
 	SIGNAL fourmeg : STD_LOGIC:='0'; --FOUR MB RAM SPACE
@@ -244,7 +246,7 @@ begin
 	DAC(31 downto 28) <= 
 		D_2630 WHEN autoconfigcomplete_2630 = '0' AND autoconfigspace ='1' AND CONFIGED = '0' ELSE
 		D_ZORRO2RAM WHEN autoconfigcomplete_ZORRO2RAM = '0' AND autoconfigspace ='1' AND CONFIGED = '0' ELSE
-		D_ZORRO3RAM WHEN autoconfigcomplete_ZORRO3RAM = '0' AND autoconfigspace ='1' AND CONFIGED = '0' ELSE
+		--D_ZORRO3RAM WHEN autoconfigcomplete_ZORRO3RAM = '0' AND autoconfigspace ='1' AND CONFIGED = '0' ELSE
 		"ZZZZ";
 		
 			
@@ -253,15 +255,15 @@ begin
 		IF nRESET = '0' THEN
 		
 			CONFIGED <= '0';
-			baseaddress <= "000";
+			--baseaddress <= "000";
 			baseaddress_ZORRO2RAM <= "000";
-			baseaddress_ZORRO3RAM <= "000";
+			--baseaddress_ZORRO3RAM <= "000";
 			autoconfigcomplete_2630 <= '0';
 			autoconfigcomplete_ZORRO2RAM <= '0';
-			autoconfigcomplete_ZORRO3RAM <= '0';
+			--autoconfigcomplete_ZORRO3RAM <= '0';
 			D_2630 <= "ZZZZ";
 			D_ZORRO2RAM <= "ZZZZ";
-			D_ZORRO3RAM <= "ZZZZ";
+			--D_ZORRO3RAM <= "ZZZZ";
 			
 		ELSIF ( FALLING_EDGE (CPUCLK)) THEN
 			IF ( autoconfigspace = '1' AND CONFIGED = '0' ) THEN
@@ -273,54 +275,54 @@ begin
 						WHEN "000000" => 
 							D_2630 <= "1110"; 
 							D_ZORRO2RAM <= "1110"; --er_type: Zorro 2 card without BOOT ROM, LINK TO MEM POOL
-							D_ZORRO3RAM <= "1010"; --er_type: Zorro 3 card without BOOT ROM, LINK TO MEM POOL
+							--D_ZORRO3RAM <= "1010"; --er_type: Zorro 3 card without BOOT ROM, LINK TO MEM POOL
 
 						--offset $02
 						WHEN "000001" => 
 							D_2630 <= "0111";
 							D_ZORRO2RAM <= "011" & TWOMEG; --er_type: NEXT BOARD NOT RELATED, 2MB OR 4MB
-							D_ZORRO3RAM <= "0011"; --NEXT BOARD NOT RELATED, 128MB
+							--D_ZORRO3RAM <= "0011"; --NEXT BOARD NOT RELATED, 128MB
 
 						--offset $04 INVERTED
 						WHEN "000010" => 
 							D_2630 <= "1010";
 							D_ZORRO2RAM <= "1010"; --Product Number Hi Nibble, we are stealing the A2630 product number
-							D_ZORRO3RAM <= "1010";
+							--D_ZORRO3RAM <= "1010";
 
 						--offset $06 INVERTED
 						WHEN "000011" => 
 							D_2630 <= "1110";
 							D_ZORRO2RAM <= "1110"; --Product Number Lo Nibble
-							D_ZORRO3RAM <= "1111";
+							--D_ZORRO3RAM <= "1111";
 
 						--offset $08 INVERTED
 						WHEN "000100" => 
 							D_2630 <= "1111"; --CAN'T BE SHUT UP
 							D_ZORRO2RAM <= "1011"; --er_flags: I/O device, can be shut up, reserved, reserved
-							D_ZORRO3RAM <= "0101"; --MEMORY DEVICE, CAN BE SHUT UP, Z3 SIZE
+							--D_ZORRO3RAM <= "0101"; --MEMORY DEVICE, CAN BE SHUT UP, Z3 SIZE
 
 						--offset $0C INVERTED						
 						WHEN "000110" => 
 							D_2630 <= OSMODE & "111"; --THE A2630 CONFIGURES THIS NIBBLE AS "0111" WHEN UNIX, "1111" WHEN AMIGA OS
 							D_ZORRO2RAM <= "1111"; --Reserved: must be zeroes
-							D_ZORRO3RAM <= "1111";
+							--D_ZORRO3RAM <= "1111";
 
 						--offset $12 INVERTED
 						WHEN "001001" => 
 							D_2630 <= "1111";
 							D_ZORRO2RAM <= "1101"; --MANUFACTURER Number, high byte, low nibble hi byte. Just for fun, lets put C= in here!
-							D_ZORRO3RAM <= "1101";
+							--D_ZORRO3RAM <= "1101";
 
 						--offset $16 INVERTED
 						WHEN "001011" => 
 							D_2630 <= "1111";
 							D_ZORRO2RAM <= "1101"; --MANUFACTURER Number, low nibble low byte. Just for fun, lets put C= in here!
-							D_ZORRO3RAM <= "1101";
+							--D_ZORRO3RAM <= "1101";
 
 						WHEN OTHERS => 
 							D_2630 <= "1111";
 							D_ZORRO2RAM <= "1111"; --INVERTED...Reserved offsets and unused offset values are all zeroes
-							D_ZORRO3RAM <= "1111";
+							--D_ZORRO3RAM <= "1111";
 
 					END CASE;
 					
@@ -331,7 +333,7 @@ begin
 					
 						IF ( autoconfigcomplete_2630 = '0' ) THEN
 							--BASE ADDRESS FOR THE 68030 BOARD
-							baseaddress <= DAC(31 downto 29);
+							--baseaddress <= DAC(31 downto 29);
 							--THE 68030 BOARD IS CONFIGED
 							autoconfigcomplete_2630 <= '1'; 
 						ELSIF ( autoconfigcomplete_ZORRO2RAM = '0' ) THEN
@@ -339,11 +341,11 @@ begin
 							baseaddress_ZORRO2RAM <= DAC(31 downto 29); 
 							--THE ZORRO 2 RAM IS CONFIGED
 							autoconfigcomplete_ZORRO2RAM <= '1'; 
-						ELSIF ( autoconfigcomplete_ZORRO3RAM = '0' ) THEN
+						--ELSIF ( autoconfigcomplete_ZORRO3RAM = '0' ) THEN
 							--BASE ADDRESS FOR THE ZORRO 3 RAM
-							baseaddress_ZORRO3RAM <= DAC(31 downto 29); 
+							--baseaddress_ZORRO3RAM <= DAC(31 downto 29); 
 							 --THE ZORRO 3 RAM IS CONFIGED
-							autoconfigcomplete_ZORRO3RAM <= '1';
+							--autoconfigcomplete_ZORRO3RAM <= '1';
 						END IF;
 						
 						IF ((AUTO = '0') OR autoconfigcomplete_ZORRO2RAM = '1') THEN
@@ -354,7 +356,7 @@ begin
 							CONFIGED <= '1'; 
 							D_2630 <= "ZZZZ";
 							D_ZORRO2RAM <= "ZZZZ";
-							D_ZORRO3RAM <= "ZZZZ";
+							--D_ZORRO3RAM <= "ZZZZ";
 						END IF;					
 						
 					END IF;					
@@ -623,7 +625,29 @@ begin
 				rds = '1')
 		ELSE 
 			'1';
+			
+	--------------
+	-- Amiga RW --
+	--------------
 
+	--This signal is the Amiga bus RW line. This signal tristates when we are 
+	--not yet boss and when there is a DMA device active, or during an
+	--onboard cycle. It shares the 68030 RW signal with the Amiga 2000 hardware
+
+	--ARW		= RW ;
+	ARnW <= RnW WHEN TRISTATE = '0' AND offboard = '0' ELSE 'Z';
+	
+	-------------------------
+	-- GARY DTACK OVERRIDE --
+	-------------------------
+	
+	--The OVR signal must be asserted whenever on-board memory is selected
+	--during a DMA cycle.  It tri-states GARY's DTACK output, allowing
+	--one to be created by our memory logic.
+
+	--OVR		= BGACK & MEMSEL;
+	--OVR.OE		= BGACK & MEMSEL;
+	nOVR <= '0' WHEN nBGACK = '0' AND nMEMSEL = '0' ELSE 'Z';
 
 end Behavioral;
 

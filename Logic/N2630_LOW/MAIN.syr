@@ -1,0 +1,226 @@
+Release 14.7 - xst P.20131013 (lin64)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+--> 
+Parameter TMPDIR set to xst/projnav.tmp
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.03 secs
+ 
+--> 
+Parameter xsthdpdir set to xst
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.03 secs
+ 
+--> 
+Reading design: MAIN.prj
+
+TABLE OF CONTENTS
+  1) Synthesis Options Summary
+  2) HDL Compilation
+  3) Design Hierarchy Analysis
+  4) HDL Analysis
+  5) HDL Synthesis
+     5.1) HDL Synthesis Report
+  6) Advanced HDL Synthesis
+     6.1) Advanced HDL Synthesis Report
+  7) Low Level Synthesis
+  8) Partition Report
+  9) Final Report
+
+=========================================================================
+*                      Synthesis Options Summary                        *
+=========================================================================
+---- Source Parameters
+Input File Name                    : "MAIN.prj"
+Input Format                       : mixed
+Ignore Synthesis Constraint File   : NO
+
+---- Target Parameters
+Output File Name                   : "MAIN"
+Output Format                      : NGC
+Target Device                      : XC9500XL CPLDs
+
+---- Source Options
+Top Module Name                    : MAIN
+Automatic FSM Extraction           : YES
+FSM Encoding Algorithm             : Auto
+Safe Implementation                : No
+Mux Extraction                     : Yes
+Resource Sharing                   : YES
+
+---- Target Options
+Add IO Buffers                     : YES
+MACRO Preserve                     : YES
+XOR Preserve                       : YES
+Equivalent register Removal        : YES
+
+---- General Options
+Optimization Goal                  : Speed
+Optimization Effort                : 1
+Keep Hierarchy                     : Yes
+Netlist Hierarchy                  : As_Optimized
+RTL Output                         : Yes
+Hierarchy Separator                : /
+Bus Delimiter                      : <>
+Case Specifier                     : Maintain
+Verilog 2001                       : YES
+
+---- Other Options
+Clock Enable                       : YES
+wysiwyg                            : NO
+
+=========================================================================
+
+
+=========================================================================
+*                          HDL Compilation                              *
+=========================================================================
+Compiling vhdl file "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_LOW/MAIN.vhd" in Library work.
+Entity <main> compiled.
+Entity <main> (Architecture <behavioral>) compiled.
+
+=========================================================================
+*                     Design Hierarchy Analysis                         *
+=========================================================================
+Analyzing hierarchy for entity <MAIN> in library <work> (architecture <behavioral>).
+
+
+=========================================================================
+*                            HDL Analysis                               *
+=========================================================================
+Analyzing Entity <MAIN> in library <work> (Architecture <behavioral>).
+INFO:Xst:2679 - Register <nDSACKDIS> in unit <MAIN> has a constant value of 0 during circuit operation. The register is replaced by logic.
+Entity <MAIN> analyzed. Unit <MAIN> generated.
+
+
+=========================================================================
+*                           HDL Synthesis                               *
+=========================================================================
+
+Performing bidirectional port resolution...
+
+Synthesizing Unit <MAIN>.
+    Related source file is "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_LOW/MAIN.vhd".
+    Found 1-bit tristate buffer for signal <nAAS>.
+    Found 1-bit tristate buffer for signal <nBGACK>.
+    Found 1-bit register for signal <nCYCEND>.
+    Found 1-bit tristate buffer for signal <nMEMSEL>.
+    Found 1-bit tristate buffer for signal <nABR>.
+    Found 1-bit register for signal <nIVMA>.
+    Found 1-bit tristate buffer for signal <RnW>.
+    Found 1-bit register for signal <DSEN>.
+    Found 1-bit register for signal <nEDTACK>.
+    Found 1-bit register for signal <nREGRESET>.
+    Found 1-bit tristate buffer for signal <nDSACK0>.
+    Found 1-bit tristate buffer for signal <nDSACK1>.
+    Found 1-bit register for signal <esync>.
+    Found 1-bit register for signal <n_aas40>.
+    Found 1-bit register for signal <n_aas80>.
+    Found 1-bit register for signal <n_aasq>.
+    Found 4-bit register for signal <sca>.
+    Summary:
+	inferred   7 Tristate(s).
+Unit <MAIN> synthesized.
+
+
+=========================================================================
+HDL Synthesis Report
+
+Macro Statistics
+# Registers                                            : 13
+ 1-bit register                                        : 13
+# Tristates                                            : 7
+ 1-bit tristate buffer                                 : 7
+
+=========================================================================
+
+=========================================================================
+*                       Advanced HDL Synthesis                          *
+=========================================================================
+
+
+=========================================================================
+Advanced HDL Synthesis Report
+
+Found no macro
+=========================================================================
+
+=========================================================================
+*                         Low Level Synthesis                           *
+=========================================================================
+WARNING:Xst:2170 - Unit MAIN : the following signal(s) form a combinatorial loop: nBOSS_or0000, nBOSS_and0000, nBOSS, nRESET_and0000.
+WARNING:Xst:2170 - Unit MAIN : the following signal(s) form a combinatorial loop: cpudtack, cycledone, dmadelay_and0001, bras, dmadelay, nDSACK0_mux0000, dmacycle.
+
+Optimizing unit <MAIN> ...
+  implementation constraint: INIT=r	 : n_aas80
+  implementation constraint: INIT=r	 : n_aas40
+  implementation constraint: INIT=r	 : sca_3
+  implementation constraint: INIT=r	 : sca_2
+  implementation constraint: INIT=r	 : sca_1
+  implementation constraint: INIT=r	 : sca_0
+  implementation constraint: INIT=r	 : n_aasq
+  implementation constraint: INIT=r	 : esync
+
+=========================================================================
+*                           Partition Report                            *
+=========================================================================
+
+Partition Implementation Status
+-------------------------------
+
+  No Partitions were found in this design.
+
+-------------------------------
+
+=========================================================================
+*                            Final Report                               *
+=========================================================================
+Final Results
+RTL Top Level Output File Name     : MAIN.ngr
+Top Level Output File Name         : MAIN
+Output Format                      : NGC
+Optimization Goal                  : Speed
+Keep Hierarchy                     : Yes
+Target Technology                  : XC9500XL CPLDs
+Macro Preserve                     : YES
+XOR Preserve                       : YES
+Clock Enable                       : YES
+wysiwyg                            : NO
+
+Design Statistics
+# IOs                              : 56
+
+Cell Usage :
+# BELS                             : 142
+#      AND2                        : 27
+#      AND3                        : 14
+#      AND4                        : 3
+#      GND                         : 1
+#      INV                         : 78
+#      OR2                         : 18
+#      XOR2                        : 1
+# FlipFlops/Latches                : 13
+#      FD                          : 13
+# IO Buffers                       : 52
+#      IBUF                        : 26
+#      IOBUFE                      : 5
+#      OBUF                        : 19
+#      OBUFE                       : 2
+=========================================================================
+
+
+Total REAL time to Xst completion: 2.00 secs
+Total CPU time to Xst completion: 1.95 secs
+ 
+--> 
+
+
+Total memory usage is 509896 kilobytes
+
+Number of errors   :    0 (   0 filtered)
+Number of warnings :    2 (   0 filtered)
+Number of infos    :    1 (   0 filtered)
+
