@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr B 17000 11000
 encoding utf-8
-Sheet 5 9
+Sheet 5 8
 Title ""
 Date ""
 Rev ""
@@ -271,7 +271,7 @@ _ABG
 Text GLabel 950  8450 0    50   BiDi ~ 0
 _DTACK
 Text GLabel 950  8550 0    50   BiDi ~ 0
-ARW
+AR_W
 Text GLabel 950  8650 0    50   BiDi ~ 0
 _LDS
 Text GLabel 950  8750 0    50   BiDi ~ 0
@@ -1987,11 +1987,11 @@ Wire Wire Line
 Wire Wire Line
 	13850 3400 14250 3400
 Text GLabel 15025 3050 2    51   Output ~ 0
-MEG4
+TWOMB
 Text GLabel 15025 3225 2    51   Output ~ 0
 B2000
 Text GLabel 15025 3400 2    51   Output ~ 0
-RAM_AUTO
+AUTO
 Text GLabel 15025 3575 2    51   Output ~ 0
 OSMODE
 Wire Wire Line

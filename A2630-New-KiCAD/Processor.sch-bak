@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr B 17000 11000
 encoding utf-8
-Sheet 2 9
+Sheet 2 8
 Title "N2630"
 Date ""
 Rev "1.0"
@@ -1330,7 +1330,7 @@ Wire Wire Line
 Wire Wire Line
 	10625 1525 1150 1525
 Text GLabel 1150 1525 0    50   Input ~ 0
-CACHE
+_CIIN
 Wire Wire Line
 	9725 4400 10750 4400
 Wire Wire Line
@@ -2303,10 +2303,10 @@ Wire Wire Line
 	5640 7000 5875 7000
 Connection ~ 5640 7800
 $Comp
-L power:GND #PWR?
+L power:GND #PWR0154
 U 1 1 6289D1A9
 P 5640 9640
-F 0 "#PWR?" H 5640 9390 50  0001 C CNN
+F 0 "#PWR0154" H 5640 9390 50  0001 C CNN
 F 1 "GND" H 5645 9467 50  0000 C CNN
 F 2 "" H 5640 9640 50  0001 C CNN
 F 3 "" H 5640 9640 50  0001 C CNN
@@ -2319,7 +2319,7 @@ U 1 1 62A4690D
 P 2225 7450
 F 0 "JP1" V 2271 7537 50  0000 L CNN
 F 1 "25/28" V 2180 7537 50  0000 L CNN
-F 2 "" H 2225 7450 50  0001 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 2225 7450 50  0001 C CNN
 F 3 "~" H 2225 7450 50  0001 C CNN
 	1    2225 7450
 	0    -1   -1   0   

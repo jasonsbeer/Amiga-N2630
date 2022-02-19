@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr B 17000 11000
 encoding utf-8
-Sheet 7 9
+Sheet 7 8
 Title ""
 Date ""
 Rev ""
@@ -219,49 +219,6 @@ Wire Wire Line
 Wire Wire Line
 	3200 4400 3200 5475
 $Comp
-L 74xx:74LS174 U302
-U 1 1 635AD4A3
-P 4075 7000
-F 0 "U302" H 4200 7625 50  0000 C CNN
-F 1 "74HCT174" H 4300 7550 50  0000 C CNN
-F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 4075 7000 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS174" H 4075 7000 50  0001 C CNN
-	1    4075 7000
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	3575 6600 3425 6600
-Wire Wire Line
-	3575 6700 3425 6700
-Wire Wire Line
-	3575 6800 3425 6800
-Wire Wire Line
-	3575 6900 3425 6900
-Wire Wire Line
-	3575 7000 3425 7000
-Wire Wire Line
-	4575 6600 4775 6600
-Wire Wire Line
-	4575 6700 4775 6700
-Wire Wire Line
-	4575 6800 4775 6800
-Wire Wire Line
-	4575 6900 4775 6900
-Wire Wire Line
-	4575 7000 4775 7000
-Wire Wire Line
-	4575 7100 4775 7100
-Entry Wire Line
-	3425 6600 3325 6500
-Entry Wire Line
-	3425 6700 3325 6600
-Entry Wire Line
-	3425 6800 3325 6700
-Entry Wire Line
-	3425 6900 3325 6800
-Entry Wire Line
-	3425 7000 3325 6900
-$Comp
 L 74xx:74LS174 U303
 U 1 1 635CAE10
 P 2275 7000
@@ -285,15 +242,15 @@ Wire Wire Line
 Wire Wire Line
 	1775 7100 1625 7100
 Wire Wire Line
-	2775 6600 2800 6600
+	2775 6600 3400 6600
 Wire Wire Line
-	2775 6700 2800 6700
+	2775 6700 3400 6700
 Wire Wire Line
-	2775 6900 2800 6900
+	2775 6900 3400 6900
 Wire Wire Line
-	2775 7000 2800 7000
+	2775 7000 3400 7000
 Wire Wire Line
-	2775 7100 2800 7100
+	2775 7100 3400 7100
 Entry Wire Line
 	1625 6600 1525 6500
 Entry Wire Line
@@ -335,46 +292,14 @@ F 3 "" H 1225 6725 50  0001 C CNN
 	1    1225 6725
 	1    0    0    -1  
 $EndComp
-Text Label 3425 6600 0    51   ~ 0
-D31
-Text Label 3425 6700 0    51   ~ 0
-D30
-Text Label 3425 6800 0    51   ~ 0
-D29
-Text Label 3425 6900 0    51   ~ 0
-D28
-Text Label 3425 7000 0    51   ~ 0
-D27
-Wire Wire Line
-	3275 6800 3275 7100
-Wire Wire Line
-	3275 7100 3575 7100
 Wire Wire Line
 	2775 6800 3275 6800
 Text Label 2800 6800 0    51   ~ 0
 ROMCONF
-Text GLabel 2800 7100 2    51   Output ~ 0
+Text GLabel 3400 7100 2    51   Output ~ 0
 68KMODE
-Text GLabel 2800 7000 2    51   Output ~ 0
+Text GLabel 3400 7000 2    51   Output ~ 0
 JMODE
-Text Label 2800 6600 0    51   ~ 0
-PHANTOMLO
-Text Label 2800 6700 0    51   ~ 0
-PHANTOMHI
-Text Label 2800 6900 0    51   ~ 0
-RSTENB
-Text Label 4775 7100 0    51   ~ 0
-RAMCONF
-NoConn ~ 4775 6900
-NoConn ~ 4775 7000
-Text Label 4775 6600 0    51   ~ 0
-RA2
-Text Label 4775 6700 0    51   ~ 0
-RA1
-Text Label 4775 6800 0    51   ~ 0
-RA0
-Text Notes 5275 6725 2    51   ~ 0
-TO u304
 $Comp
 L power:+5V #PWR0146
 U 1 1 63609F5E
@@ -384,28 +309,6 @@ F 1 "+5V" H 2290 6473 50  0000 C CNN
 F 2 "" H 2275 6300 50  0001 C CNN
 F 3 "" H 2275 6300 50  0001 C CNN
 	1    2275 6300
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:+5V #PWR0147
-U 1 1 6360A387
-P 4075 6300
-F 0 "#PWR0147" H 4075 6150 50  0001 C CNN
-F 1 "+5V" H 4090 6473 50  0000 C CNN
-F 2 "" H 4075 6300 50  0001 C CNN
-F 3 "" H 4075 6300 50  0001 C CNN
-	1    4075 6300
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:GND #PWR0148
-U 1 1 6360AB27
-P 4075 7800
-F 0 "#PWR0148" H 4075 7550 50  0001 C CNN
-F 1 "GND" H 4080 7627 50  0000 C CNN
-F 2 "" H 4075 7800 50  0001 C CNN
-F 3 "" H 4075 7800 50  0001 C CNN
-	1    4075 7800
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -420,56 +323,11 @@ F 3 "" H 2275 7800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	1775 7300 1450 7300
-Wire Wire Line
-	1450 7300 1450 8200
-Wire Wire Line
-	3575 7300 3325 7300
-Wire Wire Line
-	3325 7300 3325 8325
+	1775 7300 1225 7300
 Wire Wire Line
 	1775 7500 1225 7500
 Text GLabel 1225 7500 0    51   Input ~ 0
 _REGRESET
-Wire Wire Line
-	3600 7500 3575 7500
-Wire Wire Line
-	3475 7500 3475 8325
-Connection ~ 3575 7500
-Wire Wire Line
-	3575 7500 3475 7500
-Text Notes 3850 8400 2    51   ~ 0
-FROM U301
-$Comp
-L 74xx:74LS04 U?
-U 5 1 636212F5
-P 1450 8500
-AR Path="/61DF74A0/636212F5" Ref="U?"  Part="3" 
-AR Path="/634ECC15/636212F5" Ref="U307"  Part="5" 
-F 0 "U307" H 1450 8183 50  0000 C CNN
-F 1 "74HCT04" H 1450 8274 50  0000 C CNN
-F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 1450 8500 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 1450 8500 50  0001 C CNN
-	5    1450 8500
-	0    -1   -1   0   
-$EndComp
-$Comp
-L 74xx:74LS04 U?
-U 6 1 636251C6
-P 3325 8625
-AR Path="/61DF74A0/636251C6" Ref="U?"  Part="3" 
-AR Path="/634ECC15/636251C6" Ref="U307"  Part="6" 
-F 0 "U307" H 3325 8308 50  0000 C CNN
-F 1 "74HCT04" H 3325 8399 50  0000 C CNN
-F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 3325 8625 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 3325 8625 50  0001 C CNN
-	6    3325 8625
-	0    -1   -1   0   
-$EndComp
-Text Notes 3525 9000 2    51   ~ 0
-FROM U301
-Text Notes 1675 8900 2    51   ~ 0
-FROM U301
 $Comp
 L 74xx:74LS74 U502
 U 2 1 61F06783
@@ -712,12 +570,16 @@ Text Label 3200 5475 1    50   ~ 0
 _S7MDIS_DFF
 Text Notes 5025 4050 2    118  ~ 0
 STATE MACHINE
-Text Notes 5650 6075 2    118  ~ 0
-THESE ARE IN THE CPLD!
 Wire Bus Line
-	1175 5875 3325 5875
+	1175 5875 1425 5875
+Text GLabel 1225 7300 0    50   Input ~ 0
+ROMCLK
+Text GLabel 3400 6700 2    50   Output ~ 0
+PHANTOMHI
+Text GLabel 3400 6600 2    50   Output ~ 0
+PHANTOMLO
+Text GLabel 3400 6900 2    50   Output ~ 0
+RSTENB
 Wire Bus Line
 	1525 5975 1525 7000
-Wire Bus Line
-	3325 5875 3325 6900
 $EndSCHEMATC

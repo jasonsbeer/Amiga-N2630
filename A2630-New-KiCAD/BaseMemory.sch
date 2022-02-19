@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr B 17000 11000
 encoding utf-8
-Sheet 3 9
+Sheet 3 8
 Title ""
 Date ""
 Rev ""
@@ -593,13 +593,9 @@ F 3 "" H 7170 6540 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	7570 7790 7650 7790
-Wire Wire Line
 	7570 7940 7650 7940
 Wire Wire Line
 	7570 8040 7650 8040
-Wire Wire Line
-	6770 7790 6580 7790
 Wire Wire Line
 	7570 7590 8000 7590
 Wire Wire Line
@@ -1097,14 +1093,6 @@ F 3 "" H 10450 6550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	10850 7800 10930 7800
-Wire Wire Line
-	10850 7950 10930 7950
-Wire Wire Line
-	10850 8050 10930 8050
-Wire Wire Line
-	10050 7800 9860 7800
-Wire Wire Line
 	10850 7600 11280 7600
 Wire Wire Line
 	9940 8370 9940 7950
@@ -1187,10 +1175,6 @@ Entry Wire Line
 	11430 2430 11530 2330
 Wire Wire Line
 	10850 4430 10950 4430
-Wire Wire Line
-	10850 4580 10950 4580
-Wire Wire Line
-	10850 4680 10950 4680
 Wire Wire Line
 	10050 4430 9870 4430
 Text Label 9530 4230 0    50   ~ 0
@@ -1798,6 +1782,58 @@ Wire Wire Line
 Connection ~ 4470 7700
 Text Notes 12210 2570 0    118  ~ 0
 BANK0 = First 2 megabytes\nBANK1 = Second 2 megabytes
+Wire Wire Line
+	5440 7790 5440 8640
+Wire Wire Line
+	5440 8640 1000 8640
+Wire Wire Line
+	5440 7790 6770 7790
+Text GLabel 1000 8640 0    50   Input ~ 0
+_OE0
+Wire Wire Line
+	8760 7800 8760 8850
+Wire Wire Line
+	8760 8850 995  8850
+Wire Wire Line
+	8760 7800 10050 7800
+Text GLabel 995  8850 0    50   Input ~ 0
+_OE1
+Wire Wire Line
+	8320 7790 8320 8750
+Wire Wire Line
+	8320 8750 1000 8750
+Wire Wire Line
+	7570 7790 8320 7790
+Text GLabel 1000 8750 0    50   Input ~ 0
+_WE0
+Wire Wire Line
+	11495 7800 11495 8960
+Wire Wire Line
+	11495 8960 995  8960
+Wire Wire Line
+	10850 7800 11495 7800
+Text GLabel 995  8960 0    50   Input ~ 0
+_WE1
+Wire Wire Line
+	10850 4580 14825 4580
+Wire Wire Line
+	10850 4680 14825 4680
+Text GLabel 14825 4580 2    50   Input ~ 0
+_UUBE
+Text GLabel 14825 4680 2    50   Input ~ 0
+_UMBE
+Wire Wire Line
+	12005 7950 12005 4860
+Wire Wire Line
+	12005 4860 14835 4860
+Wire Wire Line
+	10850 7950 12005 7950
+Wire Wire Line
+	12095 8050 12095 4965
+Wire Wire Line
+	12095 4965 14835 4965
+Wire Wire Line
+	10850 8050 12095 8050
 Wire Bus Line
 	8250 1270 15640 1270
 Wire Bus Line
@@ -1814,4 +1850,8 @@ Wire Bus Line
 	9430 2410 9430 9200
 Wire Bus Line
 	6150 2415 6150 9100
+Text GLabel 14835 4860 2    50   Input ~ 0
+_LMBE
+Text GLabel 14835 4965 2    50   Input ~ 0
+_LLBE
 $EndSCHEMATC

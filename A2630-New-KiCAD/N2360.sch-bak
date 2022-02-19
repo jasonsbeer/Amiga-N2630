@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 9
+Sheet 1 8
 Title ""
 Date ""
 Rev ""
@@ -48,12 +48,6 @@ S 1025 1425 1100 400
 U 634ECC15
 F0 "Logic" 51
 F1 "Logic.sch" 51
-$EndSheet
-$Sheet
-S 2475 1400 1000 400 
-U 61EF4CC7
-F0 "Xilinx" 50
-F1 "Xilinx.sch" 50
 $EndSheet
 $Sheet
 S 4875 1450 925  350 
