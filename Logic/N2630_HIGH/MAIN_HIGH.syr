@@ -5,14 +5,14 @@ Parameter TMPDIR set to xst/projnav.tmp
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.03 secs
+Total CPU time to Xst completion: 0.02 secs
  
 --> 
 Parameter xsthdpdir set to xst
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.03 secs
+Total CPU time to Xst completion: 0.02 secs
  
 --> 
 Reading design: MAIN_HIGH.prj
@@ -79,8 +79,7 @@ wysiwyg                            : NO
 *                          HDL Compilation                              *
 =========================================================================
 Compiling vhdl file "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_HIGH/MAIN_HIGH.vhd" in Library work.
-Entity <main_high> compiled.
-Entity <main_high> (Architecture <behavioral>) compiled.
+Architecture behavioral of Entity main_high is up to date.
 
 =========================================================================
 *                     Design Hierarchy Analysis                         *
@@ -187,7 +186,7 @@ Macro Statistics
 =========================================================================
 *                         Low Level Synthesis                           *
 =========================================================================
-WARNING:Xst:2170 - Unit MAIN_HIGH : the following signal(s) form a combinatorial loop: writecycle, ROMCLK_and0000, csauto, csauto_and0000, ROMCLK.
+WARNING:Xst:2170 - Unit MAIN_HIGH : the following signal(s) form a combinatorial loop: csauto_and0000, ROMCLK, writecycle, ROMCLK_and0000, csauto.
 
 Optimizing unit <MAIN_HIGH> ...
   implementation constraint: IOB=auto	 : Mtrien_D_ZORRO2RAM
@@ -209,7 +208,7 @@ Optimizing unit <MAIN_HIGH> ...
   implementation constraint: INIT=r	 : Mtrien_D_2630
 WARNING:Xst:1426 - The value init of the FF/Latch Mtridata_D_2630_1 hinder the constant cleaning in the block MAIN_HIGH.
    You should achieve better results by setting this init to 1.
-WARNING:Xst:2170 - Unit MAIN_HIGH : the following signal(s) form a combinatorial loop: ROMCLK_or000014, ROMCLK.
+WARNING:Xst:2170 - Unit MAIN_HIGH : the following signal(s) form a combinatorial loop: ROMCLK, ROMCLK_or000014.
 
 =========================================================================
 *                           Partition Report                            *
@@ -269,12 +268,12 @@ Cell Usage :
 
 
 Total REAL time to Xst completion: 2.00 secs
-Total CPU time to Xst completion: 2.08 secs
+Total CPU time to Xst completion: 2.15 secs
  
 --> 
 
 
-Total memory usage is 512420 kilobytes
+Total memory usage is 512412 kilobytes
 
 Number of errors   :    0 (   0 filtered)
 Number of warnings :    4 (   0 filtered)

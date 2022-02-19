@@ -79,8 +79,7 @@ wysiwyg                            : NO
 *                          HDL Compilation                              *
 =========================================================================
 Compiling vhdl file "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_LOW/MAIN.vhd" in Library work.
-Entity <main> compiled.
-Entity <main> (Architecture <behavioral>) compiled.
+Architecture behavioral of Entity main is up to date.
 
 =========================================================================
 *                     Design Hierarchy Analysis                         *
@@ -151,8 +150,8 @@ Found no macro
 =========================================================================
 *                         Low Level Synthesis                           *
 =========================================================================
-WARNING:Xst:2170 - Unit MAIN : the following signal(s) form a combinatorial loop: nBOSS_or0000, nBOSS_and0000, nBOSS, nRESET_and0000.
-WARNING:Xst:2170 - Unit MAIN : the following signal(s) form a combinatorial loop: cpudtack, cycledone, dmadelay_and0001, bras, dmadelay, nDSACK0_mux0000, dmacycle.
+WARNING:Xst:2170 - Unit MAIN : the following signal(s) form a combinatorial loop: nBOSS, nRESET_and0000, nBOSS_or0000, nBOSS_and0000.
+WARNING:Xst:2170 - Unit MAIN : the following signal(s) form a combinatorial loop: dmadelay_and0001, bras, dmadelay, nDSACK0_mux0000, dmacycle, cpudtack, cycledone.
 
 Optimizing unit <MAIN> ...
   implementation constraint: INIT=r	 : n_aas80
@@ -213,12 +212,12 @@ Cell Usage :
 
 
 Total REAL time to Xst completion: 2.00 secs
-Total CPU time to Xst completion: 1.95 secs
+Total CPU time to Xst completion: 1.96 secs
  
 --> 
 
 
-Total memory usage is 509896 kilobytes
+Total memory usage is 509876 kilobytes
 
 Number of errors   :    0 (   0 filtered)
 Number of warnings :    2 (   0 filtered)
