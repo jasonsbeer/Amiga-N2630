@@ -1138,7 +1138,7 @@ Entry Wire Line
 	3200 7400 3100 7300
 Entry Bus Bus
 	5400 1000 5300 900 
-Text GLabel 1350 1100 0    50   BiDi ~ 0
+Text GLabel 1350 1100 0    50   Input ~ 0
 EMA(12..0)
 Entry Bus Bus
 	3100 1200 3000 1100
@@ -1969,7 +1969,7 @@ Text GLabel 1300 4300 0    50   Input ~ 0
 EM0CLKE
 Text GLabel 15600 7300 2    50   Input ~ 0
 EM1CLKE
-Text Notes 750  2150 0    118  ~ 0
+Text Notes 7725 10225 0    118  ~ 0
 BANK0 = First 64MB\nBANK1 = Second 64MB
 Wire Bus Line
 	1350 1100 7100 1100
@@ -1995,4 +1995,8 @@ Wire Bus Line
 	9400 900  9400 7600
 Wire Bus Line
 	5400 1000 5400 7600
+Text Notes 950  3200 0    118  ~ 0
+LOW_BYTE
+Text Notes 950  7125 0    118  ~ 0
+HIGH_BYTE
 $EndSCHEMATC

@@ -1987,7 +1987,7 @@ Wire Wire Line
 Wire Wire Line
 	13850 3400 14250 3400
 Text GLabel 15025 3050 2    51   Output ~ 0
-TWOMEG
+TWOMB
 Text GLabel 15025 3225 2    51   Output ~ 0
 B2000
 Text GLabel 15025 3400 2    51   Output ~ 0

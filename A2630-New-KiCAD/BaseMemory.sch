@@ -1834,6 +1834,12 @@ Wire Wire Line
 	12095 4965 14835 4965
 Wire Wire Line
 	10850 8050 12095 8050
+Text GLabel 14835 4860 2    50   Input ~ 0
+_LMBE
+Text GLabel 14835 4965 2    50   Input ~ 0
+_LLBE
+Text Notes 4850 3225 0    118  ~ 0
+HIGH_BYTE
 Wire Bus Line
 	8250 1270 15640 1270
 Wire Bus Line
@@ -1850,8 +1856,6 @@ Wire Bus Line
 	9430 2410 9430 9200
 Wire Bus Line
 	6150 2415 6150 9100
-Text GLabel 14835 4860 2    50   Input ~ 0
-_LMBE
-Text GLabel 14835 4965 2    50   Input ~ 0
-_LLBE
+Text Notes 4850 6600 0    118  ~ 0
+LOW_BYTE
 $EndSCHEMATC
