@@ -8,9 +8,9 @@
 <msg type="info" file="Xst" num="2679" delta="old" >Register &lt;<arg fmt="%s" index="1">nDSACKDIS</arg>&gt; in unit &lt;<arg fmt="%s" index="2">MAIN</arg>&gt; has a constant value of <arg fmt="%s" index="3">0</arg> during circuit operation. The register is replaced by logic.
 </msg>
 
-<msg type="warning" file="Xst" num="2170" delta="old" >Unit <arg fmt="%s" index="1">MAIN</arg> : the following signal(s) form a combinatorial loop: </msg>
+<msg type="warning" file="Xst" num="2170" delta="new" >Unit <arg fmt="%s" index="1">MAIN</arg> : the following signal(s) form a combinatorial loop: </msg>
 
-<msg type="warning" file="Xst" num="2170" delta="old" >Unit <arg fmt="%s" index="1">MAIN</arg> : the following signal(s) form a combinatorial loop: </msg>
+<msg type="warning" file="Xst" num="2170" delta="new" >Unit <arg fmt="%s" index="1">MAIN</arg> : the following signal(s) form a combinatorial loop: </msg>
 
 </messages>
 

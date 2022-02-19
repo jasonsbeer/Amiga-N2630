@@ -49,14 +49,10 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1645235419" xil_pn:in_ck="2701083195002454228" xil_pn:name="TRANEXT_xstsynthesize_xc9500xl" xil_pn:prop_ck="-773881532438733472" xil_pn:start_ts="1645235416">
+    <transform xil_pn:end_ts="1645294839" xil_pn:in_ck="2701083195002454228" xil_pn:name="TRANEXT_xstsynthesize_xc9500xl" xil_pn:prop_ck="-773881532438733472" xil_pn:start_ts="1645294836">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForInputs"/>
-      <status xil_pn:value="OutOfDateForOutputs"/>
-      <status xil_pn:value="InputChanged"/>
-      <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name=".lso"/>
       <outfile xil_pn:name="MAIN_HIGH.lso"/>
       <outfile xil_pn:name="MAIN_HIGH.ngc"/>
