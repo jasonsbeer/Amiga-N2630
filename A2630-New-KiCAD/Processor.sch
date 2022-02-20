@@ -1501,11 +1501,11 @@ Text Label 10225 5200 0    50   ~ 0
 D0
 Text Label 10225 5300 0    50   ~ 0
 D1
-Text Label 10225 5400 0    50   ~ 0
+Text Label 10225 5600 0    50   ~ 0
 D2
 Text Label 10225 5500 0    50   ~ 0
 D3
-Text Label 10225 5600 0    50   ~ 0
+Text Label 10225 5400 0    50   ~ 0
 D4
 Text Label 10225 5700 0    50   ~ 0
 D5
@@ -1529,15 +1529,15 @@ Text Label 10225 6600 0    50   ~ 0
 D14
 Text Label 10225 6700 0    50   ~ 0
 D15
-Text Label 10225 6800 0    50   ~ 0
-D16
 Text Label 10225 6900 0    50   ~ 0
+D16
+Text Label 10225 6800 0    50   ~ 0
 D17
-Text Label 10225 7000 0    50   ~ 0
+Text Label 10225 7200 0    50   ~ 0
 D18
 Text Label 10225 7100 0    50   ~ 0
 D19
-Text Label 10225 7200 0    50   ~ 0
+Text Label 10225 7000 0    50   ~ 0
 D20
 Text Label 10225 7300 0    50   ~ 0
 D21
@@ -2229,6 +2229,69 @@ $EndComp
 Wire Wire Line
 	4225 6400 4225 6750
 NoConn ~ 9725 4750
+Wire Wire Line
+	2250 1675 2250 2025
+$Comp
+L 74xx:74HCT04 U204
+U 7 1 626C9DD2
+P 1850 2175
+AR Path="/61D79EBC/626C9DD2" Ref="U204"  Part="7" 
+AR Path="/6209FB19/626C9DD2" Ref="U?"  Part="7" 
+F 0 "U204" V 1750 2050 50  0000 L CNN
+F 1 "74HCT04" V 1975 2025 50  0000 L CNN
+F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 1850 2175 50  0001 C CNN
+F 3 "https://assets.nexperia.com/documents/data-sheet/74HC_HCT04.pdf" H 1850 2175 50  0001 C CNN
+F 4 "296-31832-1-ND" H 1850 2175 50  0001 C CNN "Digikey"
+	7    1850 2175
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C204
+U 1 1 626C9DD9
+P 2250 2175
+AR Path="/61D79EBC/626C9DD9" Ref="C204"  Part="1" 
+AR Path="/6209FB19/626C9DD9" Ref="C?"  Part="1" 
+F 0 "C204" H 2375 2275 50  0000 L CNN
+F 1 "0.1uF" H 2375 2175 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 2288 2025 50  0001 C CNN
+F 3 "~" H 2250 2175 50  0001 C CNN
+	1    2250 2175
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2250 1675 1850 1675
+Wire Wire Line
+	1850 2675 2250 2675
+Wire Wire Line
+	2250 2675 2250 2325
+$Comp
+L power:GND #PWR0148
+U 1 1 626C9DE3
+P 1850 2675
+AR Path="/61D79EBC/626C9DE3" Ref="#PWR0148"  Part="1" 
+AR Path="/6209FB19/626C9DE3" Ref="#PWR?"  Part="1" 
+F 0 "#PWR0148" H 1850 2425 50  0001 C CNN
+F 1 "GND" H 1855 2502 50  0000 C CNN
+F 2 "" H 1850 2675 50  0001 C CNN
+F 3 "" H 1850 2675 50  0001 C CNN
+	1    1850 2675
+	1    0    0    -1  
+$EndComp
+Connection ~ 1850 2675
+$Comp
+L power:+5V #PWR0177
+U 1 1 626C9DEA
+P 1850 1675
+AR Path="/61D79EBC/626C9DEA" Ref="#PWR0177"  Part="1" 
+AR Path="/6209FB19/626C9DEA" Ref="#PWR?"  Part="1" 
+F 0 "#PWR0177" H 1850 1525 50  0001 C CNN
+F 1 "+5V" H 1865 1848 50  0000 C CNN
+F 2 "" H 1850 1675 50  0001 C CNN
+F 3 "" H 1850 1675 50  0001 C CNN
+	1    1850 1675
+	1    0    0    -1  
+$EndComp
+Connection ~ 1850 1675
 Wire Bus Line
 	10125 8450 15825 8450
 Wire Bus Line

@@ -2034,6 +2034,7 @@ Wire Wire Line
 	13750 7975 13375 7975
 Wire Wire Line
 	13375 7975 13375 7850
+Connection ~ 13750 7975
 Wire Bus Line
 	1350 1100 7100 1100
 Wire Bus Line
@@ -2058,5 +2059,4 @@ Wire Bus Line
 	9400 900  9400 7600
 Wire Bus Line
 	5400 1000 5400 7600
-Connection ~ 13750 7975
 $EndSCHEMATC

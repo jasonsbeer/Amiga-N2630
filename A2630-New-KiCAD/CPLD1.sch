@@ -27,15 +27,15 @@ $EndComp
 Wire Wire Line
 	2000 5625 1650 5625
 Wire Wire Line
-	2000 5825 1650 5825
+	2000 5825 1350 5825
 Wire Wire Line
-	2000 5925 1650 5925
+	2000 5925 1350 5925
 Wire Wire Line
-	2000 6025 1650 6025
+	2000 6025 1350 6025
 Wire Wire Line
-	2000 6125 1650 6125
+	2000 6125 1350 6125
 Wire Wire Line
-	2000 6225 1650 6225
+	2000 6225 1350 6225
 Wire Wire Line
 	2000 6325 1650 6325
 Wire Wire Line
@@ -43,11 +43,11 @@ Wire Wire Line
 Wire Wire Line
 	2000 6525 1650 6525
 Wire Wire Line
-	2000 6625 1650 6625
+	2000 6625 1350 6625
 Wire Wire Line
 	2000 6825 1650 6825
 Wire Wire Line
-	2000 6725 1650 6725
+	2000 6725 1350 6725
 Wire Wire Line
 	4350 5625 4000 5625
 Wire Wire Line
@@ -563,13 +563,13 @@ Text GLabel 4350 6125 2    50   Input ~ 0
 JMODE
 Text GLabel 4350 4125 2    50   Input ~ 0
 _STERM
-Text GLabel 1650 5825 0    50   Input ~ 0
+Text GLabel 1350 5825 0    50   Input ~ 0
 A7M
-Text GLabel 1650 5925 0    50   Input ~ 0
+Text GLabel 1350 5925 0    50   Input ~ 0
 _C1
-Text GLabel 1650 6025 0    50   Input ~ 0
+Text GLabel 1350 6025 0    50   Input ~ 0
 _C3
-Text GLabel 1650 6125 0    50   Input ~ 0
+Text GLabel 1350 6125 0    50   Input ~ 0
 CDAC
 Text GLabel 4350 6225 2    50   Input ~ 0
 _VPA
@@ -579,25 +579,25 @@ Text GLabel 1675 4725 0    50   Input ~ 0
 CONFIGED
 Text GLabel 4350 6725 2    50   Input ~ 0
 RESENB
-Text GLabel 1650 6225 0    50   Input ~ 0
+Text GLabel 1350 6225 0    50   Input ~ 0
 CPUCLK_A
 Text GLabel 1675 4825 0    50   Input ~ 0
 _UDS
 Text GLabel 1675 4925 0    50   Input ~ 0
 _LDS
-Text GLabel 1650 6325 0    50   Output ~ 0
+Text GLabel 1350 6325 0    50   Output ~ 0
 7M
-Text GLabel 1650 6425 0    50   Output ~ 0
+Text GLabel 1350 6425 0    50   Output ~ 0
 _7M
-Text GLabel 1650 6525 0    50   Output ~ 0
+Text GLabel 1350 6525 0    50   Output ~ 0
 SCLK
-Text GLabel 1650 6625 0    50   Output ~ 0
+Text GLabel 1350 6625 0    50   Output ~ 0
 SN7MDIS
-Text GLabel 1650 6725 0    50   Output ~ 0
-_S7MDIS
-Text GLabel 1650 6825 0    50   Output ~ 0
+Text GLabel 1350 6725 0    50   Output ~ 0
+_S7MDISD
+Text GLabel 1350 6825 0    50   Output ~ 0
 DSCLK
-Text GLabel 1650 5625 0    50   Output ~ 0
+Text GLabel 1350 5625 0    50   Output ~ 0
 IPLCLK
 Text GLabel 4350 4725 2    50   Output ~ 0
 _DSACKDIS
@@ -637,7 +637,6 @@ Text GLabel 4350 6025 2    50   Output ~ 0
 _BOSS
 NoConn ~ 4000 3325
 NoConn ~ 2000 6925
-NoConn ~ 2000 5725
 NoConn ~ 2000 5525
 NoConn ~ 2000 5425
 NoConn ~ 2000 5325
@@ -1570,6 +1569,65 @@ F 3 "" H 2475 9650 50  0001 C CNN
 	1    2475 9650
 	1    0    0    -1  
 $EndComp
+$Comp
+L power:+3.3V #PWR0181
+U 1 1 630418F1
+P 2475 9125
+F 0 "#PWR0181" H 2475 8975 50  0001 C CNN
+F 1 "+3.3V" H 2490 9298 50  0000 C CNN
+F 2 "" H 2475 9125 50  0001 C CNN
+F 3 "" H 2475 9125 50  0001 C CNN
+	1    2475 9125
+	1    0    0    -1  
+$EndComp
+Text GLabel 1350 5725 0    50   Input ~ 0
+_S7MDIS
+Wire Wire Line
+	2000 5725 1350 5725
+$Comp
+L Device:R R705
+U 1 1 623E2AA6
+P 1500 6825
+F 0 "R705" V 1450 7025 50  0000 C CNN
+F 1 "47" V 1500 6825 50  0000 C CNN
+F 2 "Resistor_SMD:R_0805_2012Metric" V 1430 6825 50  0001 C CNN
+F 3 "~" H 1500 6825 50  0001 C CNN
+	1    1500 6825
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R R701
+U 1 1 624E185A
+P 1500 6525
+F 0 "R701" V 1450 6725 50  0000 C CNN
+F 1 "47" V 1500 6525 50  0000 C CNN
+F 2 "Resistor_SMD:R_0805_2012Metric" V 1430 6525 50  0001 C CNN
+F 3 "~" H 1500 6525 50  0001 C CNN
+	1    1500 6525
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R R702
+U 1 1 624E1E98
+P 1500 6325
+F 0 "R702" V 1450 6525 50  0000 C CNN
+F 1 "47" V 1500 6325 50  0000 C CNN
+F 2 "Resistor_SMD:R_0805_2012Metric" V 1430 6325 50  0001 C CNN
+F 3 "~" H 1500 6325 50  0001 C CNN
+	1    1500 6325
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R R703
+U 1 1 624E257B
+P 1500 6425
+F 0 "R703" V 1450 6625 50  0000 C CNN
+F 1 "47" V 1500 6425 50  0000 C CNN
+F 2 "Resistor_SMD:R_0805_2012Metric" V 1430 6425 50  0001 C CNN
+F 3 "~" H 1500 6425 50  0001 C CNN
+	1    1500 6425
+	0    1    1    0   
+$EndComp
 Wire Bus Line
 	9650 1400 15500 1400
 Wire Bus Line
@@ -1585,14 +1643,14 @@ Wire Bus Line
 Wire Bus Line
 	14475 1275 14475 5725
 $Comp
-L power:+3.3V #PWR0181
-U 1 1 630418F1
-P 2475 9125
-F 0 "#PWR0181" H 2475 8975 50  0001 C CNN
-F 1 "+3.3V" H 2490 9298 50  0000 C CNN
-F 2 "" H 2475 9125 50  0001 C CNN
-F 3 "" H 2475 9125 50  0001 C CNN
-	1    2475 9125
-	1    0    0    -1  
+L Device:R R704
+U 1 1 62581D0A
+P 1500 5625
+F 0 "R704" V 1450 5825 50  0000 C CNN
+F 1 "47" V 1500 5625 50  0000 C CNN
+F 2 "Resistor_SMD:R_0805_2012Metric" V 1430 5625 50  0001 C CNN
+F 3 "~" H 1500 5625 50  0001 C CNN
+	1    1500 5625
+	0    1    1    0   
 $EndComp
 $EndSCHEMATC
