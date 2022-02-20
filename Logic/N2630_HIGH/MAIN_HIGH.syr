@@ -5,14 +5,14 @@ Parameter TMPDIR set to xst/projnav.tmp
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.02 secs
+Total CPU time to Xst completion: 0.04 secs
  
 --> 
 Parameter xsthdpdir set to xst
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.02 secs
+Total CPU time to Xst completion: 0.04 secs
  
 --> 
 Reading design: MAIN_HIGH.prj
@@ -116,24 +116,24 @@ WARNING:Xst:653 - Signal <EXTSEL> is used but never assigned. This sourceless si
     Found 1-bit register for signal <autoconfigcomplete_2630>.
     Found 1-bit register for signal <autoconfigcomplete_ZORRO2RAM>.
     Found 3-bit register for signal <baseaddress_ZORRO2RAM>.
-    Found 11-bit comparator lessequal for signal <chipram$cmp_le0000> created at line 154.
-    Found 11-bit comparator greatequal for signal <chipregs$cmp_ge0000> created at line 160.
-    Found 11-bit comparator lessequal for signal <chipregs$cmp_le0000> created at line 160.
-    Found 11-bit comparator greatequal for signal <ciaspace$cmp_ge0000> created at line 157.
-    Found 11-bit comparator lessequal for signal <ciaspace$cmp_le0000> created at line 157.
+    Found 11-bit comparator lessequal for signal <chipram$cmp_le0000> created at line 155.
+    Found 11-bit comparator greatequal for signal <chipregs$cmp_ge0000> created at line 161.
+    Found 11-bit comparator lessequal for signal <chipregs$cmp_le0000> created at line 161.
+    Found 11-bit comparator greatequal for signal <ciaspace$cmp_ge0000> created at line 158.
+    Found 11-bit comparator lessequal for signal <ciaspace$cmp_le0000> created at line 158.
     Found 4-bit tristate buffer for signal <D_2630>.
     Found 4-bit tristate buffer for signal <D_ZORRO2RAM>.
-    Found 3-bit adder for signal <fourmeg$addsub0000> created at line 388.
-    Found 3-bit comparator equal for signal <fourmeg$cmp_eq0000> created at line 388.
-    Found 9-bit comparator greatequal for signal <hirom$cmp_ge0000> created at line 182.
-    Found 9-bit comparator lessequal for signal <hirom$cmp_le0000> created at line 182.
-    Found 11-bit comparator greatequal for signal <iospace$cmp_ge0000> created at line 162.
-    Found 11-bit comparator lessequal for signal <iospace$cmp_le0000> created at line 162.
-    Found 4-bit register for signal <Mtridata_D_2630> created at line 262.
-    Found 4-bit register for signal <Mtridata_D_ZORRO2RAM> created at line 263.
-    Found 1-bit register for signal <Mtrien_D_2630> created at line 262.
-    Found 1-bit register for signal <Mtrien_D_ZORRO2RAM> created at line 263.
-    Found 3-bit comparator equal for signal <twomeg$cmp_eq0000> created at line 382.
+    Found 3-bit adder for signal <fourmeg$addsub0000> created at line 389.
+    Found 3-bit comparator equal for signal <fourmeg$cmp_eq0000> created at line 389.
+    Found 9-bit comparator greatequal for signal <hirom$cmp_ge0000> created at line 183.
+    Found 9-bit comparator lessequal for signal <hirom$cmp_le0000> created at line 183.
+    Found 11-bit comparator greatequal for signal <iospace$cmp_ge0000> created at line 163.
+    Found 11-bit comparator lessequal for signal <iospace$cmp_le0000> created at line 163.
+    Found 4-bit register for signal <Mtridata_D_2630> created at line 263.
+    Found 4-bit register for signal <Mtridata_D_ZORRO2RAM> created at line 264.
+    Found 1-bit register for signal <Mtrien_D_2630> created at line 263.
+    Found 1-bit register for signal <Mtrien_D_ZORRO2RAM> created at line 264.
+    Found 3-bit comparator equal for signal <twomeg$cmp_eq0000> created at line 383.
     Summary:
 	inferred   5 D-type flip-flop(s).
 	inferred   1 Adder/Subtractor(s).
@@ -185,8 +185,8 @@ Macro Statistics
 =========================================================================
 *                         Low Level Synthesis                           *
 =========================================================================
-WARNING:Xst:2170 - Unit MAIN_HIGH : the following signal(s) form a combinatorial loop: nONBOARD_or0000, nONBOARD_and0000, nONBOARD.
-WARNING:Xst:2170 - Unit MAIN_HIGH : the following signal(s) form a combinatorial loop: csauto_and0000, ROMCLK_and0000, writecycle, csauto, ROMCLK.
+WARNING:Xst:2170 - Unit MAIN_HIGH : the following signal(s) form a combinatorial loop: nONBOARD, nONBOARD_or0000, nONBOARD_and0000.
+WARNING:Xst:2170 - Unit MAIN_HIGH : the following signal(s) form a combinatorial loop: writecycle, csauto, ROMCLK, csauto_and0000, ROMCLK_and0000.
 
 Optimizing unit <MAIN_HIGH> ...
   implementation constraint: IOB=auto	 : Mtrien_D_ZORRO2RAM
@@ -208,7 +208,7 @@ Optimizing unit <MAIN_HIGH> ...
   implementation constraint: INIT=r	 : Mtrien_D_2630
 WARNING:Xst:1426 - The value init of the FF/Latch Mtridata_D_2630_1 hinder the constant cleaning in the block MAIN_HIGH.
    You should achieve better results by setting this init to 1.
-WARNING:Xst:2170 - Unit MAIN_HIGH : the following signal(s) form a combinatorial loop: ROMCLK_or000014, ROMCLK.
+WARNING:Xst:2170 - Unit MAIN_HIGH : the following signal(s) form a combinatorial loop: ROMCLK, ROMCLK_or000014.
 
 =========================================================================
 *                           Partition Report                            *
@@ -237,17 +237,17 @@ Clock Enable                       : YES
 wysiwyg                            : NO
 
 Design Statistics
-# IOs                              : 66
+# IOs                              : 67
 
 Cell Usage :
-# BELS                             : 437
+# BELS                             : 438
 #      AND2                        : 87
 #      AND3                        : 39
 #      AND4                        : 20
 #      AND5                        : 1
 #      AND8                        : 4
 #      GND                         : 1
-#      INV                         : 215
+#      INV                         : 216
 #      OR2                         : 49
 #      OR3                         : 11
 #      OR4                         : 1
@@ -259,21 +259,21 @@ Cell Usage :
 #      FDPE                        : 2
 # Tri-States                       : 8
 #      BUFE                        : 8
-# IO Buffers                       : 66
+# IO Buffers                       : 67
 #      IBUF                        : 42
 #      IOBUFE                      : 3
-#      OBUF                        : 16
+#      OBUF                        : 17
 #      OBUFE                       : 5
 =========================================================================
 
 
-Total REAL time to Xst completion: 2.00 secs
-Total CPU time to Xst completion: 2.15 secs
+Total REAL time to Xst completion: 3.00 secs
+Total CPU time to Xst completion: 2.33 secs
  
 --> 
 
 
-Total memory usage is 512416 kilobytes
+Total memory usage is 512420 kilobytes
 
 Number of errors   :    0 (   0 filtered)
 Number of warnings :    5 (   0 filtered)

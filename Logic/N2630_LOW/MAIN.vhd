@@ -34,10 +34,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity MAIN is
 	Port 
 	( 
-		--48 pins used
+		--60 pins used
+		A1 : IN STD_LOGIC; --ADDRESS LINE 1
 		nABG : IN STD_LOGIC; --AMIGA BUS GRANT
 		nHALT : IN STD_LOGIC; --_HALT SIGNAL
-		nRESET : IN STD_LOGIC; --_RESET SIGNAL
 		B2000 : IN STD_LOGIC; --IS THIS AN A2000 OR B2000
 		MODE68K : IN STD_LOGIC; --ARE WE IN 68000 MODE (DISABLED)
 		nABGACK : IN STD_LOGIC; --AMIGA BUS GRANT ACK
@@ -53,9 +53,15 @@ entity MAIN is
 		ARnW : IN STD_LOGIC; --68000 READ/WRITE
 		nVPA : IN STD_LOGIC; --68000 VALID PERIPHERAL ADDRESS
 		JMODE : IN STD_LOGIC; --JOHANN'S SPECIAL MODE! WHO IS JOHANN AND WHY DOES HE GET HIS OWN MODE? LUCKY!
-		MEMACCESS : STD_LOGIC; --WE ARE ACCESSING ON BOARD MEMORY
-		CONFIGED : STD_LOGIC; --IS AUTOCONFIG COMPLETE?
+		MEMACCESS : IN STD_LOGIC; --WE ARE ACCESSING ON BOARD MEMORY
+		CONFIGED : IN STD_LOGIC; --IS AUTOCONFIG COMPLETE?
 		RESENB : IN STD_LOGIC; -- RESET ENABLED
+		nCPURESET : IN STD_LOGIC; --THE 68030 RESET SIGNAL
+		CPUCLK : IN STD_LOGIC; --68030 CLOCK
+		nUDS : IN STD_LOGIC; --68000 UPPER DATA STROBE
+		nLDS : IN STD_LOGIC; --68000 LOWER DATA STROBE		
+		nONBOARD : IN STD_LOGIC; --ARE WE USING RESOURCES ON THE 2630?
+		nS7MDIS : IN STD_LOGIC; --STATE MACHINE OUTPUT FROM U503		
 		
 		P7M : INOUT STD_LOGIC; --7MHZ CLOCK
 		n7M : INOUT STD_LOGIC; --7MHZ CLOCK 180 DEGREE		
@@ -67,22 +73,31 @@ entity MAIN is
 		nCYCEND : INOUT STD_LOGIC; --CYCLE END
 		nEXTERN : INOUT STD_LOGIC; --ARE WE ACCESSING EXTERNAL MEMORY OR FPU?
 		SCLK : INOUT STD_LOGIC; --STATE MACHINE CLOCK
-		nMEMSEL : INOUT STD_LOGIC; --ARE WE SELECTING MEMORY ON BOARD? FIRST 4 (8) MEGABYTES
-		SN7MDIS : INOUT STD_LOGIC; --STATE MACHINE CLOCK 
-		nS7MDIS : INOUT STD_LOGIC; --STATE MACHINE CLOCK
+		nMEMSEL : INOUT STD_LOGIC; --ARE WE SELECTING MEMORY ON BOARD? FIRST 4 (8) MEGABYTES		
+		
 		nABR : INOUT STD_LOGIC; -- AMIGA BUS REQUEST
-		nONBOARD : INOUT STD_LOGIC; --ARE WE USING RESOURCES ON THE 2630?
 		nDSACKEN : INOUT STD_LOGIC; --DSACKn ENABLE
 		E : INOUT STD_LOGIC; --6800 E CLOCK
-		nIVMA : INOUT STD_LOGIC; --VALID MEMORY ADDRESS
+		nIVMA : INOUT STD_LOGIC; --VALID MEMORY ADDRESS		
+		nRESET : INOUT STD_LOGIC; --_RESET SIGNAL
+		nASDELAY : INOUT STD_LOGIC;
+		DSEN : INOUT STD_LOGIC; --68000 DATA STROBE ENABLE
+		RnW : INOUT STD_LOGIC; --68030 READ/WRITE
 		
 		nDSCLK : OUT STD_LOGIC; --GATE DSACKn REQUEST
 		IPLCLK : OUT STD_LOGIC; --CLOCK TO LATCH IPL SIGNALS
-		RnW : OUT STD_LOGIC; --68030 READ/WRTIE
-		DSEN : OUT STD_LOGIC; --68000 DATA STROBE ENABLE
 		nDSACKDIS : OUT STD_LOGIC; --DSACK DISABLE
-		nEDTACK : OUT STD_LOGIC;
-		nREGRESET : OUT STD_LOGIC --PART OF RESET LOOP "FIX"
+		nREGRESET : OUT STD_LOGIC; --PART OF RESET LOOP "FIX"
+		nBGDIS : OUT STD_LOGIC; --BUS GRANT DISABLE
+		nDSACK0 : OUT STD_LOGIC; --DSACK0
+		nDSACK1 : INOUT STD_LOGIC; --DSACK1
+		nOVR : OUT STD_LOGIC; --DDTACK Over Ride
+		nADOEH : OUT STD_LOGIC; --ADDRESS OUTPUT ENABLE HIGH
+		nADOEL : OUT STD_LOGIC; --ADDRESS OUTPUT ENABLE LOW
+		ADDIR : OUT STD_LOGIC; --ADDRESS BUS DIRECTION CONTROL
+		DRSEL : OUT STD_LOGIC; --DATA LATCH SELECT		
+		AS180 : OUT STD_LOGIC; --INVERSE ADDRESS STROBE
+		nS7MDISD : OUT STD_LOGIC --INPUT FOR STATE MACHINE U503
 			  
 	);
 end MAIN;
@@ -103,7 +118,20 @@ architecture Behavioral of MAIN is
 	SIGNAL sca : STD_LOGIC_VECTOR ( 3 downto 0 ):= "0000"; --STATE COUNTER
 	SIGNAL sync : STD_LOGIC:='0';
 	SIGNAL esync : STD_LOGIC:='0';
-	
+	SIGNAL cycledone : STD_LOGIC:='0';
+	SIGNAL dmaaccess : STD_LOGIC:='0';
+	SIGNAL dmadtack : STD_LOGIC:='0';
+	SIGNAL dmacycle : STD_LOGIC:='0';	
+	SIGNAL n_aasq : STD_LOGIC:='0';
+	SIGNAL n_aas40 : STD_LOGIC:='0';
+	SIGNAL n_aas80 : STD_LOGIC:='0';
+	SIGNAL dmadelay : STD_LOGIC:='0';
+	SIGNAL cpudtack : STD_LOGIC:='0';
+	SIGNAL cpucycle : STD_LOGIC:='0';
+	SIGNAL bras : STD_LOGIC:='0';
+	SIGNAL dsackdly : STD_LOGIC:='0';
+	SIGNAL edtack : STD_LOGIC:='0';
+	SIGNAL sn7mdis : STD_LOGIC:='0'; --STATE MACHINE CLOCK DISABLE
 
 begin
 	
@@ -140,7 +168,7 @@ begin
 	
 	SCLK <= '1' 
 		WHEN 
-			(CDAC = '1' AND p14m = '1' AND n7M = '0' AND SN7MDIS = '1') OR 
+			(CDAC = '1' AND p14m = '1' AND n7M = '0' AND sn7mdis = '1') OR 
 			(CDAC = '0' AND p14m = '1' AND n7M = '1' AND nS7MDIS = '1') 
 		ELSE '0';
 		
@@ -154,6 +182,18 @@ begin
 	--time critical interrupt code in UNIX and possibly even AmigaOS.
 
 	IPLCLK <= basis7m;
+	
+	-----------------
+	-- Delay Lines --
+	-----------------
+	
+	--TRANSPORT is the keyword for mimicing a delay line
+	--The delay lines on the A2630 are 100ns per tap...part A447-0100-02
+	nASDELAY <= transport nAS after 100 ns;
+	
+	--BRAS		= cpucycle & !CHARGE		# cpucycle & ERAS & !ROFF		# dmacycle		# REFRAS;
+	bras <= '1' WHEN cpucycle = '1' OR dmacycle = '1' ELSE '0';
+	dsackdly <= transport bras after 300ns;
 		
 	----------------------------
 	-- INTERNAL SIGNAL DEFINE --
@@ -163,6 +203,92 @@ begin
 	offboard <= '1' WHEN (nONBOARD = '1' OR nMEMSEL = '1' OR nEXTERN = '1') ELSE '0';
 	cpustate <= FC ( 2 downto 0 );
 	cpuspace <= '1' WHEN cpustate = "111" ELSE '0';
+	
+	
+	--The standard qualification for a DMA memory cycle.  This is much the
+	--same as the CPU cycle, only it obeys the 68000 comparible signals
+	--instead of 68030 signals.  The DMA cycle can DTACK early, since we
+	--know the minimum clock period is more than the DRAM access time. U600
+
+	--dmaaccess	=  BGACK & !REFACK & MEMSEL & AAS;	
+	dmaaccess <= '1' WHEN nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' ELSE '0';
+
+	--dmadtack	= dmaaccess & AAS80;
+	dmadtack <= '1' WHEN dmaaccess = '1' AND n_aas80 = '0' ELSE '0';
+
+	--dmacycle	= dmaaccess & AAS40 & !DMADELAY (was 1);	changed phase of dmadelay
+	dmacycle <= '1' WHEN dmaaccess = '1' AND n_aas40 = '0' AND dmadelay = '0' ELSE '0';
+	
+	--This indicates when a memory cycle is complete.
+	--cycledone	= cpudtack # dmadtack;
+	cycledone <= '1' WHEN cpudtack = '1' OR dmadtack = '1' ELSE '0';
+	
+	
+	--The standard qualification for a CPU memory cycle.  We have to wait
+	--until refresh is arbitrated, and make sure we're selected and it's
+	--not an EXTSELal cycle.
+
+	--cpucycle	= !BGACK & !REFACK & MEMSEL & ASDELAY &  AS & !EXTSEL;
+	--REFACK IS DRAM REFRESH ACK...I DON'T CARE ABOUT DRAM STUFF HERE...AT THE MOMENT
+	cpucycle <= '1' WHEN nBGACK = '1' AND nMEMSEL = '0' AND nASDELAY = '0' AND nAS = '0' AND EXTSEL = '0' ELSE '0';
+
+	--THIS LOOKS KINDA HACKY...THE DSACKDELAY IS A 300ns DELAY OF BRAS...PROBABLY ENOUGH TIME FOR THE RAM TO DO ITS STUFF
+	--THERE'S NO ACTUAL CONFIRMATION, WE JUST ASSUME STUFF HAPPENED...REVIEW THIS LATER FOR APPROPRIATNESS
+	--cpudtack	= cpucycle & DSACKDLY;
+	cpudtack <= '1' WHEN cpucycle = '1' AND dsackdly = '1' ELSE '0';
+	
+	--These next lines make us delayed and synchronized versions of the 
+	--68000 compatible address strobe, used to handle synchronization during DMA. U600
+
+	--AASQ.D		= BGACK & AAS;
+	PROCESS ( CPUCLK ) BEGIN
+		IF RISING_EDGE ( CPUCLK ) THEN
+			IF nBGACK = '0' AND nAAS = '0' THEN		
+				n_aasq <= '1';
+			ELSE 
+				n_aasq <= '0';
+			END IF;	
+		END IF;
+	END PROCESS;
+
+	--AAS40.D		= BGACK & AAS & AASQ;
+	PROCESS ( CPUCLK ) BEGIN
+		IF RISING_EDGE ( CPUCLK ) THEN
+			IF nBGACK = '0' AND nAAS = '0' AND n_aasq = '1' THEN
+				n_aas40 <= '1'; 
+			ELSE 
+				n_aas40 <= '0';
+			END IF;
+		END IF;
+	END PROCESS;
+
+	--AAS80.D		= BGACK & AAS & AASQ & AAS40;
+	PROCESS ( CPUCLK ) BEGIN
+		IF RISING_EDGE ( CPUCLK ) THEN
+			IF nBGACK = '0' AND nAAS = '0' AND  n_aasq = '1' AND n_aas40 = '1' THEN
+				n_aas80 <= '1';
+			ELSE 
+				n_aas80 <= '0';
+			END IF;
+		END IF;
+	END PROCESS;
+	
+	
+	
+	--The purpose of DMADELAY is to hold off RAS during a DMA cycle
+	--until there's a data strobe.  Doubling up on this functional
+	--output, we also use DMADELAY to qualify "cpuread" during non-DMA
+	--cycles.
+
+	--DMADELAY	=  BGACK & !UDS & !LDS		# !BGACK &      CAS & MEMSEL & !REFHOLD		# !BGACK & DMADELAY & MEMSEL & !REFHOLD;
+	--CAS AND REFHOLD ARE RELATED TO DRAM REFRESH...NOT NEEDED AT THIS TIME
+	dmadelay <= '1' 
+		WHEN 
+			( nBGACK = '0' AND nUDS = '1' AND nLDS = '1' ) OR 
+			( nBGACK = '1' AND dmadelay = '1' AND nMEMSEL = '0' ) 
+		ELSE 
+			'0';
+
 	
 	
 	--ESYNC is simply a one clock delay of E. It is used by the counter to do 
@@ -186,7 +312,7 @@ begin
 			END IF;
 		END IF;
 	END PROCESS;
-	
+		
 	sync <= '1' WHEN ESYNC = '0' OR E = '1' ELSE '0'; --sync		= !ESYNC # E;
 	
 	---------------------
@@ -303,21 +429,6 @@ begin
 
 	nEXTERN <= '0' WHEN ( cpuspace = '1' AND nBGACK = '1' ) OR ( EXTSEL = '1' AND nBGACK = '1' ) ELSE '1';
 	
-	---------------
-	-- CYCLE END --
-	---------------
-	
-	--This one marks the end of a slow cycle. U505
-	
-	PROCESS ( SCLK ) BEGIN
-		IF RISING_EDGE (SCLK) THEN
-			IF nDSACKEN = '1' AND nCYCEND = '1' THEN
-				nCYCEND <= '0'; 
-			ELSE
-				nCYCEND <= '1';
-			END IF;
-		END IF;
-	END PROCESS;
 	
 	-----------------------
 	-- READ/WRITE SIGNAL --
@@ -326,23 +437,6 @@ begin
 	--Logic Equations related to the DMA to RAM interface U505
 	
 	RnW <= ARnW WHEN nBGACK = '0' ELSE 'Z';
-	
-	------------------------
-	-- DATA STROBE ENABLE --
-	------------------------
-	
-	--Here we enable data strobe to the A2000.  Are we properly considering
-	--the R/W line here?  EXTERN qualification included here too. U505
-
-	PROCESS ( SCLK ) BEGIN
-		IF RISING_EDGE (SCLK) THEN
-			IF nASEN = '0' AND nEXTERN = '1' AND nCYCEND = '1' THEN
-				DSEN <= '0' ;
-			ELSE
-				DSEN <= '1';
-			END IF;
-		END IF;
-	END PROCESS;
 	
 	-------------------------
 	-- DSACK LATCH DISABLE --
@@ -405,9 +499,9 @@ begin
 			IF 
 				( sca(3) = '0' AND sca(2) = '1' AND sca(1) = '1' AND sca(0) = '1' AND nIVMA = '0' ) 
 			THEN
-				nEDTACK <= '0';
+				edtack <= '1';
 			ELSE
-				nEDTACK <= '1';
+				edtack <= '0';
 			END IF;
 		END IF;
 	END PROCESS;
@@ -532,6 +626,199 @@ begin
 	
 	--RESET		= BOSS & CPURESET & RESENB;
 	nRESET <= '0' WHEN nBOSS = '0' AND nCPURESET ='0' AND RESENB = '1' ELSE '1';
+	
+	-----------------------------
+	-- 68030 BUS GRANT DISABLE --
+	-----------------------------
+	
+	--The following is used to control the external latching of the '030
+	--version of Bus Grant.  Since some '030 cycles can't be seen by the
+	--expansion bus, DMA devices can't know when an '030 cycle may be going
+	--on.  Since THEY must arbitrate /BGACK with this knowledge, it's 
+	--necessary for US to do it instead, since we can see all cycles.  If
+	--ABG has already been asserted, we don't disable it unless we're reset.
+
+	--BGDIS		= !BOSS			# !ABG & DSACK1		# !ABG & AS ;
+	nBGDIS <= '0' WHEN nBOSS = '1' OR ( nABG = '1' AND nDSACK1 = '0' ) OR ( nABG = '1' AND nAS = '0' ) ELSE '1';	
+	
+	------------
+	-- DSACKn --
+	------------
+	
+	--These are the cycle termination signals.  They're really both the
+	--same, and both driven, indicating that we are, in fact, a 32 bit
+	--wide port.  They go hi-Z when we're not selecting memory, so that
+	--other DSACK sources (FPU and the slow bus stuff) can get their
+	--chance to terminate.
+
+	--DSACK0		= cycledone;
+	--DSACK0.OE	= MEMSEL;
+	nDSACK0 <= 'Z' 
+		WHEN 
+			nMEMSEL = '0' 
+		ELSE 
+			'0'
+		WHEN
+			cycledone = '1'
+		ELSE 
+			'1';
+
+	--DSACK1		= cycledone;
+	--DSACK1.OE	= MEMSEL;
+	nDSACK1 <= 'Z' 
+		WHEN 
+			nMEMSEL = '0' 
+		ELSE 
+			'0'
+		WHEN
+			cycledone = '1'
+		ELSE 
+			'1';
+			
+	-------------------------
+	-- GARY DTACK OVERRIDE --
+	-------------------------
+	
+	--The OVR signal must be asserted whenever on-board memory is selected
+	--during a DMA cycle.  It tri-states GARY's DTACK output, allowing
+	--one to be created by our memory logic.
+
+	--OVR		= BGACK & MEMSEL;
+	--OVR.OE		= BGACK & MEMSEL;
+	nOVR <= '0' WHEN nBGACK = '0' AND nMEMSEL = '0' ELSE 'Z';
+	
+	
+	-----------------------------------
+	-- ADDRESS BUS DIRECTION CONTROL --
+	-----------------------------------
+	
+	--This is data direction control
+
+	--!ADDIR		=  BGACK & !RW		# !BGACK &  RW;
+	ADDIR <= '0' --AMIGA WRITING TO 2630
+		WHEN 
+			( nBGACK = '0' AND RnW = '0' ) OR  
+			( nBGACK = '1' AND RnW = '1' ) 
+		ELSE 
+			'1'; --2630 WRITING TO THE AMIGA
+			
+	--------------------------
+	-- ADDRESS ENABLE HI/LO --
+	--------------------------
+	
+	--This handles the data buffer enable, including the 16 to 32 bit data
+	--bus conversion required for DMA cycles.
+
+	--ADOEH		= BOSS &  BGACK &  MEMSEL & AAS & !A1		# BOSS & !BGACK & !MEMSEL &  AS & !ONBOARD & !EXTERN;
+	nADOEH <= '0' 
+		WHEN 
+		( nBOSS = '0' AND nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' AND A1 = '0' ) OR 
+		( nBOSS = '0' AND nBGACK = '1' AND nMEMSEL = '1' AND nAS = '0' AND nONBOARD = '1' AND nEXTERN = '1' ) 
+		ELSE
+			'1';
+
+	--ADOEL		= BOSS &  BGACK &  MEMSEL & AAS &  A1;
+	nADOEL <= '0' WHEN  nBOSS = '0' AND nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' AND A1 = '0'  ELSE '1';
+	
+	
+	----------------------
+	-- AMIGA DATA LATCH --
+	----------------------
+	
+	--This selects when we want data latching, which we in fact want only on
+	--read cycles.
+
+	--DRSEL		= BOSS & !BGACK & RW;
+	DRSEL <= '1' WHEN nBOSS = '0' AND nBGACK = '1' AND RnW = '1' ELSE '0';
+	
+	
+		
+	----------------------------
+	-- INVERSE ADDRESS STROBE --
+	----------------------------
+	
+	--THIS IS FOR THE SRAM LATCH LOGIC.
+	AS180 <= NOT nAS;
+	
+	
+	-----------------
+	-- BUS CONTROL --
+	-----------------
+	
+	--This one disables the rising edge clock.  It's latched externally.
+	--I qualify with EXTERN as well, to help make sure this state machine
+	--doesn't get started for special cycles.  Since ASEN isn't qualified
+	--externally with EXTERN, everywhere here it's used, it must be 
+	--qualified with EXTERN too. U505
+
+	--S7MDIS		= !DSEN & ASEN & !EXTERN & DSACKEN;
+	nS7MDISD <= '0' WHEN DSEN = '0' AND nASEN = '0' AND nEXTERN = '1' AND nDSACKEN = '0' ELSE '1';
+	
+	
+	--This one disables the falling edge clock.  This is similarly qualified
+	--with EXTERN. U505
+
+	--S_7MDIS.D	= ASEN & !EXTERN & CYCEND;
+	PROCESS ( SCLK ) BEGIN
+		IF RISING_EDGE (SCLK) THEN
+			IF 
+				nASEN = '0' AND nEXTERN = '1' AND nCYCEND = '0'
+			THEN
+				sn7mdis <= '1';
+			ELSE
+				sn7mdis <= '0';
+			END IF;
+		END IF;
+	END PROCESS;
+	
+	
+	--This one marks the end of a slow cycle. U505
+	
+	--!CYCEND.D	= !DSACKEN & CYCEND;	
+	PROCESS ( SCLK ) BEGIN
+		IF RISING_EDGE (SCLK) THEN
+			IF nDSACKEN = '1' AND nCYCEND = '1' THEN
+				nCYCEND <= '0'; 
+			ELSE
+				nCYCEND <= '1';
+			END IF;
+		END IF;
+	END PROCESS;
+	
+	--This creates the DSACK go-ahead for all slow, 16 bit cycles.  These are,
+	--in order, A2000 DTACK, 68xx/65xx emulation DTACK, and ROM or config
+	--register access. U505
+
+	--!DSACKEN.D	= !DSEN & CYCEND & !EXTERN &   DTACK
+	--		# !DSEN & CYCEND & !EXTERN &  EDTACK
+	--		# !DSEN & CYCEND & !EXTERN & ONBOARD;
+	PROCESS ( SCLK ) BEGIN
+		IF RISING_EDGE (SCLK) THEN
+			IF 
+				(DSEN = '0' AND nEXTERN = '1' AND nCYCEND = '1' AND nDTACK = '0') OR
+				(DSEN = '0' AND nEXTERN = '1' AND nCYCEND = '1' AND edtack = '1') OR --note: edtack inverted from original
+				(DSEN = '0' AND nEXTERN = '1' AND nCYCEND = '1' AND nONBOARD = '0')
+			THEN
+				nDSACKEN <= '1';
+			ELSE
+				nDSACKEN <= '0';
+			END IF;
+		END IF;
+	END PROCESS;
+	
+	
+	--Here we enable data strobe to the A2000.  Are we properly considering
+	--the R/W line here?  EXTERN qualification included here too. U505
+
+	PROCESS ( SCLK ) BEGIN
+		IF RISING_EDGE (SCLK) THEN
+			IF nASEN = '0' AND nEXTERN = '1' AND nCYCEND = '1' THEN
+				DSEN <= '0' ;
+			ELSE
+				DSEN <= '1';
+			END IF;
+		END IF;
+	END PROCESS;
 
 end Behavioral;
 

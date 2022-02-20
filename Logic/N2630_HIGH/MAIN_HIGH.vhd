@@ -88,6 +88,7 @@ entity MAIN_HIGH is
 		nLDS : OUT STD_LOGIC; --68000 LOWER DATA STROBE
 		ARnW : OUT STD_LOGIC --68000 READ/WRITE SIGNAL
 		
+		
 		);
 		
 end MAIN_HIGH;
@@ -643,6 +644,7 @@ begin
 	
 	--ONBOARD		= icsrom 		# icsauto		# ONBOARD & AS;
 	nONBOARD <= '0' WHEN icsrom = '1' OR icsauto = '1' OR ( nONBOARD = '0' AND nAS = '0' ) ELSE '1';
+
 
 
 end Behavioral;

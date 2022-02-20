@@ -4,3 +4,4 @@ xst -intstyle ise -ifn "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_H
 xst -intstyle ise -ifn "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_HIGH/MAIN_HIGH.xst" -ofn "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_HIGH/MAIN_HIGH.syr" 
 xst -intstyle ise -ifn "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_HIGH/MAIN_HIGH.xst" -ofn "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_HIGH/MAIN_HIGH.syr" 
 xst -intstyle ise -ifn "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_HIGH/MAIN_HIGH.xst" -ofn "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_HIGH/MAIN_HIGH.syr" 
+xst -intstyle ise -ifn "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_HIGH/MAIN_HIGH.xst" -ofn "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_HIGH/MAIN_HIGH.syr" 
