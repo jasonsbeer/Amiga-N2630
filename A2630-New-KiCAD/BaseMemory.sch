@@ -1840,6 +1840,11 @@ Text GLabel 14835 4965 2    50   Input ~ 0
 _LLBE
 Text Notes 4850 3225 0    118  ~ 0
 HIGH_BYTE
+Text Notes 4850 6600 0    118  ~ 0
+LOW_BYTE
+Text GLabel 1000 8350 0    50   Input ~ 0
+AS
+NoConn ~ 13975 3325
 Wire Bus Line
 	8250 1270 15640 1270
 Wire Bus Line
@@ -1856,6 +1861,4 @@ Wire Bus Line
 	9430 2410 9430 9200
 Wire Bus Line
 	6150 2415 6150 9100
-Text Notes 4850 6600 0    118  ~ 0
-LOW_BYTE
 $EndSCHEMATC
