@@ -1501,11 +1501,11 @@ Text Label 10225 5200 0    50   ~ 0
 D0
 Text Label 10225 5300 0    50   ~ 0
 D1
-Text Label 10225 5400 0    50   ~ 0
+Text Label 10225 5600 0    50   ~ 0
 D2
 Text Label 10225 5500 0    50   ~ 0
 D3
-Text Label 10225 5600 0    50   ~ 0
+Text Label 10225 5400 0    50   ~ 0
 D4
 Text Label 10225 5700 0    50   ~ 0
 D5
@@ -1513,9 +1513,9 @@ Text Label 10225 5800 0    50   ~ 0
 D6
 Text Label 10225 5900 0    50   ~ 0
 D7
-Text Label 10225 6000 0    50   ~ 0
-D8
 Text Label 10225 6100 0    50   ~ 0
+D8
+Text Label 10225 6000 0    50   ~ 0
 D9
 Text Label 10225 6200 0    50   ~ 0
 D10
@@ -1754,9 +1754,9 @@ Text Label 6525 7500 2    50   ~ 0
 A12
 Text Label 6525 7600 2    50   ~ 0
 A13
-Text Label 6525 7700 2    50   ~ 0
-A14
 Text Label 6525 7800 2    50   ~ 0
+A14
+Text Label 6525 7700 2    50   ~ 0
 A15
 Text Label 6525 7900 2    50   ~ 0
 A16
@@ -1770,9 +1770,9 @@ Text Label 6525 8300 2    50   ~ 0
 A20
 Text Label 6525 8400 2    50   ~ 0
 A21
-Text Label 6525 8500 2    50   ~ 0
-A22
 Text Label 6525 8600 2    50   ~ 0
+A22
+Text Label 6525 8500 2    50   ~ 0
 A23
 Text Label 6525 8700 2    50   ~ 0
 A24

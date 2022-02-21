@@ -2083,6 +2083,19 @@ Wire Wire Line
 Connection ~ 14450 3750
 Wire Wire Line
 	14450 3750 15025 3750
+Text Notes 12300 9225 0    118  ~ 0
+Seein' all the sights, many crazy nights
+$Comp
+L power:+3.3V #PWR0142
+U 1 1 627D366E
+P 14050 2425
+F 0 "#PWR0142" H 14050 2275 50  0001 C CNN
+F 1 "+3.3V" H 14065 2598 50  0000 C CNN
+F 2 "" H 14050 2425 50  0001 C CNN
+F 3 "" H 14050 2425 50  0001 C CNN
+	1    14050 2425
+	1    0    0    -1  
+$EndComp
 Wire Bus Line
 	1250 3825 1250 4075
 Wire Bus Line
@@ -2097,17 +2110,4 @@ Wire Bus Line
 	6250 2575 6250 10225
 Wire Bus Line
 	8100 2575 8100 10025
-Text Notes 12300 9225 0    118  ~ 0
-Seein' all the sights, many crazy nights
-$Comp
-L power:+3.3V #PWR0142
-U 1 1 627D366E
-P 14050 2425
-F 0 "#PWR0142" H 14050 2275 50  0001 C CNN
-F 1 "+3.3V" H 14065 2598 50  0000 C CNN
-F 2 "" H 14050 2425 50  0001 C CNN
-F 3 "" H 14050 2425 50  0001 C CNN
-	1    14050 2425
-	1    0    0    -1  
-$EndComp
 $EndSCHEMATC

@@ -790,7 +790,7 @@ Wire Notes Line
 Text Notes 1850 4625 0    118  ~ 0
 DSACK FOR 16 BIT CYCLES
 Text GLabel 12125 3225 2    51   Input ~ 0
-_EXTSEL
+EXTSEL
 Wire Wire Line
 	12125 3225 11825 3225
 $Comp
@@ -889,8 +889,8 @@ Text Notes 11400 1550 0    118  ~ 0
 PULL UP/DOWN
 Text Notes 12350 9625 0    236  ~ 0
 DISCRETE LOGIC BITS
-Wire Bus Line
-	2375 6950 2375 7975
 Text Notes 12325 9150 0    118  ~ 0
 Summer turns me upside down
+Wire Bus Line
+	2375 6950 2375 7975
 $EndSCHEMATC
