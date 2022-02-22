@@ -313,7 +313,7 @@ Entry Wire Line
 Wire Bus Line
 	1250 3825 850  3825
 Text GLabel 850  3825 0    39   BiDi ~ 0
-_IPL(2:0)
+_IPL[2..0]
 Wire Wire Line
 	2525 3675 2700 3675
 Wire Wire Line

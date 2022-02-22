@@ -1197,7 +1197,7 @@ Entry Wire Line
 Wire Bus Line
 	10125 650  15875 650 
 Text GLabel 15875 650  2    50   Input ~ 0
-_IPL(2:0)
+_IPL[2:0]
 Text Label 10025 3300 2    50   ~ 0
 _IPL2
 Text Label 10025 3400 2    50   ~ 0
