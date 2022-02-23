@@ -3617,6 +3617,11 @@
     (effects (font (size 2.9972 2.9972)) (justify left bottom))
     (uuid 201a8082-80bc-49cb-a857-a9c917ee8418)
   )
+  (text "This is Zorro 2 memory, so it is \nalways treated as 16 bit, even \nthough it is 32 bits wide."
+    (at 50.8 45.085 0)
+    (effects (font (size 3 3)) (justify left bottom))
+    (uuid 2510affd-1515-4375-87e9-04c18ba8dd82)
+  )
   (text "BANK1" (at 273.558 48.387 180)
     (effects (font (size 3.9878 3.9878)) (justify right bottom))
     (uuid 3aec5e23-e675-4bcf-9a9e-48cb59d51927)
