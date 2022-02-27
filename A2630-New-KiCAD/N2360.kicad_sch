@@ -107,9 +107,6 @@
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-0000622ea597"
       (reference "#PWR01") (unit 1) (value "+5V") (footprint "")
     )
-    (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000062340d28"
-      (reference "#PWR02") (unit 1) (value "+5V") (footprint "")
-    )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-00006233005b"
       (reference "#PWR03") (unit 1) (value "+5V") (footprint "")
     )
@@ -394,6 +391,9 @@
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/10f15734-dbe1-44ce-a6ae-5009cd96020e"
       (reference "#PWR0193") (unit 1) (value "GND") (footprint "")
+    )
+    (path "/00000000-0000-0000-0000-000061df74a0/862404ad-623e-4a2f-ae2c-79c39541eefe"
+      (reference "#PWR0194") (unit 1) (value "+5V") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061fbe594/00000000-0000-0000-0000-0000641c535c"
       (reference "#U409") (unit 1) (value "74LS74") (footprint "")
@@ -743,9 +743,6 @@
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-0000622676b2"
       (reference "R213") (unit 1) (value "47") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
-    (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-0000627ed51a"
-      (reference "R215") (unit 1) (value "47") (footprint "Resistor_SMD:R_0805_2012Metric")
-    )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-000062255720"
       (reference "R216") (unit 1) (value "47") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
@@ -787,9 +784,6 @@
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000062330055"
       (reference "R301") (unit 1) (value "470") (footprint "Resistor_SMD:R_0805_2012Metric")
-    )
-    (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000062340d22"
-      (reference "R302") (unit 1) (value "3.3K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000061f83b73"
       (reference "R500") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")

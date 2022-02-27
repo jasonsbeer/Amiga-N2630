@@ -380,9 +380,7 @@
         "microvia_drill": 0.1,
         "name": "PWR",
         "nets": [
-          "+3V3",
-          "+5V",
-          "GND"
+          "+3V3"
         ],
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
