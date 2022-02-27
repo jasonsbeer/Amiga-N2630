@@ -4033,7 +4033,7 @@
     (uuid 1c6c46b2-dd9e-430f-85e9-621815ceca94)
   )
   (text "This is Zorro 3 memory, so it is always\ntreated as 32 bit memory and cannot be \nused by the Amiga 2000 chip set and cannot\nbe used by anything on the Zoroo 2 bus.\nIt can only be used by the 68030."
-    (at 274.955 153.67 0)
+    (at 274.955 155.575 0)
     (effects (font (size 3 3)) (justify left bottom))
     (uuid 59ad4c52-a1db-429b-ab90-2403dcce7c01)
   )
@@ -4072,7 +4072,7 @@
     (uuid c0aff334-d903-4487-bb18-6ea39aefe02b)
   )
   (text "JN Notes: put row address on the EMA bus \nand signal RAS. This is 68030 addresses A14:2. \nPut column address on the EMA bus and signal \nCAS. These are 68030 addresses A24:15."
-    (at 275.59 139.7 0)
+    (at 274.32 132.08 0)
     (effects (font (size 2.9972 2.9972)) (justify left bottom))
     (uuid c35e417c-496e-4303-b5c4-321c3cede22a)
   )
