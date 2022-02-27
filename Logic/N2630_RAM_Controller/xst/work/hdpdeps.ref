@@ -1,7 +1,0 @@
-V3 3
-EN work/RAM_Controller_Main 0 \
-      FL /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd \
-      PB ieee/std_logic_1164 1381692176
-AR work/RAM_Controller_Main/Behavioral 0 \
-      FL /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_RAM_Controller/RAM_Controller_Main.vhd \
-      EN work/RAM_Controller_Main 0
