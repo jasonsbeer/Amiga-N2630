@@ -8,5 +8,20 @@
 <msg type="warning" file="Cpld" num="0" delta="new" >Unable to retrieve the path to the iSE Project Repository. Will use the default filename of &apos;<arg fmt="%s" index="1">MAIN_HIGH.ise</arg>&apos;.
 </msg>
 
+<msg type="warning" file="Cpld" num="0" delta="new" >The signal(s) &apos;<arg fmt="%s" index="1">nONBOARD_or0000</arg>&apos; are in combinational feedback loops.
+These signals may cause hazards/glitches. Apply the NOREDUCE parameter to the hazard reduction circuitry.
+Timing analysis of paths involving this node may be inaccurate or incomplete.
+</msg>
+
+<msg type="warning" file="Cpld" num="0" delta="new" >The signal(s) &apos;<arg fmt="%s" index="1">csauto</arg>&apos; are in combinational feedback loops.
+These signals may cause hazards/glitches. Apply the NOREDUCE parameter to the hazard reduction circuitry.
+Timing analysis of paths involving this node may be inaccurate or incomplete.
+</msg>
+
+<msg type="warning" file="Cpld" num="0" delta="new" >The signal(s) &apos;<arg fmt="%s" index="1">ROMCLK_or000014</arg>&apos; are in combinational feedback loops.
+These signals may cause hazards/glitches. Apply the NOREDUCE parameter to the hazard reduction circuitry.
+Timing analysis of paths involving this node may be inaccurate or incomplete.
+</msg>
+
 </messages>
 
