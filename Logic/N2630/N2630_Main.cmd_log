@@ -1,1 +1,0 @@
-xst -intstyle ise -ifn "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.xst" -ofn "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630/N2630_Main.syr" 
