@@ -4066,11 +4066,6 @@
     (effects (font (size 3.9878 3.9878)) (justify left bottom))
     (uuid 9c8b409b-0d1b-49e5-8fed-acd83e0e8b3e)
   )
-  (text "TRIVIA:\nA31..24 is the autoconfig base address\nA1..0 are part of the sizing system for mem\nThis leaves A23..A2 for actual addressing...22 bits.\nThis is why the Amiga can only address 128 megabytes!"
-    (at 144.78 37.465 0)
-    (effects (font (size 3 3)) (justify left bottom))
-    (uuid c0aff334-d903-4487-bb18-6ea39aefe02b)
-  )
   (text "JN Notes: put row address on the EMA bus \nand signal RAS. This is 68030 addresses A14:2. \nPut column address on the EMA bus and signal \nCAS. These are 68030 addresses A24:15."
     (at 274.32 132.08 0)
     (effects (font (size 2.9972 2.9972)) (justify left bottom))
