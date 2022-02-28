@@ -398,6 +398,9 @@
     (path "/00000000-0000-0000-0000-00006209fb19/ef6b4ed0-26e7-4827-a8de-aca0eb91f584"
       (reference "#PWR0196") (unit 1) (value "+5V") (footprint "")
     )
+    (path "/00000000-0000-0000-0000-00006209fb19/5a0c56ec-d2cd-45d9-afca-91a6c589a932"
+      (reference "#PWR0197") (unit 1) (value "GND") (footprint "")
+    )
     (path "/00000000-0000-0000-0000-000061fbe594/00000000-0000-0000-0000-0000641c535c"
       (reference "#U409") (unit 1) (value "74LS74") (footprint "")
     )
@@ -614,6 +617,12 @@
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-000062d87b6a"
       (reference "CX2") (unit 1) (value "0.01uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
+    (path "/00000000-0000-0000-0000-00006209fb19/79b37244-453c-419e-827a-d86acfb905e5"
+      (reference "H1") (unit 1) (value "MountingHole") (footprint "MountingHole:MountingHole_3.2mm_M3_Pad")
+    )
+    (path "/00000000-0000-0000-0000-00006209fb19/c8ec97d1-6f9d-43f7-a8e3-7542ac675216"
+      (reference "H2") (unit 1) (value "MountingHole") (footprint "MountingHole:MountingHole_3.2mm_M3_Pad")
+    )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-00006329f8b1"
       (reference "J301") (unit 1) (value "Jumper_NO_Small") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
     )
@@ -769,9 +778,6 @@
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-0000626f3b09"
       (reference "R220") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
-    )
-    (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-0000626f3d75"
-      (reference "R221") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-0000626f40d6"
       (reference "R222") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
