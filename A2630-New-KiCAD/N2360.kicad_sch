@@ -104,6 +104,12 @@
   )
 
   (symbol_instances
+    (path "/00000000-0000-0000-0000-0000634ecc15/bcbaec3b-6201-42a0-a2ed-6d49ba16df70"
+      (reference "#PWR01") (unit 1) (value "GND") (footprint "")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/e47bd435-c3b4-44a9-8e6b-55f639342c94"
+      (reference "#PWR02") (unit 1) (value "GND") (footprint "")
+    )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-00006233005b"
       (reference "#PWR03") (unit 1) (value "+5V") (footprint "")
     )
@@ -401,6 +407,12 @@
     (path "/00000000-0000-0000-0000-00006209fb19/5a0c56ec-d2cd-45d9-afca-91a6c589a932"
       (reference "#PWR0197") (unit 1) (value "GND") (footprint "")
     )
+    (path "/00000000-0000-0000-0000-0000634ecc15/98ffd6dd-e525-49cb-960f-a29469bbd72f"
+      (reference "#PWR0198") (unit 1) (value "GND") (footprint "")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/d177cbdb-f334-4a94-be86-2c749b37427a"
+      (reference "#PWR0199") (unit 1) (value "+3.3V") (footprint "")
+    )
     (path "/00000000-0000-0000-0000-000061fbe594/00000000-0000-0000-0000-0000641c535c"
       (reference "#U409") (unit 1) (value "74LS74") (footprint "")
     )
@@ -520,6 +532,18 @@
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/30e93508-e7ef-429e-ad99-6651fd56286c"
       (reference "C417") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/e3a5749a-06b1-4652-8d14-c1188ceff788"
+      (reference "C418") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/f5409630-eb22-4a5f-83e0-a76f7645f97a"
+      (reference "C419") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/92b829ac-b135-4d17-a413-fe66f5f0b73a"
+      (reference "C420") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/94826e71-e4c9-47cd-9978-67efa513fa1e"
+      (reference "C421") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/2b44a432-723e-4bcd-9d33-62c197c1f734"
       (reference "C502") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
@@ -1003,6 +1027,30 @@
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/9537998b-c4b4-489e-bdb1-b4bc624745f7"
       (reference "U417") (unit 2) (value "74LVC257") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/57f4018b-9e60-4e6b-bc95-50a3b70d5726"
+      (reference "U418") (unit 1) (value "74LVC245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/884f2e81-5b2e-4f4a-8929-eda679b663e5"
+      (reference "U418") (unit 2) (value "74LVC245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/e5a055f7-b7f2-4022-b164-b6aac8cb6431"
+      (reference "U419") (unit 1) (value "74LVC245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/d3ce13c0-a804-4890-99f8-28f0224dd662"
+      (reference "U419") (unit 2) (value "74LVC245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/92fd1fa0-a3a0-4c34-b693-5aca3dff18b1"
+      (reference "U420") (unit 1) (value "74LVC245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/91dc4404-4a99-41f4-8167-b962655639f9"
+      (reference "U420") (unit 2) (value "74LVC245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/085afd9a-ec75-457b-be29-980c9da43d8d"
+      (reference "U421") (unit 1) (value "74LVC245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/52f84643-bcc8-4230-a7f9-6e52d8b01b6e"
+      (reference "U421") (unit 2) (value "74LVC245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000061f07a23"
       (reference "U502") (unit 1) (value "74HCT74") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
