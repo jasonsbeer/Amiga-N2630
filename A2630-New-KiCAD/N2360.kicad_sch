@@ -533,6 +533,18 @@
     (path "/00000000-0000-0000-0000-0000634ecc15/94826e71-e4c9-47cd-9978-67efa513fa1e"
       (reference "C421") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
+    (path "/00000000-0000-0000-0000-000061d9c8dc/47237a30-5dd2-4ae9-9ffc-945423ba4f5f"
+      (reference "C422") (unit 1) (value "0.33uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
+    )
+    (path "/00000000-0000-0000-0000-000061d9c8dc/32e8a92b-ca4b-4888-875a-ea6a5ff2bee6"
+      (reference "C423") (unit 1) (value "0.33uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
+    )
+    (path "/00000000-0000-0000-0000-000061d9c8dc/06f73858-17be-43ec-98e9-f8ccedc5f8f3"
+      (reference "C424") (unit 1) (value "0.33uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
+    )
+    (path "/00000000-0000-0000-0000-000061d9c8dc/ef7b9b8f-d3ec-4981-a7e3-9f6358117437"
+      (reference "C425") (unit 1) (value "0.33uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
+    )
     (path "/00000000-0000-0000-0000-0000634ecc15/2b44a432-723e-4bcd-9d33-62c197c1f734"
       (reference "C502") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
@@ -562,6 +574,15 @@
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-00006353d849"
       (reference "C606") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
+    )
+    (path "/00000000-0000-0000-0000-000062089831/7fe9de19-9c81-40a2-a5bf-845f55fe22c0"
+      (reference "C607") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
+    )
+    (path "/00000000-0000-0000-0000-000062089831/4c7ad4ba-56f6-4446-89aa-49d479d65d06"
+      (reference "C608") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
+    )
+    (path "/00000000-0000-0000-0000-000062089831/7598669e-0bc4-4405-9509-d610c7cd9c0b"
+      (reference "C609") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-000061ed7ad8"
       (reference "C700") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
