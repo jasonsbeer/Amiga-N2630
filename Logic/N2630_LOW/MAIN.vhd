@@ -300,8 +300,8 @@ begin
 	--as to make it automatically synced.
 
 	--ESYNC.D		= E & B2000;
-	PROCESS ( N7M ) BEGIN
-		IF RISING_EDGE (N7M) THEN
+	PROCESS ( n7M ) BEGIN
+		IF RISING_EDGE (n7M) THEN
 			IF 
 				E = '1' AND B2000 = '1'
 			THEN
@@ -320,7 +320,12 @@ begin
 
 	--ABR is the Amiga bus request output. This signal is only asserted by 
 	--this PAL on powerup in order to get the bus so that we can assert BOSS, 
-	--and it won't be asserted if MODE68K is asserted.
+	--and it won't be asserted if MODE68K is asserted. U305
+	
+	--ABR		= !RESET & AAS & !BOSS & !MODE68K
+	--	      # !RESET & ABR & !BOSS & !MODE68K;
+
+	--ABR.OE		= !RESET & !BOSS & !MODE68K;
 
 	nABR <= '0' 
 		WHEN 
@@ -353,9 +358,9 @@ begin
 	nBOSS <= '0' 
 		WHEN 
 			( nABG = '0' AND nAAS ='1' AND nDTACK = '1' AND nHALT = '1' AND nRESET = '1' AND B2000 = '1' AND MODE68K = '0' ) OR 
-			(nHALT = '1' AND MODE68K = '0' AND nBOSS = '0' ) OR 
-			(nRESET = '1' AND MODE68K = '0' AND nBOSS = '0' ) OR 
-			(B2000 = '0' AND nHALT ='1' AND nRESET ='1')
+			( nHALT = '1' AND MODE68K = '0' AND nBOSS = '0' ) OR 
+			( nRESET = '1' AND MODE68K = '0' AND nBOSS = '0' ) OR 
+			( B2000 = '0' AND nHALT ='1' AND nRESET ='1')
 		ELSE
 			'1';
 			
