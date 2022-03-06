@@ -320,6 +320,9 @@
     (path "/00000000-0000-0000-0000-000061fbe594/06ecb78a-76fd-442a-be25-69a5b84d8065"
       (reference "#PWR0168") (unit 1) (value "GND") (footprint "")
     )
+    (path "/00000000-0000-0000-0000-0000634ecc15/a6fcb2d5-12c4-437e-817e-bc885d135a71"
+      (reference "#PWR0169") (unit 1) (value "GND") (footprint "")
+    )
     (path "/00000000-0000-0000-0000-000061d9c8dc/00000000-0000-0000-0000-0000625c8363"
       (reference "#PWR0171") (unit 1) (value "GND") (footprint "")
     )
@@ -466,6 +469,9 @@
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-00006353b771"
       (reference "C300") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/3bedb728-3fb7-4bdf-bce2-06d807327719"
+      (reference "C303") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/262fecdf-f8c2-4b86-8165-e1d32e400927"
       (reference "C307") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
@@ -631,6 +637,9 @@
     )
     (path "/00000000-0000-0000-0000-00006209fb19/00000000-0000-0000-0000-00006276395d"
       (reference "C803") (unit 1) (value "47uF") (footprint "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm")
+    )
+    (path "/00000000-0000-0000-0000-00006209fb19/f34616ec-ece7-440d-9ebd-41d280cb96d2"
+      (reference "C804") (unit 1) (value "47uF") (footprint "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm")
     )
     (path "/00000000-0000-0000-0000-000062089831/00000000-0000-0000-0000-00006215b057"
       (reference "CN1") (unit 1) (value "CPLD0") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical")
@@ -850,6 +859,9 @@
     )
     (path "/00000000-0000-0000-0000-000061df74a0/c6feeb1d-1fc3-447b-bfe2-d97229c624fd"
       (reference "R306") (unit 1) (value "3.3k") (footprint "Resistor_SMD:R_0805_2012Metric")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/d18cdc92-1e08-497e-ac59-27ca632f9207"
+      (reference "R307") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000061f83b73"
       (reference "R500") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
