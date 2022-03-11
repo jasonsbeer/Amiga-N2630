@@ -76,9 +76,9 @@ entity MAIN_HIGH is
 		nCSROM : OUT STD_LOGIC; --ROM CHIP SELECT		
 		--nRAMCLK : OUT STD_LOGIC --CLOCK FOR U302
 		nOE0 : OUT STD_LOGIC; --SRAM OUTPUT ENABLE BANK 0
-		nOE1 : OUT STD_LOGIC; --SRAM OUTPUT ENABLE BANK 1
+		--nOE1 : OUT STD_LOGIC; --SRAM OUTPUT ENABLE BANK 1
 		nWE0 : OUT STD_LOGIC; --SRAM WRITE ENABLE BANK 0
-		nWE1 : OUT STD_LOGIC; --SRAM WRITE ENABLE BANK 1
+		--nWE1 : OUT STD_LOGIC; --SRAM WRITE ENABLE BANK 1
 		nUUBE : OUT STD_LOGIC; --UPPER UPPER BYTE ENABLE
 		nUMBE : OUT STD_LOGIC; --UPPER MIDDLE BYTE ENABLE
 		nLMBE : OUT STD_LOGIC; --LOWER MIDDLE BYTE ENABLE
@@ -86,8 +86,8 @@ entity MAIN_HIGH is
 		nMEMLOCK : OUT STD_LOGIC; --LOCK MEMORY DURING ACCESS FOR STATE MACHINE
 		nUDS : OUT STD_LOGIC; --68000 UPPER DATA STROBE
 		nLDS : OUT STD_LOGIC; --68000 LOWER DATA STROBE
-		ARnW : OUT STD_LOGIC --68000 READ/WRITE SIGNAL
-		
+		ARnW : OUT STD_LOGIC; --68000 READ/WRITE SIGNAL
+		MEMACCESS : OUT STD_LOGIC --LOGIC HIGH WHEN WE ARE ACCESSING Z2 RAM		
 		
 		);
 		
@@ -381,11 +381,11 @@ begin
 		ELSE
 			'0';
 			
-	fourmeg <= '1'
-		WHEN
-			AH(23 downto 21) = baseaddress_ZORRO2RAM AND AH(19) = '1' AND TWOMB = '1' AND autoconfigcomplete_ZORRO2RAM = '1' --A19 IS HIGH IN THE SECOND 2 MEGS
-		ELSE
-			'0';	
+	--fourmeg <= '1'
+	--	WHEN
+	--		AH(23 downto 21) = baseaddress_ZORRO2RAM AND AH(19) = '1' AND TWOMB = '1' AND autoconfigcomplete_ZORRO2RAM = '1' --A19 IS HIGH IN THE SECOND 2 MEGS
+	--	ELSE
+	--		'0';	
 			
 	--	EIGHTMEG <= '1'
 	--		WHEN
@@ -393,11 +393,15 @@ begin
 	--		ELSE
 	--			'0';
 	
+	--We need to signal the U600 if the address space is pointing at our zorro 2 ram
+	--This is a very simple implementation and will need to be expanded in the final version with 8MB zorro 2 ram
+	MEMACCESS <= '1' WHEN twomeg = '1' ELSE '0';
+	
 	--OUTPUT ENABLE OR WRITE ENABLE DEPENDING ON THE CPU REQUEST
 	nOE0 <= '0' WHEN RnW = '1' AND twomeg = '1' ELSE '1';
-	nOE1 <= '0' WHEN RnW = '1' AND fourmeg = '1' ELSE '1';
+	--nOE1 <= '0' WHEN RnW = '1' AND fourmeg = '1' ELSE '1';
 	nWE0 <= '0' WHEN RnW = '0' AND twomeg = '1' ELSE '1';
-	nWE1 <= '0' WHEN RnW = '0' AND fourmeg = '1' ELSE '1';	
+	--nWE1 <= '0' WHEN RnW = '0' AND fourmeg = '1' ELSE '1';	
 	
 	--THIS IS ALL IN SECTION 12 OF THE 68030 MANUAL
 	RAM_ACCESS:PROCESS ( CPUCLK ) BEGIN

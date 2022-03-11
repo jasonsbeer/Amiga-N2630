@@ -408,7 +408,7 @@ begin
 	------------
 
 	--MEMSEL is an output indicating that the address bus matches the address
-	--bits in the configuration register if the register is configured.  Note 
+	--bits in the zorro 2 configuration register if the register is configured.  Note 
 	--that EXTERN cycles can only happen during non-DMA conditions, and they 
 	--must qualify the CPU driven memory cycles. U305
 	
