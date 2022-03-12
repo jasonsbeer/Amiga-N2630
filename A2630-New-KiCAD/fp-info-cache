@@ -1,4 +1,4 @@
-20114703882407491
+20116350937635769
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -60136,6 +60136,13 @@ CONN BUS AMIGA
 0
 86
 86
+N2630
+ATA_Header_2x20_P2.54mm
+Through hole straight pin header, 2x20, 2.54mm pitch, double rows
+Through hole pin header THT 2x20 2.54mm double row
+0
+39
+39
 N2630
 TSOP-II-86
 54-lead TSOP typ II package

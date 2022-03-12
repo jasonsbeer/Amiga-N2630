@@ -317,6 +317,9 @@
     (path "/00000000-0000-0000-0000-0000634ecc15/a6fcb2d5-12c4-437e-817e-bc885d135a71"
       (reference "#PWR0169") (unit 1) (value "GND") (footprint "")
     )
+    (path "/00000000-0000-0000-0000-00006209fb19/db4b7401-ec7c-4cea-953d-a5df4901311f"
+      (reference "#PWR0170") (unit 1) (value "GND") (footprint "")
+    )
     (path "/00000000-0000-0000-0000-000061d9c8dc/00000000-0000-0000-0000-0000625c8363"
       (reference "#PWR0171") (unit 1) (value "GND") (footprint "")
     )
@@ -403,6 +406,12 @@
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/d177cbdb-f334-4a94-be86-2c749b37427a"
       (reference "#PWR0199") (unit 1) (value "+3.3V") (footprint "")
+    )
+    (path "/00000000-0000-0000-0000-00006209fb19/e0e6b01e-156a-43c4-a576-e72b6c95bfa8"
+      (reference "#PWR0200") (unit 1) (value "GND") (footprint "")
+    )
+    (path "/00000000-0000-0000-0000-00006209fb19/2e5a84c5-c49d-40ad-9d64-a881651edcde"
+      (reference "#PWR0201") (unit 1) (value "+3.3V") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061d9c8dc/00000000-0000-0000-0000-000062b32a4c"
       (reference "C102") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
@@ -648,7 +657,13 @@
       (reference "CN2") (unit 1) (value "CPLD1") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical")
     )
     (path "/00000000-0000-0000-0000-000062089831/00000000-0000-0000-0000-00006284dc2b"
-      (reference "CN3") (unit 1) (value "CPLD1") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical")
+      (reference "CN3") (unit 1) (value "CPLD2") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical")
+    )
+    (path "/00000000-0000-0000-0000-00006209fb19/b51b394e-300b-453d-b395-fcebb80cb2be"
+      (reference "CN4") (unit 1) (value "CPLD3") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical")
+    )
+    (path "/00000000-0000-0000-0000-00006209fb19/5bbd43e1-cf89-43b6-92d2-f4b55c3adccd"
+      (reference "CN5") (unit 1) (value "ATA/IDE") (footprint "N2630:ATA_Header_2x20_P2.54mm")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-000061df9cd8"
       (reference "CN700") (unit 1) (value "Amiga-2000-CPU-Slot") (footprint "N2630:A2000_CPUSLOT_MALE")
@@ -1120,6 +1135,9 @@
     )
     (path "/00000000-0000-0000-0000-000062089831/00000000-0000-0000-0000-00006284dbb1"
       (reference "U602") (unit 1) (value "XC9572XL-TQ100") (footprint "Package_QFP:TQFP-100_14x14mm_P0.5mm")
+    )
+    (path "/00000000-0000-0000-0000-00006209fb19/6c3ce01a-e542-4d43-974f-484d11a56774"
+      (reference "U603") (unit 1) (value "XC9572XL-VQ64") (footprint "Package_QFP:TQFP-64_10x10mm_P0.5mm")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-0000634f09dd"
       (reference "U606") (unit 1) (value "74HCT244") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
