@@ -55,7 +55,7 @@ entity MAIN is
 		JMODE : IN STD_LOGIC; --JOHANN'S SPECIAL MODE! WHO IS JOHANN AND WHY DOES HE GET HIS OWN MODE? LUCKY!
 		MEMACCESS : IN STD_LOGIC; --WE ARE ACCESSING ON BOARD MEMORY
 		CONFIGED : IN STD_LOGIC; --IS AUTOCONFIG COMPLETE?
-		RESENB : IN STD_LOGIC; -- RESET ENABLED
+		RSTENB : IN STD_LOGIC; -- RESET ENABLED
 		nCPURESET : IN STD_LOGIC; --THE 68030 RESET SIGNAL
 		CPUCLK : IN STD_LOGIC; --68030 CLOCK
 		nUDS : IN STD_LOGIC; --68000 UPPER DATA STROBE
@@ -73,8 +73,7 @@ entity MAIN is
 		nCYCEND : INOUT STD_LOGIC; --CYCLE END
 		nEXTERN : INOUT STD_LOGIC; --ARE WE ACCESSING EXTERNAL MEMORY OR FPU?
 		SCLK : INOUT STD_LOGIC; --STATE MACHINE CLOCK
-		nMEMSEL : INOUT STD_LOGIC; --ARE WE SELECTING MEMORY ON BOARD? FIRST 4 (8) MEGABYTES		
-		
+		nMEMSEL : INOUT STD_LOGIC; --ARE WE SELECTING MEMORY ON BOARD? FIRST 4 (8) MEGABYTES	
 		nABR : INOUT STD_LOGIC; -- AMIGA BUS REQUEST
 		nDSACKEN : INOUT STD_LOGIC; --DSACKn ENABLE
 		E : INOUT STD_LOGIC; --6800 E CLOCK
@@ -629,7 +628,7 @@ begin
 	--under CPU control, but not if the RESENB line is negated.
 	
 	--RESET		= BOSS & CPURESET & RESENB;
-	nRESET <= '0' WHEN nBOSS = '0' AND nCPURESET ='0' AND RESENB = '1' ELSE '1';
+	nRESET <= '0' WHEN nBOSS = '0' AND nCPURESET ='0' AND RSTENB = '1' ELSE '1';
 	
 	-----------------------------
 	-- 68030 BUS GRANT DISABLE --
@@ -653,31 +652,23 @@ begin
 	--same, and both driven, indicating that we are, in fact, a 32 bit
 	--wide port.  They go hi-Z when we're not selecting memory, so that
 	--other DSACK sources (FPU and the slow bus stuff) can get their
-	--chance to terminate.
+	--chance to terminate. U600
 
 	--DSACK0		= cycledone;
 	--DSACK0.OE	= MEMSEL;
-	nDSACK0 <= 'Z' 
-		WHEN 
-			nMEMSEL = '0' 
-		ELSE 
-			'0'
+	nDSACK0 <= cycledone
 		WHEN
-			cycledone = '1'
-		ELSE 
-			'1';
+			nMEMSEL = '0'
+		ELSE
+			'Z';
 
 	--DSACK1		= cycledone;
 	--DSACK1.OE	= MEMSEL;
-	nDSACK1 <= 'Z' 
-		WHEN 
-			nMEMSEL = '0' 
-		ELSE 
-			'0'
+	nDSACK1 <= cycledone
 		WHEN
-			cycledone = '1'
-		ELSE 
-			'1';
+			nMEMSEL = '0'
+		ELSE
+			'Z';
 			
 	-------------------------
 	-- GARY DTACK OVERRIDE --
@@ -745,6 +736,8 @@ begin
 	--doesn't get started for special cycles.  Since ASEN isn't qualified
 	--externally with EXTERN, everywhere here it's used, it must be 
 	--qualified with EXTERN too. U505
+	
+	--NOTE: ON THE SCHEMATIC, DSEN IS ACTIVE LOW, BUT IS TREATED AS ACTIVE HIGH IN THE PAL LOGIC
 
 	--S7MDIS		= !DSEN & ASEN & !EXTERN & DSACKEN;
 	nS7MDISD <= '0' WHEN DSEN = '0' AND nASEN = '0' AND nEXTERN = '1' AND nDSACKEN = '0' ELSE '1';
