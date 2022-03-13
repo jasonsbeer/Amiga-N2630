@@ -1,4 +1,4 @@
-20116350937635769
+20121286473646717
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -60143,6 +60143,27 @@ Through hole pin header THT 2x20 2.54mm double row
 0
 39
 39
+N2630
+Jumper1
+
+
+0
+0
+0
+N2630
+Jumper2
+
+
+0
+0
+0
+N2630
+Mug
+
+
+0
+0
+0
 N2630
 TSOP-II-86
 54-lead TSOP typ II package
