@@ -2340,6 +2340,10 @@
     (effects (font (size 3.9878 3.9878)) (justify right bottom))
     (uuid 3aec5e23-e675-4bcf-9a9e-48cb59d51927)
   )
+  (text "Something in the way she moves" (at 312.42 233.68 0)
+    (effects (font (size 3 3)) (justify left bottom))
+    (uuid 59ea1419-85c0-48aa-a8ae-41cc1b01b929)
+  )
   (text "This is 2MB of SRAM to get the prototype\nworking. Final version will have 8MB SDRAM."
     (at 50.8 66.04 0)
     (effects (font (size 3 3)) (justify left bottom))

@@ -4575,7 +4575,7 @@
     (uuid 9ea636a1-ff23-411e-b275-b6f4b33edb43)
   )
   (text "CARD EDGE AND\nINTERFACE LOGIC" (at 313.055 250.825 0)
-    (effects (font (size 5.5118 5.5118)) (justify left bottom))
+    (effects (font (size 5 5)) (justify left bottom))
     (uuid fd71d7ce-19f7-411b-9f95-5e5cb5d86d98)
   )
 
