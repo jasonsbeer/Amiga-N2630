@@ -3,7 +3,7 @@
 -- Engineer:       JASON NEUS
 -- 
 -- Create Date:    20:06:50 02/10/2022 
--- Design Name:    "LOW" CPLD
+-- Design Name:    N2630 U600 CPLD
 -- Module Name:    MAIN - Behavioral 
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
