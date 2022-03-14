@@ -120,9 +120,9 @@ architecture Behavioral of MAIN is
 	SIGNAL dmaaccess : STD_LOGIC:='0';
 	SIGNAL dmadtack : STD_LOGIC:='0';
 	SIGNAL dmacycle : STD_LOGIC:='0';	
-	SIGNAL n_aasq : STD_LOGIC:='0';
-	SIGNAL n_aas40 : STD_LOGIC:='0';
-	SIGNAL n_aas80 : STD_LOGIC:='0';
+	SIGNAL aasq : STD_LOGIC:='0';
+	SIGNAL aas40 : STD_LOGIC:='0';
+	SIGNAL aas80 : STD_LOGIC:='0';
 	SIGNAL dmadelay : STD_LOGIC:='0';
 	SIGNAL cpudtack : STD_LOGIC:='0';
 	SIGNAL cpucycle : STD_LOGIC:='0';
@@ -212,10 +212,12 @@ begin
 	dmaaccess <= '1' WHEN nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' ELSE '0';
 
 	--dmadtack	= dmaaccess & AAS80;
-	dmadtack <= '1' WHEN dmaaccess = '1' AND n_aas80 = '0' ELSE '0';
+	--this is delayed 2 clock cycles from the original DMA request
+	dmadtack <= '1' WHEN dmaaccess = '1' AND aas80 = '1' ELSE '0';
 
 	--dmacycle	= dmaaccess & AAS40 & !DMADELAY (was 1);	changed phase of dmadelay
-	dmacycle <= '1' WHEN dmaaccess = '1' AND n_aas40 = '0' AND dmadelay = '0' ELSE '0';
+	--this is delayed 1 clock cycles from the original DMA request
+	dmacycle <= '1' WHEN dmaaccess = '1' AND aas40 = '1' AND dmadelay = '0' ELSE '0';
 	
 	--This indicates when a memory cycle is complete.
 	--cycledone	= cpudtack # dmadtack;
@@ -242,9 +244,9 @@ begin
 	PROCESS ( CPUCLK ) BEGIN
 		IF RISING_EDGE ( CPUCLK ) THEN
 			IF nBGACK = '0' AND nAAS = '0' THEN		
-				n_aasq <= '1';
+				aasq <= '1';
 			ELSE 
-				n_aasq <= '0';
+				aasq <= '0';
 			END IF;	
 		END IF;
 	END PROCESS;
@@ -252,10 +254,10 @@ begin
 	--AAS40.D		= BGACK & AAS & AASQ;
 	PROCESS ( CPUCLK ) BEGIN
 		IF RISING_EDGE ( CPUCLK ) THEN
-			IF nBGACK = '0' AND nAAS = '0' AND n_aasq = '1' THEN
-				n_aas40 <= '1'; 
+			IF nBGACK = '0' AND nAAS = '0' AND aasq = '1' THEN
+				aas40 <= '1'; 
 			ELSE 
-				n_aas40 <= '0';
+				aas40 <= '0';
 			END IF;
 		END IF;
 	END PROCESS;
@@ -263,10 +265,10 @@ begin
 	--AAS80.D		= BGACK & AAS & AASQ & AAS40;
 	PROCESS ( CPUCLK ) BEGIN
 		IF RISING_EDGE ( CPUCLK ) THEN
-			IF nBGACK = '0' AND nAAS = '0' AND  n_aasq = '1' AND n_aas40 = '1' THEN
-				n_aas80 <= '1';
+			IF nBGACK = '0' AND nAAS = '0' AND  aasq = '1' AND aas40 = '1' THEN
+				aas80 <= '1';
 			ELSE 
-				n_aas80 <= '0';
+				aas80 <= '0';
 			END IF;
 		END IF;
 	END PROCESS;
