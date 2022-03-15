@@ -1,8 +1,0 @@
-INTSTYLE=impact
-INFILE=/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_LOW/impact.xsl
-OUTFILE=/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_LOW/impact.xsl
-FAMILY=None
-PART=None
-WORKINGDIR=/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/N2630_LOW
-LICENSE=iMPACT
-USER_INFO=iMPACT
