@@ -1206,16 +1206,16 @@
       (reference "U702") (unit 2) (value "74FCT646") (footprint "Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-0000620046ed"
-      (reference "U703") (unit 1) (value "74HCT245") (footprint "Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm")
+      (reference "U703") (unit 1) (value "74HCT245") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-000062312084"
-      (reference "U703") (unit 2) (value "74HCT245") (footprint "Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm")
+      (reference "U703") (unit 2) (value "74HCT245") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-000061ff48d6"
-      (reference "U704") (unit 1) (value "74HCT245") (footprint "Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm")
+      (reference "U704") (unit 1) (value "74HCT245") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-00006231688b"
-      (reference "U704") (unit 2) (value "74HCT245") (footprint "Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm")
+      (reference "U704") (unit 2) (value "74HCT245") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-0000623abce6"
       (reference "U705") (unit 1) (value "74HCT245") (footprint "Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm")
