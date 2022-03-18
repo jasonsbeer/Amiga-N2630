@@ -72,7 +72,7 @@
     (stroke (width 0) (type solid) (color 0 0 0 0))
     (fill (color 0 0 0 0.0000))
     (uuid 00000000-0000-0000-0000-00006209fb19)
-    (property "Sheet name" "Power and Spares" (id 0) (at 123.19 18.9734 0)
+    (property "Sheet name" "IDE, Power, and Spares" (id 0) (at 123.19 18.9734 0)
       (effects (font (size 1.27 1.27)) (justify left bottom))
     )
     (property "Sheet file" "Power.kicad_sch" (id 1) (at 123.19 29.1596 0)
@@ -425,6 +425,12 @@
     (path "/00000000-0000-0000-0000-00006209fb19/eb086c60-fefc-4501-a82a-0a61d1811865"
       (reference "#PWR0205") (unit 1) (value "+3.3V") (footprint "")
     )
+    (path "/00000000-0000-0000-0000-00006209fb19/f88212e3-2f28-4bf8-84a4-964383d9145e"
+      (reference "#PWR0206") (unit 1) (value "GND") (footprint "")
+    )
+    (path "/00000000-0000-0000-0000-00006209fb19/3dd1c6d1-10e0-40e2-b2eb-5915007eab79"
+      (reference "#PWR0207") (unit 1) (value "+3.3V") (footprint "")
+    )
     (path "/00000000-0000-0000-0000-000061d9c8dc/00000000-0000-0000-0000-000062b32a4c"
       (reference "C102") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
@@ -657,7 +663,7 @@
       (reference "C801") (unit 1) (value "10uF") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-00006209fb19/00000000-0000-0000-0000-00006275cf88"
-      (reference "C802") (unit 1) (value "47uF") (footprint "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm")
+      (reference "C802") (unit 1) (value "10uF") (footprint "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm")
     )
     (path "/00000000-0000-0000-0000-00006209fb19/00000000-0000-0000-0000-00006276395d"
       (reference "C803") (unit 1) (value "47uF") (footprint "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm")
@@ -721,6 +727,9 @@
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-0000622a3fb8"
       (reference "J305") (unit 1) (value "Jumper_NO_Small") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
+    )
+    (path "/00000000-0000-0000-0000-00006209fb19/8234edf2-65a6-4f5e-acc5-8f8e3c267e18"
+      (reference "J600") (unit 1) (value "IDE DISABLE") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-00006219f0d8"
       (reference "R100") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
@@ -903,19 +912,19 @@
       (reference "R236") (unit 1) (value "3.3K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/0eb458f3-33d6-4073-99be-b959f92f473b"
-      (reference "R302") (unit 1) (value "3.3k") (footprint "Resistor_SMD:R_0805_2012Metric")
+      (reference "R302") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/6bfd8888-6913-4f3f-b8f1-3391619694a9"
-      (reference "R303") (unit 1) (value "3.3k") (footprint "Resistor_SMD:R_0805_2012Metric")
+      (reference "R303") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/61fa4e2d-a7e6-48f6-8c99-82b219f7b2f5"
-      (reference "R304") (unit 1) (value "3.3k") (footprint "Resistor_SMD:R_0805_2012Metric")
+      (reference "R304") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/5cae9a7f-b5ca-4bd1-927e-ab2f00ee7b87"
-      (reference "R305") (unit 1) (value "3.3k") (footprint "Resistor_SMD:R_0805_2012Metric")
+      (reference "R305") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/c6feeb1d-1fc3-447b-bfe2-d97229c624fd"
-      (reference "R306") (unit 1) (value "3.3k") (footprint "Resistor_SMD:R_0805_2012Metric")
+      (reference "R306") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/d18cdc92-1e08-497e-ac59-27ca632f9207"
       (reference "R307") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
@@ -943,6 +952,9 @@
     )
     (path "/00000000-0000-0000-0000-00006209fb19/e3594b02-023a-480f-b6b1-57e620c0ef65"
       (reference "R600") (unit 1) (value "2.7K") (footprint "Resistor_SMD:R_0805_2012Metric")
+    )
+    (path "/00000000-0000-0000-0000-00006209fb19/ea37d1c2-c2bb-442a-a9ee-e7b2749595c3"
+      (reference "R601") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-0000623a6e97"
       (reference "R700") (unit 1) (value "1k") (footprint "Resistor_SMD:R_0805_2012Metric")
@@ -990,6 +1002,12 @@
       (reference "U204") (unit 1) (value "74HCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-00006209fb19/00000000-0000-0000-0000-0000620a8b8c"
+      (reference "U204") (unit 2) (value "74HCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+    )
+    (path "/00000000-0000-0000-0000-00006209fb19/a7c92bb5-eaf2-414f-8e57-5df1420c13d0"
+      (reference "U204") (unit 3) (value "74HCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+    )
+    (path "/00000000-0000-0000-0000-000061d79ebc/61e1f990-e4bf-4c6d-9000-2762ea2f4563"
       (reference "U204") (unit 4) (value "74HCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-000061db312e"
@@ -1006,6 +1024,9 @@
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000061f6e714"
       (reference "U300") (unit 2) (value "74HCT05") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+    )
+    (path "/00000000-0000-0000-0000-00006209fb19/46e1b78d-1829-47cb-9937-e1cd6479de11"
+      (reference "U300") (unit 3) (value "74HCT05") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-00006234eb07"
       (reference "U300") (unit 4) (value "74HCT05") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
@@ -1218,22 +1239,22 @@
       (reference "U704") (unit 2) (value "74HCT245") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-0000623abce6"
-      (reference "U705") (unit 1) (value "74HCT245") (footprint "Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm")
+      (reference "U705") (unit 1) (value "74HCT245") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-0000625d667f"
-      (reference "U705") (unit 2) (value "74HCT245") (footprint "Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm")
+      (reference "U705") (unit 2) (value "74HCT245") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-0000623acd38"
-      (reference "U706") (unit 1) (value "74HCT245") (footprint "Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm")
+      (reference "U706") (unit 1) (value "74HCT245") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-0000625d714a"
-      (reference "U706") (unit 2) (value "74HCT245") (footprint "Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm")
+      (reference "U706") (unit 2) (value "74HCT245") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-0000623adfc6"
-      (reference "U707") (unit 1) (value "74HCT245") (footprint "Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm")
+      (reference "U707") (unit 1) (value "74HCT245") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-0000625d79ab"
-      (reference "U707") (unit 2) (value "74HCT245") (footprint "Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm")
+      (reference "U707") (unit 2) (value "74HCT245") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-00006209fb19/00000000-0000-0000-0000-0000627c8d0c"
       (reference "U800") (unit 1) (value "LM1117-3.3") (footprint "Package_TO_SOT_SMD:SOT-223")
