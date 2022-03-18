@@ -9,13 +9,14 @@ J302|Amiga Version|A2000|B2000
 J303|Zorro 2 RAM|Do Not Configure|Configure
 J304|OS Mode|Unix|Amiga OS
 J305|Zorro 3 RAM|Do Not Configure|Configure
+J600|IDE|Disabled|Enabled
 
 *The factory configuration for all jumpers is open (no jumper)
 
 ## Table 2. Clock Jumper Settings
 Jumper|Description|1-2|2-3
 -|-|-|-
-J201|CPU Clock|28MHz|25MHz (X1)*
-J202|FPU Clock|25MHz (X1)*|X2
+J201|CPU Clock|28MHz|X1* (25MHz)
+J202|FPU Clock|X1* (25MHz)|X2
 
 *Factory default
