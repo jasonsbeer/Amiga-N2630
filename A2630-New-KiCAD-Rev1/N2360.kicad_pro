@@ -115,7 +115,7 @@
         "min_silk_clearance": 0.0,
         "min_through_hole_diameter": 0.3,
         "min_track_width": 0.09999999999999999,
-        "min_via_annular_width": 0.049999999999999996,
+        "min_via_annular_width": 0.15,
         "min_via_diameter": 0.44999999999999996,
         "use_height_for_length_calcs": true
       },
@@ -128,10 +128,6 @@
         {
           "diameter": 0.0,
           "drill": 0.0
-        },
-        {
-          "diameter": 0.55,
-          "drill": 0.3
         },
         {
           "diameter": 0.8,
@@ -376,7 +372,7 @@
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.15,
         "via_diameter": 0.6,
-        "via_drill": 0.4,
+        "via_drill": 0.3,
         "wire_width": 6.0
       },
       {
