@@ -43,7 +43,7 @@ entity U600 is
 		nABGACK : IN STD_LOGIC; --AMIGA BUS GRANT ACK
 		FC : IN STD_LOGIC_VECTOR ( 2 downto 0 ); --FCn FROM 68030
 		EXTSEL : IN STD_LOGIC; --SELECTION INPUT FROM DAUGHTER CARD
-		nSTERM : IN STD_LOGIC; --_STERM 68030 SIGNAL (SYNC TERMINATION)
+		--nDSACK0 : IN STD_LOGIC; --THIS WAS nSTERM ON REV 0
 		nASEN : IN STD_LOGIC; --ADDRESS STROBE ENABLE
 		A7M : IN STD_LOGIC; --AMIGA 7MHZ CLOCK
 		nC1 : IN STD_LOGIC; --AMIGA _C1 CLOCK
@@ -88,7 +88,7 @@ entity U600 is
 		nDSACKDIS : OUT STD_LOGIC; --DSACK DISABLE
 		nREGRESET : OUT STD_LOGIC; --PART OF RESET LOOP "FIX"
 		nBGDIS : OUT STD_LOGIC; --BUS GRANT DISABLE
-		nDSACK0 : OUT STD_LOGIC; --DSACK0
+		nDSACK0 : INOUT STD_LOGIC; --DSACK0
 		nDSACK1 : INOUT STD_LOGIC; --DSACK1
 		nOVR : OUT STD_LOGIC; --DDTACK Over Ride
 		nADOEH : OUT STD_LOGIC; --ADDRESS OUTPUT ENABLE HIGH
@@ -203,9 +203,16 @@ begin
 	----------------------------
 	-- INTERNAL SIGNAL DEFINE --
 	----------------------------
-	
+
+
+	--as		=  ASEN & !CYCEND & !EXTERN; U501
+	--JN: Assumption is this ABEL equation will return 1 when true...
+	--that's how I made all these internal signals work
 	as <= '1' WHEN nASEN = '0' AND nCYCEND = '1' AND nEXTERN = '1' ELSE '0';
+	
+	--offboard	= !(ONBOARD # MEMSEL # EXTERN); U501
 	offboard <= '1' WHEN (nONBOARD = '1' OR nMEMSEL = '1' OR nEXTERN = '1') ELSE '0';
+	
 	cpustate <= FC ( 2 downto 0 );
 	cpuspace <= '1' WHEN cpustate = "111" ELSE '0';
 	
@@ -355,8 +362,8 @@ begin
 	--Request the Amiga 2000 bus so be we can become the BOSS
 	--Bus mastering is supposed to be clocked on the 7MHz rising edge (A2000 technical reference)
 	--Doing it like this avoids combitorial loops and it should work fine
-	PROCESS (P7M) BEGIN
-		IF (RISING_EDGE (P7M)) THEN
+	PROCESS (n7M) BEGIN
+		IF (RISING_EDGE (n7M)) THEN
 			IF (nRESET = '1' AND nBOSS = '1' AND MODE68K = '0') THEN
 				IF (nABR = '0') THEN
 					--_ABR is asserted, but we're not yet BOSS, so continue asserting _ABR
@@ -417,7 +424,10 @@ begin
 				END IF;
 			ELSE
 				--We are not yet BOSS, try to become BOSS
-				IF (( nABG = '0' AND nAAS ='1' AND nDTACK = '1' AND nHALT = '1' AND nRESET = '1' AND B2000 = '1' AND MODE68K = '0' ) OR ( B2000 = '0' AND nHALT ='1' AND nRESET ='1')) THEN
+				IF 
+					(( nABG = '0' AND nAAS ='1' AND nDTACK = '1' AND nHALT = '1' AND nRESET = '1' AND B2000 = '1' AND MODE68K = '0' ) OR 
+					( B2000 = '0' AND nHALT ='1' AND nRESET ='1')) 
+				THEN
 					nBOSS <= '0';
 				ELSE
 					nBOSS <= '1';
@@ -433,8 +443,10 @@ begin
 	--68000 style address strobe. Again, this only becomes active when the
 	--TRISTATE signal is negated and the memory cycle is for an offboard
 	--resource. U501
-
-	nAAS <= '0' WHEN as = '1' AND TRISTATE = '0' AND offboard = '1' ELSE 'Z';
+	
+	--AAS		= as ;
+	--[UDS, LDS, ARW, AAS].OE = !TRISTATE & offboard ;
+	nAAS <= as WHEN TRISTATE = '0' AND offboard = '1' ELSE 'Z';
 	
 	--------------
 	-- TRISTATE --
@@ -462,8 +474,11 @@ begin
 	--This is the DTACK generator for DMA access to on-board memory.  It
 	--waits until we're in a cycle, and then a fixed delay from RAS, to `
 	--account for any refresh that must take place. U501
-
-	nDTACK <= '0' WHEN nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' AND nSTERM = '0' ELSE '1';
+	
+	--JN: STERM is actually _DSACK0!!!
+	
+	--DTACK		= BGACK & MEMSEL & AAS & STERM;
+	nDTACK <= '0' WHEN nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' AND nDSACK0 = '0' ELSE '1';
 
 	------------
 	-- MEMSEL --
@@ -474,7 +489,7 @@ begin
 	--that EXTERN cycles can only happen during non-DMA conditions, and they 
 	--must qualify the CPU driven memory cycles. U305
 	
-	--HAD TO CHANGE access TO memaccess
+	--JN: HAD TO CHANGE access TO memaccess
 
 	nMEMSEL <= '0' 
 		WHEN 
@@ -519,7 +534,8 @@ begin
 	-- 6800 E CLOCK --
 	------------------
 	
-	E <= '1' WHEN sca(2) = '1' ELSE '0' WHEN sca(2) = '0' ELSE 'Z' WHEN B2000 = '0';
+	--E <= '1' WHEN sca(2) = '1' ELSE '0' WHEN sca(2) = '0' ELSE 'Z' WHEN B2000 = '0';
+	E <= 'Z' WHEN B2000 = '0' ELSE sca(2);
 	
 	--------------------------
 	-- VALID MEMORY ADDRESS --
@@ -536,7 +552,7 @@ begin
 	--assuring that a CASE 3 VPA will be delayed.  This adds a potential problem
 	--in that IVMA would is asserted sooner than a 68000 would assert it.  We
 	--know this is no problem for 8520 devices, and /VPA driven devices aren't
-	--supported under autoconfig, so we should be OK here.
+	--supported under autoconfig, so we should be OK here. U506
   
 	--!IVMA.D		=   !A3 & !A2 & !A1 & !A0 & VPA	# !IVMA & !A3;
 	PROCESS ( P7M ) BEGIN
