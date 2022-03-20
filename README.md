@@ -13,6 +13,15 @@ J600|IDE|Disabled|Enabled
 
 *The factory configuration for all jumpers is open (no jumper)
 
+## Table 1 REV 1. Configuration Jumper Settings
+Jumper|Description|Shorted|Open*
+-|-|-|-
+J302|Amiga Version|A2000|B2000
+J303|Zorro 2 RAM|Disable|Enable
+J304|OS Mode|Unix|Amiga OS
+J305|Zorro 3 RAM|Disable|Enable
+J600|IDE|Disable|Enable
+
 ## Table 2. Clock Jumper Settings
 Jumper|Description|1-2|2-3
 -|-|-|-
