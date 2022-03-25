@@ -1,4 +1,4 @@
-# Amiga-N2630
+# Amiga N2630
 A re-imagining of the Amiga A2630 processor card.
 
 <img src="/Images/N2360_PCB_R1.png" width="750">
