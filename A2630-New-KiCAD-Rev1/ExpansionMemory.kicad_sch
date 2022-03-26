@@ -4,6 +4,13 @@
 
   (paper "B")
 
+  (title_block
+    (title "Amiga N2630")
+    (date "2022-03-25")
+    (rev "1.0")
+    (company "Drawn By: Jason Neus")
+  )
+
   (lib_symbols
     (symbol "Device:C" (pin_numbers hide) (pin_names (offset 0.254)) (in_bom yes) (on_board yes)
       (property "Reference" "C" (id 0) (at 0.635 2.54 0)

@@ -4,6 +4,13 @@
 
   (paper "B")
 
+  (title_block
+    (title "Amiga N2630")
+    (date "2022-03-25")
+    (rev "1.0")
+    (company "Drawn By: Jason Neus")
+  )
+
   (lib_symbols
     (symbol "CPLD_Xilinx:XC9572XL-TQ100" (in_bom yes) (on_board yes)
       (property "Reference" "U" (id 0) (at -20.32 64.77 0)

@@ -5,8 +5,10 @@
   (paper "B")
 
   (title_block
-    (title "N2630")
+    (title "Amiga N2630")
+    (date "2022-03-25")
     (rev "1.0")
+    (company "Drawn By: Jason Neus")
   )
 
   (lib_symbols
