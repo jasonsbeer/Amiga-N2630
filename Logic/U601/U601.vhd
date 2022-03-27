@@ -47,16 +47,15 @@ entity U601 is
 		RnW : IN STD_LOGIC; --680x0 READ/WRITE
 		nBGACK : IN STD_LOGIC; --AMIGA BUS GRANT ACK
 		nSENSE : IN STD_LOGIC; --6888x PRESENCE
-		--EXTSEL : IN STD_LOGIC; --IS THE EXPANSION RAM SELECTED?
 		OSMODE : IN STD_LOGIC; --HIGH FOR AMIGA OS, LOW FOR UNIX
 		PHANTOMHI : IN STD_LOGIC; --PHANTOM HI DATA
 		PHANTOMLO : IN STD_LOGIC; --PHANTOM LO DATA
 		--nBOSS : IN STD_LOGIC; --ARE WE BOSS?
 		nCPURESET : IN STD_LOGIC; --RESET FOR THE 68030		
-		Z2AUTO : IN STD_LOGIC; --SHOULD I AUTOCONFIG?
+		Z2AUTO : IN STD_LOGIC; --SHOULD I AUTOCONFIG ZORRO 2 RAM?
 		--ROMCONF : IN STD_LOGIC; --ROM HAS BEEN CONFIGURED
 		--RAMCONF : IN STD_LOGIC; --RAM HAS BEEN CONFIGURED
-	   TWOMB : IN STD_LOGIC; --LOW LOGIC FOR 2MB CONFIGURATION, HIGH FOR 4MB
+	   --TWOMB : IN STD_LOGIC; --LOW LOGIC FOR 2MB CONFIGURATION, HIGH FOR 4MB
 		nEXTERN : IN STD_LOGIC; --EXTERNAL ACCESS (DAUGHTER OR FPU)
 		nCYCEND : IN STD_LOGIC; --CYCLE END
 		nDSEN : IN STD_LOGIC; --DATA STROBE ENABLE
@@ -119,14 +118,14 @@ architecture Behavioral of U601 is
 	SIGNAL coppercom : STD_LOGIC:='0';
 	SIGNAL mc68881 : STD_LOGIC:='0';
 	
-	SIGNAL D_2630 : STD_LOGIC_VECTOR ( 3 downto 0 ) := "1111"; --This throws a "hinder the constant cleaning" error. IGNORE IT.
+	SIGNAL D_2630 : STD_LOGIC_VECTOR ( 2 downto 0 ) := "ZZZ";
 	SIGNAL D_ZORRO2RAM : STD_LOGIC_VECTOR ( 3 downto 0 ):="ZZZZ";
 	--SIGNAL D_ZORRO3RAM : STD_LOGIC_VECTOR ( 3 downto 0 ):="ZZZZ";
 	SIGNAL autoconfigcomplete_2630 : STD_LOGIC := '0'; --HAS 68030 BOARD BEEN AUTOCONFIGed?
 	SIGNAL autoconfigcomplete_ZORRO2RAM : STD_LOGIC := '0'; --HAS 68030 BOARD BEEN AUTOCONFIGed?
 	--SIGNAL autoconfigcomplete_ZORRO3RAM : STD_LOGIC := '0'; --HAS 68030 BOARD BEEN AUTOCONFIGed?
 	
-	SIGNAL twomeg : STD_LOGIC:='0'; --TWO MB RAM SPACE
+	--SIGNAL twomeg : STD_LOGIC:='0'; --TWO MB RAM SPACE
 	--SIGNAL fourmeg : STD_LOGIC:='0'; --FOUR MB RAM SPACE
 	
 	SIGNAL icsrom : STD_LOGIC:='0';
@@ -149,6 +148,8 @@ begin
 	----------------------------
 	-- INTERNAL SIGNAL DEFINE --
 	----------------------------
+
+	--ADDRESS DECODING
 
 	--field cpuaddr	= [A23..13] ;			/* Normal CPU space stuff */
 	chipram <= '1' WHEN A(23 downto 13) >= "00000000000" AND A(23 downto 13) <= "00011111111"  ELSE '0';
@@ -175,60 +176,16 @@ begin
 	superdata <= '1' WHEN FC( 2 downto 0 ) = "101" ELSE '0'; --(cpustate:5)
 	cpuspace <= '1' WHEN FC(2 downto 0) = "111" ELSE '0'; --(cpustate:7)
 	
-	--addr <= A( 23 downto 15 );
-	--Low memory ROM space, used for mapping of ROMs on reset.
-	lorom <= '1' WHEN A( 23 downto 15 ) >= "000000000" AND A( 23 downto 15 ) <= "111111111" ELSE '0'; --addr:[000000..00ffff]
-	--High memory rom space, where ROMs normally reside when available.
-	hirom <= '1' WHEN A( 23 downto 15 ) >= "111110000" AND A( 23 downto 15 ) <= "111110001" ELSE '0'; --addr:[f80000..f8ffff]	
-	--icsrom		= hirom & !PHANHI & readcycle		# lorom & !PHANLO & readcycle;
-	icsrom <= '1' WHEN ( hirom = '1' AND PHANTOMHI = '0' AND readcycle = '1' ) OR ( lorom = '1' AND PHANTOMLO = '0' AND readcycle = '1' ) ELSE '0';
-	--icsrom <= '1' WHEN ( hirom = '1' AND RnW = '1' AND nAS = '0' ) OR ( lorom = '1' AND RnW = '1' AND nAS = '0' ) ELSE '0';
-	--romaddr		= addr:40;
-	romaddr <= '1' WHEN A(6 downto 1) = "100000" ELSE '0'; --01000000
+
 	--ramaddr		= addr:48;
 	--ramaddr <= '1' WHEN A(6 downto 1) = "100100" ELSE '0'; --01001000
 	
 	
 	readcycle <= '1' WHEN RnW = '1' AND nAS = '0' ELSE '0';
 	
-	--CSAUTO		= icsauto		# CSAUTO & AS; CHIP SELECT FOR AUTOCONFIG
-	PROCESS (CPUCLK) BEGIN
-		IF RISING_EDGE (CPUCLK) THEN
-			IF csauto = '1' THEN
-				IF nAS = '0' THEN
-					csauto <= '1';
-				ELSE
-					csauto <= '0';
-				END IF;
-			ELSE
-				IF icsauto = '1' THEN
-					csauto <= '1';
-				ELSE
-					csauto <= '0';
-				END IF;
-			END IF;
-		END IF;
-	END PROCESS;
-	
-	
-	--csauto <= '1' WHEN ( icsauto = '1' ) OR ( csauto = '1' AND nAS = '0') ELSE '0';
-	
-	--writecycle	= CSAUTO & !PRW & DS & !CPURESET;
-	writecycle <= '1' WHEN csauto = '1' AND RnW = '0' AND nDS ='0' AND nCPURESET = '1' ELSE '0';
-	--WRITECYCLE WHEN CSAUTO AND WRITE MODE AND DATA STROBE AND NOT CPURESET
-	--csauto IS WHEN WE ARE IN THE AUTOCONFIG PROCESS
-	
-	--This is the basic autoconfig chip select logic.  The special register
-	--always shows up first, the standard RAM register doesn't show up if 
-	--we're inhibiting autoconfiguration.
 
-	--icsauto		= autocon & AS & !RAMCONF &  AUTO 		# autocon & AS & !ROMCONF & !AUTO;
-	icsauto <= '1' 
-		WHEN 
-			( Z2AUTO = '1' AND autoconfigspace = '1' AND nAS = '0' AND autoconfigcomplete_ZORRO2RAM = '0' ) OR 
-			( Z2AUTO = '0' AND autoconfigspace = '1' AND nAS = '0' AND autoconfigcomplete_2630 = '0' ) 
-		ELSE 
-			'0';
+	
+
 
 	--rds		=  ASEN & !CYCEND &  RW & !EXTERN;
 	rds <= '1' WHEN nASEN = '0' AND nCYCEND = '1' AND RnW = '1' AND nEXTERN = '1' ELSE '0';
@@ -246,7 +203,7 @@ begin
 	--We have three boards we need to autoconfig, in this order
 	--1. The 68030 board itself
 	--2. The 68030 base memory (up to 8MB) without BOOT ROM in the Zorro 2 space
-	--3. The expansion memory (up to 112MB) in the Zorro 3 space	
+	--3. The expansion memory (up to 112MB) in the Zorro 3 space. This is done in U602.	
 
 	--A good explaination of the autoconfig process is given in the Amiga Hardware Reference Manual from Commodore
 	--https://archive.org/details/amiga-hardware-reference-manual-3rd-edition	
@@ -255,91 +212,80 @@ begin
 	
 	autoconfigspace <= '1'
 		WHEN 
-			A(23 downto 16) = "11101000" AND nAS = '0' --x"E8" & 0000 hexadecimal 
+			A(23 downto 16) = "11101000" AND nAS = '0' --x"E8" hexadecimal 
 		ELSE
 			'0';	
 
 	--THIS CODE DUMPS THE AUTOCONFIG DATA ON TO D(31..28) DEPENDING ON WHAT WE ARE AUTOCONFIGing	
+	--We AUTOCONFIG the 2630 FIRST, then the Zorro 2 RAM
+	--For REV 0 we only have 2 MB of RAM, so always config it unless AUTO = 0
 	D(31 downto 28) <= 
-		D_2630 WHEN autoconfigcomplete_2630 = '0' AND autoconfigspace ='1' AND CONFIGED = '0' ELSE
-		D_ZORRO2RAM WHEN TWOMB = '1' AND autoconfigcomplete_ZORRO2RAM = '0' AND autoconfigspace ='1' AND CONFIGED = '0' ELSE
-		--D_ZORRO3RAM WHEN autoconfigcomplete_ZORRO3RAM = '0' AND autoconfigspace ='1' AND CONFIGED = '0' ELSE
-		"ZZZZ";
-		
+		D_2630(0) & D_2630(1) & "1" & D2630(2) WHEN autoconfigcomplete_2630 = '0' AND autoconfigspace ='1' AND CONFIGED = '0' ELSE
+		D_ZORRO2RAM WHEN autoconfigcomplete_ZORRO2RAM = '0' AND autoconfigspace ='1' AND CONFIGED = '0' ELSE
+		"ZZZZ";		
 			
 	--Here it is in all its glory...the AUTOCONFIG sequence
-	PROCESS ( CPUCLK, nCPURESET ) BEGIN
-		IF nCPURESET = '0' THEN
-		
+	PROCESS ( CPUCLK, nRESET ) BEGIN
+		IF nRESET = '0' THEN
+			--The computer has been reset
+			
 			CONFIGED <= '0';
-			--baseaddress <= "000";
+			
 			baseaddress_ZORRO2RAM <= "000";
-			--baseaddress_ZORRO3RAM <= "000";
+			
 			autoconfigcomplete_2630 <= '0';
-			autoconfigcomplete_ZORRO2RAM <= '0';
-			--autoconfigcomplete_ZORRO3RAM <= '0';
-			D_2630 <= "ZZZZ";
-			D_ZORRO2RAM <= "ZZZZ";
-			--D_ZORRO3RAM <= "ZZZZ";
+			autoconfigcomplete_ZORRO2RAM <= '0';			
 			
 		ELSIF ( FALLING_EDGE (CPUCLK)) THEN
 			IF ( autoconfigspace = '1' AND CONFIGED = '0' ) THEN
 				IF ( RnW = '1' ) THEN
+					--The 680x0 is reading from us
 				
 					CASE A(6 downto 1) IS
 
 						--offset $00
 						WHEN "000000" => 
-							D_2630 <= "1110"; 
+							D_2630 <= "110"; 
 							D_ZORRO2RAM <= "1110"; --er_type: Zorro 2 card without BOOT ROM, LINK TO MEM POOL
-							--D_ZORRO3RAM <= "1010"; --er_type: Zorro 3 card without BOOT ROM, LINK TO MEM POOL
 
 						--offset $02
 						WHEN "000001" => 
-							D_2630 <= "0111";
-							D_ZORRO2RAM <= "011" & TWOMEG; --er_type: NEXT BOARD NOT RELATED, 2MB OR 4MB
-							--D_ZORRO3RAM <= "0011"; --NEXT BOARD NOT RELATED, 128MB
+							D_2630 <= "011";
+							D_ZORRO2RAM <= "0110"; --er_type: NEXT BOARD NOT RELATED, 2MB
 
 						--offset $04 INVERTED
 						WHEN "000010" => 
-							D_2630 <= "1010";
+							D_2630 <= "100";
 							D_ZORRO2RAM <= "1010"; --Product Number Hi Nibble, we are stealing the A2630 product number
-							--D_ZORRO3RAM <= "1010";
 
 						--offset $06 INVERTED
 						WHEN "000011" => 
-							D_2630 <= "1110";
+							D_2630 <= "110";
 							D_ZORRO2RAM <= "1110"; --Product Number Lo Nibble
-							--D_ZORRO3RAM <= "1111";
 
 						--offset $08 INVERTED
 						WHEN "000100" => 
-							D_2630 <= "1111"; --CAN'T BE SHUT UP
+							D_2630 <= "111"; --CAN'T BE SHUT UP
 							D_ZORRO2RAM <= "1011"; --er_flags: I/O device, can be shut up, reserved, reserved
-							--D_ZORRO3RAM <= "0101"; --MEMORY DEVICE, CAN BE SHUT UP, Z3 SIZE
 
 						--offset $0C INVERTED						
 						WHEN "000110" => 
-							D_2630 <= OSMODE & "111"; --THE A2630 CONFIGURES THIS NIBBLE AS "0111" WHEN UNIX, "1111" WHEN AMIGA OS
+							D_2630 <= OSMODE & "11"; --THE A2630 CONFIGURES THIS NIBBLE AS "0111" WHEN UNIX, "1111" WHEN AMIGA OS
 							D_ZORRO2RAM <= "1111"; --Reserved: must be zeroes
-							--D_ZORRO3RAM <= "1111";
 
 						--offset $12 INVERTED
 						WHEN "001001" => 
-							D_2630 <= "1111";
+							D_2630 <= "111";
 							D_ZORRO2RAM <= "1101"; --MANUFACTURER Number, high byte, low nibble hi byte. Just for fun, lets put C= in here!
-							--D_ZORRO3RAM <= "1101";
 
 						--offset $16 INVERTED
 						WHEN "001011" => 
-							D_2630 <= "1111";
+							D_2630 <= "111";
 							D_ZORRO2RAM <= "1101"; --MANUFACTURER Number, low nibble low byte. Just for fun, lets put C= in here!
-							--D_ZORRO3RAM <= "1101";
 
 						WHEN OTHERS => 
-							D_2630 <= "1111";
+							D_2630 <= "111";
 							D_ZORRO2RAM <= "1111"; --INVERTED...Reserved offsets and unused offset values are all zeroes
-							--D_ZORRO3RAM <= "1111";
 
 					END CASE;
 					
@@ -349,31 +295,26 @@ begin
 					IF ( A(6 downto 1) = "100100" ) THEN
 					
 						IF ( autoconfigcomplete_2630 = '0' ) THEN
+						
 							--BASE ADDRESS FOR THE 68030 BOARD
-							--baseaddress <= D(31 downto 29);
-							--THE 68030 BOARD IS CONFIGED
+							--We don't acutally need this for anything, 
+							--but it is confirmation that the 2630 ROM has been configed
 							autoconfigcomplete_2630 <= '1'; 
+							
 						ELSIF ( autoconfigcomplete_ZORRO2RAM = '0' ) THEN
+						
 							--BASE ADDRESS FOR THE ZORRO 2 RAM
 							baseaddress_ZORRO2RAM <= D(31 downto 29); 
 							--THE ZORRO 2 RAM IS CONFIGED
 							autoconfigcomplete_ZORRO2RAM <= '1'; 
-						--ELSIF ( autoconfigcomplete_ZORRO3RAM = '0' ) THEN
-							--BASE ADDRESS FOR THE ZORRO 3 RAM
-							--baseaddress_ZORRO3RAM <= D(31 downto 29); 
-							 --THE ZORRO 3 RAM IS CONFIGED
-							--autoconfigcomplete_ZORRO3RAM <= '1';
+							
 						END IF;
 						
 						IF ((Z2AUTO = '0') OR autoconfigcomplete_ZORRO2RAM = '1') THEN
-							--We always autoconfig the 2630, so do that no matter what
+							--We always autoconfig the 2630 ROM.
 							--Z2AUTO is driven by a jumper on the board, if it is logic 0, the user does not want to use the 
 							--on board Z2 RAM. Thus, we will stop after the 2630 is autoconfiged.
-							--PROBABLY NEED A DIFFERENT CONSIDERATION FOR Z3 RAM
 							CONFIGED <= '1'; 
-							--D_2630 <= "ZZZZ";
-							--D_ZORRO2RAM <= "ZZZZ";
-							--D_ZORRO3RAM <= "ZZZZ";
 						END IF;					
 						
 					END IF;					
@@ -381,50 +322,22 @@ begin
 			END IF;
 		END IF;
 	END PROCESS;
-	
-	---------------------
-	-- ROM CHIP SELECT --
-	---------------------
-	
-	--This is the basic ROM chip select logic.  We want ROM to pay attention
-	--to the phantom signals, and only show up on reads.
-	
-	--CSROM		= icsrom;
-	nCSROM <= '0' WHEN icsrom = '1' ELSE '1';
 			
 	---------------
 	-- RAM STUFF --
 	---------------
 
-	--THIS DETERMINES IF WE ARE IN THE FIRST OR SECOND 2 MEGS OF ADDRESS SPACE	
-	--HOW DOES BASE ADDRESS FIGURE IN TO ALL THIS?
-	twomeg <= '1' 
+	--THIS DETERMINES IF WE ARE ACCESSING ZORRO 2 RAM
+	--We need to signal the U600 if the address space is pointing at our zorro 2 ram
+	MEMACCESS <= '1' 
 		WHEN
-			TWOMB = '1' AND A(23 downto 21) = baseaddress_ZORRO2RAM AND A(19) = '0' AND autoconfigcomplete_ZORRO2RAM = '1' --A19 IS LOW IN THE FIRST 2 MEGS
+			autoconfigcomplete_ZORRO2RAM = '1' AND A(23 downto 21) = baseaddress_ZORRO2RAM AND A(20) = '0' --A20 IS LOW IN THE FIRST 2 MEGS
 		ELSE
 			'0';
-			
-	--fourmeg <= '1'
-	--	WHEN
-	--		A(23 downto 21) = baseaddress_ZORRO2RAM AND A(19) = '1' AND TWOMB = '1' AND autoconfigcomplete_ZORRO2RAM = '1' --A19 IS HIGH IN THE SECOND 2 MEGS
-	--	ELSE
-	--		'0';	
-			
-	--	EIGHTMEG <= '1'
-	--		WHEN
-	--			A(31 downto 21) = "01000000011" --A20 IS HIGH IN THE SECOND 4 MEGS
-	--		ELSE
-	--			'0';
-	
-	--We need to signal the U600 if the address space is pointing at our zorro 2 ram
-	--This is a very simple implementation and will need to be expanded in the final version with 8MB zorro 2 ram
-	MEMACCESS <= '1' WHEN twomeg = '1' ELSE '0';
 	
 	--OUTPUT ENABLE OR WRITE ENABLE DEPENDING ON THE CPU REQUEST
-	nOE0 <= '0' WHEN RnW = '1' AND twomeg = '1' ELSE '1';
-	--nOE1 <= '0' WHEN RnW = '1' AND fourmeg = '1' ELSE '1';
-	nWE0 <= '0' WHEN RnW = '0' AND twomeg = '1' ELSE '1';
-	--nWE1 <= '0' WHEN RnW = '0' AND fourmeg = '1' ELSE '1';	
+	nOE0 <= '0' WHEN RnW = '1' AND MEMACCESS = '1' ELSE '1';
+	nWE0 <= '0' WHEN RnW = '0' AND MEMACCESS = '1' ELSE '1';
 	
 	--THIS IS ALL IN SECTION 12 OF THE 68030 MANUAL
 	RAM_ACCESS:PROCESS ( CPUCLK ) BEGIN
@@ -479,24 +392,8 @@ begin
 					nLLBE <= '1';
 				END IF;	
 
-				--nSTERM = Bus response signal that indicates a port size of 32 bits and
-				--that data may be latched on the next falling clock edge. Synchronous transfer.
-				--STERM is only used on the daughterboard of the A2630. The A2630 card uses DSACKx for terminiation,
-				--which may be due to the 32 <-> 16 bit transfers when DMA'ing
-
-				--IF TWOMEG = '1' OR FOURMEG = '1' THEN
-				--	nSTERM <= '0';
-				--ELSE
-				--	nSTERM <= '1';
-				--END IF;
-
-				--CACHE GOES IN HERE SOMEWHERE
-				--_CBREQ _CBACK WE ARE NOT USING ANY CACHE MEMORY
-				--DBEN external data buffers - not needed
-
 			ELSE 
 				--DEACTIVATE ALL THE RAM STUFF
-				--nSTERM <= '1';
 
 				nUUBE <= '1';
 				nUMBE <= '1';
@@ -521,15 +418,20 @@ begin
 	--always data.  The "wanna be cached" term doesn't fit, so here's the 
 	--"don't wanna be cached" terms, with inversion. U306
 	
+	--EXTSEL = 1 is when Zorro 3 RAM is responding to the address space
+	--So, this original code never caches in Z3 ram. 
+	--Might want to consider looking into that when Z3 ram is present.
+	
 	nCIIN <= '1' 
 		WHEN
-			(chipram = '1' AND ( userdata = '1' OR superdata = '1' ) AND EXTSEL = '0') OR
+			EXTSEL = '0' AND (
+			(chipram = '1' AND ( userdata = '1' OR superdata = '1' )) OR
 			--!CACHE = chipram & (userdata # superdata) & !EXTSEL
-			(ciaspace = '1' AND EXTSEL = '0') OR
+			(ciaspace = '1') OR
 			--ciaspace & !EXTSEL
-			(chipregs = '1' AND EXTSEL = '0') OR
+			(chipregs = '1') OR
 			--chipregs & !EXTSEL
-			(iospace = '1' AND EXTSEL = '0')
+			(iospace = '1'))
 			--iospace & !EXTSEL
 		ELSE
 			'0';		
@@ -562,25 +464,86 @@ begin
 	nAVEC <= '0' WHEN (cpuspace = '1' AND interruptack = '1' AND nBGACK = '1') ELSE '1';
 
 
-	---------------------------------
-	-- CLOCKS FOR FF U302 AND U303 --
-	---------------------------------
+	---------------
+	-- ROM STUFF --
+	---------------
+
+	--This group of logic is to drive the clock on U303 in order to capture
+	--important information for the ROM at startup/autoconfig
 	
-	--I DON'T KNOW...SOME OF THIS LOOKS LIKE AUTOCONFIG STUFF...I DON'T NEED THE AUTOCONFIG LOGIC...
+	--addr <= A( 23 downto 15 );
+	--Low memory ROM space, used for mapping of ROMs on reset.
+	lorom <= '1' WHEN A( 23 downto 16 ) = "00000000" ELSE '0'; --addr:[000000..00ffff] AND A( 23 downto 16 ) <= "11111111"
 	
+	--High memory rom space, where ROMs normally reside when available.
+	hirom <= '1' WHEN A( 23 downto 16 ) = "11111000" ELSE '0'; --addr:[f80000..f8fff] AND A( 23 downto 15 ) <= "111110001"
 	
+	--icsrom		= hirom & !PHANHI & readcycle		# lorom & !PHANLO & readcycle;
+	icsrom <= '1' 
+		WHEN 
+			( hirom = '1' AND PHANTOMHI = '0' AND readcycle = '1' ) OR 
+			( lorom = '1' AND PHANTOMLO = '0' AND readcycle = '1' ) 
+		ELSE 
+			'0';
 	
-	--SEEMS THAT THIS CLOCKS U307 DURING THE AUTOCONFIG WRITE CYCLE BUT BEFORE THE 2360 AUTOCONFIG BASE ADDRESS IS ASSIGNED
+	--The Special Device configuration register is at $E80040, occupying the lower byte of that word.
+	--romaddr		= addr:40;
+	romaddr <= '1' WHEN A(6 downto 1) = "100000" ELSE '0'; --01000000
+
+	--icsauto		= autocon & AS & !RAMCONF &  AUTO 		# autocon & AS & !ROMCONF & !AUTO;
+	--autocon = we're in autoconfig space (e8000 - e8fff)
+	--ramconf and rom conf = are the ram or rom autoconfiged?
+	--auto = should we autoconfig ram? 1=yes
+	--U301 
+	
+	--This will hold the latch on U303 from the time autoconfig begins until it is complete
+	icsauto <= '1' 
+		WHEN 
+			( autoconfigspace = '1' AND nAS = '0' AND autoconfigcomplete_ZORRO2RAM = '0' AND Z2AUTO = '1' ) OR 
+			( autoconfigspace = '1' AND nAS = '0' AND autoconfigcomplete_2630 = '0' AND Z2AUTO = '0' ) 
+		ELSE 
+			'0';
 			
-	--THE ADDRESS romaddr x40 (binary 01000000) LINES UP WITH THE SERIAL NUMBER READ DURING AUTOCONFIG, BUT THAT MEANS NOTHING IN THIS CONTEXT?
-	--DAVE MUST HAVE PICKED A POINT BEFORE THE AUTOCONFIG WAS COMPLETE TO LATCH THE DATA ON U307? But the serial number read is a "read" event, but this
-	--is looking for a "write" event? So I'm not sure this will ever fire...
+	--This is the basic ROM chip select logic.  We want ROM to pay attention
+	--to the phantom signals, and only show up on reads.
 	
-	--THIS GOES THROUGH AN INVERTING GATE IN THE A2630 (U307). NO NEED FOR THAT, SO WE INVERT THE SIGNAL HERE!
+	--CSROM		= icsrom;
+	--nCSROM <= '0' WHEN icsrom = '1' ELSE '1';
+	nCSROM <= NOT icsrom;
+	
+	--CSAUTO		= icsauto		# CSAUTO & AS; 	
+	--CHIP SELECT FOR AUTOCONFIG
+	--CAN THIS BE REWORKED BECAUSE OF HOW I'M AUTOCONFIGING?
+	--probably not, as this is to latch U303. 
+	--there might be an alternative way, but this is ok for now
+	PROCESS (CPUCLK) BEGIN
+		IF RISING_EDGE (CPUCLK) THEN
+			IF csauto = '1' THEN
+				IF nAS = '0' THEN
+					csauto <= '1';
+				ELSE
+					csauto <= '0';
+				END IF;
+			ELSE
+				IF icsauto = '1' THEN
+					csauto <= '1';
+				ELSE
+					csauto <= '0';
+				END IF;
+			END IF;
+		END IF;
+	END PROCESS;
+	
+	--writecycle	= CSAUTO & !PRW & DS & !CPURESET;
+	writecycle <= '1' WHEN csauto = '1' AND RnW = '0' AND nDS ='0' AND nCPURESET = '1' ELSE '0';
+	--WRITECYCLE WHEN CSAUTO AND WRITE MODE AND DATA STROBE AND NOT CPURESET	
+		
+	--THIS GOES THROUGH AN INVERTING GATE IN THE A2630 (U307). NO NEED FOR THAT, SO WE SUPPLY THE CORRECT SIGNAL HERE!
 	--ROMCLK = writecycle & romaddr & !CONFIGED  #  ROMCLK & DS;
 	--ROMCLK <= '1' WHEN ( writecycle = '1' AND romaddr = '1' AND autoconfigcomplete_2630 = '0' ) OR ( ROMCLK = '1' AND nDS = '0' ) ELSE '0';
 	
-		--The 2630 ROM falls into the special register category and is handled differently than the typical AUTOCONFIG sequence
+	--The 2630 ROM falls into the special register category and is handled differently than the typical AUTOCONFIG sequence
+	--This clocks U303, which latches some data lines to capture the PHANTOM signals, among others
 	PROCESS (CPUCLK) BEGIN
 		IF RISING_EDGE ( CPUCLK ) THEN
 			IF (ROMCLK = '1') THEN		
@@ -601,27 +564,20 @@ begin
 		END IF;
 	END PROCESS;
 	
-	
-	
-	--WRITECYCLE WHEN CSAUTO AND WRITE MODE AND DATA STROBE AND NOT CPURESET
-	--csauto IS WHEN WE ARE IN THE AUTOCONFIG PROCESS
-
-	--RAMCLK		= writecycle & ramaddr & !ROMCLK		# !CPURESET & RAMCLK;	
-	--nRAMCLK <= '0' WHEN ( writecycle = '1' AND ramaddr = '1' AND nROMCLK = '1' ) OR (nCPURESET = '1' AND nROMCLK = '1' ) ELSE '1';
-	
 	-----------------
 	-- MEMORY LOCK --
 	-----------------
 	
 	--MEMLOCK is used to lock out the 68000 state machine during a fast 
 	--system cycle, which is basically either an on-board memory cycle
-	--or an EXTERN cycle.  Additionally, the 68000 state machine uses
+	--or an EXTERN (Z3 or FPU) cycle.  Additionally, the 68000 state machine uses
 	--this same mechanism to end it's own cycle, so CYCEND also gets
 	--included. U305
 
+	--"Normal" state is logic low unless we are DMAing.
 	nMEMLOCK <= '0' 
 		WHEN
-			( CONFIGED = '1' AND twomeg = '1' ) --OR fourmeg = '1' 
+			( CONFIGED = '1' AND MEMACCESS = '1' )
 			--access & CONFIGED
 		OR
 			( nAS = '1' )
@@ -654,7 +610,8 @@ begin
 			TRISTATE = '1' OR offboard = '0'
 		ELSE '0'
 			WHEN
-				wds = '1' AND A(0) = '0'
+				( wds = '1' AND A(0) = '0' ) OR
+				( rds = '1' )
 		ELSE 
 			'1';
 
@@ -667,7 +624,7 @@ begin
 				((wds = '1' AND SIZ(1) = '1') OR 
 				(wds = '1' AND SIZ(0) = '0') OR 
 				(wds = '1' AND A(0) = '1') OR
-				rds = '1')
+				(rds = '1'))
 		ELSE 
 			'1';
 			
@@ -679,14 +636,19 @@ begin
 	--not yet boss and when there is a DMA device active, or during an
 	--onboard cycle. It shares the 68030 RW signal with the Amiga 2000 hardware
 
-	--ARW		= RW ;
-	ARnW <= RnW WHEN TRISTATE = '0' AND offboard = '0' ELSE 'Z';
-	
+	--ARW		= RW ;	
+	ARnW <= 'Z' 
+		WHEN 
+			TRISTATE = '1' OR offboard = '0'
+		ELSE
+			RnW;
 	----------------------
 	-- ONBOARD RESOURCE --
 	----------------------
 	
 	--DETERMINES IF WE ARE USING A RESOURCE ON THE 2630 BOARD
+	--Basically, if we accessing the 2630 ROM or in autoconfig mode, then
+	--we are "ONBOARD"
 	
 	--ONBOARD		= icsrom 		# icsauto		# ONBOARD & AS;
 	--nONBOARD <= '0' WHEN icsrom = '1' OR icsauto = '1' OR ( nONBOARD = '0' AND nAS = '0' ) ELSE '1';
@@ -701,7 +663,7 @@ begin
 					nONBOARD <= '1';
 				END IF;
 			ELSE
-				--Are we in an onboard process?	
+				--Are we accessing the 2630 ROM or in autoconfig mode?	
 				IF (icsrom = '1' OR icsauto = '1') THEN
 					nONBOARD <= '0';
 				ELSE
@@ -709,16 +671,15 @@ begin
 				END IF;
 			END IF;
 		END IF;
-	END PROCESS;
+	END PROCESS;	
 	
+	---------------------------
+	-- MEMORY DATA DIRECTION --
+	---------------------------
 	
-	-------------------------------------
-	-- EXPANSION MEMORY DATA DIRECTION --
-	-------------------------------------
+	--This sets the direction of the LVC data buffers between the 680x0 and the RAM
 	
-	--This sets the direction of the data buffers between the 68030 and the SDRAM
-	
-	EMDDIR <= RnW;
+	EMDDIR <= NOT RnW;
 
 
 end Behavioral;
