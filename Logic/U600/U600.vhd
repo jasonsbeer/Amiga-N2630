@@ -337,6 +337,28 @@ begin
 	
 	--The read/write signal is locked to the DMA read/write signal when DMA'ing. U505
 	RnW <= ARnW WHEN nBGACK = '0' ELSE 'Z';
+			
+	--The OVR signal must be asserted whenever on-board memory is selected
+	--during a DMA cycle.  It tri-states GARY's DTACK output, allowing
+	--one to be created by our memory logic.
+
+	--OVR		= BGACK & MEMSEL;
+	--OVR.OE		= BGACK & MEMSEL;
+	nOVR <= '0' WHEN nBGACK = '0' AND nMEMSEL = '0' ELSE 'Z';
+			
+	--We keep ABGACK disconnected from BGACK until we are BOSS. U501
+
+	--BGACK = ABGACK; BGACK.OE	= BOSS;
+	nBGACK <= nABGACK WHEN nBOSS = '0' ELSE 'Z';
+	
+	--This is the DTACK generator for DMA access to on-board memory.  It
+	--waits until we're in a cycle, and then a fixed delay from RAS, to `
+	--account for any refresh that must take place. U501
+	
+	--JN: STERM is actually _DSACK0 in this formula!!!
+	
+	--DTACK		= BGACK & MEMSEL & AAS & STERM;
+	nDTACK <= '0' WHEN nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' AND nDSACK0 = '0' ELSE '1';
 	
 	--These next lines make us delayed and synchronized versions of the 
 	--68000 compatible address strobe, used to handle synchronization during DMA. U600
@@ -458,35 +480,13 @@ begin
 	--AAS		= as ;
 	--[UDS, LDS, ARW, AAS].OE = !TRISTATE & offboard ;
 	nAAS <= as WHEN TRISTATE = '0' AND offboard = '1' ELSE 'Z';
-		
-	-------------------
-	-- BUS GRANT ACK --
-	-------------------
-	
-	--We keep ABGACK disconnected from BGACK until we are BOSS. U501
-
-	--BGACK = ABGACK; BGACK.OE	= BOSS;
-	nBGACK <= nABGACK WHEN nBOSS = '0' ELSE 'Z';
-	
-	-----------------------
-	-- DATA TRANSFER ACK --
-	-----------------------
-	
-	--This is the DTACK generator for DMA access to on-board memory.  It
-	--waits until we're in a cycle, and then a fixed delay from RAS, to `
-	--account for any refresh that must take place. U501
-	
-	--JN: STERM is actually _DSACK0 in this formula!!!
-	
-	--DTACK		= BGACK & MEMSEL & AAS & STERM;
-	nDTACK <= '0' WHEN nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' AND nDSACK0 = '0' ELSE '1';
 
 	------------
 	-- MEMSEL --
 	------------
 
 	--MEMSEL is an output indicating that the address bus matches the address
-	--bits in the zorro 2 configuration register if the register is configured.  Note 
+	--bits in the zorro 2 configuration register, if the register is configured.  Note 
 	--that EXTERN cycles can only happen during non-DMA conditions, and they 
 	--must qualify the CPU driven memory cycles. U305
 	
@@ -532,9 +532,9 @@ begin
 	--E	= A2; E.OE	= !B2000;
 	E <= 'Z' WHEN B2000 = '0' ELSE sca(2);
 	
-	--------------------------
-	-- VALID MEMORY ADDRESS --
-	--------------------------
+	-----------------------------------
+	-- INTERNAL VALID MEMORY ADDRESS --
+	-----------------------------------
 	
 	--Initially, the logic here enabled IVMA during (!A3 & A2 & !A1 & A0 & VPA).
 	--This is the proper time to have VMA come out, just about when the 68000 
@@ -717,45 +717,7 @@ begin
 
 	--BGDIS		= !BOSS			# !ABG & DSACK1		# !ABG & AS ;
 	nBGDIS <= '0' WHEN nBOSS = '1' OR ( nABG = '1' AND nDSACK1 = '0' ) OR ( nABG = '1' AND nAS = '0' ) ELSE '1';	
-	
-	------------
-	-- DSACKn --
-	------------
-	
-	--These are the cycle termination signals.  They're really both the
-	--same, and both driven, indicating that we are, in fact, a 32 bit
-	--wide port.  They go hi-Z when we're not selecting memory, so that
-	--other DSACK sources (FPU and the slow bus stuff) can get their
-	--chance to terminate. U600
-
-	--DSACK0		= cycledone;
-	--DSACK0.OE	= MEMSEL;
-	nDSACK0 <= cycledone
-		WHEN
-			nMEMSEL = '0'
-		ELSE
-			'Z';
-
-	--DSACK1		= cycledone;
-	--DSACK1.OE	= MEMSEL;
-	nDSACK1 <= cycledone
-		WHEN
-			nMEMSEL = '0'
-		ELSE
-			'Z';
-			
-	-------------------------
-	-- GARY DTACK OVERRIDE --
-	-------------------------
-	
-	--The OVR signal must be asserted whenever on-board memory is selected
-	--during a DMA cycle.  It tri-states GARY's DTACK output, allowing
-	--one to be created by our memory logic.
-
-	--OVR		= BGACK & MEMSEL;
-	--OVR.OE		= BGACK & MEMSEL;
-	nOVR <= '0' WHEN nBGACK = '0' AND nMEMSEL = '0' ELSE 'Z';
-	
+				
 	
 	-----------------------------------
 	-- ADDRESS BUS DIRECTION CONTROL --
@@ -881,5 +843,27 @@ begin
 			END IF;
 		END IF;
 	END PROCESS;
+			
+	--These are the cycle termination signals.  They're really both the
+	--same, and both driven, indicating that we are, in fact, a 32 bit
+	--wide port.  They go hi-Z when we're not selecting memory, so that
+	--other DSACK sources (FPU and the slow bus stuff) can get their
+	--chance to terminate. U600
+
+	--DSACK0		= cycledone;
+	--DSACK0.OE	= MEMSEL;
+	nDSACK0 <= cycledone
+		WHEN
+			nMEMSEL = '0'
+		ELSE
+			'Z';
+
+	--DSACK1		= cycledone;
+	--DSACK1.OE	= MEMSEL;
+	nDSACK1 <= cycledone
+		WHEN
+			nMEMSEL = '0'
+		ELSE
+			'Z';
 
 end Behavioral;
