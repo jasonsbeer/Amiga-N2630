@@ -112,7 +112,7 @@ architecture Behavioral of U600 is
 	SIGNAL as : STD_LOGIC:='0';
 	SIGNAL offboard : STD_LOGIC:='0';		
 	SIGNAL cpuspace : STD_LOGIC:= '0'; --Derived from cpustate
-	SIGNAL cpustate : STD_LOGIC_VECTOR ( 2 downto 0 ):= "000"; --Derived from FC(2..0)
+	--SIGNAL cpustate : STD_LOGIC_VECTOR ( 2 downto 0 ):= "000"; --Derived from FC(2..0)
 	SIGNAL basis7m : STD_LOGIC:='0';
 	SIGNAL p14m : STD_LOGIC:='0'; --14mhz clock
 	SIGNAL sca : STD_LOGIC_VECTOR ( 3 downto 0 ):= "0000"; --STATE COUNTER
@@ -213,25 +213,8 @@ begin
 	--offboard	= !(ONBOARD # MEMSEL # EXTERN); U501
 	offboard <= '1' WHEN (nONBOARD = '1' OR nMEMSEL = '1' OR nEXTERN = '1') ELSE '0';
 	
-	cpustate <= FC ( 2 downto 0 );
-	cpuspace <= '1' WHEN cpustate = "111" ELSE '0';
-	
-	
-	--The standard qualification for a DMA memory cycle.  This is much the
-	--same as the CPU cycle, only it obeys the 68000 comparible signals
-	--instead of 68030 signals.  The DMA cycle can DTACK early, since we
-	--know the minimum clock period is more than the DRAM access time. U600
-
-	--dmaaccess	=  BGACK & !REFACK & MEMSEL & AAS;	
-	dmaaccess <= '1' WHEN nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' ELSE '0';
-
-	--dmadtack	= dmaaccess & AAS80;
-	--this is delayed 2 clock cycles from the original DMA request
-	dmadtack <= '1' WHEN dmaaccess = '1' AND aas80 = '1' ELSE '0';
-
-	--dmacycle	= dmaaccess & AAS40 & !DMADELAY (was 1);	changed phase of dmadelay
-	--this is delayed 1 clock cycles from the original DMA request
-	dmacycle <= '1' WHEN dmaaccess = '1' AND aas40 = '1' AND dmadelay = '0' ELSE '0';
+	--cpustate <= FC ( 2 downto 0 );
+	cpuspace <= '1' WHEN FC ( 2 downto 0 ) = "111" ELSE '0';
 	
 	--This indicates when a memory cycle is complete.
 	--cycledone	= cpudtack # dmadtack;
@@ -251,107 +234,12 @@ begin
 	--cpudtack	= cpucycle & DSACKDLY;
 	cpudtack <= '1' WHEN cpucycle = '1' AND dsackdly = '1' ELSE '0';
 	
-	--These next lines make us delayed and synchronized versions of the 
-	--68000 compatible address strobe, used to handle synchronization during DMA. U600
-
-	--AASQ.D		= BGACK & AAS;
-	PROCESS ( CPUCLK ) BEGIN
-		IF RISING_EDGE ( CPUCLK ) THEN
-			IF nBGACK = '0' AND nAAS = '0' THEN		
-				aasq <= '1';
-			ELSE 
-				aasq <= '0';
-			END IF;	
-		END IF;
-	END PROCESS;
-
-	--AAS40.D		= BGACK & AAS & AASQ;
-	PROCESS ( CPUCLK ) BEGIN
-		IF RISING_EDGE ( CPUCLK ) THEN
-			IF nBGACK = '0' AND nAAS = '0' AND aasq = '1' THEN
-				aas40 <= '1'; 
-			ELSE 
-				aas40 <= '0';
-			END IF;
-		END IF;
-	END PROCESS;
-
-	--AAS80.D		= BGACK & AAS & AASQ & AAS40;
-	PROCESS ( CPUCLK ) BEGIN
-		IF RISING_EDGE ( CPUCLK ) THEN
-			IF nBGACK = '0' AND nAAS = '0' AND  aasq = '1' AND aas40 = '1' THEN
-				aas80 <= '1';
-			ELSE 
-				aas80 <= '0';
-			END IF;
-		END IF;
-	END PROCESS;
-	
-	
-	
-	--The purpose of DMADELAY is to hold off RAS during a DMA cycle
-	--until there's a data strobe.  Doubling up on this functional
-	--output, we also use DMADELAY to qualify "cpuread" during non-DMA
-	--cycles.
-
-	--DMADELAY	=  BGACK & !UDS & !LDS		# !BGACK &      CAS & MEMSEL & !REFHOLD		# !BGACK & DMADELAY & MEMSEL & !REFHOLD;
-	--CAS AND REFHOLD ARE RELATED TO DRAM REFRESH...NOT NEEDED AT THIS TIME
-	
-	--Prevent CPU RAM access (RAS/CAS) during DMA. This would be bad because other devices are accessing the memory at this time.
-	--Bus mastering is supposed to be clocked on the 7MHz rising edge (A2000 technical reference)
-	--Doing it like this avoids combitorial loops and it should work fine
-	PROCESS (P7M) BEGIN
-		IF RISING_EDGE (P7M) THEN
-			IF dmadelay = '1' THEN
-				--We are already in delay mode, do we need to continue delaying?
-				IF ( nBGACK = '1' AND nMEMSEL = '0' ) THEN
-					dmadelay <= '1';
-				ELSE
-					dmadelay <= '0';
-				END IF;
-			ELSE
-				--We are not in delay. Should we be?
-				IF ( nBGACK = '0' AND nUDS = '1' AND nLDS = '1' ) THEN
-					dmadelay <= '1';
-				ELSE
-					dmadelay <= '0';
-				END IF;
-			END IF;
-		END IF;
-	END PROCESS;
-
-	
-	
-	--ESYNC is simply a one clock delay of E. It is used by the counter to do 
-	--edge detection.  When a high to low transition of the E clock is detected,
-	--the counter is forced to a known state. This allows an absolute count to 
-	--be used for VMA and peripheral DTACK.  This sync-up is only required when
-	--the board is in a B2000, since that board will be receiving E from the 
-	--motherboard.  On an A2000, the E clock is absent (because the processor 
-	--is pulled) and thus WE create the E clock, and can create it in such a way
-	--as to make it automatically synced.
-
-	--ESYNC.D		= E & B2000;
-	PROCESS ( n7M ) BEGIN
-		IF RISING_EDGE (n7M) THEN
-			IF 
-				E = '1' AND B2000 = '1'
-			THEN
-				esync <= '1';
-			ELSE
-				esync <= '0';
-			END IF;
-		END IF;
-	END PROCESS;
-		
-	sync <= '1' WHEN ESYNC = '0' OR E = '1' ELSE '0'; --sync		= !ESYNC # E;
-	
 	---------------------
 	-- REQUEST THE BUS --
 	---------------------	
 
-	--ABR is the Amiga bus request output. This signal is only asserted by 
-	--this PAL on powerup in order to get the bus so that we can assert BOSS, 
+	--ABR is the Amiga bus request output. This signal is only asserted 
+	--on powerup in order to get the bus so that we can assert BOSS, 
 	--and it won't be asserted if MODE68K is asserted. U305
 	
 	--ABR		= !RESET & AAS & !BOSS & !MODE68K
@@ -364,25 +252,25 @@ begin
 	--Doing it like this avoids combitorial loops and it should work fine
 	PROCESS (n7M) BEGIN
 		IF (RISING_EDGE (n7M)) THEN
-			IF (nRESET = '1' AND nBOSS = '1' AND MODE68K = '0') THEN
-				IF (nABR = '0') THEN
-					--_ABR is asserted, but we're not yet BOSS, so continue asserting _ABR
-					IF (nRESET = '1' AND nBOSS = '1' AND MODE68K = '0') THEN
-						nABR <= '0';
-					ELSE
-						nABR <= '1';
-					END IF;
-				ELSE 
-					--We don't own the bus, so try to grab it
+			IF ( nRESET = '0' OR nBOSS = '0' OR MODE68K = '1' ) THEN		
+				--We do not need to request the bus at this time.
+				--Tristate so we don't interfere with other bus users.
+				nABR <= 'Z';
+			ELSE
+				IF nABR = '1' THEN
+					--nABR is not asserted. Should we?
 					IF (nRESET = '1' AND nAAS = '0' AND nBOSS = '1' AND MODE68K = '0') THEN				
 						nABR <= '0';
 					ELSE
 						nABR <= '1';
 					END IF;
-				END IF;
-			ELSE
-				--Tristate so we don't interfere with bus mastering during regular system usage
-				nABR <= 'Z';
+				ELSE
+					--nABR is asserted, but are we BOSS yet?
+					IF (nRESET = '1' AND nBOSS = '1' AND MODE68K = '0') THEN
+						nABR <= '0';
+					ELSE
+						nABR <= '1';
+					END IF;					
 			END IF;
 		END IF;
 	END PROCESS;
@@ -435,6 +323,127 @@ begin
 			END IF;
 		END IF;
 	END PROCESS;
+		
+	---------------
+	-- DMA STUFF --
+	---------------
+	
+	--TRISTATE is an output used to tristate all signals that go to the 68000
+	--bus. This is done on powerup before BOSS is asserted and whenever a DMA
+	--device has control of the A2000 Bus.  We want tristate when we're not 
+	--BOSS, or when we are BOSS but we're being DMAed. U305
+
+	TRISTATE <= '1' WHEN nBOSS = '1' OR ( nBOSS = '0' AND nBGACK = '0' ) ELSE '0';
+	
+	--The read/write signal is locked to the DMA read/write signal when DMA'ing. U505
+	RnW <= ARnW WHEN nBGACK = '0' ELSE 'Z';
+	
+	--These next lines make us delayed and synchronized versions of the 
+	--68000 compatible address strobe, used to handle synchronization during DMA. U600
+
+	--AASQ.D		= BGACK & AAS;
+	PROCESS ( CPUCLK ) BEGIN
+		IF RISING_EDGE ( CPUCLK ) THEN
+			IF nBGACK = '0' AND nAAS = '0' THEN		
+				aasq <= '1';
+			ELSE 
+				aasq <= '0';
+			END IF;	
+		END IF;
+	END PROCESS;
+
+	--AAS40.D		= BGACK & AAS & AASQ;
+	PROCESS ( CPUCLK ) BEGIN
+		IF RISING_EDGE ( CPUCLK ) THEN
+			IF nBGACK = '0' AND nAAS = '0' AND aasq = '1' THEN
+				aas40 <= '1'; 
+			ELSE 
+				aas40 <= '0';
+			END IF;
+		END IF;
+	END PROCESS;
+
+	--AAS80.D		= BGACK & AAS & AASQ & AAS40;
+	PROCESS ( CPUCLK ) BEGIN
+		IF RISING_EDGE ( CPUCLK ) THEN
+			IF nBGACK = '0' AND nAAS = '0' AND  aasq = '1' AND aas40 = '1' THEN
+				aas80 <= '1';
+			ELSE 
+				aas80 <= '0';
+			END IF;
+		END IF;
+	END PROCESS;
+	
+	--The standard qualification for a DMA memory cycle.  This is much the
+	--same as the CPU cycle, only it obeys the 68000 comparible signals
+	--instead of 68030 signals.  The DMA cycle can DTACK early, since we
+	--know the minimum clock period is more than the DRAM access time. U600
+
+	--dmaaccess	=  BGACK & !REFACK & MEMSEL & AAS;	
+	dmaaccess <= '1' WHEN nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' ELSE '0';
+
+	--dmadtack	= dmaaccess & AAS80;
+	--this is delayed 2 clock cycles from the original DMA request
+	dmadtack <= '1' WHEN dmaaccess = '1' AND aas80 = '1' ELSE '0';
+	
+	--dmacycle	= dmaaccess & AAS40 & !DMADELAY (was 1);	changed phase of dmadelay
+	--this is delayed 1 clock cycles from the original DMA request
+	dmacycle <= '1' WHEN dmaaccess = '1' AND aas40 = '1' AND dmadelay = '0' ELSE '0';	
+	
+	--The purpose of DMADELAY is to hold off RAS during a DMA cycle
+	--until there's a data strobe.  Doubling up on this functional
+	--output, we also use DMADELAY to qualify "cpuread" during non-DMA
+	--cycles.
+
+	--DMADELAY	=  BGACK & !UDS & !LDS		# !BGACK &      CAS & MEMSEL & !REFHOLD		# !BGACK & DMADELAY & MEMSEL & !REFHOLD;
+	--CAS AND REFHOLD ARE RELATED TO DRAM REFRESH...NOT NEEDED AT THIS TIME
+	
+	--Prevent CPU RAM access (RAS/CAS) during DMA. This would be bad because other devices are accessing the memory at this time.
+	--Bus mastering is supposed to be clocked on the 7MHz rising edge (A2000 technical reference)
+	--Doing it like this avoids combitorial loops and it should work fine
+	PROCESS (P7M) BEGIN
+		IF RISING_EDGE (P7M) THEN
+			IF dmadelay = '1' THEN
+				--We are already in delay mode, do we need to continue delaying?
+				IF ( nBGACK = '1' AND nMEMSEL = '0' ) THEN
+					dmadelay <= '1';
+				ELSE
+					dmadelay <= '0';
+				END IF;
+			ELSE
+				--We are not in delay. Should we be?
+				IF ( nBGACK = '0' AND nUDS = '1' AND nLDS = '1' ) THEN
+					dmadelay <= '1';
+				ELSE
+					dmadelay <= '0';
+				END IF;
+			END IF;
+		END IF;
+	END PROCESS;	
+	
+	--ESYNC is simply a one clock delay of E. It is used by the counter to do 
+	--edge detection.  When a high to low transition of the E clock is detected,
+	--the counter is forced to a known state. This allows an absolute count to 
+	--be used for VMA and peripheral DTACK.  This sync-up is only required when
+	--the board is in a B2000, since that board will be receiving E from the 
+	--motherboard.  On an A2000, the E clock is absent (because the processor 
+	--is pulled) and thus WE create the E clock, and can create it in such a way
+	--as to make it automatically synced.
+
+	--ESYNC.D		= E & B2000;
+	PROCESS ( n7M ) BEGIN
+		IF RISING_EDGE (n7M) THEN
+			IF 
+				E = '1' AND B2000 = '1'
+			THEN
+				esync <= '1';
+			ELSE
+				esync <= '0';
+			END IF;
+		END IF;
+	END PROCESS;
+		
+	sync <= '1' WHEN ESYNC = '0' OR E = '1' ELSE '0'; --sync		= !ESYNC # E;	
 			
 	--------------------------		
 	-- AMIGA ADDRESS STROBE --
@@ -444,27 +453,19 @@ begin
 	--TRISTATE signal is negated and the memory cycle is for an offboard
 	--resource. U501
 	
+	--OFFBOARD meaning we are accessing something on the A2000 PCB or Zorro 2 Bus
+	
 	--AAS		= as ;
 	--[UDS, LDS, ARW, AAS].OE = !TRISTATE & offboard ;
 	nAAS <= as WHEN TRISTATE = '0' AND offboard = '1' ELSE 'Z';
-	
-	--------------
-	-- TRISTATE --
-	--------------
-	
-	--TRISTATE is an output used to tristate all signals that go to the 68000
-	--bus. This is done on powerup before BOSS is asserted and whenever a DMA
-	--device has control of the A2000 Bus.  We want tristate when we're not 
-	--BOSS, or when we are BOSS but we're being DMAed. U305
-
-	TRISTATE <= '1' WHEN nBOSS = '1' OR ( nBOSS = '0' AND nBGACK = '0' ) ELSE '0';
-	
+		
 	-------------------
 	-- BUS GRANT ACK --
 	-------------------
 	
 	--We keep ABGACK disconnected from BGACK until we are BOSS. U501
 
+	--BGACK = ABGACK; BGACK.OE	= BOSS;
 	nBGACK <= nABGACK WHEN nBOSS = '0' ELSE 'Z';
 	
 	-----------------------
@@ -475,7 +476,7 @@ begin
 	--waits until we're in a cycle, and then a fixed delay from RAS, to `
 	--account for any refresh that must take place. U501
 	
-	--JN: STERM is actually _DSACK0!!!
+	--JN: STERM is actually _DSACK0 in this formula!!!
 	
 	--DTACK		= BGACK & MEMSEL & AAS & STERM;
 	nDTACK <= '0' WHEN nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' AND nDSACK0 = '0' ELSE '1';
@@ -508,16 +509,8 @@ begin
 	--is defined to be a processor access with EXTSEL asserted.  DMA devices 
 	--can't get to daughterboard space. U306
 
+	--EXTERN		= cpuspace & !BGACK		# EXTSEL & !BGACK ;
 	nEXTERN <= '0' WHEN ( cpuspace = '1' AND nBGACK = '1' ) OR ( EXTSEL = '1' AND nBGACK = '1' ) ELSE '1';
-	
-	
-	-----------------------
-	-- READ/WRITE SIGNAL --
-	-----------------------
-	
-	--Logic Equations related to the DMA to RAM interface U505
-	
-	RnW <= ARnW WHEN nBGACK = '0' ELSE 'Z';
 	
 	-------------------------
 	-- DSACK LATCH DISABLE --
@@ -528,13 +521,15 @@ begin
 	--these special cycles. JN: NO EXTERN IN THE EQUATION...MUST BE AN OLD NOTE
 
 	--DSACKDIS	= !AS ;
-	nDSACKDIS <= '0' WHEN nAS = '1';
+	nDSACKDIS <= NOT nAS;
 	
 	------------------
 	-- 6800 E CLOCK --
 	------------------
 	
-	--E <= '1' WHEN sca(2) = '1' ELSE '0' WHEN sca(2) = '0' ELSE 'Z' WHEN B2000 = '0';
+	--U506
+	
+	--E	= A2; E.OE	= !B2000;
 	E <= 'Z' WHEN B2000 = '0' ELSE sca(2);
 	
 	--------------------------
