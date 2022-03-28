@@ -6,17 +6,16 @@
 -- Design Name:    N2630 U600 CPLD
 -- Module Name:    U600 - Behavioral 
 -- Project Name:   N2630
--- Target Devices: XC9572 64 PIN
+-- Target Devices: XC9572 100 PIN
 -- Tool versions: 
--- Description:    LOGIC EQUATIONS FOR THE "LOW" CPLD
+-- Description:    LOGIC EQUATIONS FOR U600 CPLD
 --
 -- Dependencies: 
 --
 -- Revision: 0.0
 -- Revision 0.01 - File Created
--- Additional Comments: MUCH OF THIS LOGIC AND COMMENTS ARE TRANSLATED FROM THE PAL LOGIC FROM DAVE HAYNIE 
---                      (THANKS DAVE! HOPE YOU ARE DOING WELL.)
---                      EDITS FOR THE N2630 PROJECT MADE BY JASON NEUS
+-- Additional Comments: MUCH OF THIS LOGIC AND COMMENTS ARE TRANSLATED FROM THE PAL LOGIC FROM DAVE HAYNIE.
+--                      EDITS AND ADDITIONS FOR THE N2630 PROJECT MADE BY JASON NEUS.
 --
 ----------------------------------------------------------------------------------
 library IEEE;
