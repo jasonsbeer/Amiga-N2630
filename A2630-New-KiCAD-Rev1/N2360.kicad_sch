@@ -2478,16 +2478,16 @@
       (reference "U405") (unit 2) (value "74LVC257") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061d9c8dc/00000000-0000-0000-0000-000062134e3a"
-      (reference "U406") (unit 1) (value "SDRAM_256Mb(16Mx16)") (footprint "Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm")
+      (reference "U406") (unit 1) (value "SDRAM(16Mx16)") (footprint "Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm")
     )
     (path "/00000000-0000-0000-0000-000061d9c8dc/00000000-0000-0000-0000-000062536620"
-      (reference "U407") (unit 1) (value "SDRAM_256Mb(16Mx16)") (footprint "Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm")
+      (reference "U407") (unit 1) (value "SDRAM(16Mx16)") (footprint "Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm")
     )
     (path "/00000000-0000-0000-0000-000061d9c8dc/00000000-0000-0000-0000-0000625c827e"
-      (reference "U408") (unit 1) (value "SDRAM_256Mb(16Mx16)") (footprint "Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm")
+      (reference "U408") (unit 1) (value "SDRAM(16Mx16)") (footprint "Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm")
     )
     (path "/00000000-0000-0000-0000-000061d9c8dc/00000000-0000-0000-0000-0000625c830f"
-      (reference "U409") (unit 1) (value "SDRAM_256Mb(16Mx16)") (footprint "Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm")
+      (reference "U409") (unit 1) (value "SDRAM(16Mx16)") (footprint "Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/71ef4ede-17cc-4b0e-8ad3-e928f1e81bde"
       (reference "U414") (unit 1) (value "74LVC257") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
