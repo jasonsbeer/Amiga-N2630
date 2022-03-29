@@ -11,5 +11,116 @@
 <msg type="info" file="ProjectMgmt" num="1061" ><arg fmt="%s" index="1">Parsing VHDL file &quot;/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd&quot; into library work</arg>
 </msg>
 
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">253</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">280</arg>. <arg fmt="%s" index="3">Syntax error near &quot;BEGIN&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">302</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">344</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">352</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">355</arg>. <arg fmt="%s" index="3">Syntax error near &quot;BEGIN&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">363</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">366</arg>. <arg fmt="%s" index="3">Syntax error near &quot;BEGIN&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">374</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">403</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">421</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">433</arg>. <arg fmt="%s" index="3">Syntax error near &quot;BEGIN&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">443</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">535</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">546</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">556</arg>. <arg fmt="%s" index="3">Syntax error near &quot;BEGIN&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">566</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">588</arg>. <arg fmt="%s" index="3">Syntax error near &quot;BEGIN&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">598</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">601</arg>. <arg fmt="%s" index="3">Syntax error near &quot;BEGIN&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">614</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">617</arg>. <arg fmt="%s" index="3">Syntax error near &quot;BEGIN&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">630</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">633</arg>. <arg fmt="%s" index="3">Syntax error near &quot;BEGIN&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">645</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">657</arg>. <arg fmt="%s" index="3">Syntax error near &quot;BEGIN&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">668</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">768</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">778</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">784</arg>. <arg fmt="%s" index="3">Syntax error near &quot;BEGIN&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">792</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">798</arg>. <arg fmt="%s" index="3">Syntax error near &quot;BEGIN&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">806</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">815</arg>. <arg fmt="%s" index="3">Syntax error near &quot;BEGIN&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">827</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">855</arg>. <arg fmt="%s" index="3">Syntax error near &quot;PROCESS&quot;.</arg>
+</msg>
+
+<msg type="error" file="ProjectMgmt" num="806" >&quot;<arg fmt="%s" index="1">/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd</arg>&quot; Line <arg fmt="%d" index="2">857</arg>. <arg fmt="%s" index="3">Syntax error near &quot;IF&quot;.</arg>
+</msg>
+
 </messages>
 

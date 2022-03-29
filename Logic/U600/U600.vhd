@@ -78,10 +78,10 @@ entity U600 is
 		E : INOUT STD_LOGIC; --6800 E CLOCK
 		nIVMA : INOUT STD_LOGIC; --VALID MEMORY ADDRESS		
 		nRESET : INOUT STD_LOGIC; --_RESET SIGNAL
-		nASDELAY : INOUT STD_LOGIC;
 		DSEN : INOUT STD_LOGIC; --68000 DATA STROBE ENABLE
 		RnW : INOUT STD_LOGIC; --68030 READ/WRITE
 		
+		nASDELAY : OUT STD_LOGIC;
 		nDSCLK : OUT STD_LOGIC; --GATE DSACKn REQUEST
 		IPLCLK : OUT STD_LOGIC; --CLOCK TO LATCH IPL SIGNALS
 		nDSACKDIS : OUT STD_LOGIC; --DSACK DISABLE
@@ -89,7 +89,7 @@ entity U600 is
 		nBGDIS : OUT STD_LOGIC; --BUS GRANT DISABLE
 		nDSACK0 : INOUT STD_LOGIC; --DSACK0
 		nDSACK1 : INOUT STD_LOGIC; --DSACK1
-		nOVR : OUT STD_LOGIC; --DDTACK Over Ride
+		nOVR : OUT STD_LOGIC; --Over Ride Gary's Address Decoding During DMA
 		nADOEH : OUT STD_LOGIC; --ADDRESS OUTPUT ENABLE HIGH
 		nADOEL : OUT STD_LOGIC; --ADDRESS OUTPUT ENABLE LOW
 		ADDIR : OUT STD_LOGIC; --ADDRESS BUS DIRECTION CONTROL
@@ -127,8 +127,8 @@ architecture Behavioral of U600 is
 	--SIGNAL dmadelay : STD_LOGIC:='0';
 	SIGNAL cpudtack : STD_LOGIC:='0';
 	SIGNAL cpucycle : STD_LOGIC:='0';
-	SIGNAL bras : STD_LOGIC:='0';
-	SIGNAL dsackdly : STD_LOGIC:='0';
+	--SIGNAL bras : STD_LOGIC:='0';
+	--SIGNAL dsackdly : STD_LOGIC:='0';
 	SIGNAL edtack : STD_LOGIC:='0';
 	SIGNAL sn7mdis : STD_LOGIC:='0'; --STATE MACHINE CLOCK DISABLE
 	
@@ -196,42 +196,20 @@ begin
 	nASDELAY <= transport nAS after 100 ns;
 	
 	--BRAS		= cpucycle & !CHARGE		# cpucycle & ERAS & !ROFF		# dmacycle		# REFRAS;
-	bras <= '1' WHEN cpucycle = '1' OR dmacycle = '1' ELSE '0';
-	dsackdly <= transport bras after 300ns;
+	--bras <= '1' WHEN cpucycle = '1' OR dmacycle = '1' ELSE '0';
+	--dsackdly <= transport bras after 300ns;
 		
 	----------------------------
 	-- INTERNAL SIGNAL DEFINE --
 	----------------------------
-
-
-	--as		=  ASEN & !CYCEND & !EXTERN; U501
-	--JN: Assumption is this ABEL equation will return 1 when true...
-	--that's how I made all these internal signals work
-	as <= '1' WHEN nASEN = '0' AND nCYCEND = '1' AND nEXTERN = '1' ELSE '0';
 	
 	--offboard	= !(ONBOARD # MEMSEL # EXTERN); U501
 	offboard <= '1' WHEN (nONBOARD = '1' OR nMEMSEL = '1' OR nEXTERN = '1') ELSE '0';
 	
 	--cpustate <= FC ( 2 downto 0 );
-	cpuspace <= '1' WHEN FC ( 2 downto 0 ) = "111" ELSE '0';
+	cpuspace <= '1' WHEN FC ( 2 downto 0 ) = "111" ELSE '0';	
 	
-	--This indicates when a memory cycle is complete.
-	--cycledone	= cpudtack # dmadtack;
-	cycledone <= '1' WHEN cpudtack = '1' OR dmadtack = '1' ELSE '0';
-	
-	
-	--The standard qualification for a CPU memory cycle.  We have to wait
-	--until refresh is arbitrated, and make sure we're selected and it's
-	--not an EXTSELal cycle.
 
-	--cpucycle	= !BGACK & !REFACK & MEMSEL & ASDELAY &  AS & !EXTSEL;
-	--REFACK IS DRAM REFRESH ACK...I DON'T CARE ABOUT DRAM STUFF HERE...AT THE MOMENT
-	cpucycle <= '1' WHEN nBGACK = '1' AND nMEMSEL = '0' AND nASDELAY = '0' AND nAS = '0' AND EXTSEL = '0' ELSE '0';
-
-	--THIS LOOKS KINDA HACKY...THE DSACKDELAY IS A 300ns DELAY OF BRAS...PROBABLY ENOUGH TIME FOR THE RAM TO DO ITS STUFF
-	--THERE'S NO ACTUAL CONFIRMATION, WE JUST ASSUME STUFF HAPPENED...REVIEW THIS LATER FOR APPROPRIATNESS
-	--cpudtack	= cpucycle & DSACKDLY;
-	cpudtack <= '1' WHEN cpucycle = '1' AND dsackdly = '1' ELSE '0';
 	
 	---------------------
 	-- REQUEST THE BUS --
@@ -469,6 +447,11 @@ begin
 	--------------------------		
 	-- AMIGA ADDRESS STROBE --
 	--------------------------
+	
+	--as		=  ASEN & !CYCEND & !EXTERN; U501
+	--JN: Assumption is this ABEL equation will return 1 when true...even though it seems backwards here
+	--that's how I made all these internal signals work
+	as <= '1' WHEN nASEN = '0' AND nCYCEND = '1' AND nEXTERN = '1' ELSE '0';
 	
 	--68000 style address strobe. Again, this only becomes active when the
 	--TRISTATE signal is negated and the memory cycle is for an offboard
@@ -762,9 +745,9 @@ begin
 	DRSEL <= '1' WHEN nBOSS = '0' AND nBGACK = '1' AND RnW = '1' ELSE '0';
 	
 	
-	-----------------
-	-- BUS CONTROL --
-	-----------------
+	-------------------------
+	-- 68000 STATE MACHINE --
+	-------------------------
 	
 	--This one disables the rising edge clock.  It's latched externally.
 	--I qualify with EXTERN as well, to help make sure this state machine
@@ -808,6 +791,20 @@ begin
 		END IF;
 	END PROCESS;
 	
+	--Here we enable data strobe to the A2000.  Are we properly considering
+	--the R/W line here?  EXTERN qualification included here too. U505
+
+	--!DSEN.D = ASEN & !EXTERN & CYCEND;
+	PROCESS ( SCLK ) BEGIN
+		IF RISING_EDGE (SCLK) THEN
+			IF nASEN = '0' AND nEXTERN = '1' AND nCYCEND = '1' THEN
+				DSEN <= '0' ;
+			ELSE
+				DSEN <= '1';
+			END IF;
+		END IF;
+	END PROCESS;
+	
 	--This creates the DSACK go-ahead for all slow, 16 bit cycles.  These are,
 	--in order, A2000 DTACK, 68xx/65xx emulation DTACK, and ROM or config
 	--register access. U505
@@ -829,25 +826,58 @@ begin
 		END IF;
 	END PROCESS;
 	
+	------------------------------
+	-- MEMORY CYCLE TERMINATION --
+	------------------------------
 	
-	--Here we enable data strobe to the A2000.  Are we properly considering
-	--the R/W line here?  EXTERN qualification included here too. U505
+	--The standard qualification for a CPU memory cycle.  We have to wait
+	--until refresh is arbitrated, and make sure we're selected and it's
+	--not an EXTSELal cycle.
 
-	PROCESS ( SCLK ) BEGIN
-		IF RISING_EDGE (SCLK) THEN
-			IF nASEN = '0' AND nEXTERN = '1' AND nCYCEND = '1' THEN
-				DSEN <= '0' ;
+	--cpucycle	= !BGACK & !REFACK & MEMSEL & ASDELAY &  AS & !EXTSEL;
+	--REFACK IS DRAM REFRESH ACK...I DON'T CARE ABOUT DRAM STUFF HERE...AT THE MOMENT
+	--This determines if we the CPU is accessing memory
+	--cpucycle <= '1' WHEN nBGACK = '1' AND nMEMSEL = '0' AND nASDELAY = '0' AND nAS = '0' AND EXTSEL = '0' ELSE '0';
+	
+	--My assumption right now is the nASDELAY is there to deal with propagation delay
+	--or waiting for the DRAM to get/take the data on the bus. It is not required by the 030 timing digrams.
+	--This is STATE 1 on page 7-36.
+	--With SDRAM, add a check for REFRESH and wait for it to complete, when needed. This will add wait states.
+	cpucycle <= '1' WHEN nBGACK = '1' AND nMEMSEL = '0' AND nAS = '0' AND EXTSEL = '0' ELSE '0';
+
+	--cpudtack	= cpucycle & DSACKDLY;
+	--cpudtack <= '1' WHEN cpucycle = '1' AND dsackdly = '1' ELSE '0';
+	
+	--According to 68030 manual, you want dsack to assert on the next rising clock edge after the address strobe is asserted.
+	--DSACKx is also negated on the rising edge after AS is negated. The below code follows this to the letter.
+	--This is STATE 2 on page 7-36
+	
+	PROCESS (CPUCLK) BEGIN
+		IF RISING_EDGE (CPUCLK) 
+			IF cpucycle = '1' THEN
+				cpudtack <= '1';
 			ELSE
-				DSEN <= '1';
+				cpudtack <= '0';
 			END IF;
 		END IF;
-	END PROCESS;
+	END PROCESS;	
+	
+
+	--Since "cycledone" drives DSCAKx directly, we can make changes from the original and not use delay lines...see cpudtack and dmadtack
+	--This indicates when a memory cycle is complete.
+	--cycledone	= cpudtack # dmadtack;
+	cycledone <= '1' WHEN cpudtack = '1' OR dmadtack = '1' ELSE '0';
 			
 	--These are the cycle termination signals.  They're really both the
 	--same, and both driven, indicating that we are, in fact, a 32 bit
 	--wide port.  They go hi-Z when we're not selecting memory, so that
 	--other DSACK sources (FPU and the slow bus stuff) can get their
 	--chance to terminate. U600
+	
+	--According to 68030 manual, you want dsack to assert on the next rising clock edge after address strobe is asserted
+	--DSACKx is sampled on the rising edge during STATE 3. If valid, data is latched on the next falling clock edge. 
+	--Else, wait states are inserted until DSACKx is valid. This lets us insert wait states in the event our RAM is 
+	--slow or in the middle of refreshing.
 
 	--DSACK0		= cycledone;
 	--DSACK0.OE	= MEMSEL;

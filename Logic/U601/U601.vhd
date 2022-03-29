@@ -575,6 +575,7 @@ begin
 	--included. U305
 
 	--"Normal" state is logic low unless we are DMAing.
+	--MEMLOCK		= access & CONFIGED		# !AS		# EXTERN		# CYCEND;
 	nMEMLOCK <= '0' 
 		WHEN
 			( CONFIGED = '1' AND MEMACCESS = '1' )
@@ -586,7 +587,7 @@ begin
 			( nEXTERN = '0' )
 			--EXTERN
 		OR
-			( nCYCEND = '1' )
+			( nCYCEND = '0' )
 			--CYCEND
 		ELSE
 			'1';
