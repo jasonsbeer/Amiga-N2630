@@ -249,7 +249,8 @@ begin
 						nABR <= '0';
 					ELSE
 						nABR <= '1';
-					END IF;					
+					END IF;	
+				END IF;
 			END IF;
 		END IF;
 	END PROCESS;
@@ -884,7 +885,7 @@ begin
 	--This is STATE 2 on page 7-36
 	
 	PROCESS (CPUCLK) BEGIN
-		IF RISING_EDGE (CPUCLK) 
+		IF RISING_EDGE (CPUCLK) THEN
 			IF cpucycle = '1' THEN
 				cpudtack <= '1';
 			ELSE
