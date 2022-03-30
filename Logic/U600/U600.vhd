@@ -43,7 +43,7 @@ entity U600 is
 		FC : IN STD_LOGIC_VECTOR ( 2 downto 0 ); --FCn FROM 68030
 		EXTSEL : IN STD_LOGIC; --SELECTION INPUT FROM DAUGHTER CARD
 		--nDSACK0 : IN STD_LOGIC; --THIS WAS nSTERM ON REV 0
-		nASEN : IN STD_LOGIC; --ADDRESS STROBE ENABLE
+		nASEN : IN STD_LOGIC; --ADDRESS STROBE ENABLE FROM U503
 		A7M : IN STD_LOGIC; --AMIGA 7MHZ CLOCK
 		nC1 : IN STD_LOGIC; --AMIGA _C1 CLOCK
 		nC3 : IN STD_LOGIC; --AMIGA _C3 CLOCK
@@ -76,9 +76,9 @@ entity U600 is
 		nABR : INOUT STD_LOGIC; -- AMIGA BUS REQUEST
 		nDSACKEN : INOUT STD_LOGIC; --DSACKn ENABLE
 		E : INOUT STD_LOGIC; --6800 E CLOCK
-		nIVMA : INOUT STD_LOGIC; --VALID MEMORY ADDRESS		
+		IVMA : INOUT STD_LOGIC; --VALID MEMORY ADDRESS...ON THE SCHEMATIC, IVMA IS ACTIVE LOW, BUT IS TREATED AS ACTIVE HIGH IN THE PAL LOGIC	
 		nRESET : INOUT STD_LOGIC; --_RESET SIGNAL
-		DSEN : INOUT STD_LOGIC; --68000 DATA STROBE ENABLE
+		DSEN : INOUT STD_LOGIC; --68000 DATA STROBE ENABLE...ON THE SCHEMATIC, DSEN IS ACTIVE LOW, BUT IS TREATED AS ACTIVE HIGH IN THE PAL LOGIC
 		RnW : INOUT STD_LOGIC; --68030 READ/WRITE
 		
 		nASDELAY : OUT STD_LOGIC;
@@ -107,7 +107,6 @@ architecture Behavioral of U600 is
 	-- INTERNAL SIGNALS --
 	----------------------
 	
-	--All internal signals are active HIGH!
 	SIGNAL as : STD_LOGIC:='0';
 	SIGNAL offboard : STD_LOGIC:='0';		
 	SIGNAL cpuspace : STD_LOGIC:= '0'; --Derived from cpustate
@@ -133,6 +132,9 @@ architecture Behavioral of U600 is
 	SIGNAL sn7mdis : STD_LOGIC:='0'; --STATE MACHINE CLOCK DISABLE
 	
 	SIGNAL n7M : STD_LOGIC;
+	
+	SIGNAL memsel : STD_LOGIC:='Z';
+	SIGNAL dmasel : STD_LOGIC:='Z';
 
 begin
 	
@@ -427,7 +429,7 @@ begin
 	--the board is in a B2000, since that board will be receiving E from the 
 	--motherboard.  On an A2000, the E clock is absent (because the processor 
 	--is pulled) and thus WE create the E clock, and can create it in such a way
-	--as to make it automatically synced.
+	--as to make it automatically synced. U504
 
 	--ESYNC.D		= E & B2000;
 	PROCESS ( n7M ) BEGIN
@@ -442,7 +444,8 @@ begin
 		END IF;
 	END PROCESS;
 		
-	sync <= '1' WHEN ESYNC = '0' OR E = '1' ELSE '0'; --sync		= !ESYNC # E;	
+	--sync		= !ESYNC # E; U504
+	sync <= '1' WHEN esync = '0' OR E = '1' ELSE '0'; 
 			
 	--------------------------		
 	-- AMIGA ADDRESS STROBE --
@@ -473,13 +476,35 @@ begin
 	--must qualify the CPU driven memory cycles. U305
 	
 	--JN: HAD TO CHANGE access TO memaccess
+	
+	--MEMSEL		= access & CONFIGED &  AS & !EXTERN; MEMSEL.OE	= !BGACK;
+	--DMAMEM		= access & CONFIGED & AAS; DMAMEM.OE	= BGACK;
 
-	nMEMSEL <= '0' 
+	--MEMSEL and DMAMEM are tied together on the A2630 schematics, so I'm combining them here
+		
+	memsel <= 'Z'
 		WHEN 
-			MEMACCESS = '1' AND CONFIGED = '1' AND nAS = '0' AND nEXTERN = '1' AND nBGACK = '1'
-		ELSE '1'
-			WHEN nBGACK = '1'
-		ELSE 'Z';
+			nBGACK = '0'
+		ELSE '0'	
+			WHEN
+				MEMACCESS = '1' AND CONFIGED = '1' AND nAS = '0' AND nEXTERN = '1'
+		ELSE '1';
+		
+	dmasel <= 'Z'
+		WHEN
+			nBGACK = '1'
+		ELSE '0' 
+			WHEN
+				MEMACCESS = '1' AND CONFIGED = '1' AND nAAS = '0'
+		ELSE '1';
+		
+	nMEMSEL <= 'Z'
+		WHEN 
+			memsel = 'Z' AND dmasel = 'Z'
+		ELSE '0'
+			WHEN
+				memsel = '0' OR dmasel = '0'
+		ELSE '1';
 		
 	------------
 	-- EXTERN --
@@ -512,6 +537,8 @@ begin
 	--U506
 	
 	--E	= A2; E.OE	= !B2000;
+	--When we are a B2000, we use the E clock from the 68000
+	--On the A2000, we must make our own
 	E <= 'Z' WHEN B2000 = '0' ELSE sca(2);
 	
 	-----------------------------------
@@ -536,11 +563,11 @@ begin
 		IF RISING_EDGE ( P7M ) THEN
 			IF 
 				( sca(3) = '0' AND sca(2) = '0' AND sca(1) = '0' AND sca(0) = '0' AND nVPA = '0' ) OR
-				( nIVMA = '0' AND sca(3) = '0' ) 
+				( IVMA = '0' AND sca(3) = '0' ) 
 			THEN		
-				nIVMA <= '0';
+				IVMA <= '0';
 			ELSE
-				nIVMA <= '1';
+				IVMA <= '1';
 			END IF;
 		END IF;
 	END PROCESS;
@@ -549,14 +576,16 @@ begin
 	-- EDT ACK --
 	-------------
 	
+	--DTACK for 6800 cycle
 	--This was "!A3 & A2 & A1 & !A0 & !IVMA", but I think that may make
 	--the cycle end too early.  So I'm pushing it up by one clock. U506
 
 	--!EDTACK.D	= !A3 & A2 & A1 & A0 & !IVMA;
+	--This is an internal signal and is inverted from the original PAL
 	PROCESS ( P7M ) BEGIN
 		IF RISING_EDGE ( P7M ) THEN
 			IF 
-				( sca(3) = '0' AND sca(2) = '1' AND sca(1) = '1' AND sca(0) = '1' AND nIVMA = '0' ) 
+				( sca(3) = '0' AND sca(2) = '1' AND sca(1) = '1' AND sca(0) = '1' AND IVMA = '0' ) 
 			THEN
 				edtack <= '1';
 			ELSE
@@ -731,7 +760,7 @@ begin
 			'1';
 
 	--ADOEL		= BOSS &  BGACK &  MEMSEL & AAS &  A1;
-	nADOEL <= '0' WHEN  nBOSS = '0' AND nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' AND A1 = '0'  ELSE '1';
+	nADOEL <= '0' WHEN  nBOSS = '0' AND nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' AND A1 = '1'  ELSE '1';
 	
 	
 	----------------------
@@ -783,7 +812,7 @@ begin
 	--!CYCEND.D	= !DSACKEN & CYCEND;	
 	PROCESS ( SCLK ) BEGIN
 		IF RISING_EDGE (SCLK) THEN
-			IF nDSACKEN = '1' AND nCYCEND = '1' THEN
+			IF nDSACKEN = '1' AND nCYCEND = '0' THEN
 				nCYCEND <= '0'; 
 			ELSE
 				nCYCEND <= '1';
@@ -797,7 +826,7 @@ begin
 	--!DSEN.D = ASEN & !EXTERN & CYCEND;
 	PROCESS ( SCLK ) BEGIN
 		IF RISING_EDGE (SCLK) THEN
-			IF nASEN = '0' AND nEXTERN = '1' AND nCYCEND = '1' THEN
+			IF nASEN = '0' AND nEXTERN = '1' AND nCYCEND = '0' THEN
 				DSEN <= '0' ;
 			ELSE
 				DSEN <= '1';
@@ -815,9 +844,9 @@ begin
 	PROCESS ( SCLK ) BEGIN
 		IF RISING_EDGE (SCLK) THEN
 			IF 
-				(DSEN = '0' AND nEXTERN = '1' AND nCYCEND = '1' AND nDTACK = '0') OR
-				(DSEN = '0' AND nEXTERN = '1' AND nCYCEND = '1' AND edtack = '1') OR --note: edtack inverted from original
-				(DSEN = '0' AND nEXTERN = '1' AND nCYCEND = '1' AND nONBOARD = '0')
+				(DSEN = '0' AND nEXTERN = '1' AND nCYCEND = '0' AND nDTACK = '0') OR
+				(DSEN = '0' AND nEXTERN = '1' AND nCYCEND = '0' AND edtack = '1') OR --note: edtack inverted from original
+				(DSEN = '0' AND nEXTERN = '1' AND nCYCEND = '0' AND nONBOARD = '0')
 			THEN
 				nDSACKEN <= '1';
 			ELSE
@@ -843,12 +872,14 @@ begin
 	--or waiting for the DRAM to get/take the data on the bus. It is not required by the 030 timing digrams.
 	--This is STATE 1 on page 7-36.
 	--With SDRAM, add a check for REFRESH and wait for it to complete, when needed. This will add wait states.
+	
+	--cpucycle	= !BGACK & !REFACK & MEMSEL & ASDELAY &  AS & !EXTSEL;
 	cpucycle <= '1' WHEN nBGACK = '1' AND nMEMSEL = '0' AND nAS = '0' AND EXTSEL = '0' ELSE '0';
 
 	--cpudtack	= cpucycle & DSACKDLY;
 	--cpudtack <= '1' WHEN cpucycle = '1' AND dsackdly = '1' ELSE '0';
 	
-	--According to 68030 manual, you want dsack to assert on the next rising clock edge after the address strobe is asserted.
+	--According to 68030 manual, you want dsack to assert on the next or later rising clock edge after the address strobe is asserted.
 	--DSACKx is also negated on the rising edge after AS is negated. The below code follows this to the letter.
 	--This is STATE 2 on page 7-36
 	
@@ -874,7 +905,7 @@ begin
 	--other DSACK sources (FPU and the slow bus stuff) can get their
 	--chance to terminate. U600
 	
-	--According to 68030 manual, you want dsack to assert on the next rising clock edge after address strobe is asserted
+	--According to 68030 manual, you want dsack to assert on the next or later rising clock edge after address strobe is asserted
 	--DSACKx is sampled on the rising edge during STATE 3. If valid, data is latched on the next falling clock edge. 
 	--Else, wait states are inserted until DSACKx is valid. This lets us insert wait states in the event our RAM is 
 	--slow or in the middle of refreshing.
