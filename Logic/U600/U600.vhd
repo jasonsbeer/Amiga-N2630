@@ -49,7 +49,7 @@ entity U600 is
 		nC3 : IN STD_LOGIC; --AMIGA _C3 CLOCK
 		CDAC : IN STD_LOGIC; --AMIGA CDAC CLOCK
 		nAS : IN STD_LOGIC; --68030 ADDRESS STROBE
-		ARnW : IN STD_LOGIC; --68000 READ/WRITE
+		ARnW : IN STD_LOGIC; --DMA READ/WRITE FROM AMIGA 2000
 		nVPA : IN STD_LOGIC; --68000 VALID PERIPHERAL ADDRESS
 		JMODE : IN STD_LOGIC; --JOHANN'S SPECIAL MODE! WHO IS JOHANN AND WHY DOES HE GET HIS OWN MODE? LUCKY!
 		MEMACCESS : IN STD_LOGIC; --WE ARE ACCESSING ON BOARD MEMORY
@@ -82,7 +82,7 @@ entity U600 is
 		RnW : INOUT STD_LOGIC; --68030 READ/WRITE
 		
 		nASDELAY : OUT STD_LOGIC;
-		nDSCLK : OUT STD_LOGIC; --GATE DSACKn REQUEST
+		DSCLK : OUT STD_LOGIC; --GATE DSACKn REQUEST
 		IPLCLK : OUT STD_LOGIC; --CLOCK TO LATCH IPL SIGNALS
 		nDSACKDIS : OUT STD_LOGIC; --DSACK DISABLE
 		nREGRESET : OUT STD_LOGIC; --PART OF RESET LOOP "FIX"
@@ -119,7 +119,7 @@ architecture Behavioral of U600 is
 	SIGNAL cycledone : STD_LOGIC:='0';
 	SIGNAL dmaaccess : STD_LOGIC:='0';
 	SIGNAL dmadtack : STD_LOGIC:='0';
-	SIGNAL dmacycle : STD_LOGIC:='0';	
+	--SIGNAL dmacycle : STD_LOGIC:='0';	
 	SIGNAL aasq : STD_LOGIC:='0';
 	SIGNAL aas40 : STD_LOGIC:='0';
 	SIGNAL aas80 : STD_LOGIC:='0';
@@ -165,28 +165,17 @@ begin
 	--P14M	=   basis7M $ CDAC;
 	p14m <= '1' WHEN basis7m = '1' XOR CDAC = '1' ELSE '0';
 	--N14M <= '0' WHEN basis7m XOR CDAC = '1' ELSE '1';
-	
-	--This is the state machine clock.  This is basically a 14MHz clock, 
-	--but some of it's edges are suppressed.  This lets the 68000 state
-	--machine just skip the unimportant clock edges in the 68000 cycle
-	--and just concentrate on the interesting edges. U708
-	
-	--SCLK		=  CDAC & P14M & !N7M & SN7MDIS		# !CDAC & P14M &  N7M & !S7MDIS;
-	SCLK <= '1' 
-		WHEN 
-			(CDAC = '1' AND p14m = '1' AND n7M = '1' AND sn7mdis = '1') OR 
-			(CDAC = '0' AND p14m = '1' AND n7M = '0' AND nS7MDIS = '1')
-		ELSE '0';
 		
-	--This clock is used to gate a DSACK request.
-
-	nDSCLK <= NOT basis7m;
+	--This clock is used to gate a DSACK request. U708
+	--DSCLK		= !basis7M;
+	DSCLK <= NOT basis7m;
 
 	--This clock is used to latch the interrupt lines between the motherboard
 	--and the 68030.  If this isn't done, you'll get phantom interrupts
 	--that you probably won't even notice in AmigaOS, but can be fatal to
-	--time critical interrupt code in UNIX and possibly even AmigaOS.
+	--time critical interrupt code in UNIX and possibly even AmigaOS. U708
 
+	--IPLCLK		=  basis7M;
 	IPLCLK <= basis7m;
 	
 	-----------------
@@ -200,18 +189,6 @@ begin
 	--BRAS		= cpucycle & !CHARGE		# cpucycle & ERAS & !ROFF		# dmacycle		# REFRAS;
 	--bras <= '1' WHEN cpucycle = '1' OR dmacycle = '1' ELSE '0';
 	--dsackdly <= transport bras after 300ns;
-		
-	----------------------------
-	-- INTERNAL SIGNAL DEFINE --
-	----------------------------
-	
-	--offboard	= !(ONBOARD # MEMSEL # EXTERN); U501
-	offboard <= '1' WHEN (nONBOARD = '1' OR nMEMSEL = '1' OR nEXTERN = '1') ELSE '0';
-	
-	--cpustate <= FC ( 2 downto 0 );
-	cpuspace <= '1' WHEN FC ( 2 downto 0 ) = "111" ELSE '0';	
-	
-
 	
 	---------------------
 	-- REQUEST THE BUS --
@@ -236,20 +213,20 @@ begin
 				--Tristate so we don't interfere with other bus users.
 				nABR <= 'Z';
 			ELSE
-				IF nABR = '1' THEN
-					--nABR is not asserted. Should we?
-					IF (nRESET = '1' AND nAAS = '0' AND nBOSS = '1' AND MODE68K = '0') THEN				
-						nABR <= '0';
-					ELSE
-						nABR <= '1';
-					END IF;
-				ELSE
+				IF nABR = '0' THEN	
 					--nABR is asserted, but are we BOSS yet?
 					IF (nRESET = '1' AND nBOSS = '1' AND MODE68K = '0') THEN
 						nABR <= '0';
 					ELSE
 						nABR <= '1';
 					END IF;	
+				ELSE
+					--nABR is not asserted. Should we?
+					IF (nRESET = '1' AND nAAS = '0' AND nBOSS = '1' AND MODE68K = '0') THEN				
+						nABR <= '0';
+					ELSE
+						nABR <= '1';
+					END IF;
 				END IF;
 			END IF;
 		END IF;
@@ -280,6 +257,11 @@ begin
 	--Check if the bus has been granted and lock in BOSS
 	--Bus mastering is supposed to be clocked on the 7MHz rising edge (A2000 technical reference)
 	--Doing it like this avoids combitorial loops and it should work fine
+	
+	--BOSS		= ABG & !AAS & !DTACK & !HALT & !RESET & B2000 & !MODE68K 
+	--	#  !HALT & !MODE68K & BOSS
+	--	# !RESET & !MODE68K & BOSS
+	--	# !B2000 & !HALT & !RESET;
 	PROCESS (P7M) BEGIN
 		IF (RISING_EDGE (P7M)) THEN
 			IF (nBOSS = '0') THEN
@@ -313,14 +295,17 @@ begin
 	--device has control of the A2000 Bus.  We want tristate when we're not 
 	--BOSS, or when we are BOSS but we're being DMAed. U305
 
+	--TRISTATE	= !BOSS # (BOSS & BGACK);
 	TRISTATE <= '1' WHEN nBOSS = '1' OR ( nBOSS = '0' AND nBGACK = '0' ) ELSE '0';
 	
+	--Logic Equations related to the DMA to RAM interface
 	--The read/write signal is locked to the DMA read/write signal when DMA'ing. U505
+	--RW		= ARW; RW.OE		= BGACK;
 	RnW <= ARnW WHEN nBGACK = '0' ELSE 'Z';
 			
 	--The OVR signal must be asserted whenever on-board memory is selected
 	--during a DMA cycle.  It tri-states GARY's DTACK output, allowing
-	--one to be created by our memory logic.
+	--one to be created by our memory logic. u501
 
 	--OVR		= BGACK & MEMSEL;
 	--OVR.OE		= BGACK & MEMSEL;
@@ -342,6 +327,7 @@ begin
 	
 	--These next lines make us delayed and synchronized versions of the 
 	--68000 compatible address strobe, used to handle synchronization during DMA. U600
+	--These are active low in the PALs, but I have inverted it here
 
 	--AASQ.D		= BGACK & AAS;
 	PROCESS ( CPUCLK ) BEGIN
@@ -377,20 +363,28 @@ begin
 	END PROCESS;
 	
 	--The standard qualification for a DMA memory cycle.  This is much the
-	--same as the CPU cycle, only it obeys the 68000 comparible signals
+	--same as the CPU cycle, only it obeys the 68000 compatible signals
 	--instead of 68030 signals.  The DMA cycle can DTACK early, since we
 	--know the minimum clock period is more than the DRAM access time. U600
 
-	--dmaaccess	=  BGACK & !REFACK & MEMSEL & AAS;	
+	--dmaaccess	=  BGACK & !REFACK & MEMSEL & AAS;
+		--We are starting the DMA thing
 	dmaaccess <= '1' WHEN nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' ELSE '0';
+
+	--dmacycle	= dmaaccess & AAS40 & !DMADELAY (was 1);	changed phase of dmadelay
+	--This is delayed 1 clock cycles from the original DMA request
+	--Hold will DMADELAY is asserted
+	
+	--We are doing the DMA thing...THIS IS USED TO ASSERT RAS IN PAL U600 FOR DMA CYCLES
+	--THIS NEEDS TO ACTIVATE SRAM! NEED TO SEND THIS SIGNAL TO THE OTHER CPLD
+	--THIS INDICATES SOMETHING IS TRYING TO ACCESS RAM VIA DMA. 
+	--WE DON'T WANT THE 68030 TO TRY TO ACCESS RAM AT THE SAME TIME...
+	dmacycle <= '1' WHEN dmaaccess = '1' AND aas40 = '1' AND dmadelay = '0' ELSE '0';	
 
 	--dmadtack	= dmaaccess & AAS80;
 	--this is delayed 2 clock cycles from the original DMA request
+	--We are done doing the DMA thing
 	dmadtack <= '1' WHEN dmaaccess = '1' AND aas80 = '1' ELSE '0';
-	
-	--dmacycle	= dmaaccess & AAS40 & !DMADELAY (was 1);	changed phase of dmadelay
-	--this is delayed 1 clock cycles from the original DMA request
-	dmacycle <= '1' WHEN dmaaccess = '1' AND aas40 = '1' AND dmadelay = '0' ELSE '0';	
 	
 	--The purpose of DMADELAY is to hold off RAS during a DMA cycle
 	--until there's a data strobe.  Doubling up on this functional
@@ -403,6 +397,7 @@ begin
 	--Prevent CPU RAM access (RAS/CAS) during DMA. This would be bad because other devices are accessing the memory at this time.
 	--Bus mastering is supposed to be clocked on the 7MHz rising edge (A2000 technical reference)
 	--Doing it like this avoids combitorial loops and it should work fine
+	
 	PROCESS (P7M) BEGIN
 		IF RISING_EDGE (P7M) THEN
 			IF dmadelay = '1' THEN
@@ -457,6 +452,9 @@ begin
 	--that's how I made all these internal signals work
 	as <= '1' WHEN nASEN = '0' AND nCYCEND = '1' AND nEXTERN = '1' ELSE '0';
 	
+	--offboard	= !(ONBOARD # MEMSEL # EXTERN); U501
+	offboard <= '1' WHEN (nONBOARD = '1' OR nMEMSEL = '1' OR nEXTERN = '1') ELSE '0';
+	
 	--68000 style address strobe. Again, this only becomes active when the
 	--TRISTATE signal is negated and the memory cycle is for an offboard
 	--resource. U501
@@ -510,7 +508,10 @@ begin
 	------------
 	-- EXTERN --
 	------------
-		
+	
+	--cpustate <= FC ( 2 downto 0 ); U306
+	cpuspace <= '1' WHEN FC ( 2 downto 0 ) = "111" ELSE '0';	
+	
 	--Here's the EXTERN logic.  The EXTERN signal is used to qualify unusual
 	--memory accesses.  There are two kinds, CPU space and daughterboard
 	--space.  CPU space is given by the function codes.  Daughterboard space
@@ -778,6 +779,18 @@ begin
 	-------------------------
 	-- 68000 STATE MACHINE --
 	-------------------------
+	
+	--This is the state machine clock.  This is basically a 14MHz clock, 
+	--but some of it's edges are suppressed.  This lets the 68000 state
+	--machine just skip the unimportant clock edges in the 68000 cycle
+	--and just concentrate on the interesting edges. U708
+	
+	--SCLK		=  CDAC & P14M & !N7M & SN7MDIS		# !CDAC & P14M &  N7M & !S7MDIS;
+	SCLK <= '1' 
+		WHEN 
+			(CDAC = '1' AND p14m = '1' AND n7M = '1' AND sn7mdis = '1') OR 
+			(CDAC = '0' AND p14m = '1' AND n7M = '0' AND nS7MDIS = '1')
+		ELSE '0';
 	
 	--This one disables the rising edge clock.  It's latched externally.
 	--I qualify with EXTERN as well, to help make sure this state machine

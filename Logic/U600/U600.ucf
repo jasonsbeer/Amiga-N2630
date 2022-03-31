@@ -6,7 +6,7 @@ NET "nASDELAY"	LOC = "P8" ;
 NET "nDSACKDIS"	LOC = "P9" ;
 NET "IPLCLK"	LOC = "P10" ;
 NET "nDSACKEN"	LOC = "P11" ;	
-NET "nDSCLK"	LOC = "P12" ;
+NET "DSCLK"		LOC = "P12" ;
 
 NET "ADDIR"		LOC = "P13" ;
 NET "DRSEL"		LOC = "P14"	;
