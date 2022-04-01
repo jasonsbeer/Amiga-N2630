@@ -3,10 +3,10 @@
 -- Engineer:       JASON NEUS
 -- 
 -- Create Date:    09:42:54 02/13/2022 
--- Design Name:    "HIGH" CPLD
+-- Design Name:    N2630 U601 CPLD
 -- Module Name:    U601 - Behavioral 
 -- Project Name:   N2630
--- Target Devices: XC9572 64 PIN
+-- Target Devices: XC9572 100 PIN
 -- Tool versions: 
 -- Description: 
 --
@@ -14,9 +14,8 @@
 --
 -- Revision: 
 -- Revision 0.01 - File Created
--- Additional Comments: MUCH OF THIS LOGIC AND COMMENTS ARE TRANSLATED FROM THE PAL LOGIC FROM DAVE HAYNIE 
---                      (THANKS DAVE! HOPE YOU ARE DOING WELL.)
---                      EDITS FOR THE N2630 PROJECT MADE BY JASON NEUS
+-- Additional Comments: MUCH OF THIS LOGIC AND COMMENTS ARE TRANSLATED FROM THE PAL LOGIC FROM DAVE HAYNIE.
+--                      EDITS AND ADDITIONS FOR THE N2630 PROJECT MADE BY JASON NEUS.
 --
 ----------------------------------------------------------------------------------
 library IEEE;
@@ -34,7 +33,6 @@ use ieee.std_logic_unsigned.all;
 
 entity U601 is
     Port ( 
-		--64 PINS USED
 	 
 		FC : IN STD_LOGIC_VECTOR (2 downto 0); --FCn FROM 68030
 		--AL : IN STD_LOGIC_VECTOR (6 downto 0); --ADDRESS BUS BITS 6..1
@@ -71,6 +69,8 @@ entity U601 is
 		ROMCLK : INOUT STD_LOGIC; --CLOCK FOR U303
 		nONBOARD : INOUT STD_LOGIC; --ARE WE USING RESOURCES ON THE 2630?
 		MEMACCESS : INOUT STD_LOGIC; --LOGIC HIGH WHEN WE ARE ACCESSING Z2 RAM	
+		nUDS : INOUT STD_LOGIC; --68000 UPPER DATA STROBE
+		nLDS : INOUT STD_LOGIC; --68000 LOWER DATA STROBE
 	 
 	 	nFPUCS : OUT STD_LOGIC; --FPU CHIP SELECT
 		nBERR : OUT STD_LOGIC; --BUS ERROR
@@ -87,8 +87,6 @@ entity U601 is
 		nLMBE : OUT STD_LOGIC; --LOWER MIDDLE BYTE ENABLE
 		nLLBE : OUT STD_LOGIC; --LOWER LOWER BYTE ENABLE
 		nMEMLOCK : OUT STD_LOGIC; --LOCK MEMORY DURING ACCESS FOR STATE MACHINE
-		nUDS : OUT STD_LOGIC; --68000 UPPER DATA STROBE
-		nLDS : OUT STD_LOGIC; --68000 LOWER DATA STROBE
 		ARnW : OUT STD_LOGIC; --68000 READ/WRITE SIGNAL		
 		EMDDIR : OUT STD_LOGIC --DIRECTION OF DATA LINES FOR MEMORY
 		
@@ -153,48 +151,21 @@ begin
 
 	--field cpuaddr	= [A23..13] ;			/* Normal CPU space stuff */
 	chipram <= '1' WHEN A(23 downto 13) >= "00000000000" AND A(23 downto 13) <= "00011111111"  ELSE '0';
-	--chipram		= (cpuaddr:[000000..1fffff]) ;    /* All Chip RAM */
-	--busspace	= (cpuaddr:[200000..9fffff]) ;    /* Main expansion bus */
+	--chipram		= (cpuaddr:[000000..1fffff]) ;    /* All Chip RAM */ 0-000111111111111111111111
+	--busspace	= (cpuaddr:[200000..9fffff]) ;    /* Main expansion bus */ 001000000000000000000000-100111111111111111111111
 	ciaspace <= '1' WHEN A(23 downto 13) >= "10100000000" AND A(23 downto 13) <= "10111111111" ELSE '0';
-	--ciaspace	= (cpuaddr:[a00000..bfffff]) ;    /* VPA decode */
-	--extraram	= (cpuaddr:[c00000..cfffff]) ;    /* Motherboard RAM */
+	--ciaspace	= (cpuaddr:[a00000..bfffff]) ;    /* VPA decode */ 101000000000000000000000-101111111111111111111111
+	--extraram	= (cpuaddr:[c00000..cfffff]) ;    /* Motherboard RAM */ 110000000000000000000000-110011111111111111111111
 	chipregs <= '1' WHEN A(23 downto 13) >= "11010000000" AND A(23 downto 13) <= "11011111111" ELSE '0';
-	--chipregs	= (cpuaddr:[d00000..dfffff]) ;    /* Custom chip registers */
+	--chipregs	= (cpuaddr:[d00000..dfffff]) ;    /* Custom chip registers */ 110100000000000000000000-110111111111111111111111
 	iospace <= '1' WHEN A(23 downto 13) >= "11101000000" AND A(23 downto 13) <= "11101111111" ELSE '0';
-	--iospace		= (cpuaddr:[e80000..efffff]) ;    /* I/O expansion bus */
-	--romspace	= (cpuaddr:[f80000..ffffff]) ;    /* All ROM */
-	
-	--field spacetype	= [A19..16] ;
-	--interruptack	= (spacetype:f0000) ;
-	--coppercom	= (spacetype:20000) ;
-	--breakpoint	= (spacetype:00000) ;
-	interruptack <= '1' WHEN A( 19 downto 16 ) = "1111" ELSE '0';
-	coppercom <= '1' WHEN A( 19 downto 16 ) = "0010" ELSE '0';
-	mc68881 <= '1' WHEN A( 15 downto 13 ) = "001" ELSE '0';
-	
-	userdata	<= '1' WHEN FC( 2 downto 0 ) = "001" ELSE '0'; --(cpustate:1)
-	superdata <= '1' WHEN FC( 2 downto 0 ) = "101" ELSE '0'; --(cpustate:5)
-	cpuspace <= '1' WHEN FC(2 downto 0) = "111" ELSE '0'; --(cpustate:7)
-	
+	--iospace		= (cpuaddr:[e80000..efffff]) ;    /* I/O expansion bus */ 111010000000000000000000-111011111111111111111111
+	--romspace	= (cpuaddr:[f80000..ffffff]) ;    /* All ROM */ 111110000000000000000000-111111111111111111111111
+
+	cpuspace <= '1' WHEN FC(2 downto 0) = "111" ELSE '0'; --(cpustate:7)	
 
 	--ramaddr		= addr:48;
-	--ramaddr <= '1' WHEN A(6 downto 1) = "100100" ELSE '0'; --01001000
-	
-	
-	readcycle <= '1' WHEN RnW = '1' AND nAS = '0' ELSE '0';
-	
-
-	
-
-
-	--rds		=  ASEN & !CYCEND &  RW & !EXTERN;
-	rds <= '1' WHEN nASEN = '0' AND nCYCEND = '1' AND RnW = '1' AND nEXTERN = '1' ELSE '0';
-
-	--wds		=  DSEN & !CYCEND & !RW;
-	wds <= '1' WHEN nDSEN = '0' AND nCYCEND = '1' AND RnW = '0' ELSE '0';
-	
-	--offboard	= !(ONBOARD # MEMSEL # EXTERN);
-	offboard <= '1' WHEN (nONBOARD = '1' OR nMEMSEL = '1' OR nEXTERN = '1') ELSE '0';
+	--ramaddr <= '1' WHEN A(6 downto 1) = "100100" ELSE '0'; --01001000	
 
 	----------------
 	-- AUTOCONFIG --
@@ -220,9 +191,13 @@ begin
 	--We AUTOCONFIG the 2630 FIRST, then the Zorro 2 RAM
 	--For REV 0 we only have 2 MB of RAM, so always config it unless AUTO = 0
 	D(31 downto 28) <= 
-		D_2630(0) & D_2630(1) & "1" & D_2630(2) WHEN autoconfigcomplete_2630 = '0' AND autoconfigspace ='1' AND CONFIGED = '0' ELSE
-		D_ZORRO2RAM WHEN autoconfigcomplete_ZORRO2RAM = '0' AND autoconfigspace ='1' AND CONFIGED = '0' ELSE
-		"ZZZZ";		
+			D_2630(0) & D_2630(1) & "1" & D_2630(2) 
+				WHEN autoconfigcomplete_2630 = '0' AND autoconfigspace = '1' AND CONFIGED = '0' 
+		ELSE
+			D_ZORRO2RAM 
+				WHEN autoconfigcomplete_ZORRO2RAM = '0' AND autoconfigspace ='1' AND CONFIGED = '0' 
+		ELSE
+			"ZZZZ";		
 			
 	--Here it is in all its glory...the AUTOCONFIG sequence
 	PROCESS ( CPUCLK, nRESET ) BEGIN
@@ -328,6 +303,8 @@ begin
 	---------------
 
 	--THIS DETERMINES IF WE ARE ACCESSING ZORRO 2 RAM
+	--THIS CAN BE DONE BY THE 68030 OR ANY DMA DEVICES ON THE ZORRO 2 BUS
+	
 	--We need to signal the U600 if the address space is pointing at our zorro 2 ram
 	MEMACCESS <= '1' 
 		WHEN
@@ -335,11 +312,16 @@ begin
 		ELSE
 			'0';
 	
-	--OUTPUT ENABLE OR WRITE ENABLE DEPENDING ON THE CPU REQUEST
+	--OUTPUT ENABLE OR WRITE ENABLE DEPENDING ON THE REQUEST
 	nOE0 <= '0' WHEN RnW = '1' AND MEMACCESS = '1' ELSE '1';
 	nWE0 <= '0' WHEN RnW = '0' AND MEMACCESS = '1' ELSE '1';
 	
-	--THIS IS ALL IN SECTION 12 OF THE 68030 MANUAL
+	--WE NEED TO BE RESPONSIVE TO BOTH THE CPU AND DMA READ/WRITE REQUESTS
+	--WE NEED TO HOLD OFF THE CPU WHEN A DMA CYCLE IS IN PROGRESS AND VICE VERSA
+	--nBGACK DOES THIS NICELY. WHEN ASSERTED, THE 68030 RELEASES THE BUS. 
+	--EXTERNAL DEVICES ARE NOT TO ASSERT nBGACK UNTIL THE 680x0 NEGATES nAS AND nDSACK (nDTACK). pp7-100.
+	--WHEN IMPLEMENTING SDRAM, WE NEED TO HOLD OFF ANY RAM ACCESS (DMA OR CPU) UNTIL REFRESH IS COMPLETE.
+	--DISCUSSION OF PORT SIZE AND BYTE SIZING IS ALL IN SECTION 12 OF THE 68030 MANUAL
 	RAM_ACCESS:PROCESS ( CPUCLK ) BEGIN
 		
 		IF ( FALLING_EDGE (CPUCLK) ) THEN
@@ -349,8 +331,10 @@ begin
 				--ENABLE THE VARIOUS BYTES ON THE SRAM DEPENDING ON WHAT THE CPU IS ASKING FOR
 
 				--UPPER UPPER BYTE ENABLE (D31..24)
-				IF (( RnW = '1' ) 
-					OR (RnW = '0' AND A(1 downto 0) = "00" AND nDS = '0')) 
+				IF 
+				   (( RnW = '1' ) OR
+					(nBGACK = '1' AND A(1 downto 0) = "00" AND nDS = '0') OR
+					(nBGACK = '0' AND nUDS = '0' AND A(1) = '1'))
 				THEN			
 					nUUBE <= '0'; 
 				ELSE 
@@ -358,10 +342,12 @@ begin
 				END IF;
 
 				--UPPER MIDDLE BYTE (D23..16)
-				IF (( RnW = '1' ) 
-					OR ( RnW = '0' AND A(1 downto 0) = "01"  AND nDS = '0')
-					OR ( A(1) = '0' AND SIZ(0) = '0'  AND nDS = '0') 
-					OR ( A(1) = '0' AND SIZ(1) = '1'  AND nDS = '0')) 
+				IF 
+					(( RnW = '1' ) OR
+					(nBGACK = '1' AND A(1 downto 0) = "01" AND nDS = '0') OR
+					(nBGACK = '1' AND A(1) = '0' AND SIZ(0) = '0'  AND nDS = '0') OR
+					(nBGACK = '1' AND A(1) = '0' AND SIZ(1) = '1'  AND nDS = '0') OR
+					(nBGACK = '0' AND nLDS = '0' AND A(1) = '1')) 
 				THEN
 					nUMBE <= '0';
 				ELSE
@@ -369,11 +355,13 @@ begin
 				END IF;
 
 				--LOWER MIDDLE BYTE (D15..8)
-				IF (( RnW = '1' )
-					OR ( RnW = '0' AND A(1 downto 0) = "10"  AND nDS = '0') 
-					OR ( A(1) = '0' AND SIZ(0) = '0' AND SIZ(1) = '0'  AND nDS = '0') 
-					OR	( A(1) = '0' AND SIZ(0) = '1' AND SIZ(1) = '1'  AND nDS = '0') 
-					OR ( A(0) = '1' AND A(1) = '0' AND SIZ(0) = '0'  AND nDS = '0'))
+				IF 
+				   (( RnW = '1' ) OR
+					(nBGACK = '1' AND A(1 downto 0) = "10" AND nDS = '0') OR
+					(nBGACK = '1' AND A(1) = '0' AND SIZ(0) = '0' AND SIZ(1) = '0'  AND nDS = '0') OR
+					(nBGACK = '1' AND A(1) = '0' AND SIZ(0) = '1' AND SIZ(1) = '1'  AND nDS = '0') OR
+					(nBGACK = '1' AND A(0) = '1' AND A(1) = '0' AND SIZ(0) = '0'  AND nDS = '0') OR
+					(nBGACK = '0' AND nUDS = '0' AND A(1) = '0'))
 				THEN
 					nLMBE <= '0';
 				ELSE
@@ -381,11 +369,13 @@ begin
 				END IF;
 
 				--LOWER LOWER BYTE (D7..0)
-				IF (( RnW = '1' )
-					OR	( RnW = '0' AND ( A(1 downto 0) = "11"  AND nDS = '0' ))
-					OR (A(0) = '1' AND SIZ(0) = '1' AND SIZ(1) = '1' AND nDS = '0') 
-					OR	(SIZ(0) = '0' AND SIZ(1) = '0' AND nDS = '0') 
-					OR	(A(1) = '1' AND SIZ(1) ='1' AND nDS = '0'))
+				IF 
+				   (( RnW = '1' ) OR
+					(nBGACK = '1' AND A(1 downto 0) = "11" AND nDS = '0' ) OR
+					(nBGACK = '1' AND A(0) = '1' AND SIZ(0) = '1' AND SIZ(1) = '1' AND nDS = '0') OR
+					(nBGACK = '1' AND SIZ(0) = '0' AND SIZ(1) = '0' AND nDS = '0') OR
+					(nBGACK = '1' AND A(1) = '1' AND SIZ(1) ='1' AND nDS = '0') OR
+					(nBGACK = '0' AND nLDS = '0' AND A(1) = '0'))
 				THEN
 					nLLBE <= '0';
 				ELSE
@@ -420,7 +410,10 @@ begin
 	
 	--EXTSEL = 1 is when Zorro 3 RAM is responding to the address space
 	--So, this original code never caches in Z3 ram. 
-	--Might want to consider looking into that when Z3 ram is present.
+	--Might want to consider looking into that when Z3 ram is present.	
+		
+	userdata	<= '1' WHEN FC( 2 downto 0 ) = "001" ELSE '0'; --(cpustate:1)
+	superdata <= '1' WHEN FC( 2 downto 0 ) = "101" ELSE '0'; --(cpustate:5)
 	
 	nCIIN <= '1' 
 		WHEN
@@ -444,6 +437,13 @@ begin
 	--going on.  If the chip isn't there, we want a bus error generated to 
 	--force an F-line emulation exception.  Add in AS as a qualifier here
 	--if the PAL ever turns out too slow to make FPUCS before AS.
+	
+	--field spacetype	= [A19..16] ;
+	--coppercom	= (spacetype:20000) ; 00100000000000000000
+	coppercom <= '1' WHEN A( 19 downto 16 ) = "0010" ELSE '0';
+	--field copperid	= [A15..13] ;	
+	--mc68881	= (copperid:2000) ; 0010000000000000
+	mc68881 <= '1' WHEN A( 15 downto 13 ) = "001" ELSE '0';
 
 	nFPUCS <= '0' WHEN ( cpuspace = '1' AND coppercom = '1' AND mc68881 = '1' AND nBGACK = '1' ) ELSE '1';
 
@@ -458,7 +458,12 @@ begin
 	--generally incompatible with supplied vectors, so this shouldn't be
 	--a problem working all the time.  During DMA we don't want any AVEC
 	--generation, in case the DMA device is like a Boyer HD and doesn't
-	--drive the function codes properly. U306
+	--drive the function codes properly. U306	
+		
+	--field spacetype	= [A19..16] ;
+	--interruptack	= (spacetype:f0000) ;
+	--11110000000000000000
+	interruptack <= '1' WHEN A( 19 downto 16 ) = "1111" ELSE '0';
 
 	--AVEC		= cpuspace & interruptack & !BGACK;
 	nAVEC <= '0' WHEN (cpuspace = '1' AND interruptack = '1' AND nBGACK = '1') ELSE '1';
@@ -477,6 +482,8 @@ begin
 	
 	--High memory rom space, where ROMs normally reside when available.
 	hirom <= '1' WHEN A( 23 downto 16 ) = "11111000" ELSE '0'; --addr:[f80000..f8fff] AND A( 23 downto 15 ) <= "111110001"
+	
+	readcycle <= '1' WHEN RnW = '1' AND nAS = '0' ELSE '0';
 	
 	--icsrom		= hirom & !PHANHI & readcycle		# lorom & !PHANLO & readcycle;
 	icsrom <= '1' 
@@ -538,7 +545,7 @@ begin
 	writecycle <= '1' WHEN csauto = '1' AND RnW = '0' AND nDS ='0' AND nCPURESET = '1' ELSE '0';
 	--WRITECYCLE WHEN CSAUTO AND WRITE MODE AND DATA STROBE AND NOT CPURESET	
 		
-	--THIS GOES THROUGH AN INVERTING GATE IN THE A2630 (U307). NO NEED FOR THAT, SO WE SUPPLY THE CORRECT SIGNAL HERE!
+	--THIS GOES THROUGH AN INVERTING GATE IN THE A2630 (U307). NO NEED FOR THAT, CUZ WE CAN SUPPLY THE CORRECT SIGNAL HERE!
 	--ROMCLK = writecycle & romaddr & !CONFIGED  #  ROMCLK & DS;
 	--ROMCLK <= '1' WHEN ( writecycle = '1' AND romaddr = '1' AND autoconfigcomplete_2630 = '0' ) OR ( ROMCLK = '1' AND nDS = '0' ) ELSE '0';
 	
@@ -595,6 +602,16 @@ begin
 	------------------		
 	-- DATA STROBES --
 	------------------
+	
+	--rds		=  ASEN & !CYCEND &  RW & !EXTERN;
+	rds <= '1' WHEN nASEN = '0' AND nCYCEND = '1' AND RnW = '1' AND nEXTERN = '1' ELSE '0';
+
+	--wds		=  DSEN & !CYCEND & !RW;
+	wds <= '1' WHEN nDSEN = '0' AND nCYCEND = '1' AND RnW = '0' ELSE '0';
+	
+	--offboard	= !(ONBOARD # MEMSEL # EXTERN);
+	--Can this be replaced with nBGACK = 0??
+	offboard <= '1' WHEN (nONBOARD = '1' OR nMEMSEL = '1' OR nEXTERN = '1') ELSE '0';
 					
 	--68000 style data strobes.  These are kept in tri-state when the 
 	--TRISTATE signal is active, or when we're not "offboard".  For 68030
@@ -604,6 +621,8 @@ begin
 	--a fix here.  If the memory access is a normal offboard access, UDS
 	--looks normal.  If the memory access is not offboard, the then UDS
 	--reflects the state of the CPU's R/W line. U501
+	
+	--DO WE NEED THESE? YES. LDS AND UDS CONNECT TO GARY, AGNUS, AND ZORRO BUS.
 
 	--UDS		= wds & !A0		# rds ;
 	nUDS <= 'Z' 
@@ -634,10 +653,11 @@ begin
 	--------------
 
 	--This signal is the Amiga bus RW line. This signal tristates when we are 
-	--not yet boss and when there is a DMA device active, or during an
-	--onboard cycle. It shares the 68030 RW signal with the Amiga 2000 hardware
+	--not boss and when there is a DMA device active, or during an
+	--onboard cycle. It shares the 68030 RW signal with the Amiga 2000 hardware. U501
 
 	--ARW		= RW ;	
+	--[UDS, LDS, ARW, AAS].OE = !TRISTATE & offboard ;
 	ARnW <= 'Z' 
 		WHEN 
 			TRISTATE = '1' OR offboard = '0'
