@@ -1,0 +1,124 @@
+
+		PARTNO	  XXXXX ;
+		NAME	  U305;
+ 		DATE	  March 28, 1989 ;
+		REV	  6 ;
+		DESIGNER  Haynie ;
+		COMPANY   Commodore ;
+		ASSEMBLY  312828 ;
+		LOCATION  U305;
+
+/************************************************************************/
+/*									*/
+/*  A2630	RAM address decode, Tristate generation and ABR		*/
+/*  		generation.						*/
+/*									*/
+/************************************************************************/
+/*  Allowable Target Device Types: 20L8B 				*/
+/************************************************************************/
+/*  Free Pins: NONE							*/
+/************************************************************************/
+/*  HISTORY								*/
+/*	DBH May  3:	First 68030 specific version			*/
+/*	DBH May  3:	Removed BEER->BERR buffering			*/
+/*	DBH May  3:	Added EXTERN support				*/
+/*	DBH May  3:	Noticed ACCESS feedback unused!			*/
+/*	DBH Sep  6:	Some Rev3 changes added				*/
+/*	DBH Sep 25:	The rest of the Rev3 changes are added.  They	*/
+/*			are pretty extensive.				*/
+/*	DBH Sep 26:	Changed system for Rev3 PCB messup.		*/
+/*	DBH Mar 10:	Changed MEMLOCK for AAS* glitch fix.		*/
+/*	DBH Mar 10:	Had to cut some of the last slots from MEMSEL 	*/
+/*			to fit MEMLOCK.  Should never be a problem.	*/
+/*	DBH Mar 28:	Added LBANK line for Rev4 banking scheme.	*/
+/************************************************************************/
+
+/**  Inputs  **/
+
+PIN [1..3]	=  [RA2..0]	;	/* Register address bits 23-21 */
+PIN 4		= !CYCEND	;	/* Cycle end from 68000 state machine */
+PIN 5		=  CONFIGED	;	/* RAM config register is valid */
+PIN 6		= !EXTERN	;	/* External memory access, we shut up */
+PIN [7..9]	=  [A2..0]	;	/* CPU address bits A23-21 */
+PIN 10		= !BGACK	;	/* Bus grant acknowledge from '030 */
+PIN 11		= !BOSS		;	/* We are the boss of the bus */
+PIN 13		= !RESET	;	/* The system reset line */
+PIN 14		= !AAS		;	/* The 68000 address strobe */
+PIN 16		=  MEG4		;	/* Izit a 4 meg board? */
+PIN 20		=  MODE68K	;	/* Make the 68000 the boss, fatally */
+PIN 23		= !AS		;	/* The '030 address strobe */
+
+/**  Outputs  **/
+
+PIN 15		= !LBANK	;	/* Selects first RAM bank */
+PIN 17		= !MEMSEL	;	/* Memory select output */
+PIN 18		= !DMAMEM	;	/* Memory select for DMA */
+PIN 19		= !MEMLOCK	;	/* Locks out 68000 machine */
+PIN 21		= !ABR		;	/* Amiga bus request output */
+PIN 22		= TRISTATE	;	/* Tristate all 68000 bus lines */
+
+/**  Used Internally **/
+
+/** Declarations and Intermediate Variable Definitions **/
+
+field slot	= [RA2..0] ;		/* Autoconfiged base address */
+field cpu	= [A2..0] ;		/* Actual bus address */
+
+/* There are a possible 8 slots for any 2 meg board in the 16 meg address
+   space.  Only 4 of these slots can actually be used by autoconfig. */
+
+access		= slot:1 & cpu:1		/* 2 or 4 megs */
+		# slot:1 & cpu:2 & MEG4		/* 4 megs only */
+		# slot:2 & cpu:2		/* 2 or 4 megs */
+		# slot:2 & cpu:3 & MEG4;	/* 4 megs only */
+
+/* This defines the high memory bank for 4 meg boards only. */
+
+low		= slot:1 & cpu:1 & MEG4
+		# slot:2 & cpu:2 & MEG4;
+
+/**  Logic Equations  **/
+
+/* MEMSEL is an output indicating that the address bus matches the address
+   bits in the configuration register if the register is configured.  Note 
+   that EXTERN cycles can only happen during non-DMA conditions, and they 
+   must qualify the CPU driven memory cycles. */
+
+MEMSEL		= access & CONFIGED &  AS & !EXTERN;
+MEMSEL.OE	= !BGACK;
+
+DMAMEM		= access & CONFIGED & AAS;
+DMAMEM.OE	= BGACK;
+
+/* LBANK is asserted for the first 2meg bank of memory on the card. */
+
+LBANK		= low & CONFIGED;
+
+/* MEMLOCK is used to lock out the 68000 state machine during a fast 
+   system cycle, which is basically either an on-board memory cycle
+   or an EXTERN cycle.  Additionally, the 68000 state machine uses
+   this same mechanism to end it's own cycle, so CYCEND also gets
+   included. */
+
+MEMLOCK		= access & CONFIGED
+		# !AS
+		# EXTERN
+		# CYCEND;
+
+/* TRISTATE is an output used to tristate all signals that go to the 68000
+   bus. This is done on powerup before BOSS is asserted and whenever a DMA
+   device has control of the A2000 Bus.  We want tristate when we're not 
+   BOSS, or when we are BOSS but we're being DMAed. */
+
+TRISTATE	= !BOSS # (BOSS & BGACK);
+
+/* ABR is the Amiga bus request output. This signal is only asserted by 
+   this PAL on powerup in order to get the bus so that we can assert BOSS, 
+   and it won't be asserted if MODE68K is asserted.
+*/
+
+ABR		= !RESET & AAS & !BOSS & !MODE68K
+		# !RESET & ABR & !BOSS & !MODE68K;
+
+ABR.OE		= !RESET & !BOSS & !MODE68K;
+

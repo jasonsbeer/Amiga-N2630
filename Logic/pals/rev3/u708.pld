@@ -1,0 +1,104 @@
+
+		PARTNO	  XXXXX ;
+		NAME	  U708;
+		DATE	  March 9, 1988;
+		REV	  5;
+		DESIGNER  Haynie ;
+		COMPANY   Commodore ;
+		ASSEMBLY  312828 ;
+		LOCATION  U603;
+
+/************************************************************************/
+/*									*/
+/*  A2630 	System and state clock generator			*/
+/*									*/
+/************************************************************************/
+/*  Allowable Target Device Types: 16L8B 				*/
+/************************************************************************/
+/*  Free Pins: NONE							*/
+/************************************************************************/
+/*  HISTORY								*/
+/*	DBH Sep 26:	New, replaced discrete on A2630R2.		*/
+/*	DBH Sep 26:	Polarity of 14M clocks corrected.		*/
+/*	DBH Sep 26:	Tried A7M instead of N7M in SCLK.		*/
+/*	DBH Oct 14:	Going back to N7M again				*/
+/*	DBH Mar  9:	Changed MA8 polarity for Rev 5.			*/
+/************************************************************************/
+
+/**  Inputs  **/
+
+PIN 1		=  CDAC		;	/* 7.16 MHz clock, 90 degree */
+PIN 2		= !C1		;	/* 3.58 MHz clock */
+PIN 3		= !C3		;	/* 3.58 MHz clock, 90 degree */
+PIN 4		=  B2000	;	/* Are we a B2000? */
+PIN 5		= !S7MDIS	;	/* Disable used in state clock */
+PIN 6		=  SN7MDIS	;	/* Disable used in state clock */
+PIN 7		=  MUX		;	/* DRAM address multiplex */
+PIN 8		=  A21		;	/* CPU address */
+PIN 9		=  A12		;	/* CPU address */
+PIN 11		=  A3		;	/* CPU address */
+PIN 17		=  MEG4		;	/* Are we a 4 meg board? */
+
+/**  Bidirectionals  **/
+
+PIN 18		=  A7M		;	/* 7.16 MHz clock */
+
+/**  Outputs  **/
+
+PIN 16		=  MA8		;	/* Multiplexed address for DRAM */
+PIN 15		= !N14M		;	/* 14.3 MHz clock, 180 degree */
+PIN 14		=  P14M		;	/* 14.3 MHz clock */
+PIN 13		= !N7M		;	/* 7.16 MHz clock, 180 degree */
+PIN 12		=  P7M		;	/* 7.16 MHz clock */
+PIN 19		=  SCLK		;	/* State machine clock */
+
+/** Declarations and Intermediate Variable Definitions **/
+
+/* Here I define the 7MHz clock used by the state machine. */
+ 
+state7M		= N7M;
+
+/**  Logic Equations  **/
+
+/* The address multiplexing for MA8, the high order address, depends on
+   whether we're a 4 meg system or a two meg system.  A 4 meg system
+   gets A12 and A21 muxed, and A3 becomes a bank select.  A 2 meg system
+   muxes A12 and A3, as there are only two banks.  */
+
+MA8		=  MUX & A12
+		# !MUX & A21 &  MEG4
+		# !MUX &  A3 & !MEG4;
+
+/* In previous systems, I used a set of jumpers to let you change the
+   clocking around for A2000 vs. B2000.  Here it's all done based on
+   the B2000 setting jumper.  The most straightforward way to do this
+   is to make the signal A7M bidirectional.  On a B2000, we gets the
+   signal from the Coprocessor Slot.  On an A2000, I'll make the A7M
+   signal from C1 and C3.  This way, the one A7M signal here is the
+   only clocking difference between A2000 and B2000. */
+
+A7M		= !B2000 & (!C1 $ C3);
+A7M.OE		= !B2000;
+
+/* The 7MHz clock lines are pretty simple.  I make 'em both here to keep 
+   them consistent with each other and all other clocks derived from the
+   motherboard. */
+
+P7M		=  A7M;
+
+N7M		=  A7M;
+
+/* The 14MHz clock lines are pretty simple too.  I make 'em both here to 
+   keep them consistent with each other and all other clocks derived from 
+   the motherboard. */
+
+P14M		=   A7M $ CDAC;
+N14M		=   A7M $ CDAC;
+
+/* This is the state machine clock.  This is basically a 14MHz clock, 
+   but some of it's edges are suppressed.  This lets the 68000 state
+   machine just skip the unimportant clock edges in the 68000 cycle
+   and just concentrate on the interesting edges. */
+
+SCLK		=  CDAC & P14M & !state7M & SN7MDIS
+		# !CDAC & P14M &  state7M & !S7MDIS;

@@ -1,0 +1,84 @@
+
+		PARTNO	  XXXXX ;
+		NAME	  U602;
+		DATE	  March 9, 1989;
+ 		REV	  1;
+		DESIGNER  Haynie ;
+		COMPANY   Commodore ;
+		ASSEMBLY  312828 ;
+		LOCATION  U504;
+
+/************************************************************************/
+/*									*/
+/*  A2630 	DRAM Output and Write Enable Generation			*/
+/*									*/
+/************************************************************************/
+/*  Allowable Target Device Types: 20L8A 				*/
+/************************************************************************/
+/*  Free Pins: NONE							*/
+/************************************************************************/
+/*  HISTORY								*/
+/*	DBH Mar  9:	New for Rev 5, based in part on the Rev 4 part.	*/
+/************************************************************************/
+
+/**  Inputs  **/
+
+PIN 2		= !MEMSEL	;	/* On-Board memory selected */
+PIN 3		= !REFACK	;	/* Are we doing refresh? */
+PIN 7		=  RW		;	/* 68030 Read/Write signal */
+PIN 10		=  MEG4		;	/* Is this a 4 meg board? */
+PIN 14		=  A3		;	/* 68030 address line */
+PIN 23		=  A2		;	/* 68030 address line */
+
+/**  Outputs  **/
+
+PIN 22		= !WE0		;	/* Lowest write strobe */
+PIN 21		= !WE1		;
+PIN 16		= !WE2		;
+PIN 15		= !WE3		;	/* Highest write strobe */
+PIN 20		= !OE0		;	/* Lowest output enable */
+PIN 19		= !OE1		;
+PIN 18		= !OE2		;
+PIN 17		= !OE3		;	/* Highest output strobe */
+
+/** Declarations and Intermediate Variable Definitions **/
+
+/* This indicates we're interested; memory is selected, but we're
+   not refreshing. */
+
+memcycle	= MEMSEL & !REFACK;
+
+/* The basic write cycle. */
+
+writecycle	= memcycle & !RW;
+
+/* The basic read cycle. */
+
+readcycle	= memcycle &  RW;
+
+/* There are four memory banks of 32 bits each.  A two meg board will
+   only support the upper two banks. */
+
+bank0		=  MEG4 & !A2 & !A3;
+bank1		=  MEG4 &  A2 & !A3;
+bank2 		=  MEG4 & !A2 &  A3
+		# !MEG4 & !A2;
+bank3		=  MEG4 &  A2 &  A3
+		# !MEG4 &  A2;
+
+/** Logic Equations **/
+
+/* The write strobes.  We support the 2 meg board as the second two banks. */
+
+WE0		= writecycle & bank0;
+WE1		= writecycle & bank1;
+WE2		= writecycle & bank2;
+WE3		= writecycle & bank3;
+
+/* The output enables, or read strobes. */
+
+OE0		= readcycle & bank0;
+OE1		= readcycle & bank1;
+OE2		= readcycle & bank2;
+OE3		= readcycle & bank3;
+

@@ -1,0 +1,86 @@
+
+		PARTNO	  XXXXX ;
+		NAME	  U500;
+		DATE	  September 25, 1988 ;
+		REV	  1 ;
+		DESIGNER  Haynie ;
+		COMPANY   Commodore ;
+		ASSEMBLY  312828 ;
+		LOCATION  U500 ;
+
+/************************************************************************/
+/*								  	*/
+/*  A2630	Address and Data buffer control, Amiga bus grant	*/
+/*		generation.						*/
+/*								  	*/
+/************************************************************************/
+/*  Allowable Target Device Types: 16L8A 			  	*/
+/************************************************************************/
+/*  Free Pins: NONE						  	*/
+/************************************************************************/
+/*  HISTORY							  	*/
+/*	DBH Sep 25:	New, based on U307-7 A2630 Rev 2.		*/
+/************************************************************************/
+
+/**  Inputs  **/
+
+PIN 1		= !BOSS		;	/* Indicates that we are boss */
+PIN 2		=  RW		;	/* '030 RW line */
+PIN 3		=  A1		;	/* Address line A1 */
+PIN 4		= !ABR		;	/* Amiga Bus Request */
+PIN 5		= !BGACK	;	/* '030 Bus grant acknowledge */
+PIN 6		= !DSACK1	;	/* '030 Data Transfer Acknowledge */
+PIN 7		= !EXTERN	;	/* Special resource access */
+PIN 8		= !AS		;	/* '030 Address strobe */
+PIN 9		= !ONBOARD	;	/* This is an onboard access */
+PIN 11		= !AAS		;	/* Amiga Address strobe */
+PIN 13		= !MEMSEL	;	/* Onboard memory is being accessed */
+PIN 14		= !ABG		;	/* Bus Grant to A2000 */
+
+/**  Outputs  **/
+
+PIN 19		= !BGDIS	;	/* Bus Grant disable */
+PIN 18		= !ADOEH	;	/* Amiga data output enable high word */
+PIN 17		= !ADOEL	;	/* Amiga data output enable low word */
+PIN 16		= !ADDIR	;	/* Amiga data direction control */
+PIN 15		=  DRSEL	;	/* Data register select */
+PIN 12		= !BR		;	/* 68030 Bus Request */
+
+/** Declarations and Intermediate Variable Definitions **/
+
+/**  Logic Equations  **/
+
+/* This is data direction control */
+
+ADDIR		=  BGACK & !RW
+		# !BGACK &  RW;
+
+/* This handles the data buffer enable, including the 16 to 32 bit data
+   bus conversion required for DMA cycles. */
+
+ADOEH		= BOSS &  BGACK &  MEMSEL & AAS & !A1
+		# BOSS & !BGACK & !MEMSEL &  AS & !ONBOARD & !EXTERN;
+
+ADOEL		= BOSS &  BGACK &  MEMSEL & AAS &  A1;
+
+/* This selects when we want data latching, which we in fact want only on
+   read cycles. */
+
+DRSEL		= BOSS & !BGACK & RW;
+
+/* Here we simply pass on an A2000 bus request to the 68030. */
+
+BR		= BOSS & !BGACK & ABR;
+
+/* The following is used to control the external latching of the '030
+   version of Bus Grant.  Since some '030 cycles can't be seen by the
+   expansion bus, DMA devices can't know when an '030 cycle may be going
+   on.  Since THEY must arbitrate /BGACK with this knowledge, it's 
+   necessary for US to do it instead, since we can see all cycles.  If
+   ABG has already been asserted, we don't disable it unless we're reset.
+*/
+
+BGDIS		= !BOSS
+		# !ABG & DSACK1
+		# !ABG & AS ;
+

@@ -1,0 +1,19 @@
+
+
+
+
+			A2630 Speedup Modifications
+
+
+There are two PAL program changes here.  The new U505, along with the 
+associated pullup resistor, adjusts the A2630 itself for operation that's been
+tested up to 33MHz.  The new U600, along with a jumper wire described in the
+PAL file, adjusts the board timing for increased efficiency with most 80ns
+DRAM.  Along with that, I changed U603 from a 25ns part to a 15ns part, though
+the program is unchanged.
+
+At present, the A2630 Fast memory system still has problems at 32-33MHz, but 
+is quite stable at 28MHz.  Should I ultimately find the problem at 33MHz, I
+will pass on the additional changes.
+
+					-Dave Haynie

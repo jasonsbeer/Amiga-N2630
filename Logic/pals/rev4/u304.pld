@@ -1,0 +1,95 @@
+
+		PARTNO	  XXXXX ;
+		NAME	  U304 ;
+		DATE	  September 26, 1988 ;
+		REV	  4 ;
+		DESIGNER  Haynie ;
+		COMPANY   Commodore ;
+		ASSEMBLY  312828 ;
+		LOCATION  U304 ;
+
+/************************************************************************/
+/*								  	*/
+/*  A2630	ROM and AUTOconfig chip selects, Onboard generation 	*/
+/*		and global reset			  		*/
+/*									*/
+/************************************************************************/
+/*  Allowable Target Device Types: 20L8A 				*/
+/************************************************************************/
+/*  Free Pins: 15(O)							*/
+/************************************************************************/
+/*  HISTORY								*/
+/*	DBH Sep 25:	Big change for Rev3 boards			*/
+/*	DBH Sep 26:	Changed to 20L8 cause of Rev3 errors		*/
+/************************************************************************/
+
+/**  Inputs  **/
+
+PIN 1		=  PHANLO	;	/* ROM Phantom Low enable */
+PIN 2		=  PHANHI	;	/* ROM Phantom High enable */
+PIN 3		=  ROMCONF	;	/* The rom is configed */
+PIN [4..8]	=  [A16..20]	;	/* CPU Addresses 16-20 */
+PIN 9		=  RAMCONF	;	/* The board is fully configed */
+PIN 11		=  A21		;	/* CPU Address */
+PIN 13		=  A22		;
+PIN 14		=  A23		;
+PIN 16		=  AUTO		;	/* Should I do autoconfig of memory? */
+PIN 17		= !AS		;	/* Address strobe */
+PIN 18		=  RW		;	/* Processor Read/Write */
+PIN 23		= !EXTERN	;	/* External access? */
+
+/**  Outputs  **/
+
+PIN 19		= !CSAUTO	;	/* Auto config chip select */
+PIN 22		= !CSROM	;	/* Rom chip select */
+PIN 21		= !ONBOARD	;	/* Addressed location is on board */
+
+/**  Used Internally **/
+
+/** Declarations and Intermediate Variable Definitions **/
+
+field addr	= [A23..16];
+
+readcycle	= RW & AS;
+
+/* The standard auto config space, used to configure both special and
+   standard configuration registers. */
+
+autocon		= addr:[e80000..e8ffff];
+
+/* High memory rom space, where ROMs normally reside when available. */
+
+hirom		= addr:[f80000..f8ffff];
+
+/* Low memory ROM space, used for mapping of ROMs on reset. */
+
+lorom		= addr:[000000..00ffff];
+
+/* This is the basic ROM chip select logic.  We want ROM to pay attention
+   to the phantom signals, and only show up on reads. */
+
+icsrom		= hirom & !PHANHI & readcycle
+		# lorom & !PHANLO & readcycle;
+
+/* This is the basic autoconfig chip select logic.  The special register
+   always shows up first, the standard RAM register doesn't show up if 
+   we're inhibiting autoconfiguration.  */
+
+icsauto		= autocon & AS & !RAMCONF &  AUTO 
+		# autocon & AS & !ROMCONF & !AUTO;
+
+/**  Logic Equations  **/
+
+/* Not much left to do at this point.  Since writing to a configuration
+   register can change the mapping, I've gotta latch autoconfig chip
+   select, and the ONBOARD signal based on it. */
+
+CSROM		= icsrom;
+
+CSAUTO		= icsauto
+		# CSAUTO & AS;
+
+ONBOARD		= icsrom 
+		# icsauto
+		# ONBOARD & AS;
+

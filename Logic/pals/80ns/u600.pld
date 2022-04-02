@@ -1,0 +1,148 @@
+
+		PARTNO	  390411-03 ;
+		NAME	  U600;
+		DATE	  September 30, 1990;
+		REV	  05;
+		DESIGNER  Haynie ;
+		COMPANY   Commodore ;
+		ASSEMBLY  312288 ;
+		LOCATION  U600;
+
+/************************************************************************/
+/*									*/
+/*  A2630	RAS and burst generation machine			*/
+/*									*/
+/************************************************************************/
+/*  Allowable Target Device Types: 20R4-10 				*/
+/************************************************************************/
+/*  Free Pins: NONE							*/
+/************************************************************************/
+/*  HISTORY							  	*/
+/*	DBH Mar  8:	New for A2630R5, based on U600 for Rev 4.	*/
+/*	DBH Mar  9:	Fixed DMA bug.					*/
+/*	DBH Mar 13:	Tuned DMA access as much as possible.		*/
+/*	EG  Jun 19:	Added second *RAS line				*/
+/*	DBH Sep 30:	Changes for 80ns DRAM, methinks			*/
+/************************************************************************/
+/*	IMPORTANT NOTE!!!						*/
+/*									*/
+/*	This PAL is designed to provide 80ns DRAM timing on an A2630.	*/
+/* However, it's not quite a simple plug-in replacement.  The 100ns RAS	*/
+/* delay from the U604 tap delay must be cut from pin 14 and replaced	*/
+/* with the 40ns tap, from pin 4 of U604.  Otherwise, this baby will	*/
+/* slow down to a crawl. 						*/
+/************************************************************************/
+
+/**  Inputs **/ 
+
+PIN 2		= !ASDELAY	;	/* AS plus arbitration delay */
+PIN 3		= !AS		;	/* 68030 address strobe */
+PIN 4		= !AAS		;	/* 68000 address strobe */
+PIN 5		= !BGACK	;	/* Bus grant acknowledge */
+PIN 6		= !EXTSEL	;	/* EXTSEL qualifier for specials */
+PIN 7		= !MEMSEL	;	/* The CPU is accessing our RAM */
+PIN 8		= !REFACK	;	/* It's a refresh cycle */
+PIN 9		= !REFRAS	;	/* RAS for refresh */
+PIN 10		= !RDEL80	;	/* RAS plus 80ns */
+PIN 11		= !DMADELAY	;	/* Don't start a DMA memory cycle. */
+PIN 14		= !RDEL40	;	/* RAS plus 40ns.  See Note Above !!! */
+PIN 23		= !RDEL60	;	/* RAS plus 60ns */
+
+/**  Outputs **/
+
+PIN 22		= !DSACK0	;	/* Cycle terminator. */
+PIN 21		= !ERAS		;	/* Unbuffered RAS */
+PIN 19		= !AASQ		;	/* AAS sampled by !CPUCLK */
+PIN 16 		= !BRAS		;	/* Unbuffered RAS */
+PIN 15		= !DSACK1	;	/* Cycle terminator. */
+
+/**  Used internally */
+
+PIN 18		= !AASQ2	;	/* AASQ additional delay state */
+PIN 17		= !AASQ3	;
+
+/** Declarations and Intermediate Variable Definitions **/
+
+/* The standard qualification for a CPU memory cycle.  We have to wait
+   until refresh is arbitrated, and make sure we're selected and it's
+   not an EXTSELal cycle. */
+
+cpucycle	= !BGACK & !REFACK & MEMSEL & ASDELAY &  AS & !EXTSEL;
+
+/* This one is the basis for DSACK generation.  Note that in the best case,
+   DSACK leads data sampling by 1 clock cycle.  So, as long as the cycle is
+   RAS driven, this can be the RAS access time - 40ns on a 25MHz system,
+   or -30ns on a 33MHz system.  */
+
+cpudtack	= cpucycle & RDEL40;
+
+/* Once a cycle is underway, we cut off RAS here to ensure a goodly amount
+   of precharge time.  This should be 100ns for 100ns DRAM, 80ns for 80ns
+   DRAM, etc. */
+
+ cpurasoff	= RDEL80;
+
+/* Once a cycle is over with, we must wait the appropriate precharge time 
+   before permitting a new one.  Here, we're waiting for the delayed RAS
+   line to turn off after RAS goes away.  The 100ns DRAM need 80ns of
+   precharge, while most 80ns DRAM are happy with 60ns worth of precharge. */
+
+cpurecycled	= !RDEL60;
+
+/* The standard qualification for a DMA memory cycle.  This is much the
+   same as the CPU cycle, only it obeys the 68000 comparible signals
+   instead of 68030 signals.  The DMA cycle can DTACK early, since we
+   know the minimum clock period is more than the DRAM access time. */
+
+dmaaccess	=  BGACK & !REFACK & MEMSEL & AAS;
+
+dmadtack	= dmaaccess & AASQ2 & AASQ3;
+
+dmacycle	= dmaaccess & AASQ3 & !DMADELAY;
+ 
+/* This indicates when any cycle is complete. */
+
+cycledone	= cpudtack # dmadtack;
+
+/**  Logic Equations related to the refresh arbitration logic **/
+
+/* These next lines make us delayed and synchronized versions of the 
+   68000 compatible address strobe, used to handle refresh arbitration
+   during DMA.  */
+
+AASQ.D		= BGACK & AAS;
+
+AASQ2.D		= BGACK & AAS & AASQ & !AASQ2
+		# BGACK & AAS & AASQ &  AASQ3;
+
+AASQ3.D		= BGACK & AAS & AASQ &  AASQ2
+		# BGACK & AAS & AASQ &  AASQ3;
+
+/* This is the basic RAS enable.  If it's a refresh cycle, we just go
+   ahead.  If it's the start of a standard CPU cycle, we wait until
+   we're done charging, and then go.  We continue until switched off
+   by ROFF and the end of the cycle.  If it's a DMA cycle, we go on
+   ahead, since the time between DMA cycles is enough to assure Trp. */
+
+ERAS		= cpucycle & cpurecycled
+		# cpucycle & ERAS & !cpurasoff
+		# dmacycle
+		# REFRAS;
+
+BRAS		= cpucycle & cpurecycled
+		# cpucycle & ERAS & !cpurasoff
+		# dmacycle
+		# REFRAS;
+
+/* These are the cycle termination signals.  They're really both the
+   same, and both driven, indicating that we are, in fact, a 32 bit
+   wide port.  They go hi-Z when we're not selecting memory, so that
+   other DSACK sources (FPU and the slow bus stuff) can get their
+   chance to terminate. */
+
+DSACK0		= cycledone;
+DSACK0.OE	= MEMSEL;
+
+DSACK1		= cycledone;
+DSACK1.OE	= MEMSEL;
+
