@@ -1,4 +1,4 @@
-20167959734911941
+20169610069372737
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -60157,6 +60157,13 @@ Jumper2
 0
 0
 0
+N2630
+MC68030FE-PQFP-132
+PQFP, 132 pins, 24mm sq body, 0.635mm pitch (https://www.intel.com/content/dam/www/public/us/en/documents/packaging-databooks/packaging-chapter-02-databook.pdf, http://www.nxp.com/docs/en/application-note/AN4388.pdf)
+PQFP 132
+0
+132
+132
 N2630
 Mug
 

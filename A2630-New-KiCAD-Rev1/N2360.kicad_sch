@@ -2397,7 +2397,7 @@
       (reference "U103") (unit 1) (value "27C256") (footprint "Package_DIP:DIP-28_W15.24mm")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-000061d83ffb"
-      (reference "U200") (unit 1) (value "MC68030FE") (footprint "Package_QFP:PQFP-132_24x24mm_P0.635mm")
+      (reference "U200") (unit 1) (value "MC68030FE") (footprint "N2630:MC68030FE-PQFP-132")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-000061d8ae9d"
       (reference "U201") (unit 1) (value "MC68882") (footprint "Package_LCC:PLCC-68_THT-Socket")
