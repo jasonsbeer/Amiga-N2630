@@ -53,6 +53,7 @@ NET "FC<0>"		LOC = "P74" ;
 NET "nAS"		LOC = "P85" ;
 NET "RnW"		LOC = "P86" ;
 //NET "nSTERM"	LOC = "P87" ;
+NET "nBR"		LOC = "P87" ;
 NET "nHALT"		LOC = "P90" ;
 NET "nDSACK1"	LOC = "P92" ;
 NET "nDSACK0"	LOC = "P93" ;

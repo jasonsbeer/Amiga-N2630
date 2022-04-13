@@ -33,7 +33,6 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity U600 is
 	Port 
 	( 
-		--60 pins used
 		A1 : IN STD_LOGIC; --ADDRESS LINE 1
 		nABG : IN STD_LOGIC; --AMIGA BUS GRANT
 		nHALT : IN STD_LOGIC; --_HALT SIGNAL
@@ -95,6 +94,7 @@ entity U600 is
 		ADDIR : OUT STD_LOGIC; --ADDRESS BUS DIRECTION CONTROL
 		DRSEL : OUT STD_LOGIC; --DATA LATCH SELECT		
 		nS7MDISD : OUT STD_LOGIC; --INPUT FOR STATE MACHINE U503
+		nBR : OUT STD_LOGIC; --Bus Request
 		
 		dmadelay : INOUT STD_LOGIC
 			  
@@ -289,6 +289,10 @@ begin
 	---------------
 	-- DMA STUFF --
 	---------------
+	
+	--Here we simply pass on an A2000 bus request to the 68030. U500
+	--BR		= BOSS & !BGACK & ABR;
+	nBR <= '0' WHEN nBOSS = '0' AND nBGACK = '1' AND nABR = '0';
 	
 	--TRISTATE is an output used to tristate all signals that go to the 68000
 	--bus. This is done on powerup before BOSS is asserted and whenever a DMA
