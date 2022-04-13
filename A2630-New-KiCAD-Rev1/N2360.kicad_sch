@@ -2067,10 +2067,10 @@
       (reference "C718") (unit 1) (value "10uF") (footprint "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm")
     )
     (path "/00000000-0000-0000-0000-00006209fb19/00000000-0000-0000-0000-000062756c11"
-      (reference "C800") (unit 1) (value "10uF") (footprint "Resistor_SMD:R_0805_2012Metric")
+      (reference "C800") (unit 1) (value "10uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-00006209fb19/00000000-0000-0000-0000-000062757474"
-      (reference "C801") (unit 1) (value "10uF") (footprint "Resistor_SMD:R_0805_2012Metric")
+      (reference "C801") (unit 1) (value "10uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-00006209fb19/00000000-0000-0000-0000-00006275cf88"
       (reference "C802") (unit 1) (value "10uF") (footprint "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm")
