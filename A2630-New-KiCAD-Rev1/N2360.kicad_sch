@@ -2403,7 +2403,7 @@
       (reference "U201") (unit 1) (value "MC68882") (footprint "Package_LCC:PLCC-68_THT-Socket")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-000061daf331"
-      (reference "U204") (unit 1) (value "74HCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+      (reference "U204") (unit 1) (value "74AHCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000061f737d0"
       (reference "U204") (unit 2) (value "74HCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
@@ -2412,16 +2412,16 @@
       (reference "U204") (unit 3) (value "74HCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/61e1f990-e4bf-4c6d-9000-2762ea2f4563"
-      (reference "U204") (unit 4) (value "74HCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+      (reference "U204") (unit 4) (value "74AHCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-000061db312e"
-      (reference "U204") (unit 5) (value "74HCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+      (reference "U204") (unit 5) (value "74AHCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-000061db439a"
-      (reference "U204") (unit 6) (value "74HCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+      (reference "U204") (unit 6) (value "74AHCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-0000626c9dd2"
-      (reference "U204") (unit 7) (value "74HCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+      (reference "U204") (unit 7) (value "74AHCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000061f2b4a6"
       (reference "U300") (unit 1) (value "74HCT05") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
@@ -2556,13 +2556,13 @@
       (reference "U503") (unit 3) (value "74HCT74") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-0000622dfef1"
-      (reference "U507") (unit 1) (value "74HCT74") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+      (reference "U507") (unit 1) (value "74AHCT74") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-00006209fb19/7ba039a6-9484-4e87-a7ac-8bf3b800e737"
-      (reference "U507") (unit 2) (value "74HCT74") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+      (reference "U507") (unit 2) (value "74AHCT74") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/83c4597d-c567-46ba-9047-b3607301a21a"
-      (reference "U507") (unit 3) (value "74HCT74") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+      (reference "U507") (unit 3) (value "74AHCT74") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000062089831/00000000-0000-0000-0000-0000620f1cda"
       (reference "U600") (unit 1) (value "XC9572XL-TQ100") (footprint "Package_QFP:TQFP-100_14x14mm_P0.5mm")
