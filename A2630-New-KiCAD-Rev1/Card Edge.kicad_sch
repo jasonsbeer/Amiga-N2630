@@ -6508,7 +6508,7 @@
     (in_bom yes) (on_board yes)
     (uuid 00000000-0000-0000-0000-000062331568)
     (property "Reference" "U204" (id 0) (at 57.785 175.4632 0))
-    (property "Value" "74HCT04" (id 1) (at 57.785 177.7746 0))
+    (property "Value" "" (id 1) (at 57.785 177.7746 0))
     (property "Footprint" "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" (id 2) (at 57.785 183.515 0)
       (effects (font (size 1.27 1.27)) hide)
     )

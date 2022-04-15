@@ -4574,7 +4574,7 @@
     (in_bom yes) (on_board yes)
     (uuid 7ba039a6-9484-4e87-a7ac-8bf3b800e737)
     (property "Reference" "U507" (id 0) (at 378.46 132.08 0))
-    (property "Value" "" (id 1) (at 379.73 133.985 0))
+    (property "Value" "74AHCT74" (id 1) (at 379.73 133.985 0))
     (property "Footprint" "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" (id 2) (at 374.65 140.335 0)
       (effects (font (size 1.27 1.27)) hide)
     )

@@ -2406,10 +2406,10 @@
       (reference "U204") (unit 1) (value "74AHCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000061f737d0"
-      (reference "U204") (unit 2) (value "74HCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+      (reference "U204") (unit 2) (value "74AHCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-000062331568"
-      (reference "U204") (unit 3) (value "74HCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+      (reference "U204") (unit 3) (value "74AHCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/61e1f990-e4bf-4c6d-9000-2762ea2f4563"
       (reference "U204") (unit 4) (value "74AHCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
