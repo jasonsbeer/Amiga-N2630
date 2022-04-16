@@ -1,6 +1,6 @@
 ﻿Max Refresh Time (ms),64
 Frequency (MHz),25
-Period (ms),0.00004
+Period (milliseconds),0.00004
 Pos Edges In Max Time,1600000
 Refreshes Required During Max Time,8192
 Refesh Every n Pos Edges,195.3125
