@@ -27,15 +27,15 @@ NET "Z2AUTO"		LOC = "P36" ;
 
 //NET "MODE68K"		LOC = "P40" ; //
 NET "OSMODE"		LOC = "P42" ; //
-NET "nOE0"			LOC = "P49" ; //
+//NET "nOE0"			LOC = "P49" ; //
 NET "nLMBE"			LOC = "P50" ; //
 NET "nLLBE"			LOC = "P52" ; //
 NET "nUUBE"			LOC = "P53" ; //
 NET "nUMBE"			LOC = "P54" ; //
-NET "nWE0"			LOC = "P55" ; //
+//NET "nWE0"			LOC = "P55" ; //
 NET "SIZ<0>"		LOC = "P56" ; //
 NET "SIZ<1>"		LOC = "P58" ; //
-NET "EMDDIR"		LOC = "P59" ; //
+//NET "EMDDIR"		LOC = "P59" ; //
 
 NET "A<0>"			LOC = "P60" ; //60
 NET "A<1>"			LOC = "P61" ; //61

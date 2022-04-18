@@ -124,8 +124,8 @@ architecture Behavioral of U600 is
 	SIGNAL aas40 : STD_LOGIC:='0';
 	SIGNAL aas80 : STD_LOGIC:='0';
 	--SIGNAL dmadelay : STD_LOGIC:='0';
-	SIGNAL cpudtack : STD_LOGIC:='0';
-	SIGNAL cpucycle : STD_LOGIC:='0';
+	--SIGNAL cpudtack : STD_LOGIC:='0';
+	--SIGNAL cpucycle : STD_LOGIC:='0';
 	--SIGNAL bras : STD_LOGIC:='0';
 	--SIGNAL dsackdly : STD_LOGIC:='0';
 	SIGNAL edtack : STD_LOGIC:='0';
@@ -290,9 +290,17 @@ begin
 	-- DMA STUFF --
 	---------------
 	
+	--The OVR signal must be asserted whenever on-board memory is selected
+	--during a DMA cycle.  It tri-states GARY's DTACK output, allowing
+	--one to be created by our memory logic. u501
+
+	--OVR		= BGACK & MEMSEL;
+	--OVR.OE		= BGACK & MEMSEL;
+	nOVR <= '0' WHEN nBGACK = '0' AND nMEMSEL = '1' ELSE 'Z';
+	
 	--Here we simply pass on an A2000 bus request to the 68030. U500
 	--BR		= BOSS & !BGACK & ABR;
-	nBR <= '0' WHEN nBOSS = '0' AND nBGACK = '1' AND nABR = '0';
+	nBR <= '0' WHEN nBOSS = '0' AND nBGACK = '1' AND nABR = '0' ELSE '1';
 	
 	--TRISTATE is an output used to tristate all signals that go to the 68000
 	--bus. This is done on powerup before BOSS is asserted and whenever a DMA
@@ -306,14 +314,6 @@ begin
 	--The read/write signal is locked to the DMA read/write signal when DMA'ing. U505
 	--RW		= ARW; RW.OE		= BGACK;
 	RnW <= ARnW WHEN nBGACK = '0' ELSE 'Z';
-			
-	--The OVR signal must be asserted whenever on-board memory is selected
-	--during a DMA cycle.  It tri-states GARY's DTACK output, allowing
-	--one to be created by our memory logic. u501
-
-	--OVR		= BGACK & MEMSEL;
-	--OVR.OE		= BGACK & MEMSEL;
-	nOVR <= '0' WHEN nBGACK = '0' AND nMEMSEL = '0' ELSE 'Z';
 			
 	--We keep ABGACK disconnected from BGACK until we are BOSS. U501
 
@@ -372,7 +372,7 @@ begin
 	--know the minimum clock period is more than the DRAM access time. U600
 
 	--dmaaccess	=  BGACK & !REFACK & MEMSEL & AAS;
-		--We are starting the DMA thing
+	--We are starting the DMA thing
 	dmaaccess <= '1' WHEN nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' ELSE '0';
 
 	--dmacycle	= dmaaccess & AAS40 & !DMADELAY (was 1);	changed phase of dmadelay
@@ -383,7 +383,7 @@ begin
 	--THIS NEEDS TO ACTIVATE SRAM! NEED TO SEND THIS SIGNAL TO THE OTHER CPLD
 	--THIS INDICATES SOMETHING IS TRYING TO ACCESS RAM VIA DMA. 
 	--WE DON'T WANT THE 68030 TO TRY TO ACCESS RAM AT THE SAME TIME...
-	dmacycle <= '1' WHEN dmaaccess = '1' AND aas40 = '1' AND dmadelay = '0' ELSE '0';	
+--	dmacycle <= '1' WHEN dmaaccess = '1' AND aas40 = '1' AND dmadelay = '0' ELSE '0';	
 
 	--dmadtack	= dmaaccess & AAS80;
 	--this is delayed 2 clock cycles from the original DMA request
@@ -892,7 +892,7 @@ begin
 	--With SDRAM, add a check for REFRESH and wait for it to complete, when needed. This will add wait states.
 	
 	--cpucycle	= !BGACK & !REFACK & MEMSEL & ASDELAY &  AS & !EXTSEL;
-	cpucycle <= '1' WHEN nBGACK = '1' AND nMEMSEL = '0' AND nAS = '0' AND EXTSEL = '0' ELSE '0';
+--	cpucycle <= '1' WHEN nBGACK = '1' AND nMEMSEL = '0' AND nAS = '0' AND EXTSEL = '0' ELSE '0';
 
 	--cpudtack	= cpucycle & DSACKDLY;
 	--cpudtack <= '1' WHEN cpucycle = '1' AND dsackdly = '1' ELSE '0';
@@ -901,21 +901,22 @@ begin
 	--DSACKx is also negated on the rising edge after AS is negated. The below code follows this to the letter.
 	--This is STATE 2 on page 7-36
 	
-	PROCESS (CPUCLK) BEGIN
-		IF RISING_EDGE (CPUCLK) THEN
-			IF cpucycle = '1' THEN
-				cpudtack <= '1';
-			ELSE
-				cpudtack <= '0';
-			END IF;
-		END IF;
-	END PROCESS;	
+--	PROCESS (CPUCLK) BEGIN
+--		IF RISING_EDGE (CPUCLK) THEN
+--			IF cpucycle = '1' THEN
+--				cpudtack <= '1';
+--			ELSE
+--				cpudtack <= '0';
+--			END IF;
+--		END IF;
+--	END PROCESS;	
 	
 
 	--Since "cycledone" drives DSCAKx directly, we can make changes from the original and not use delay lines...see cpudtack and dmadtack
 	--This indicates when a memory cycle is complete.
 	--cycledone	= cpudtack # dmadtack;
-	cycledone <= '1' WHEN cpudtack = '1' OR dmadtack = '1' ELSE '0';
+--cycledone <= '1' WHEN cpudtack = '1' OR dmadtack = '1' ELSE '0';
+	cycledone <= dmadtack;
 			
 	--These are the cycle termination signals.  They're really both the
 	--same, and both driven, indicating that we are, in fact, a 32 bit
