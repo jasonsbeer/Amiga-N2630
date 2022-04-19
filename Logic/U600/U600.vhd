@@ -293,6 +293,7 @@ begin
 	--The OVR signal must be asserted whenever on-board memory is selected
 	--during a DMA cycle.  It tri-states GARY's DTACK output, allowing
 	--one to be created by our memory logic. u501
+	--PROBABLY MAKES MORE SENSE TO MOVE THIS TO U601. LOCK OUT GARY'S DURING DMA.
 
 	--OVR		= BGACK & MEMSEL;
 	--OVR.OE		= BGACK & MEMSEL;
@@ -327,6 +328,7 @@ begin
 	--JN: STERM is actually _DSACK0 in this formula!!!
 	
 	--DTACK		= BGACK & MEMSEL & AAS & STERM;
+	--THIS SHOULD BE CREATED IN U601. WE NEED TO ASSERT DTACK AFTER ANY DMA MEMORY CYCLE COMPLETES.
 	nDTACK <= '0' WHEN nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' AND nDSACK0 = '0' ELSE '1';
 	
 	--These next lines make us delayed and synchronized versions of the 
@@ -373,6 +375,7 @@ begin
 
 	--dmaaccess	=  BGACK & !REFACK & MEMSEL & AAS;
 	--We are starting the DMA thing
+	--MOVE THIS TO U601. MAKES MORE SENSE THERE.
 	dmaaccess <= '1' WHEN nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' ELSE '0';
 
 	--dmacycle	= dmaaccess & AAS40 & !DMADELAY (was 1);	changed phase of dmadelay
@@ -388,6 +391,7 @@ begin
 	--dmadtack	= dmaaccess & AAS80;
 	--this is delayed 2 clock cycles from the original DMA request
 	--We are done doing the DMA thing
+	--THIS IS USED TO ASSERT BGACK. MOVE TO U601 AS PART OF THE MEMORY ACCESS STUFF. I STILL DON'T UNDERSTAND WHY WE NEED TO DSACK AFTER DMA?
 	dmadtack <= '1' WHEN dmaaccess = '1' AND aas80 = '1' ELSE '0';
 	
 	--The purpose of DMADELAY is to hold off RAS during a DMA cycle
@@ -401,6 +405,7 @@ begin
 	--Prevent CPU RAM access (RAS/CAS) during DMA. This would be bad because other devices are accessing the memory at this time.
 	--Bus mastering is supposed to be clocked on the 7MHz rising edge (A2000 technical reference)
 	--Doing it like this avoids combitorial loops and it should work fine
+	--THIS SHOULD BE RECREATED IN U601 WITH THE MEMORY ACCESS STUFF. WE JUST WANT TO PREVENT ANY OTHER MEMORY ACTIONS WHILE DMA IS IN PROGRESS.
 	
 	PROCESS (P7M) BEGIN
 		IF RISING_EDGE (P7M) THEN
@@ -855,6 +860,7 @@ begin
 	--This creates the DSACK go-ahead for all slow, 16 bit cycles.  These are,
 	--in order, A2000 DTACK, 68xx/65xx emulation DTACK, and ROM or config
 	--register access. U505
+	--THIS IS FOR CYCLES OTHER THAN MEMORY...NEEDS TO STAY
 
 	--!DSACKEN.D	= !DSEN & CYCEND & !EXTERN &   DTACK
 	--		# !DSEN & CYCEND & !EXTERN &  EDTACK
@@ -928,6 +934,8 @@ begin
 	--DSACKx is sampled on the rising edge during STATE 3. If valid, data is latched on the next falling clock edge. 
 	--Else, wait states are inserted until DSACKx is valid. This lets us insert wait states in the event our RAM is 
 	--slow or in the middle of refreshing.
+				
+	--FINISH MOVING THIS TO U601. SEEMS LIKE THIS IS PROBABLY NOT NEEDED FOR DMA, BUT DSACK IS A MEANS TO AN END TO ASSERT DTACK.
 
 	--DSACK0		= cycledone;
 	--DSACK0.OE	= MEMSEL;
