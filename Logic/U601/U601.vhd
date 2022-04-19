@@ -56,6 +56,7 @@ entity U601 is
 		nMEMSEL : IN STD_LOGIC; --ARE WE SELECTING MEMORY ON BOARD? FIRST 4 (8) MEGABYTES
 		EXTSEL : IN STD_LOGIC; --EXPANSION RAM IS RESPONDING TO THE ADDRESS
 		nRESET : IN STD_LOGIC; --A2000 SYSTEM RESET
+		--nAAS : IN STD_LOGIC; --AMIGA 2000 ADDRESS STROBE FOR DMA
 	 
 		D : INOUT STD_LOGIC_VECTOR (31 downto 28) := "ZZZZ"; --DATA BUS FOR THE AUTOCONFIG PROCESS
 		CONFIGED : INOUT STD_LOGIC; --HAS AUTOCONFIG COMPLETED?		
@@ -64,6 +65,7 @@ entity U601 is
 		MEMACCESS : INOUT STD_LOGIC; --LOGIC HIGH WHEN WE ARE ACCESSING Z2 RAM	
 		nUDS : INOUT STD_LOGIC; --68000 UPPER DATA STROBE
 		nLDS : INOUT STD_LOGIC; --68000 LOWER DATA STROBE
+		ARnW : OUT STD_LOGIC; --68000 READ/WRITE SIGNAL	
 	 
 	 	nFPUCS : OUT STD_LOGIC; --FPU CHIP SELECT
 		nBERR : OUT STD_LOGIC; --BUS ERROR
@@ -85,10 +87,11 @@ entity U601 is
 		nLMBE : OUT STD_LOGIC; --LOWER MIDDLE BYTE ENABLE
 		nLLBE : OUT STD_LOGIC; --LOWER LOWER BYTE ENABLE
 		nMEMLOCK : OUT STD_LOGIC; --LOCK MEMORY DURING ACCESS FOR STATE MACHINE
-		ARnW : OUT STD_LOGIC; --68000 READ/WRITE SIGNAL		
+		--EMDDIR : OUT STD_LOGIC; --DIRECTION OF MEMORY DATA BUS FOR LEVEL SHIFTERS
 		ISREFRESHING : OUT STD_LOGIC; --IS THE SDRAM IN REFRESH MODE? ACTIVE HIGH.
 		nDSACK0 : OUT STD_LOGIC;
 		nDSACK1 : OUT STD_LOGIC
+		--nDTACK : OUT STD_LOGIC --68000 DTACK FOR DMA
 		
 		);
 		
@@ -100,12 +103,15 @@ architecture Behavioral of U601 is
 	TYPE SDRAM_STATE IS ( POWERUP, POWERUP_PRECHARGE, MODE_REGISTER, AUTO_REFRESH, AUTO_REFRESH_CYCLE, RUN_STATE, CAS_STATE, DATA_STATE );
 	
 	SIGNAL CURRENT_STATE : SDRAM_STATE;
-	SIGNAL COUNT : INTEGER RANGE 0 TO 2 := 0; --COUNTER FOR SDRAM STARTUP ACTIVITIES
 	SIGNAL REFRESH : STD_LOGIC := '0'; --SDRAM REFRESH NEEDED. ACTIVE HIGH.	
 	SIGNAL SDRAM_START_REFRESH_COUNT : STD_LOGIC := '0'; --WE NEED TO REFRESH TWICE UPON STARTUP	
-	SIGNAL REFRESH_COUNTER : INTEGER RANGE 0 TO 2 := 0;
+	--SIGNAL DMAACCESS : STD_LOGIC := '0'; --IS A DMA CYCLE GOING ON?
+	
+	SIGNAL REFRESH_COUNTER : INTEGER RANGE 0 TO 200 := 0;
+	SIGNAL COUNT : INTEGER RANGE 0 TO 2 := 0; --COUNTER FOR SDRAM STARTUP ACTIVITIES
+	
 	CONSTANT REFRESH_COUNTER_DEFAULT : INTEGER := 185;
-	--AT 25MHZ, WE NEED TO REFRESH EVERY 195 FALLING CLOCK EDGES
+	--AT 25MHZ, WE NEED TO REFRESH EVERY 195 CLOCK CYCLES
 	--THIS CAUSES US TO REFRESH 8192 TIMES EVERY 64 MILLISECONDS
 	--WE GO A LITTLE LESS THAN 195 IN CASE REFRESH HITS IN THE MIDDLE OF A RAM ACTION
 	--THAT GIVES US SOME WIGGLE ROOM
@@ -318,7 +324,8 @@ begin
 			'0';
 	
 	--THIS DETECTS MEMORY ACCESS BY DMA
---	dmaaccess < '1'
+	--DMA ACCESS IS VERY SIMILAR TO 68030 ACCESS, BUT THE SIGNALS ARE 68000 BASED
+--	DMAACCESS <= '1'
 --		WHEN
 --			autoconfigcomplete_ZORRO2RAM = '1' AND A(23 downto 21) = baseaddress_ZORRO2RAM AND nAAS = '0' AND nBGACK = '0'
 --		ELSE
@@ -411,32 +418,9 @@ begin
 	-- SDRAM RISING CLOCK EDGE ACTIONS --
 	-------------------------------------
 	
-	PROCESS ( CPUCLK ) BEGIN
-		
-		IF ( RISING_EDGE (CPUCLK) ) THEN
-			
-			--We must use DSACKn for Zorro 2 RAM because this enables dynamic bus sizing, which is needed for Z2 devices.
-			--BECAUSE OF THIS, WE CANNOT USE BURST MODE IN Z2 RAM, WHICH ONLY WORKS WITH STERM TERMINATED ACTIONS.
-			
-			--SDRAM is pretty fast. Most operations will complete in less than one 25MHz clock cycle. Only AUTOREFRESH and 
-			--successive BANK ACTIVE commands take more than one clock cycle. Both are 60ns.
-			
-			--REFRESH
-			IF (REFRESH_COUNTER >= REFRESH_COUNTER_DEFAULT) THEN
-				--TIME TO REFRESH THE SDRAM
-				IF (MEMACCESS = '0') THEN
-					--IF THIS IS NOT A MEMORY CYCLE, PROCEED TO REFRESH
-					--IF WE ARE IN THE MIDDLE OF MEMORY ACCESS, WE NEED TO WAIT UNTIL THAT IS OVER
-					CURRENT_STATE <= AUTO_REFRESH;
-				END IF;
-			ELSE
-				--INCREMENT THE REFRESH COUNTER
-				REFRESH_COUNTER <= REFRESH_COUNTER + 1;
-			END IF;
-			
-			--THE SDRAM STATE EVALUATIONS ARE HERE!
-			
-			IF (nRESET = '0') THEN 
+	PROCESS ( CPUCLK, nRESET ) BEGIN
+	
+		IF (nRESET = '0') THEN 
 				--THE AMIGA HAS BEEN RESET
 				CURRENT_STATE <= POWERUP;
 				nZCAS <= '1';
@@ -449,159 +433,204 @@ begin
 				ZBUSOE <= '1'; --Disable the 257 MUX logic on the Z2 bus so we can "talk" to the SDRAM
 				nDSACK0 <= 'Z';
 				nDSACK1 <= 'Z';
+--				nDTACK <= 'Z';
+		
+		ELSIF ( RISING_EDGE (CPUCLK) ) THEN
 			
+			--We must use DSACKn for Zorro 2 RAM because this enables dynamic bus sizing, which is needed for Z2 devices.
+			--BECAUSE OF THIS, WE CANNOT USE BURST MODE IN Z2 RAM, WHICH ONLY WORKS WITH STERM TERMINATED ACTIONS.
+			
+			--SDRAM is pretty fast. Most operations will complete in less than one 25MHz clock cycle. Only AUTOREFRESH and 
+			--successive BANK ACTIVE commands take more than one clock cycle. Both are 60ns.
+			
+			--REFRESH
+			IF (REFRESH_COUNTER >= REFRESH_COUNTER_DEFAULT) THEN
+				--TIME TO REFRESH THE SDRAM
+				IF (MEMACCESS = '0') THEN -- AND DMAACCESS = '0') THEN
+					--IF THIS IS NOT A MEMORY CYCLE, PROCEED DIRECTLY TO REFRESH
+					--IF WE ARE IN THE MIDDLE OF MEMORY ACCESS, WE NEED TO WAIT UNTIL THAT IS OVER
+					CURRENT_STATE <= AUTO_REFRESH;
+				END IF;
 			ELSE
-				--PROCEED WITH SDRAM STATE MACHINE
-				--THE FIRST STATES ARE TO INITIALIZE THE SDRAM, WHICH WE ALWAYS DO
-				--THE LATER STATES ARE TO UTILIZE THE SDRAM, WHICH ONLY HAPPENS IF MEMACCESS = 1
-				--THIS MEANS THE ADDRESS STROBE IS ASSERTED, WE ARE IN THE ZORRO 2 ADDRESS SPACE, AND THE RAM IS AUTOCONFIGured
-				CASE CURRENT_STATE IS
+				--INCREMENT THE REFRESH COUNTER
+				REFRESH_COUNTER <= REFRESH_COUNTER + 1;
+			END IF;
+			
+			--THE SDRAM STATE EVALUATIONS ARE HERE!
+			
+		
+			--PROCEED WITH SDRAM STATE MACHINE
+			--THE FIRST STATES ARE TO INITIALIZE THE SDRAM, WHICH WE ALWAYS DO
+			--THE LATER STATES ARE TO UTILIZE THE SDRAM, WHICH ONLY HAPPENS IF MEMACCESS = 1
+			--THIS MEANS THE ADDRESS STROBE IS ASSERTED, WE ARE IN THE ZORRO 2 ADDRESS SPACE, AND THE RAM IS AUTOCONFIGured
+			CASE CURRENT_STATE IS
+			
+				WHEN POWERUP =>
+					--First power up or warm reset
+					--200 microsecond is needed to stabilize. We are going to rely on the 
+					--the system reset to give us the needed time, although it might be inadequate.
+					nCLKE <= '0'; --DISABLE CLOCK
+					nZWE <= '1';
+					nZRAS <= '1';
+					nZCAS <= '1';
+					nZCS <= '0'; --NOP STATE
+					CURRENT_STATE <= POWERUP_PRECHARGE;
+					
+				WHEN POWERUP_PRECHARGE =>
+					nZPRECHARGE <= '1'; --ALL BANKS TO BE PRECHARGED
+					ZMUX <= '1'; --SELECT THE CORRECT INPUTS SO THE PRECHARGE IS SEEN
+					nZWE <= '0';
+					nZRAS <= '0';
+					nZCAS <= '1';
+					nZCS <= '0';
+					nCLKE <= '1';
+					CURRENT_STATE <= MODE_REGISTER;
 				
-					WHEN POWERUP =>
-						--First power up or warm reset
-						--200 microsecond is needed to stabilize. We are going to rely on the 
-						--the system reset to give us the needed time, although it might be inadequate.
-						nCLKE <= '0'; --DISABLE CLOCK
-						nZWE <= '1';
-						nZRAS <= '1';
-						nZCAS <= '1';
-						nZCS <= '0'; --NOP STATE
-						CURRENT_STATE <= POWERUP_PRECHARGE;
-						
-					WHEN POWERUP_PRECHARGE =>
-						nZPRECHARGE <= '1'; --ALL BANKS TO BE PRECHARGED
-						ZMUX <= '1'; --SELECT THE CORRECT INPUTS SO THE PRECHARGE IS SEEN
-						nZWE <= '0';
-						nZRAS <= '0';
-						nZCAS <= '1';
-						nZCS <= '0';
-						nCLKE <= '1';
-						CURRENT_STATE <= MODE_REGISTER;
+				WHEN MODE_REGISTER =>
+					--TWO CLOCK CYCLES ARE NEEDED FOR THE REGISTER TO, WELL, REGISTER
+					ZMA <= "01000100000";
+					nZWE <= '0';
+					nZRAS <= '0';
+					nZCAS <= '0';
+					nZCS <= '0';	
 					
-					WHEN MODE_REGISTER =>
-						--TWO CLOCK CYCLES ARE NEEDED FOR THE REGISTER TO, WELL, REGISTER
-						ZMA <= "01000100000";
-						nZWE <= '0';
-						nZRAS <= '0';
-						nZCAS <= '0';
-						nZCS <= '0';	
-						
-						IF (COUNT = 2) THEN
-							--NOW NEED TO REFRESH TWICE	
-							ZMA <= (OTHERS => 'Z');
-							ZBUSOE <= '0'; --Enable the MUX logic on the Z2 SDRAM bus
+					IF (COUNT = 2) THEN
+						--NOW NEED TO REFRESH TWICE	
+						ZMA <= (OTHERS => 'Z');
+						ZBUSOE <= '0'; --Enable the MUX logic on the Z2 SDRAM bus
+						CURRENT_STATE <= AUTO_REFRESH;
+					END IF;
+					
+					COUNT <= COUNT + 1;
+					
+				WHEN AUTO_REFRESH =>
+					--REFRESH the SDRAM
+					--MUST BE FOLLOWED BY NOPs UNTIL REFRESH COMPLETE
+					--Refresh time is 60ns. Each 25MHz clock period is 40ns.
+					--If we wait two clock cycles, this will allow time for refresh.
+					
+					nZWE <= '1';
+					nZRAS <= '0';
+					nZCAS <= '0';
+					nZCS <= '0';
+					COUNT <= 0;
+					
+					ISREFRESHING <= '1';
+					
+					CURRENT_STATE <= AUTO_REFRESH_CYCLE;				
+					
+				WHEN AUTO_REFRESH_CYCLE =>
+					--NOPs WHILE THE SDRAM IS REFRESHING
+					nZWE <= '1';
+					nZRAS <= '1';
+					nZCAS <= '1';
+					nZCS <= '0';
+					
+					IF (COUNT = 2) THEN --TWO CLOCK CYCLES HAVE PASSED. WE CAN PROCEED.
+						--DO WE NEED TO REFRESH AGAIN (STARTUP)?
+						IF (SDRAM_START_REFRESH_COUNT = '0') THEN							
 							CURRENT_STATE <= AUTO_REFRESH;
-						END IF;
-						
-						COUNT <= COUNT + 1;
-						
-					WHEN AUTO_REFRESH =>
-						--REFRESH the SDRAM
-						--MUST BE FOLLOWED BY NOPs UNTIL REFRESH COMPLETE
-						--Refresh time is 60ns. Each 25MHz clock period is 40ns.
-						--If we wait two clock cycles, this will allow time for refresh.
-						
-						nZWE <= '1';
-						nZRAS <= '0';
-						nZCAS <= '0';
-						nZCS <= '0';
-						COUNT <= 0;
-						
-						ISREFRESHING <= '1';
-						
-						CURRENT_STATE <= AUTO_REFRESH_CYCLE;				
-						
-					WHEN AUTO_REFRESH_CYCLE =>
-						--NOPs WHILE THE SDRAM IS REFRESHING
-						nZWE <= '1';
-						nZRAS <= '1';
-						nZCAS <= '1';
-						nZCS <= '0';
-						
-						IF (COUNT = 2) THEN --TWO CLOCK CYCLES HAVE PASSED. WE CAN PROCEED.
-							--DO WE NEED TO REFRESH AGAIN (STARTUP)?
-							IF (SDRAM_START_REFRESH_COUNT = '0') THEN							
-								CURRENT_STATE <= AUTO_REFRESH;
-								SDRAM_START_REFRESH_COUNT <= '1';
-							ELSE
-								CURRENT_STATE <= RUN_STATE;
-								ISREFRESHING <= '0';
-							END IF;
-						END IF;		
-
-						COUNT <= COUNT + 1;						
-					
-					WHEN RUN_STATE =>
-						--CLOCK EDGE 0
-						
-						IF (MEMACCESS = '1') THEN
-							--WE ARE IN THE Z2 MEMORY SPACE WITH THE ADDRESS STROBE ASSERTED.
-							--SEND THE BANK ACTIVATE COMMAND W/RAS
-							
-							ZMUX <= '0'; --SET THE 257 LOGIC TO THE LEAST SIGNIFICANT ADDRESS BITS FOR RAS
-							nZCS <= '0';
-							nZRAS <= '0';	
-							nZCAS <= '1';							
-							nZWE <= '1';
-							
-							nDSACK0 <= '1'; --SET DSACK HIGH BECAUSE WE ARE TALKING TO THE BUS RIGHT NOW
-							nDSACK1 <= '1';
-							
-							CURRENT_STATE <= CAS_STATE;
-							COUNT <= 0;
-						
+							SDRAM_START_REFRESH_COUNT <= '1';
 						ELSE
-							--THERE IS NO RAM ACTIVITY THIS CLOCK EDGE
-							--SET NOP MODE
-							nZCS <= '0';
-							nZRAS <= '1';	
-							nZCAS <= '1';							
-							nZWE <= '1';
+							CURRENT_STATE <= RUN_STATE;
+							ISREFRESHING <= '0';
+							REFRESH_COUNTER <= 0;
 						END IF;
+					END IF;		
+
+					COUNT <= COUNT + 1;						
+				
+				WHEN RUN_STATE =>
+					--CLOCK EDGE 0
+					
+					IF (MEMACCESS = '1') THEN -- OR DMAACCESS = '1') THEN
+						--WE ARE IN THE Z2 MEMORY SPACE WITH THE ADDRESS STROBE ASSERTED.
+						--SEND THE BANK ACTIVATE COMMAND W/RAS
 						
-					WHEN CAS_STATE =>
-						--CLOCK EDGE 1
-						--READ OR WRITE WITH AUTOPRECHARGE
-						ZMUX <= '1'; --SET THE 257 LOGIC TO THE MOST SIGNIFICANT ADDRESS BITS FOR CAS
-						nZPRECHARGE <= '1';
+						ZMUX <= '0'; --SET THE 257 LOGIC TO THE LEAST SIGNIFICANT ADDRESS BITS FOR RAS
+						nZCS <= '0';
+						nZRAS <= '0';	
+						nZCAS <= '1';							
+						nZWE <= '1';
+						
+						--IF (MEMACCESS = '1') THEN
+							nDSACK0 <= '1'; --SET DSACK HIGH BECAUSE WE ARE TALKING TO THE 68030 BUS RIGHT NOW
+							nDSACK1 <= '1';
+--							ELSE
+--								nDTACK <= '1'; --DMA ACCESS, SET HIGH BECAUSE WE ARE TALKING TO THE ZORRO 2 BUS NOW
+--							END IF; 
+						
+						CURRENT_STATE <= CAS_STATE;
+						COUNT <= 0;
+					
+					ELSE
+						--THERE IS NO RAM ACTIVITY THIS CLOCK EDGE
+						--SET NOP MODE
 						nZCS <= '0';
 						nZRAS <= '1';	
-						nZCAS <= '0';	
-						nZWE <= RnW;
+						nZCAS <= '1';							
+						nZWE <= '1';
+					END IF;
+					
+				WHEN CAS_STATE =>
+					--CLOCK EDGE 1
+					--READ OR WRITE WITH AUTOPRECHARGE
+					ZMUX <= '1'; --SET THE 257 LOGIC TO THE MOST SIGNIFICANT ADDRESS BITS FOR CAS
+					nZPRECHARGE <= '1';
+					nZCS <= '0';
+					nZRAS <= '1';	
+					nZCAS <= '0';	
+					nZWE <= RnW;
 
-						--IF THIS IS A WRITE ACTION, WE CAN IMMEDIATELY PROCEED TO THE ACTION
-						--IF THIS IS A READ ACTION, THE CAS LATENCY IS 2 CLOCK CYCLES, SO WE NEED TO WAIT ONE CLOCK BEFORE READING
-						
+					--IF THIS IS A WRITE ACTION, WE CAN IMMEDIATELY PROCEED TO THE ACTION
+					--IF THIS IS A READ ACTION, THE CAS LATENCY IS 2 CLOCK CYCLES, SO WE NEED TO WAIT ONE CLOCK BEFORE READING
+					
+					--IF (MEMACCESS = '1') THEN
+						--THIS IS A 68030 MEMORY ACCESS
 						IF ((RnW = '0') OR (RnW = '1' AND COUNT >= 1)) THEN
-							--THIS IS A WRITE ACTION ON THE FIRST CLOCK OR THIS IS A READ ACTION AND TWO CLOCKS CYCLES HAVE PASSED
+						
 							nDSACK0 <= '0'; --68030 CAN READ/WRITE ON THE NEXT FALLING CLOCK EDGE
 							nDSACK1 <= '0'; --SETTING BOTH DSACKs TO 0 TELLS THE 68030 THAT THIS IS A 32 BIT PORT
 							CURRENT_STATE <= DATA_STATE;
-						ELSE
-							COUNT <= COUNT + 1;
-						END IF;	
-						
-					WHEN DATA_STATE =>
-						--RISING CLOCK EDGE 2
-						--THIS IS THE CLOCK EDGE WE EXPECT THE DATA TO BE WRITTEN TO OR READ FROM THE SDRAM
-						--WE NEED TO WAIT 30ns BEFORE ISSUING ANOTHER BANK ACTIVATE COMMAND. NO PROBLEM, SINCE ONE CLOCK CYCLE IS 40ns.
-						
-						IF (MEMACCESS = '0') THEN --THE 68030 HAS NEGATED THE ADDRESS STROBE INDICATING THE END OF THE MEMORY ACCESS
-							nDSACK0 <= 'Z'; --WE TRISTATE DSACKn SO WE DON'T INTERFERE WITH OTHER DEVICES ON THE BUS
-							nDSACK1 <= 'Z';
-							CURRENT_STATE <= RUN_STATE;
 							
-							--SET NOP
-							nZCS <= '0';
-							nZRAS <= '1';	
-							nZCAS <= '1';							
-							nZWE <= '1';
+						--END IF;
 							
-						END IF;					
+--						ELSIF (DMAACCESS = '1') THEN
+--							--THIS IS A DMA MEMORY ACCESS
+--							IF ((ARnW = '0') OR (ARnW = '1' AND COUNT >= 1)) THEN
+--							
+--								nDTACK <= '0'; --68000 DTACK FOR DMA
+--								CURRENT_STATE <= DATA_STATE;
+--								
+--							END IF;
+						
+					ELSE
+						COUNT <= COUNT + 1;
+					END IF;	
 					
-				END CASE;
+				WHEN DATA_STATE =>
+					--RISING CLOCK EDGE 2
+					--THIS IS THE CLOCK EDGE WE EXPECT THE DATA TO BE WRITTEN TO OR READ FROM THE SDRAM
+					--WE NEED TO WAIT 30ns BEFORE ISSUING ANOTHER BANK ACTIVATE COMMAND. NO PROBLEM, SINCE ONE CLOCK CYCLE IS 40ns.
+					
+					IF (MEMACCESS = '0') THEN -- AND DMAACCESS = '0') THEN --THE ADDRESS STROBE HAS NEGATED INDICATING THE END OF THE MEMORY ACCESS
+						
+						nDSACK0 <= 'Z'; --WE TRISTATE SO WE DON'T INTERFERE WITH OTHER DEVICES ON THE BUSES
+						nDSACK1 <= 'Z';
+--							nDTACK <= 'Z';
+						
+						CURRENT_STATE <= RUN_STATE;
+						
+						--SET NOP
+						nZCS <= '0';
+						nZRAS <= '1';	
+						nZCAS <= '1';							
+						nZWE <= '1';
+						
+					END IF;					
 				
-			END IF;
+			END CASE;
+				
 		END IF;
 	END PROCESS;
 	
@@ -611,7 +640,7 @@ begin
 	
 	--This sets the direction of the LVC data buffers between the 680x0 and the RAM
 	
-	EMDDIR <= NOT RnW;
+	--EMDDIR <= NOT RnW;
 	
 	------------------------
 	-- 68030 CACHE ENABLE --
