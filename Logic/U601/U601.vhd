@@ -53,10 +53,10 @@ entity U601 is
 		nDSEN : IN STD_LOGIC; --DATA STROBE ENABLE
 		nASEN: IN STD_LOGIC; --ADDRESS STROBE ENABLE
 		TRISTATE : IN STD_LOGIC; --TRISTATE WHEN WE DON'T HAVE THE BUS		
-		nMEMSEL : IN STD_LOGIC; --ARE WE SELECTING MEMORY ON BOARD? FIRST 4 (8) MEGABYTES
+		--nMEMSEL : IN STD_LOGIC; --ARE WE SELECTING MEMORY ON BOARD? FIRST 4 (8) MEGABYTES
 		EXTSEL : IN STD_LOGIC; --EXPANSION RAM IS RESPONDING TO THE ADDRESS
 		nRESET : IN STD_LOGIC; --A2000 SYSTEM RESET
-		--nAAS : IN STD_LOGIC; --AMIGA 2000 ADDRESS STROBE FOR DMA
+		nAAS : IN STD_LOGIC; --AMIGA 2000 ADDRESS STROBE FOR DMA
 	 
 		D : INOUT STD_LOGIC_VECTOR (31 downto 28) := "ZZZZ"; --DATA BUS FOR THE AUTOCONFIG PROCESS
 		CONFIGED : INOUT STD_LOGIC; --HAS AUTOCONFIG COMPLETED?		
@@ -65,7 +65,7 @@ entity U601 is
 		MEMACCESS : INOUT STD_LOGIC; --LOGIC HIGH WHEN WE ARE ACCESSING Z2 RAM	
 		nUDS : INOUT STD_LOGIC; --68000 UPPER DATA STROBE
 		nLDS : INOUT STD_LOGIC; --68000 LOWER DATA STROBE
-		ARnW : OUT STD_LOGIC; --68000 READ/WRITE SIGNAL	
+		--ARnW : OUT STD_LOGIC; --68000 READ/WRITE SIGNAL	
 	 
 	 	nFPUCS : OUT STD_LOGIC; --FPU CHIP SELECT
 		nBERR : OUT STD_LOGIC; --BUS ERROR
@@ -79,7 +79,6 @@ entity U601 is
 		nZWE : OUT STD_LOGIC; --SDRAM WRITE ENABLE
 		nZCAS : OUT STD_LOGIC; --SDRAM CAS
 		nZRAS : OUT STD_LOGIC; --SDRAM RAS
-		--nSTERM : OUT STD_LOGIC; --STERM SIGNAL
 		nZPRECHARGE : OUT STD_LOGIC; --SDRAM PRECHARGE SIGNAL
 		ZMUX : OUT STD_LOGIC; -- ZORRO 2 ADDRESS MUX
 		nUUBE : OUT STD_LOGIC; --UPPER UPPER BYTE ENABLE
@@ -87,11 +86,10 @@ entity U601 is
 		nLMBE : OUT STD_LOGIC; --LOWER MIDDLE BYTE ENABLE
 		nLLBE : OUT STD_LOGIC; --LOWER LOWER BYTE ENABLE
 		nMEMLOCK : OUT STD_LOGIC; --LOCK MEMORY DURING ACCESS FOR STATE MACHINE
-		--EMDDIR : OUT STD_LOGIC; --DIRECTION OF MEMORY DATA BUS FOR LEVEL SHIFTERS
-		ISREFRESHING : OUT STD_LOGIC; --IS THE SDRAM IN REFRESH MODE? ACTIVE HIGH.
+		EMDDIR : OUT STD_LOGIC; --DIRECTION OF MEMORY DATA BUS FOR LEVEL SHIFTERS
 		nDSACK0 : OUT STD_LOGIC;
-		nDSACK1 : OUT STD_LOGIC
-		--nDTACK : OUT STD_LOGIC --68000 DTACK FOR DMA
+		nDSACK1 : OUT STD_LOGIC;
+		nDTACK : OUT STD_LOGIC --68000 DTACK FOR DMA
 		
 		);
 		
@@ -103,9 +101,10 @@ architecture Behavioral of U601 is
 	TYPE SDRAM_STATE IS ( POWERUP, POWERUP_PRECHARGE, MODE_REGISTER, AUTO_REFRESH, AUTO_REFRESH_CYCLE, RUN_STATE, CAS_STATE, DATA_STATE );
 	
 	SIGNAL CURRENT_STATE : SDRAM_STATE;
-	SIGNAL REFRESH : STD_LOGIC := '0'; --SDRAM REFRESH NEEDED. ACTIVE HIGH.	
+	--SIGNAL REFRESH : STD_LOGIC := '0'; --SDRAM REFRESH NEEDED. ACTIVE HIGH.	
 	SIGNAL SDRAM_START_REFRESH_COUNT : STD_LOGIC := '0'; --WE NEED TO REFRESH TWICE UPON STARTUP	
-	--SIGNAL DMAACCESS : STD_LOGIC := '0'; --IS A DMA CYCLE GOING ON?
+	SIGNAL dmaaccess : STD_LOGIC := '0'; --IS A DMA CYCLE GOING ON?
+	SIGNAL cpuaccess : STD_LOGIC := '0'; --IS THE CPU ACCESSING THE MEMORY?
 	
 	SIGNAL REFRESH_COUNTER : INTEGER RANGE 0 TO 200 := 0;
 	SIGNAL COUNT : INTEGER RANGE 0 TO 2 := 0; --COUNTER FOR SDRAM STARTUP ACTIVITIES
@@ -183,8 +182,8 @@ begin
 
 	--We have three boards we need to autoconfig, in this order
 	--1. The 68030 board itself
-	--2. The 68030 base memory (up to 8MB) without BOOT ROM in the Zorro 2 space
-	--3. The expansion memory (up to 112MB) in the Zorro 3 space. This is done in U602.	
+	--2. The base memory (8MB) without BOOT ROM in the Zorro 2 space
+	--3. The expansion memory (112MB) in the Zorro 3 space. This is done in U602.	
 
 	--A good explaination of the autoconfig process is given in the Amiga Hardware Reference Manual from Commodore
 	--https://archive.org/details/amiga-hardware-reference-manual-3rd-edition	
@@ -250,7 +249,7 @@ begin
 						--offset $08 INVERTED
 						WHEN "000100" => 
 							D_2630 <= "111"; --CAN'T BE SHUT UP
-							D_ZORRO2RAM <= "1011"; --er_flags: I/O device, can be shut up, reserved, reserved
+							D_ZORRO2RAM <= "1011"; --er_flags: I/O device, can't be shut up, reserved, reserved
 
 						--offset $0C INVERTED						
 						WHEN "000110" => 
@@ -312,31 +311,36 @@ begin
 	---------------
 
 	--EITHER THE 68030 OR DMA FROM THE ZORRO 2 BUS CAN ACCESS ZORRO 2 RAM ON OUR CARD
-	--WE ARE USING SDRAMS IN THIS DESIGN. SDRAMS HAVE A NUMBER OF DEFINED STATES
-	--WE CAN DO OUR WORK BY IDENTIFYING THE CURRENT STATE AND IMPLEMENTING A SIMPLE STATE MACHINE
 	
-	--SIGNAL FOR U600 AND OTHER STUFF WHEN WE ARE IN THE ZORRO 2 MEMORY ADDRESS SPACE. U305
+	--WE ARE USING SDRAMS IN THIS DESIGN. SDRAMS HAVE A NUMBER OF DEFINED STATES
+	--WE CAN DO OUR WORK BY IDENTIFYING THE CURRENT AND NEXT STATE AND IMPLEMENTING A SIMPLE STATE MACHINE
+	
+	--THE CPU IS ADDRESSING THE ZORRO 2 MEMORY SPACE. U305
 	--THIS DETECTS MEMORY ACCESS BY THE 68030
-	MEMACCESS <= '1' 
+	cpuaccess <= '1' 
 		WHEN
-			autoconfigcomplete_ZORRO2RAM = '1' AND A(23 downto 21) = baseaddress_ZORRO2RAM AND nAS = '0'
+			autoconfigcomplete_ZORRO2RAM = '1' AND A(23 downto 21) = baseaddress_ZORRO2RAM AND nAS = '0' AND cpuspace = '0'
 		ELSE
 			'0';
 	
 	--THIS DETECTS MEMORY ACCESS BY DMA
 	--DMA ACCESS IS VERY SIMILAR TO 68030 ACCESS, BUT THE SIGNALS ARE 68000 BASED
---	DMAACCESS <= '1'
---		WHEN
---			autoconfigcomplete_ZORRO2RAM = '1' AND A(23 downto 21) = baseaddress_ZORRO2RAM AND nAAS = '0' AND nBGACK = '0'
---		ELSE
---			'0';
+	dmaaccess <= '1'
+		WHEN
+			autoconfigcomplete_ZORRO2RAM = '1' AND A(23 downto 21) = baseaddress_ZORRO2RAM AND nAAS = '0' AND nBGACK = '0'
+		ELSE
+			'0';
+			
+	MEMACCESS <= '1' 
+		WHEN
+			cpuaccess = '1' OR dmaaccess = '1'
+		ELSE
+			'0';
 	
 	--WE NEED TO BE RESPONSIVE TO BOTH THE CPU AND DMA READ/WRITE REQUESTS
 	--WE NEED TO HOLD OFF THE CPU WHEN A DMA CYCLE IS IN PROGRESS AND VICE VERSA
 	--nBGACK DOES THIS NICELY. WHEN ASSERTED, THE 68030 RELEASES THE BUS. 
 	--EXTERNAL DEVICES ARE NOT TO ASSERT nBGACK UNTIL THE 680x0 NEGATES nAS AND nDSACK (nDTACK). pp7-100.
-	--WHEN IMPLEMENTING SDRAM, WE NEED TO HOLD OFF ANY RAM ACCESS (DMA OR CPU) UNTIL REFRESH IS COMPLETE AND VICE VERSA.
-	--DISCUSSION OF PORT SIZE AND BYTE SIZING IS ALL IN SECTION 12 OF THE 68030 MANUAL
 	
 	-------------------------------------
 	-- SDRAM FALLING CLOCK EDGE ACTIONS --
@@ -346,10 +350,11 @@ begin
 		
 		IF ( FALLING_EDGE (CPUCLK) ) THEN
 
-			IF (autoconfigcomplete_ZORRO2RAM = '1' AND cpuspace = '0' AND MEMACCESS = '1') THEN		
+			IF (MEMACCESS = '1') THEN		
 
-				--ENABLE THE VARIOUS BYTES ON THE SDRAM DEPENDING ON WHAT THE CPU IS ASKING FOR. U603
-
+				--ENABLE THE VARIOUS BYTES ON THE SDRAM DEPENDING ON WHAT THE ACCESSING DEVICE IS ASKING FOR. U603
+				--DISCUSSION OF PORT SIZE AND BYTE SIZING IS ALL IN SECTION 12 OF THE 68030 MANUAL
+				
 				--UPPER UPPER BYTE ENABLE (D31..24)
 				IF 
 				   (( RnW = '1' ) OR
@@ -433,7 +438,7 @@ begin
 				ZBUSOE <= '1'; --Disable the 257 MUX logic on the Z2 bus so we can "talk" to the SDRAM
 				nDSACK0 <= 'Z';
 				nDSACK1 <= 'Z';
---				nDTACK <= 'Z';
+				nDTACK <= 'Z';
 		
 		ELSIF ( RISING_EDGE (CPUCLK) ) THEN
 			
@@ -515,7 +520,7 @@ begin
 					nZCS <= '0';
 					COUNT <= 0;
 					
-					ISREFRESHING <= '1';
+					--ISREFRESHING <= '1';
 					
 					CURRENT_STATE <= AUTO_REFRESH_CYCLE;				
 					
@@ -533,7 +538,7 @@ begin
 							SDRAM_START_REFRESH_COUNT <= '1';
 						ELSE
 							CURRENT_STATE <= RUN_STATE;
-							ISREFRESHING <= '0';
+							--ISREFRESHING <= '0';
 							REFRESH_COUNTER <= 0;
 						END IF;
 					END IF;		
@@ -543,7 +548,7 @@ begin
 				WHEN RUN_STATE =>
 					--CLOCK EDGE 0
 					
-					IF (MEMACCESS = '1') THEN -- OR DMAACCESS = '1') THEN
+					IF (MEMACCESS = '1') THEN 
 						--WE ARE IN THE Z2 MEMORY SPACE WITH THE ADDRESS STROBE ASSERTED.
 						--SEND THE BANK ACTIVATE COMMAND W/RAS
 						
@@ -553,23 +558,15 @@ begin
 						nZCAS <= '1';							
 						nZWE <= '1';
 						
-						--IF (MEMACCESS = '1') THEN
+						IF (nBGACK = '0') THEN
+							nDTACK <= '1'; --DMA ACCESS, SET HIGH BECAUSE _WE_ ARE TALKING TO THE ZORRO 2 BUS NOW							
+						ELSE
 							nDSACK0 <= '1'; --SET DSACK HIGH BECAUSE WE ARE TALKING TO THE 68030 BUS RIGHT NOW
 							nDSACK1 <= '1';
---							ELSE
---								nDTACK <= '1'; --DMA ACCESS, SET HIGH BECAUSE WE ARE TALKING TO THE ZORRO 2 BUS NOW
---							END IF; 
+						END IF; 
 						
 						CURRENT_STATE <= CAS_STATE;
 						COUNT <= 0;
-					
-					ELSE
-						--THERE IS NO RAM ACTIVITY THIS CLOCK EDGE
-						--SET NOP MODE
-						nZCS <= '0';
-						nZRAS <= '1';	
-						nZCAS <= '1';							
-						nZWE <= '1';
 					END IF;
 					
 				WHEN CAS_STATE =>
@@ -584,40 +581,37 @@ begin
 
 					--IF THIS IS A WRITE ACTION, WE CAN IMMEDIATELY PROCEED TO THE ACTION
 					--IF THIS IS A READ ACTION, THE CAS LATENCY IS 2 CLOCK CYCLES, SO WE NEED TO WAIT ONE CLOCK BEFORE READING
+					--DURING DMA, THE REQUESTING DEVICE'S RW SIGNAL IS LOCKED TO OUR RW SIGNAL
+
+					IF ((RnW = '0') OR (RnW = '1' AND COUNT >= 1)) THEN
 					
-					--IF (MEMACCESS = '1') THEN
-						--THIS IS A 68030 MEMORY ACCESS
-						IF ((RnW = '0') OR (RnW = '1' AND COUNT >= 1)) THEN
+						IF (nBGACK = '0') THEN
 						
-							nDSACK0 <= '0'; --68030 CAN READ/WRITE ON THE NEXT FALLING CLOCK EDGE
-							nDSACK1 <= '0'; --SETTING BOTH DSACKs TO 0 TELLS THE 68030 THAT THIS IS A 32 BIT PORT
-							CURRENT_STATE <= DATA_STATE;
+							nDTACK <= '0'; --ASSERT nDTACK SINCE THIS IS A DMA EVENT. DEVICE CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
 							
-						--END IF;
-							
---						ELSIF (DMAACCESS = '1') THEN
---							--THIS IS A DMA MEMORY ACCESS
---							IF ((ARnW = '0') OR (ARnW = '1' AND COUNT >= 1)) THEN
---							
---								nDTACK <= '0'; --68000 DTACK FOR DMA
---								CURRENT_STATE <= DATA_STATE;
---								
---							END IF;
+						ELSE
 						
-					ELSE
-						COUNT <= COUNT + 1;
-					END IF;	
+							nDSACK0 <= '0'; --68030 CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
+							nDSACK1 <= '0'; --ASSERTING BOTH DSACKs TELLS THE 68030 THAT THIS IS A 32 BIT PORT.
+							
+						END IF;
+						
+						CURRENT_STATE <= DATA_STATE;
+					
+					END IF;						
+					
+					COUNT <= COUNT + 1;
 					
 				WHEN DATA_STATE =>
 					--RISING CLOCK EDGE 2
 					--THIS IS THE CLOCK EDGE WE EXPECT THE DATA TO BE WRITTEN TO OR READ FROM THE SDRAM
 					--WE NEED TO WAIT 30ns BEFORE ISSUING ANOTHER BANK ACTIVATE COMMAND. NO PROBLEM, SINCE ONE CLOCK CYCLE IS 40ns.
 					
-					IF (MEMACCESS = '0') THEN -- AND DMAACCESS = '0') THEN --THE ADDRESS STROBE HAS NEGATED INDICATING THE END OF THE MEMORY ACCESS
+					IF (MEMACCESS = '0') THEN --THE ADDRESS STROBE HAS NEGATED INDICATING THE END OF THE MEMORY ACCESS
 						
 						nDSACK0 <= 'Z'; --WE TRISTATE SO WE DON'T INTERFERE WITH OTHER DEVICES ON THE BUSES
 						nDSACK1 <= 'Z';
---							nDTACK <= 'Z';
+						nDTACK <= '1';
 						
 						CURRENT_STATE <= RUN_STATE;
 						
@@ -640,7 +634,7 @@ begin
 	
 	--This sets the direction of the LVC data buffers between the 680x0 and the RAM
 	
-	--EMDDIR <= NOT RnW;
+	EMDDIR <= NOT RnW;
 	
 	------------------------
 	-- 68030 CACHE ENABLE --
@@ -760,7 +754,7 @@ begin
 			'0';
 			
 	--This is the basic ROM chip select logic.  We want ROM to pay attention
-	--to the phantom signals, and only show up on reads.
+	--to the phantom signals, and only show up on reads. U304
 	
 	--CSROM		= icsrom;
 	--nCSROM <= '0' WHEN icsrom = '1' ELSE '1';
@@ -861,7 +855,13 @@ begin
 	--Can this be replaced with nBGACK = 0??
 	--nMEMSEL is low when we are accessing Z2 ram...either cpu or dma
 	--Should be "1" when we are not using any onboard resources...that is no z2 ram, rom, or autoconfig in process, or cpu space
-	offboard <= '1' WHEN (nONBOARD = '1' OR nMEMSEL = '1' OR nEXTERN = '1') ELSE '0';
+	--offboard <= '1' WHEN (nONBOARD = '1' OR nMEMSEL = '1' OR nEXTERN = '1') ELSE '0';
+	offboard <= '1' 
+	WHEN 
+		(nONBOARD = '1' AND MEMACCESS = '0' AND nEXTERN = '1')
+		--(nONBOARD = '1' OR nMEMSEL = '1' OR nEXTERN = '1') 
+	ELSE 
+		'0';
 					
 	--68000 style data strobes.  These are kept in tri-state when the 
 	--TRISTATE signal is active, or when we're not "offboard".  For 68030
@@ -897,22 +897,6 @@ begin
 				(rds = '1'))
 		ELSE 
 			'1';
-			
-	--------------
-	-- Amiga RW --
-	--------------
-
-	--This signal is the Amiga bus RW line. This signal tristates when we are 
-	--not boss and when there is a DMA device active, or during an
-	--onboard cycle. It shares the 68030 RW signal with the Amiga 2000 hardware. U501
-
-	--ARW		= RW ;	
-	--[UDS, LDS, ARW, AAS].OE = !TRISTATE & offboard ;
-	ARnW <= 'Z' 
-		WHEN 
-			TRISTATE = '1' OR offboard = '0'
-		ELSE
-			RnW;
 			
 	----------------------
 	-- ONBOARD RESOURCE --
