@@ -6,7 +6,7 @@
 -- Design Name:    N2630 U601 CPLD
 -- Module Name:    U601 - Behavioral 
 -- Project Name:   N2630
--- Target Devices: XC9572 100 PIN
+-- Target Devices: XC95144 144 PIN
 -- Tool versions: 
 -- Description: 
 --
@@ -74,13 +74,13 @@ entity U601 is
 		nCSROM : OUT STD_LOGIC; --ROM CHIP SELECT	
 		nCLKE : OUT STD_LOGIC; --SDRAM CLOCK ENABLE
 		ZMA : OUT STD_LOGIC_VECTOR (10 downto 0) := (OTHERS => 'Z'); --Z2 SDRAM ADDRESS BUS
-		ZBUSOE : OUT STD_LOGIC; --Output enable for 257 mux logic Z2 memory bus
+		--ZBUSOE : OUT STD_LOGIC; --Output enable for 257 mux logic Z2 memory bus
 		nZCS : OUT STD_LOGIC; --SDRAM CHIP SELECT
 		nZWE : OUT STD_LOGIC; --SDRAM WRITE ENABLE
 		nZCAS : OUT STD_LOGIC; --SDRAM CAS
 		nZRAS : OUT STD_LOGIC; --SDRAM RAS
-		nZPRECHARGE : OUT STD_LOGIC; --SDRAM PRECHARGE SIGNAL
-		ZMUX : OUT STD_LOGIC; -- ZORRO 2 ADDRESS MUX
+		--nZPRECHARGE : OUT STD_LOGIC; --SDRAM PRECHARGE SIGNAL
+		--ZMUX : OUT STD_LOGIC; -- ZORRO 2 ADDRESS MUX
 		nUUBE : OUT STD_LOGIC; --UPPER UPPER BYTE ENABLE
 		nUMBE : OUT STD_LOGIC; --UPPER MIDDLE BYTE ENABLE
 		nLMBE : OUT STD_LOGIC; --LOWER MIDDLE BYTE ENABLE
@@ -89,7 +89,11 @@ entity U601 is
 		EMDDIR : OUT STD_LOGIC; --DIRECTION OF MEMORY DATA BUS FOR LEVEL SHIFTERS
 		nDSACK0 : OUT STD_LOGIC;
 		nDSACK1 : OUT STD_LOGIC;
-		nDTACK : OUT STD_LOGIC --68000 DTACK FOR DMA
+		nDTACK : OUT STD_LOGIC; --68000 DTACK FOR DMA
+		ZBANK0 : OUT STD_LOGIC; --ZORRO 2 SDRAM BANK0 SIGNAL
+		ZBANK1 : OUT STD_LOGIC; --ZORRO 2 SDRAM BANK1 SIGNAL
+		nOVR : OUT STD_LOGIC; --DTACK OVERRIDE TO GARY
+		ADDIR : OUT STD_LOGIC --ADDRESS BUS DIRECTION CONTROL
 		
 		);
 		
@@ -119,7 +123,6 @@ architecture Behavioral of U601 is
 	-- INTERNAL SIGNALS --
 	----------------------
 	
-	--All internal signals are active HIGH!
 	SIGNAL baseaddress_ZORRO2RAM : STD_LOGIC_VECTOR ( 2 downto 0 ):="000"; --BASE ADDRESS ASSIGNED FOR ZORRO 2 RAM
 	SIGNAL autoconfigspace : STD_LOGIC:='0'; --ARE WE IN THE AUTOCONFIG ADDRESS SPACE?
 	SIGNAL chipram : STD_LOGIC:='0';
@@ -136,7 +139,7 @@ architecture Behavioral of U601 is
 	SIGNAL D_2630 : STD_LOGIC_VECTOR ( 2 downto 0 ) := "ZZZ";
 	SIGNAL D_ZORRO2RAM : STD_LOGIC_VECTOR ( 3 downto 0 ):="ZZZZ";
 	SIGNAL autoconfigcomplete_2630 : STD_LOGIC := '0'; --HAS 68030 BOARD BEEN AUTOCONFIGed?
-	SIGNAL autoconfigcomplete_ZORRO2RAM : STD_LOGIC := '0'; --HAS 68030 BOARD BEEN AUTOCONFIGed?
+	SIGNAL autoconfigcomplete_ZORRO2RAM : STD_LOGIC := '0'; --HAS ZORRO2 RAM BEEN AUTOCONFIGed?
 	
 	SIGNAL icsrom : STD_LOGIC:='0';
 	SIGNAL hirom : STD_LOGIC:='0';
@@ -336,6 +339,20 @@ begin
 			cpuaccess = '1' OR dmaaccess = '1'
 		ELSE
 			'0';
+			
+	--The OVR signal must be asserted whenever on-board memory is selected
+	--during a DMA cycle.  It tri-states GARY's DTACK output, allowing
+	--one to be created by our memory logic. u501
+	--PROBABLY MAKES MORE SENSE TO MOVE THIS TO U601. LOCK OUT GARY'S DURING DMA.
+
+	--OVR		= BGACK & MEMSEL;
+	--OVR.OE		= BGACK & MEMSEL;
+	nOVR <= '0' 
+		WHEN 
+			nBGACK = '0' AND MEMACCESS = '1' 
+			--nBGACK = '0' AND nMEMSEL = '0' 
+		ELSE 
+			'Z';	
 	
 	--WE NEED TO BE RESPONSIVE TO BOTH THE CPU AND DMA READ/WRITE REQUESTS
 	--WE NEED TO HOLD OFF THE CPU WHEN A DMA CYCLE IS IN PROGRESS AND VICE VERSA
@@ -435,10 +452,10 @@ begin
 				nCLKE <= '1';
 				COUNT <= 0;
 				SDRAM_START_REFRESH_COUNT <= '0';
-				ZBUSOE <= '1'; --Disable the 257 MUX logic on the Z2 bus so we can "talk" to the SDRAM
+				--ZBUSOE <= '1'; --Disable the 257 MUX logic on the Z2 bus so we can "talk" to the SDRAM
 				nDSACK0 <= 'Z';
 				nDSACK1 <= 'Z';
-				nDTACK <= 'Z';
+				nDTACK <= '1';
 		
 		ELSIF ( RISING_EDGE (CPUCLK) ) THEN
 			
@@ -482,8 +499,10 @@ begin
 					CURRENT_STATE <= POWERUP_PRECHARGE;
 					
 				WHEN POWERUP_PRECHARGE =>
-					nZPRECHARGE <= '1'; --ALL BANKS TO BE PRECHARGED
-					ZMUX <= '1'; --SELECT THE CORRECT INPUTS SO THE PRECHARGE IS SEEN
+					--nZPRECHARGE <= '1'; --ALL BANKS TO BE PRECHARGED
+					ZMA <= (OTHERS => '0');
+					ZMA(10) <= '1'; --PRECHARGE					
+					--ZMUX <= '1'; --SELECT THE CORRECT INPUTS SO THE PRECHARGE IS SEEN
 					nZWE <= '0';
 					nZRAS <= '0';
 					nZCAS <= '1';
@@ -501,8 +520,8 @@ begin
 					
 					IF (COUNT = 2) THEN
 						--NOW NEED TO REFRESH TWICE	
-						ZMA <= (OTHERS => 'Z');
-						ZBUSOE <= '0'; --Enable the MUX logic on the Z2 SDRAM bus
+						--ZMA <= (OTHERS => 'Z');
+						--ZBUSOE <= '0'; --Enable the MUX logic on the Z2 SDRAM bus
 						CURRENT_STATE <= AUTO_REFRESH;
 					END IF;
 					
@@ -552,7 +571,11 @@ begin
 						--WE ARE IN THE Z2 MEMORY SPACE WITH THE ADDRESS STROBE ASSERTED.
 						--SEND THE BANK ACTIVATE COMMAND W/RAS
 						
-						ZMUX <= '0'; --SET THE 257 LOGIC TO THE LEAST SIGNIFICANT ADDRESS BITS FOR RAS
+						--ZMUX <= '0'; --SET THE 257 LOGIC TO THE LEAST SIGNIFICANT ADDRESS BITS FOR RAS
+						ZMA(10 downto 0) <= A(12 downto 2);
+						ZBANK0 <= A(13);
+						ZBANK1 <= A(14);
+						
 						nZCS <= '0';
 						nZRAS <= '0';	
 						nZCAS <= '1';							
@@ -572,8 +595,13 @@ begin
 				WHEN CAS_STATE =>
 					--CLOCK EDGE 1
 					--READ OR WRITE WITH AUTOPRECHARGE
-					ZMUX <= '1'; --SET THE 257 LOGIC TO THE MOST SIGNIFICANT ADDRESS BITS FOR CAS
-					nZPRECHARGE <= '1';
+					--ZMUX <= '1'; --SET THE 257 LOGIC TO THE MOST SIGNIFICANT ADDRESS BITS FOR CAS
+					
+					ZMA <= (OTHERS => '0');
+					ZMA(7 downto 0) <= A(22 downto 15);
+					ZMA(10) <= '1'; --PRECHARGE
+					
+					--nZPRECHARGE <= '1';
 					nZCS <= '0';
 					nZRAS <= '1';	
 					nZCAS <= '0';	
@@ -866,13 +894,9 @@ begin
 	--68000 style data strobes.  These are kept in tri-state when the 
 	--TRISTATE signal is active, or when we're not "offboard".  For 68030
 	--caching, we must always return 16 bits on reads, regardless of the
-	--state of A0, SIZ1, or SIZ2.  Since the CAS PAL for onboard memory
-	--was full when this feature of the 68030 was considered, I kludge
-	--a fix here.  If the memory access is a normal offboard access, UDS
+	--state of A0, SIZ1, or SIZ2. If the memory access is a normal offboard access, UDS
 	--looks normal.  If the memory access is not offboard, the then UDS
 	--reflects the state of the CPU's R/W line. U501
-	
-	--DO WE NEED THESE? YES. LDS AND UDS CONNECT TO GARY, AGNUS, AND ZORRO BUS.
 
 	--UDS		= wds & !A0		# rds ;
 	nUDS <= 'Z' 
@@ -927,7 +951,20 @@ begin
 				END IF;
 			END IF;
 		END IF;
-	END PROCESS;	
+	END PROCESS;
 
+	-----------------------------------
+	-- ADDRESS BUS DIRECTION CONTROL --
+	-----------------------------------
+	
+	--This is data direction control
+
+	--!ADDIR		=  BGACK & !RW		# !BGACK &  RW;
+	ADDIR <= '0' --AMIGA WRITING TO 2630
+		WHEN 
+			( nBGACK = '0' AND RnW = '0' ) OR  
+			( nBGACK = '1' AND RnW = '1' ) 
+		ELSE 
+			'1'; --2630 WRITING TO THE AMIGA
 
 end Behavioral;

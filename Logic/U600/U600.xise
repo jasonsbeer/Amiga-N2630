@@ -128,7 +128,7 @@
     <property xil_pn:name="Output File Name" xil_pn:value="U600" xil_pn:valueState="default"/>
     <property xil_pn:name="Output Slew Rate" xil_pn:value="Fast" xil_pn:valueState="default"/>
     <property xil_pn:name="Overwrite Compiled Libraries" xil_pn:value="false" xil_pn:valueState="default"/>
-    <property xil_pn:name="Package" xil_pn:value="TQ100" xil_pn:valueState="non-default"/>
+    <property xil_pn:name="Package" xil_pn:value="VQ64" xil_pn:valueState="non-default"/>
     <property xil_pn:name="Port to be used" xil_pn:value="Auto - default" xil_pn:valueState="default"/>
     <property xil_pn:name="Post Map Simulation Model Name" xil_pn:value="U600_map.vhd" xil_pn:valueState="default"/>
     <property xil_pn:name="Post Place &amp; Route Simulation Model Name" xil_pn:value="U600_timesim.vhd" xil_pn:valueState="default"/>
@@ -191,7 +191,7 @@
     <property xil_pn:name="Use Global Clocks" xil_pn:value="true" xil_pn:valueState="default"/>
     <property xil_pn:name="Use Global Output Enables" xil_pn:value="false" xil_pn:valueState="non-default"/>
     <property xil_pn:name="Use Global Set/Reset" xil_pn:value="false" xil_pn:valueState="non-default"/>
-    <property xil_pn:name="Use Location Constraints" xil_pn:value="Always" xil_pn:valueState="default"/>
+    <property xil_pn:name="Use Location Constraints" xil_pn:value="Never" xil_pn:valueState="non-default"/>
     <property xil_pn:name="Use Multi-level Logic Optimization" xil_pn:value="true" xil_pn:valueState="default"/>
     <property xil_pn:name="Use Smart Guide" xil_pn:value="false" xil_pn:valueState="default"/>
     <property xil_pn:name="Use Synthesis Constraints File" xil_pn:value="true" xil_pn:valueState="default"/>

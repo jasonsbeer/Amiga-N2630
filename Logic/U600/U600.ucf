@@ -8,7 +8,7 @@ NET "IPLCLK"	LOC = "P10" ;
 NET "nDSACKEN"	LOC = "P11" ;	
 NET "DSCLK"		LOC = "P12" ;
 
-NET "ADDIR"		LOC = "P13" ;
+//NET "ADDIR"		LOC = "P13" ;
 NET "DRSEL"		LOC = "P14"	;
 NET "nADOEH"	LOC = "P15" ;
 NET "P7M"		LOC = "P16" ;
@@ -25,7 +25,7 @@ NET "nABR"		LOC = "P33" ;
 NET "nRESET"	LOC = "P35" ;
 NET "E"			LOC = "P36" ;
 NET "nVPA"		LOC = "P37" ;
-NET "nOVR"		LOC = "P39" ;
+//NET "nOVR"		LOC = "P39" ;
 NET "nBGACK"	LOC = "P40" ;
 NET "IVMA"		LOC = "P41" ;
 NET "B2000"		LOC = "P42" ;

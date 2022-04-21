@@ -88,10 +88,10 @@ entity U600 is
 		nBGDIS : OUT STD_LOGIC; --BUS GRANT DISABLE
 		--nDSACK0 : IN STD_LOGIC; --DSACK0
 		nDSACK1 : IN STD_LOGIC; --DSACK1
-		nOVR : OUT STD_LOGIC; --Over Ride Gary's Address Decoding During DMA
+		--nOVR : OUT STD_LOGIC; --Over Ride Gary's Address Decoding During DMA
 		nADOEH : OUT STD_LOGIC; --ADDRESS OUTPUT ENABLE HIGH
 		nADOEL : OUT STD_LOGIC; --ADDRESS OUTPUT ENABLE LOW
-		ADDIR : OUT STD_LOGIC; --ADDRESS BUS DIRECTION CONTROL
+		--ADDIR : OUT STD_LOGIC; --ADDRESS BUS DIRECTION CONTROL
 		DRSEL : OUT STD_LOGIC; --DATA LATCH SELECT		
 		nS7MDISD : OUT STD_LOGIC; --INPUT FOR STATE MACHINE U503
 		nBR : OUT STD_LOGIC --Bus Request
@@ -301,24 +301,6 @@ begin
 			TRISTATE = '1' OR offboard = '0'
 		ELSE
 			RnW;
-		
-	---------------
-	-- DMA STUFF --
-	---------------
-	
-	--The OVR signal must be asserted whenever on-board memory is selected
-	--during a DMA cycle.  It tri-states GARY's DTACK output, allowing
-	--one to be created by our memory logic. u501
-	--PROBABLY MAKES MORE SENSE TO MOVE THIS TO U601. LOCK OUT GARY'S DURING DMA.
-
-	--OVR		= BGACK & MEMSEL;
-	--OVR.OE		= BGACK & MEMSEL;
-	nOVR <= '0' 
-		WHEN 
-			nBGACK = '0' AND MEMACCESS = '1' 
-			--nBGACK = '0' AND nMEMSEL = '0' 
-		ELSE 
-			'Z';
 	
 	--Here we simply pass on an A2000 bus request to the 68030. U500
 	--BR		= BOSS & !BGACK & ABR;
@@ -766,21 +748,6 @@ begin
 
 	--BGDIS		= !BOSS			# !ABG & DSACK1		# !ABG & AS ;
 	nBGDIS <= '0' WHEN nBOSS = '1' OR ( nABG = '1' AND nDSACK1 = '0' ) OR ( nABG = '1' AND nAS = '0' ) ELSE '1';	
-				
-	
-	-----------------------------------
-	-- ADDRESS BUS DIRECTION CONTROL --
-	-----------------------------------
-	
-	--This is data direction control
-
-	--!ADDIR		=  BGACK & !RW		# !BGACK &  RW;
-	ADDIR <= '0' --AMIGA WRITING TO 2630
-		WHEN 
-			( nBGACK = '0' AND RnW = '0' ) OR  
-			( nBGACK = '1' AND RnW = '1' ) 
-		ELSE 
-			'1'; --2630 WRITING TO THE AMIGA
 			
 	--------------------------
 	-- ADDRESS ENABLE HI/LO --
