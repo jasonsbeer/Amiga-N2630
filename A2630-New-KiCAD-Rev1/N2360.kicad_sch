@@ -1706,6 +1706,9 @@
     (path "/00000000-0000-0000-0000-000062089831/81078043-9966-47f7-80eb-79185bf5d670"
       (reference "#PWR0165") (unit 1) (value "GND") (footprint "")
     )
+    (path "/00000000-0000-0000-0000-000062089831/2485789e-e6be-4c24-9361-53f487111203"
+      (reference "#PWR0166") (unit 1) (value "+3.3V") (footprint "")
+    )
     (path "/00000000-0000-0000-0000-0000634ecc15/a6fcb2d5-12c4-437e-817e-bc885d135a71"
       (reference "#PWR0169") (unit 1) (value "GND") (footprint "")
     )
@@ -1949,6 +1952,9 @@
     (path "/00000000-0000-0000-0000-000062089831/7598669e-0bc4-4405-9509-d610c7cd9c0b"
       (reference "C609") (unit 1) (value "0.1uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
+    (path "/00000000-0000-0000-0000-000062089831/b1f54dc5-3270-461f-9448-74ac70cb6db6"
+      (reference "C610") (unit 1) (value "0.1uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
+    )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-000061ed7ad8"
       (reference "C700") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
@@ -2003,20 +2009,20 @@
     (path "/00000000-0000-0000-0000-00006209fb19/4c01de83-5a45-4da5-9363-71d0ab560906"
       (reference "C805") (unit 1) (value "10uF") (footprint "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm")
     )
-    (path "/00000000-0000-0000-0000-000062089831/00000000-0000-0000-0000-00006215b057"
-      (reference "CN1") (unit 1) (value "CPLD0") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical")
-    )
-    (path "/00000000-0000-0000-0000-000062089831/00000000-0000-0000-0000-000062227388"
-      (reference "CN2") (unit 1) (value "CPLD1") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical")
-    )
-    (path "/00000000-0000-0000-0000-000062089831/00000000-0000-0000-0000-00006284dc2b"
-      (reference "CN3") (unit 1) (value "CPLD2") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical")
-    )
     (path "/00000000-0000-0000-0000-00006209fb19/5bbd43e1-cf89-43b6-92d2-f4b55c3adccd"
       (reference "CN5") (unit 1) (value "ATA/IDE") (footprint "N2630:ATA_Header_2x20_P2.54mm")
     )
     (path "/00000000-0000-0000-0000-00006209fb19/9913adf4-f9a7-4e0f-acea-487a0ae2d296"
       (reference "CN6") (unit 1) (value "LED") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical")
+    )
+    (path "/00000000-0000-0000-0000-000062089831/00000000-0000-0000-0000-00006215b057"
+      (reference "CN600") (unit 1) (value "CPLD0") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical")
+    )
+    (path "/00000000-0000-0000-0000-000062089831/00000000-0000-0000-0000-000062227388"
+      (reference "CN601") (unit 1) (value "CPLD1") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical")
+    )
+    (path "/00000000-0000-0000-0000-000062089831/00000000-0000-0000-0000-00006284dc2b"
+      (reference "CN602") (unit 1) (value "CPLD2") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-000061df9cd8"
       (reference "CN700") (unit 1) (value "Amiga-2000-CPU-Slot") (footprint "N2630:A2000_CPUSLOT_MALE")
