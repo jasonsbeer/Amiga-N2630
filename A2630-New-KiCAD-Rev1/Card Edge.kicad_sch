@@ -6,9 +6,8 @@
 
   (title_block
     (title "Amiga N2630")
-    (date "2022-03-25")
+    (date "2022-04-24")
     (rev "1.0")
-    (company "Drawn By: Jason Neus")
   )
 
   (lib_symbols
