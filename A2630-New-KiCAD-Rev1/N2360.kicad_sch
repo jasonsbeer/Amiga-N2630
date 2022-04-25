@@ -2351,6 +2351,9 @@
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000061f6e714"
       (reference "U300") (unit 2) (value "74HCT05") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
+    (path "/00000000-0000-0000-0000-00006209fb19/a9fbb35c-6ec3-480f-80eb-8d7c7dad799a"
+      (reference "U300") (unit 3) (value "74HCT05") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+    )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-00006234eb07"
       (reference "U300") (unit 4) (value "74HCT05") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
