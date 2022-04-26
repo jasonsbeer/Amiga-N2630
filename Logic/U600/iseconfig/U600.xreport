@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="2.0" >
  <header>
-  <DateModified>2022-04-20T22:13:28</DateModified>
+  <DateModified>2022-04-25T20:44:30</DateModified>
   <ModuleName>U600</ModuleName>
-  <SummaryTimeStamp>2022-04-17T20:42:18</SummaryTimeStamp>
+  <SummaryTimeStamp>2022-04-25T20:39:54</SummaryTimeStamp>
   <SavedFilePath>/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/iseconfig/U600.xreport</SavedFilePath>
   <ImplementationReportsDirectory>/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/</ImplementationReportsDirectory>
   <DateInitialized>2022-03-14T18:07:31</DateInitialized>
