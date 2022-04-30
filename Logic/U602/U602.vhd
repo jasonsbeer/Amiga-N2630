@@ -1,0 +1,206 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date:    08:05:23 04/30/2022 
+-- Design Name: 
+-- Module Name:    U602 - Behavioral 
+-- Project Name: 
+-- Target Devices: 
+-- Tool versions: 
+-- Description: 
+--
+-- Dependencies: 
+--
+-- Revision: 
+-- Revision 0.01 - File Created
+-- Additional Comments: 
+--
+----------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx primitives in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity U602 is
+    Port ( 
+				A : IN  STD_LOGIC_VECTOR (31 downto 0);
+				RnW : IN STD_LOGIC; --READ/WRITE SIGNAL FROM 680x0
+				nAS : IN STD_LOGIC; --ADDRESS STROBE
+				IORDY : IN STD_LOGIC; --IDE I/O READY
+				INTRQ : IN STD_LOGIC; --IDE INTERUPT REQUEST
+				MODE68K : IN STD_LOGIC; --ARE WE IN 68000 MODE?
+				CPUCLK : IN STD_LOGIC; --25MHz CPU CLOCK
+				nRESET : IN STD_LOGIC; --RESET SIGNAL
+				
+				D : INOUT  STD_LOGIC_VECTOR (31 downto 24);
+				
+				nCS0 : OUT STD_LOGIC; --IDE CHIP SELECT 0
+				nCS1 : OUT STD_LOGIC; --IDE CHIP SELECT 1
+				DA : OUT STD_LOGIC_VECTOR (2 DOWNTO 0); --IDE ADDRESS LINES
+				nDIOR : OUT STD_LOGIC; --IDE READ SIGNAL
+				nDIOW : OUT STD_LOGIC; --IDE WRITE SIGNAL
+				nDSACK0 : OUT STD_LOGIC; --68030 ASYNC PORT SIZE SIGNAL
+				nDSACK1 : OUT STD_LOGIC; --68030 ASYNC PORT SIZE SIGNAL
+				nDTACK : OUT STD_LOGIC --68000 DATA SIGNAL
+				
+			);
+end U602;
+
+architecture Behavioral of U602 is
+
+	--SIGNAL IDE_BASE_ADDR : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	--SIGNAL IDE_CONFIG : STD_LOGIC := '0'; --HAS IDE BE AUTOCONFIGed? ACTIVE HIGH
+	SIGNAL IDE_SPACE : STD_LOGIC := '0'; --ARE WE IN THE IDE BASE ADDRESS SPACE?
+	
+	SIGNAL Z3RAM_BASE_ADDR : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL Z3RAM_CONFIG : STD_LOGIC := '0'; --HAS ZORRO 3 RAM BEEN AUTOCONFIGed? ACTIVE HIGH
+
+begin
+
+	------------------------------------------------------
+	-- GAYLE COMPATABLE HARD DRIVE CONTROLLER INTERFACE --
+	------------------------------------------------------
+
+	--WE ARE GOING TO USE THE AMIGA OS GAYLE IDE INTERFACE
+	--UNFORTUNATELY, THIS MEANS VERY LIMITED PERFORMANCE CAPABILITY, ONLY SUPPORTING PIO 0 WITH UP TO 2 DRIVES.
+	--BUT IT IS SIMPLE TO IMPLEMENT AND READY OUT OF THE BOX WITH KS 35.300.
+	--COMPATABILITY CAN BE ADDED TO EARLIER KICKSTARTS BY ADDING THE APPROPRIATE SCSI.DEVICE TO ROM
+	--IN THE FUTURE, I WOULD LIKE TO REPLACE THIS WITH A MORE ROBUST MULTIDRIVE IDE INTERFACE
+	
+	--GAYLE WAS ONLY CONNECTED TO A23..12, SO WE ARE IMITATING THAT HERE
+
+	--TO TRICK AMIGA OS INTO THINKING WE HAVE A GAYLE ADDRESS DECODER, WE NEED TO RESPOND TO GAYLE SPECIFIC REGISTERS
+	--SEE THE GAYLE SPECIFICATIONS FOR MORE DETAILS
+	
+	--IN THE EVENT THE IDE DEVICE IS ASSERTING AN INTERRUPT REQUEST, WE PASS THAT TO ANYONE INTERESTED WITH THE REGISTER AT $DA8000.
+	--BIT 7 IS SET HIGH TO INDICATE THE IRQ. THE OTHER BITS ARE ALL FOR THE PCMCIA, SETTING BIT 0 HIGH DISABLES IT.
+	--THE INTERUPT REQUEST IS ACKNOWLEDGED WITH THE REGISTER AT $DA9000. THERE IS NOT A HARDWARE INTERUPT ACK, SO JUST FYI.
+	
+	PROCESS (CPUCLK) BEGIN
+		IF (RISING_EDGE (CPUCLK)) THEN
+		
+			IF (RnW = '1' AND nAS = '0') THEN
+			
+				CASE A(23 DOWNTO 12) IS
+					WHEN x"DE1" => D(31 DOWNTO 24) <= x"DF"; --GAYLE_ID is at $DE1000. Return $DF.
+					WHEN x"DAA" => D(31 DOWNTO 24) <= x"80"; --INTENA (enable ide interupts) AT $DAA000, Return $80.
+					WHEN x"DA8" => D(31 DOWNTO 24) <= INTRQ & "0000001"; --IDE Device Interrupt Request on data bit 7 at $DA8000.
+					WHEN OTHERS => D(31 DOWNTO 24) <= "ZZZZZZZZ";
+				END CASE;
+				
+			END IF;
+			
+		END IF;
+	END PROCESS;
+	
+	--GAYLE SPECS TELL US WHEN THE IDE CHIP SELECT LINES ARE ACTIVE
+	
+	nCS0 <= '0' 
+		WHEN 
+			(A(14 DOWNTO 12) = "000" OR A(14 DOWNTO 12) <= "010") AND nAS = '0' --$0DA0000 TO $0DA0FFF OR $0DA2000 TO $0DA2FFF
+		ELSE 
+			'1';
+			
+	nCS1 <= '0' 
+		WHEN 
+			(A(14 DOWNTO 12) = "001" OR A(14 DOWNTO 12) <= "011") AND nAS = '0' --$0DA1000 TO $0DA1FFF OR $0DA3000 TO $0DA3FFF
+		ELSE 
+			'1';
+			
+	--GAYLE EXPECTS IDE DA2..0 TO BE CONNECTED TO A4..2
+	
+	DA(0) <= A(2);
+	DA(1) <= A(3);
+	DA(2) <= A(4);
+	
+	--ARE WE IN THE ASSIGNED ADDRESS SPACE FOR THE IDE CONTROLLER?
+	--GAYLE IDE ADDRESS SPACE IS $0DA0000 - $0DA3FFF. THE ADDRESS SPACE IS HARD CODED.
+	--SPACE $0DA4000 - $0DA4FFF IS IDE RESERVED. GUESSING IT WAS NEVER IMPLEMENTED? MAYBE FOR A SECOND PORT?
+	IDE_SPACE <= '1' WHEN (A(23 DOWNTO 12) >= x"DA0" AND A(23 DOWNTO 12) <= x"DA3") AND nAS = '0' ELSE '0';
+	
+	--HERE IS THE CONTROLLER INTERFACE
+	PROCESS (CPUCLK, nRESET) BEGIN
+	
+		IF (nRESET = '0') THEN
+			--AMIGA HAS RESET, START OVER
+			nDIOR <= '1';
+			nDIOW <= '1';
+			nDSACK0 <= 'Z';
+			nDSACK1 <= 'Z';
+			nDTACK <= 'Z';
+		
+		ELSIF (RISING_EDGE(CPUCLK)) THEN
+		
+			IF (IDE_SPACE = '1') THEN			
+				--WE ARE IN THE IDE ADDRESS SPACE 
+				
+				 IF (nAS = '0') THEN 
+					--ADDRESS STROBE IS ASSERTED
+				
+					IF (RnW = '1') THEN
+						--THIS IS A READ
+						nDIOR <= '0';
+						nDIOW <= '1';
+					ELSE
+						--THIS IS A WRITE
+						nDIOR <= '1';
+						nDIOW <= '0';
+					END IF;
+						
+					IF (IORDY = '1') THEN
+					
+						--THE DEVICE IS READY TO TRANSMIT DATA, SIGNAL 16 BIT PORT TO 68030
+						--DTACK WHEN IN 68K MODE
+						IF (MODE68K = '0') THEN
+							nDSACK0 <= '1';
+							nDSACK1 <= '0';
+						ELSE
+							nDTACK <= '0';
+						END IF;
+						
+					END IF;
+					
+				ELSE
+				
+					--ADDRESS STROBE NOT ASSERTED
+					IF (MODE68K = '0') THEN
+						nDSACK0 <= '1';
+						nDSACK1 <= '1';
+					ELSE
+						nDTACK <= '1';
+					END IF;
+					
+				END IF;	
+			
+			ELSE
+			
+				--SET IN A "NOP" STATE
+				nDIOR <= '1';
+				nDIOW <= '1';
+				
+				--HI Z DSACK/DTACK SO WE DON'T INTERFERE WITH OTHER STUFF ON THE BUS
+				IF (MODE68K = '0') THEN
+					nDSACK0 <= 'Z';
+					nDSACK1 <= 'Z';
+				ELSE
+					nDTACK <= 'Z';
+				END IF;
+					
+			END IF;
+		
+		END IF;
+		
+	
+	END PROCESS;
+
+
+end Behavioral;
+
