@@ -3118,7 +3118,7 @@
     (effects (font (size 2.9972 2.9972)) (justify right bottom))
     (uuid 09446760-860d-46e4-a2cb-b4efb2197664)
   )
-  (text "PULL UP/DOWN" (at 23.495 217.17 0)
+  (text "PULL UP" (at 23.495 217.17 0)
     (effects (font (size 2.9972 2.9972)) (justify left bottom))
     (uuid 23fd8ab2-9115-4418-91e6-98eecb4fbf95)
   )
