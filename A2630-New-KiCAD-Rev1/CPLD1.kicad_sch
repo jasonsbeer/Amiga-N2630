@@ -6,7 +6,7 @@
 
   (title_block
     (title "Amiga N2630")
-    (date "2022-04-24")
+    (date "2022-05-02")
     (rev "1.0")
   )
 
@@ -1463,7 +1463,7 @@
   (no_connect (at 160.655 153.67) (uuid 483dcd72-d815-49e1-9bb2-5658cc1c7741))
   (no_connect (at 160.655 146.05) (uuid 483dcd72-d815-49e1-9bb2-5658cc1c7742))
   (no_connect (at 300.355 186.055) (uuid 7de884a1-63bf-4096-9c7e-f9fe093c9cc0))
-  (no_connect (at 300.355 183.515) (uuid 7de884a1-63bf-4096-9c7e-f9fe093c9cc0))
+  (no_connect (at 300.355 183.515) (uuid 7de884a1-63bf-4096-9c7e-f9fe093c9cc1))
   (no_connect (at 300.355 94.615) (uuid 99d522a8-cdb0-4eb2-913a-15390faac3c7))
   (no_connect (at 300.355 97.155) (uuid 99d522a8-cdb0-4eb2-913a-15390faac3c8))
 
@@ -3804,27 +3804,9 @@
     (uuid ffc65262-9c95-4e81-8213-9857a1a7f240)
   )
 
-  (text "When A26 is HIGH, we are in the \nsecond 64 MB memory space."
-    (at 290.83 27.305 0)
-    (effects (font (size 4 4)) (justify left bottom))
-    (uuid 1d710a7c-aec3-4eeb-b455-bb5fe6fbd798)
-  )
   (text "CPLDs" (at 341.63 245.745 180)
     (effects (font (size 5.9944 5.9944)) (justify right bottom))
     (uuid 2ac7653f-9b43-4afe-929a-44fc7e2d6a22)
-  )
-  (text "ADD DSACK0 AND 1, DTACK, 68KMODE" (at 321.945 73.025 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 8c9c2f71-2b7f-4070-8d97-a1f034d62ec9)
-  )
-  (text "7.3.7 Cache Burst Cycles" (at 393.065 168.275 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid afaa74dc-9ff6-4a6e-a94e-6508f45cfff5)
-  )
-  (text "zorro 3 autoconfig\n\n33222222222211111111110000000000\n10987654321098765432109876543210\n\nFF000000\n11111111000000000000000000000000\nFF000100\n11111111000000000000000100000000\nFF000004\n11111111000000000000000000000100\nFF000104\n11111111000000000000000100000100\nFF000008\n11111111000000000000000000001000\nFF000108\n11111111000000000000000100001000"
-    (at 21.59 219.075 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid f0b4403d-7fee-4901-8944-9de5b061e997)
   )
 
   (label "TDO1" (at 239.395 227.33 180)
@@ -5022,10 +5004,10 @@
       (effects (font (size 1.27 1.27)) (justify left) hide)
     )
   )
-  (global_label "_ZCLKE" (shape output) (at 240.03 168.91 0) (fields_autoplaced)
+  (global_label "ZCLKE" (shape output) (at 240.03 168.91 0) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify left))
     (uuid 94a8d41d-3a70-48bb-ace9-2fef14e5a7b7)
-    (property "Intersheet References" "${INTERSHEET_REFS}" (id 0) (at 249.2485 168.9894 0)
+    (property "Intersheet References" "${INTERSHEET_REFS}" (id 0) (at 248.2809 168.8306 0)
       (effects (font (size 1.27 1.27)) (justify left) hide)
     )
   )

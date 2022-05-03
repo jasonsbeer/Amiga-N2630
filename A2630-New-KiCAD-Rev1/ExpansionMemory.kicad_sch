@@ -6,7 +6,7 @@
 
   (title_block
     (title "Amiga N2630")
-    (date "2022-04-24")
+    (date "2022-05-02")
     (rev "1.0")
   )
 
@@ -4122,19 +4122,14 @@
     (effects (font (size 5.9944 5.9944)) (justify left bottom))
     (uuid 1c6c46b2-dd9e-430f-85e9-621815ceca94)
   )
-  (text "This is Zorro 3 memory, so it is always\ntreated as 32 bit memory and cannot be \nused by the Amiga 2000 chip set and cannot\nbe used by anything on the Zorro 2 bus.\nIt can only be used by the 68030."
-    (at 146.685 37.465 0)
+  (text "This is Zorro 3 memory. It is exclusively\nfor the 68030. It cannot be DMA'd from the\nZorro 2 bus or Amiga chipset."
+    (at 281.94 144.78 0)
     (effects (font (size 3 3)) (justify left bottom))
     (uuid 59ad4c52-a1db-429b-ab90-2403dcce7c01)
   )
   (text "LOW_WORD" (at 24.13 81.28 0)
     (effects (font (size 2.9972 2.9972)) (justify left bottom))
     (uuid 5e3106c4-aefe-4ef5-8aa8-6f8a9c16fe7d)
-  )
-  (text "CKE..The next rising edge of the CLK signal is valid \nwhen CKE is high and invalid when it is low. When \nCKE is LOW, the device will be in power-down mode, \nclock suspend mode or self-refresh mode\nJN: Might be able to refresh one bank when the other is\nbeing accessed?"
-    (at 17.78 133.35 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 61b6f2c4-b226-47d6-bbd8-9d67fcaf35c3)
   )
   (text "BANK1" (at 203.2 45.72 0)
     (effects (font (size 2.9972 2.9972)) (justify left bottom))
@@ -4151,11 +4146,6 @@
   (text "ROMs" (at 285.75 52.07 0)
     (effects (font (size 3.9878 3.9878)) (justify left bottom))
     (uuid 9c8b409b-0d1b-49e5-8fed-acd83e0e8b3e)
-  )
-  (text "JN Notes: put row addresses 14..2 on the EMA bus \nand A16..15 on the bank select. Signal RAS \n(SDRAM BANKACTIVATE). Put column address 25..17\non the EMA bus and signal CAS. A26 is used to \ndetermine whether we are in the first 64MB or\nthe second 64MB."
-    (at 273.05 147.955 0)
-    (effects (font (size 2.9972 2.9972)) (justify left bottom))
-    (uuid c35e417c-496e-4303-b5c4-321c3cede22a)
   )
   (text "HIGH_WORD" (at 24.13 180.975 0)
     (effects (font (size 2.9972 2.9972)) (justify left bottom))
