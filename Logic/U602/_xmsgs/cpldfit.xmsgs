@@ -8,10 +8,19 @@
 <msg type="warning" file="Cpld" num="0" delta="new" >Unable to retrieve the path to the iSE Project Repository. Will use the default filename of &apos;<arg fmt="%s" index="1">U602.ise</arg>&apos;.
 </msg>
 
+<msg type="info" file="Cpld" num="0" delta="new" >Inferring BUFG constraint for signal &apos;<arg fmt="%s" index="1">A&lt;30&gt;</arg>&apos; based upon the LOC constraint &apos;<arg fmt="%s" index="2">P38</arg>&apos;. It is recommended that you declare this BUFG explicitedly in your design. Note that for certain device families the output of a BUFG constraint can not drive a gated clock, and the BUFG constraint will be ignored.
+</msg>
+
+<msg type="info" file="Cpld" num="0" delta="new" >Inferring BUFG constraint for signal &apos;<arg fmt="%s" index="1">CPUCLK</arg>&apos; based upon the LOC constraint &apos;<arg fmt="%s" index="2">P30</arg>&apos;. It is recommended that you declare this BUFG explicitedly in your design. Note that for certain device families the output of a BUFG constraint can not drive a gated clock, and the BUFG constraint will be ignored.
+</msg>
+
+<msg type="warning" file="Cpld" num="1239" delta="old" >The global <arg fmt="%s" index="1">clock</arg> designation (BUFG) on signal &apos;<arg fmt="%s" index="2">A_30_IBUF</arg>&apos; is ignored. Most likely the signal is gated and therefore cannot be used as a global control signal.
+</msg>
+
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">54</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -20,7 +29,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">53</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -29,7 +38,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">52</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -38,7 +47,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">51</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -47,7 +56,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">50</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -56,7 +65,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">49</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -65,7 +74,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">48</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -74,7 +83,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">47</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -83,7 +92,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">46</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -92,7 +101,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">45</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -101,7 +110,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">44</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -110,7 +119,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">43</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -119,7 +128,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">42</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -128,7 +137,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">41</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -137,7 +146,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">40</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -146,7 +155,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">39</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -155,7 +164,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">38</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -164,7 +173,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">37</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -173,7 +182,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">36</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -182,7 +191,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">35</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -191,7 +200,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">34</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -200,7 +209,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">33</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -209,7 +218,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">32</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -218,7 +227,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">31</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -227,7 +236,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">30</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1291</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -236,7 +245,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">29</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1294</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1378</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -245,7 +254,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">28</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1288</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1279</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -254,7 +263,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">27</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1124</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1272</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -263,7 +272,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">26</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1022</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1143</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -272,7 +281,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">25</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">968</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1096</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -281,7 +290,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">24</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">885</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1017</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -290,7 +299,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">23</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">804</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">1008</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -299,7 +308,7 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">22</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">781</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">840</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
@@ -308,13 +317,142 @@
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">21</arg>
 </msg>
 
-<msg type="error" file="Cpld" num="853" delta="new" >Insufficient number of product terms.  This design needs at least <arg fmt="%d" index="1">741</arg> but only <arg fmt="%d" index="2">720</arg> left after allocating other resources.
+<msg type="warning" file="Cpld" num="895" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">7</arg>, because too many function block inputs are required. Buffering output signal <arg fmt="%s" index="2">nEM1UUBE</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="warning" file="Cpld" num="895" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">7</arg>, because too many function block inputs are required. Buffering output signal <arg fmt="%s" index="2">BANK1</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="warning" file="Cpld" num="895" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">7</arg>, because too many function block inputs are required. Buffering output signal <arg fmt="%s" index="2">BANK0</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="error" file="Cpld" num="901" delta="old" >Cannot place signal <arg fmt="%s" index="1">nCAS0</arg> in its specified location.
+</msg>
+
+<msg type="error" file="Cpld" num="825" delta="old" >Cannot assign <arg fmt="%s" index="1">macrocell</arg> <arg fmt="%s" index="2">$OpTx$DEC_nLMBE$0</arg> to <arg fmt="%s" index="3">Pin 107 (FB8_16)</arg>.  This location is currently assigned to <arg fmt="%s" index="4">nCAS0</arg>.
 </msg>
 
 <msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
 </msg>
 
-<msg type="info" file="Cpld" num="994" delta="new" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">20</arg>
+<msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">20</arg>
+</msg>
+
+<msg type="warning" file="Cpld" num="896" delta="new" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">7</arg>, because too many function block product terms are required. Buffering output signal <arg fmt="%s" index="2">BANK1</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="warning" file="Cpld" num="896" delta="new" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">7</arg>, because too many function block product terms are required. Buffering output signal <arg fmt="%s" index="2">BANK0</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="warning" file="Cpld" num="896" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">7</arg>, because too many function block product terms are required. Buffering output signal <arg fmt="%s" index="2">nEM1UUBE</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="warning" file="Cpld" num="896" delta="new" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">7</arg>, because too many function block product terms are required. Buffering output signal <arg fmt="%s" index="2">nEM1CS</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="warning" file="Cpld" num="895" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">8</arg>, because too many function block inputs are required. Buffering output signal <arg fmt="%s" index="2">nEM0UUBE</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="error" file="Cpld" num="892" delta="new" >Cannot place signal <arg fmt="%s" index="1">Mcompar_EXTSEL_cmp_eq0000_or0000_xor0001/Mcompar_EXTSEL_cmp_eq0000_or0000_xor0001_D</arg>. Consider reducing the collapsing input limit or the product term limit to prevent the fitter from creating high input and/or high product term functions.
+</msg>
+
+<msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
+</msg>
+
+<msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">19</arg>
+</msg>
+
+<msg type="warning" file="Cpld" num="895" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">7</arg>, because too many function block inputs are required. Buffering output signal <arg fmt="%s" index="2">nEM1UUBE</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="error" file="Cpld" num="892" delta="new" >Cannot place signal <arg fmt="%s" index="1">$OpTx$$OpTx$FX_DC$828_INV$1464</arg>. Consider reducing the collapsing input limit or the product term limit to prevent the fitter from creating high input and/or high product term functions.
+</msg>
+
+<msg type="error" file="Cpld" num="825" delta="old" >Cannot assign <arg fmt="%s" index="1">macrocell</arg> <arg fmt="%s" index="2">CURRENT_STATE_FSM_FFd7</arg> to <arg fmt="%s" index="3">Pin 101 (FB8_10)</arg>.  This location is currently assigned to <arg fmt="%s" index="4">EMA&lt;8&gt;</arg>.
+</msg>
+
+<msg type="error" file="Cpld" num="825" delta="new" >Cannot assign <arg fmt="%s" index="1">macrocell</arg> <arg fmt="%s" index="2">$OpTx$DEC_nLMBE$5</arg> to <arg fmt="%s" index="3">Pin 107 (FB8_16)</arg>.  This location is currently assigned to <arg fmt="%s" index="4">nCAS0</arg>.
+</msg>
+
+<msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
+</msg>
+
+<msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">18</arg>
+</msg>
+
+<msg type="warning" file="Cpld" num="895" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">8</arg>, because too many function block inputs are required. Buffering output signal <arg fmt="%s" index="2">nEM0UUBE</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="error" file="Cpld" num="901" delta="new" >Cannot place signal <arg fmt="%s" index="1">nEM1LMBE</arg> in its specified location.
+</msg>
+
+<msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
+</msg>
+
+<msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">17</arg>
+</msg>
+
+<msg type="warning" file="Cpld" num="895" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">7</arg>, because too many function block inputs are required. Buffering output signal <arg fmt="%s" index="2">nEM1UUBE</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="error" file="Cpld" num="901" delta="old" >Cannot place signal <arg fmt="%s" index="1">EMA&lt;8&gt;</arg> in its specified location.
+</msg>
+
+<msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
+</msg>
+
+<msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">16</arg>
+</msg>
+
+<msg type="warning" file="Cpld" num="896" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">7</arg>, because too many function block product terms are required. Buffering output signal <arg fmt="%s" index="2">nEM1UUBE</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="error" file="Cpld" num="901" delta="old" >Cannot place signal <arg fmt="%s" index="1">EMA&lt;9&gt;</arg> in its specified location.
+</msg>
+
+<msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
+</msg>
+
+<msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">15</arg>
+</msg>
+
+<msg type="warning" file="Cpld" num="896" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">7</arg>, because too many function block product terms are required. Buffering output signal <arg fmt="%s" index="2">nEM1LLBE</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="error" file="Cpld" num="901" delta="old" >Cannot place signal <arg fmt="%s" index="1">nCAS0</arg> in its specified location.
+</msg>
+
+<msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
+</msg>
+
+<msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">14</arg>
+</msg>
+
+<msg type="warning" file="Cpld" num="896" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">7</arg>, because too many function block product terms are required. Buffering output signal <arg fmt="%s" index="2">nEM1LLBE</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="error" file="Cpld" num="901" delta="old" >Cannot place signal <arg fmt="%s" index="1">nEM0UUBE</arg> in its specified location.
+</msg>
+
+<msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
+</msg>
+
+<msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">13</arg>
+</msg>
+
+<msg type="warning" file="Cpld" num="895" delta="new" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">8</arg>, because too many function block inputs are required. Buffering output signal <arg fmt="%s" index="2">nEM0UMBE</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="warning" file="Cpld" num="895" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">8</arg>, because too many function block inputs are required. Buffering output signal <arg fmt="%s" index="2">nEM0UUBE</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="error" file="Cpld" num="886" delta="new" >Function block <arg fmt="%s" index="1">FB3</arg> was too congested to route successfully. This occurs due to excessive (&gt;= 50) product term input fanins to this function block. Consider moving output signals in this function block to less congested function blocks, buffering output signals that must remain in this function block, or selecting a larger package.
+</msg>
+
+<msg type="error" file="Cpld" num="868" delta="old" >Cannot fit the design into any of the specified devices with the selected implementation options.
+</msg>
+
+<msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">12</arg>
 </msg>
 
 </messages>

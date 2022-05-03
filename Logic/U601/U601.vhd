@@ -70,7 +70,7 @@ entity U601 is
 		nCIIN : OUT STD_LOGIC; --68030 CACHE ENABLE
 		nAVEC : OUT STD_LOGIC; --AUTO VECTORING
 		nCSROM : OUT STD_LOGIC; --ROM CHIP SELECT	
-		nCLKE : OUT STD_LOGIC; --SDRAM CLOCK ENABLE
+		CLKE : OUT STD_LOGIC; --SDRAM CLOCK ENABLE
 		ZMA : OUT STD_LOGIC_VECTOR (10 downto 0); --Z2 SDRAM ADDRESS BUS
 		nZCS : OUT STD_LOGIC; --SDRAM CHIP SELECT
 		nZWE : OUT STD_LOGIC; --SDRAM WRITE ENABLE
@@ -232,7 +232,7 @@ begin
 						--offset $02
 						WHEN "000001" => 
 							D_2630 <= "011";
-							D_ZORRO2RAM <= "0110"; --er_type: NEXT BOARD NOT RELATED, 2MB
+							D_ZORRO2RAM <= "0000"; --er_type: NEXT BOARD NOT RELATED, 2MB
 
 						--offset $04 INVERTED
 						WHEN "000010" => 
@@ -445,7 +445,7 @@ begin
 				nZRAS <= '1';
 				nZWE <= '1';
 				nZCS <= '1';
-				nCLKE <= '1';
+				CLKE <= '0';
 				COUNT <= 0;
 				SDRAM_START_REFRESH_COUNT <= '0';
 				dsack <= 'Z';
@@ -482,7 +482,7 @@ begin
 					--First power up or warm reset
 					--200 microsecond is needed to stabilize. We are going to rely on the 
 					--the system reset to give us the needed time, although it might be inadequate.
-					nCLKE <= '0'; --DISABLE CLOCK
+					CLKE <= '0'; --DISABLE CLOCK
 					nZWE <= '1';
 					nZRAS <= '1';
 					nZCAS <= '1';
@@ -497,7 +497,7 @@ begin
 					nZRAS <= '0';
 					nZCAS <= '1';
 					nZCS <= '0';
-					nCLKE <= '1';
+					CLKE <= '1';
 					CURRENT_STATE <= MODE_REGISTER;
 				
 				WHEN MODE_REGISTER =>
@@ -525,9 +525,8 @@ begin
 					nZRAS <= '0';
 					nZCAS <= '0';
 					nZCS <= '0';
-					COUNT <= 0;
 					
-					--ISREFRESHING <= '1';
+					COUNT <= 0;
 					
 					CURRENT_STATE <= AUTO_REFRESH_CYCLE;				
 					
@@ -568,9 +567,9 @@ begin
 						nZWE <= '1';
 						
 						IF (nBGACK = '0') THEN
-							nDTACK <= '1'; --DMA ACCESS, SET HIGH BECAUSE _WE_ ARE TALKING TO THE ZORRO 2 BUS NOW							
+							nDTACK <= '1'; --DMA ACCESS, NEGATE BECAUSE _WE_ ARE TALKING TO THE ZORRO 2 BUS NOW							
 						ELSE
-							dsack <= '1'; --SET DSACK HIGH BECAUSE _WE_ ARE TALKING TO THE 68030 BUS RIGHT NOW
+							dsack <= '1'; --NEGATE DSACK BECAUSE _WE_ ARE TALKING TO THE 68030 BUS RIGHT NOW
 						END IF; 
 						
 						CURRENT_STATE <= CAS_STATE;
@@ -629,7 +628,7 @@ begin
 						CURRENT_STATE <= RUN_STATE;
 						
 						--SET NOP
-						nZCS <= '0';
+						nZCS <= '1';
 						nZRAS <= '1';	
 						nZCAS <= '1';							
 						nZWE <= '1';
