@@ -1,20 +1,23 @@
 # Amiga N2630
-A re-imagining of the Amiga A2630 processor card.
+The N2630 is a Motorolla 68030 accelerator, RAM, and IDE card for the Amiga 2000 family of computers. It is installed in the CPU slot where it immediately upgrades the system to a 25MHz 68030 processor with FPU, 136 megabytes of Fast RAM, and an ATA/IDE port. When desired, the 68030 processor may be disabled in software to run the Amiga 2000 in 68000 mode. This enables compatability with tempermental software. When running in 68000 mode, eight megabytes of Zorro 2 RAM and the ATA/IDE port remain enabled, unless otherwise disabled by the user.
 
 <img src="/Images/N2360_PCB_R1.png" width="750">
 
 ## Features
-1. Accelerator card for the Amiga 2000 computer.
-2. Compatible with either 2 or 4* layer Amiga 2000 boards and the Amiga 2000 EATX.
-3. Motorola 68030 microprocessor running at 25MHz, which can be disabled to enhance compatability with non-compliant software.
-4. Motorola 68882 math coprocessor running at 25MHZ or greater.
-5. 8 megabytes of Zorro 2 RAM that can be used even when the 68030 processor is disabled.
-6. 128 megabytes of Zorro 3 RAM.
-7. PATA/IDE hard drive port that can be used even when the 68030 processor is disabled. SCSI.DEVICE required in Kickstart for AUTOBOOT.**
+1. Motorola 68030 microprocessor running at 25MHz.**
+2. Motorola 68882 math coprocessor running at 25MHZ or greater.
+3. Eight megabytes of Zorro 2 RAM.***
+4. 128 megabytes of Zorro 3 RAM.**
+5. PATA/IDE hard drive port.*** (SCSI.DEVICE required in Kickstart for AUTOBOOT)
 
 *Motorola 68000 CPU must be removed from 4-layer boards for proper operation.
 
-**Kickstart version 37.300 and greater include SCSI.DEVICE in ROM.
+**68030 may be software disabled.
+
+***Device remains active when in 68000 mode.
+
+## Installation Notes
+Compatible with either 2 or 4* layer Amiga 2000 boards and the Amiga 2000 EATX.
 
 ## Table 1 REV 1. Configuration Jumper Settings
 Jumper|Description|Shorted|Open*
