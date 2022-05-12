@@ -13,7 +13,7 @@ The N2630 is a Motorolla 68030 CPU card with RAM and IDE for the Amiga 2000 fami
 ## Installation Notes
 This card may be installed in any Amiga 2000 computer. This includes Amiga 2000HD and Amiga 2000 EATX computers. Some Amiga 2000 versions came from the factory with a 68030 card installed. This card will work equally well in those systems. Installation is as simple as inserting the card into the 86 pin CPU/Coprocessor slot of the Amiga computer. There are no software drivers to install.  
 
-Before installing, it is necessary to determine if you have a 4 layer motherboard. If your motherboard is marked "Made In Germany" and "(C) 1986 Commodore" on the left side of the board, you have a 4 layer Amiga 2000 board. In this event, you must remove the Motorola 68000 processor from the Amiga 2000 motherboard. Unfortunately, it is not possible to run in Motorola 68000 mode on a 4 layer mother board. All other Amiga 2000 motherboards may leave the Motorola 68000 in place.
+Before installing, it is necessary to determine if you have a 4 layer motherboard. If your motherboard is marked "Made In Germany" and "(C) 1986 Commodore" on the left side of the board, you have a 4 layer Amiga 2000 board. In this event, you must remove the Motorola 68000 processor from the Amiga 2000 motherboard. Unfortunately, it is not possible to run in Motorola 68000 mode on a 4 layer mother board. All other Amiga 2000 motherboards should leave the Motorola 68000 in place.
 
 (SCSI.DEVICE required in Kickstart for AUTOBOOT)
 
