@@ -58,7 +58,7 @@ entity U601 is
 		nAAS : IN STD_LOGIC; --AMIGA 2000 ADDRESS STROBE FOR DMA
 	 
 		D : INOUT STD_LOGIC_VECTOR (31 downto 28) := "ZZZZ"; --DATA BUS FOR THE AUTOCONFIG PROCESS
-		CONFIGED : INOUT STD_LOGIC; --HAS AUTOCONFIG COMPLETED?		
+		--CONFIGED : INOUT STD_LOGIC; --HAS AUTOCONFIG COMPLETED?		
 		ROMCLK : INOUT STD_LOGIC; --CLOCK FOR U303
 		nONBOARD : INOUT STD_LOGIC; --ARE WE USING RESOURCES ON THE 2630?
 		MEMACCESS : INOUT STD_LOGIC; --LOGIC HIGH WHEN WE ARE ACCESSING Z2 RAM	
@@ -135,6 +135,7 @@ architecture Behavioral of U601 is
 	SIGNAL D_ZORRO2RAM : STD_LOGIC_VECTOR ( 3 downto 0 ):="ZZZZ";
 	SIGNAL autoconfigcomplete_2630 : STD_LOGIC := '0'; --HAS 68030 BOARD BEEN AUTOCONFIGed?
 	SIGNAL autoconfigcomplete_ZORRO2RAM : STD_LOGIC := '0'; --HAS ZORRO2 RAM BEEN AUTOCONFIGed?
+	SIGNAL configed : STD_LOGIC; --HAS AUTOCONFIG COMPLETED?		
 	
 	SIGNAL icsrom : STD_LOGIC:='0';
 	SIGNAL hirom : STD_LOGIC:='0';
@@ -198,10 +199,10 @@ begin
 	--We AUTOCONFIG the 2630 FIRST, then the Zorro 2 RAM
 	D(31 downto 28) <= 
 			D_2630(0) & D_2630(1) & "1" & D_2630(2) 
-				WHEN autoconfigcomplete_2630 = '0' AND autoconfigspace = '1' AND CONFIGED = '0' 
+				WHEN autoconfigcomplete_2630 = '0' AND autoconfigspace = '1'
 		ELSE
 			D_ZORRO2RAM 
-				WHEN autoconfigcomplete_ZORRO2RAM = '0' AND autoconfigspace ='1' AND CONFIGED = '0' 
+				WHEN autoconfigcomplete_ZORRO2RAM = '0' AND autoconfigspace ='1'
 		ELSE
 			"ZZZZ";		
 			
@@ -210,7 +211,7 @@ begin
 		IF nRESET = '0' THEN
 			--The computer has been reset
 			
-			CONFIGED <= '0';
+			configed <= '0';
 			
 			baseaddress_ZORRO2RAM <= "000";
 			
@@ -218,7 +219,7 @@ begin
 			autoconfigcomplete_ZORRO2RAM <= '0';			
 			
 		ELSIF ( FALLING_EDGE (CPUCLK)) THEN
-			IF ( autoconfigspace = '1' AND CONFIGED = '0' ) THEN
+			IF ( autoconfigspace = '1' AND configed = '0' ) THEN
 				IF ( RnW = '1' ) THEN
 					--The 680x0 is reading from us
 				
@@ -295,7 +296,7 @@ begin
 							--We always autoconfig the 2630 ROM.
 							--Z2AUTO is driven by a jumper on the board, if it is logic 0, the user does not want to use the 
 							--on board Z2 RAM. Thus, we will stop after the 2630 is autoconfiged.
-							CONFIGED <= '1'; 
+							configed <= '1'; 
 						END IF;					
 						
 					END IF;					
@@ -460,11 +461,10 @@ begin
 			--successive BANK ACTIVE commands take more than one clock cycle. Both are 60ns.
 			
 			--REFRESH
-			IF (REFRESH_COUNTER >= REFRESH_COUNTER_DEFAULT) THEN
-				--TIME TO REFRESH THE SDRAM
-				IF (MEMACCESS = '0') THEN -- AND DMAACCESS = '0') THEN
+			IF (REFRESH_COUNTER >= REFRESH_COUNTER_DEFAULT AND CURRENT_STATE /= DATA_STATE) THEN
+				--TIME TO REFRESH THE SDRAM, BUT ONLY IF WE ARE NOT IN THE MIDDLE OF A MEMORY ACCESS CYCLE
+				IF (MEMACCESS = '0') THEN
 					--IF THIS IS NOT A MEMORY CYCLE, PROCEED DIRECTLY TO REFRESH
-					--IF WE ARE IN THE MIDDLE OF MEMORY ACCESS, WE NEED TO WAIT UNTIL THAT IS OVER
 					CURRENT_STATE <= AUTO_REFRESH;
 				END IF;
 			ELSE
@@ -537,7 +537,7 @@ begin
 					nZCAS <= '1';
 					nZCS <= '0';
 					
-					IF (COUNT = 1) THEN --TWO CLOCK CYCLES HAVE PASSED. WE CAN PROCEED.
+					--IF (COUNT = 1) THEN --TWO CLOCK CYCLES HAVE PASSED. WE CAN PROCEED.
 						--DO WE NEED TO REFRESH AGAIN (STARTUP)?
 						IF (SDRAM_START_REFRESH_COUNT = '0') THEN							
 							CURRENT_STATE <= AUTO_REFRESH;
@@ -546,9 +546,9 @@ begin
 							CURRENT_STATE <= RUN_STATE;
 							REFRESH_COUNTER <= 0;
 						END IF;
-					END IF;		
+					--END IF;		
 
-					COUNT <= COUNT + 1;						
+					--COUNT <= COUNT + 1;						
 				
 				WHEN RUN_STATE =>
 					--CLOCK EDGE 0
@@ -593,7 +593,8 @@ begin
 					--IF THIS IS A WRITE ACTION, WE CAN IMMEDIATELY PROCEED TO THE ACTION
 					--IF THIS IS A READ ACTION, THE CAS LATENCY IS 2 CLOCK CYCLES, SO WE NEED TO WAIT ONE MORE CLOCK BEFORE READING
 					--DURING DMA, THE REQUESTING DEVICE'S RW SIGNAL IS LOCKED TO OUR RW SIGNAL
-
+					
+					--DO WE WANT TO CONSIDER DS ON THE READ ACTION?
 					IF ((RnW = '0') OR (RnW = '1' AND COUNT >= 1)) THEN
 					
 						IF (nBGACK = '0') THEN
@@ -662,7 +663,7 @@ begin
 	--always data.  The "wanna be cached" term doesn't fit, so here's the 
 	--"don't wanna be cached" terms, with inversion. U306
 	
-	--EXTSEL = 1 is when Zorro 3 RAM is responding to the address space
+	--EXTSEL = 1 is when Zorro 3 RAM is responding to the address space (EXTSEL)
 	--So, this original code never caches in Z3 ram. 
 	--Might want to consider looking into that when Z3 ram is present.	
 		
@@ -687,10 +688,10 @@ begin
 	-- 6888x CHIP SELECT --
 	-----------------------
 	
-	--This selects the 68881 or 68882 math chip, as long as there's no DMA 
+	--This selects the 68881 or 68882 math chip (FPU chip select), as long as there's no DMA 
 	--going on.  If the chip isn't there, we want a bus error generated to 
 	--force an F-line emulation exception.  Add in AS as a qualifier here
-	--if the PAL ever turns out too slow to make FPUCS before AS.
+	--if the PAL ever turns out too slow to make FPUCS before AS. U306
 	
 	--field spacetype	= [A19..16] ;
 	--coppercom	= (spacetype:20000) ; 00100000000000000000
@@ -699,8 +700,11 @@ begin
 	--mc68881	= (copperid:2000) ; 0010000000000000
 	mc68881 <= '1' WHEN A( 15 downto 13 ) = "001" ELSE '0';
 
+	--FPUCS = cpuspace & coppercom & mc68881 & !BGACK;
 	nFPUCS <= '0' WHEN ( cpuspace = '1' AND coppercom = '1' AND mc68881 = '1' AND nBGACK = '1' ) ELSE '1';
 
+	--BERR		= cpuspace & coppercom & mc68881 & !SENSE & !BGACK;
+	--BERR.OE	= cpuspace & coppercom & mc68881 & !SENSE & !BGACK;
 	nBERR <= '0' WHEN ( cpuspace = '1' AND coppercom = '1' AND mc68881 = '1' AND nBGACK = '1' AND nSENSE = '1' ) ELSE 'Z';
 	
 	--------------------
@@ -728,14 +732,17 @@ begin
 	---------------
 
 	--This group of logic is to drive the clock on U303 in order to capture
-	--important information for the ROM at startup/autoconfig
+	--important information for the ROM at startup/autoconfig u304
 	
 	--addr <= A( 23 downto 15 );
 	--Low memory ROM space, used for mapping of ROMs on reset.
-	lorom <= '1' WHEN A( 23 downto 16 ) = "00000000" ELSE '0'; --addr:[000000..00ffff] AND A( 23 downto 16 ) <= "11111111"
+	lorom <= '1' WHEN A( 23 downto 16 ) = "00000000" ELSE '0'; --addr:[000000..00ffff] 
+	--00ffff = 000000001111111111111111
 	
 	--High memory rom space, where ROMs normally reside when available.
-	hirom <= '1' WHEN A( 23 downto 16 ) = "11111000" ELSE '0'; --addr:[f80000..f8fff] AND A( 23 downto 15 ) <= "111110001"
+	hirom <= '1' WHEN A( 23 downto 16 ) = "11111000" ELSE '0'; --addr:[f80000..f8ffff] 
+	--f80000 = 111110000000000000000000
+	--f8fff =   111110001111111111111111
 	
 	readcycle <= '1' WHEN RnW = '1' AND nAS = '0' ELSE '0';
 	
@@ -749,6 +756,8 @@ begin
 	
 	--The Special Device configuration register is at $E80040, occupying the lower byte of that word.
 	--romaddr		= addr:40;
+	--THIS SIGNAL LATCHES HIGH WHEN THE ADDRESS IS EQUAL TO THE SPECIAL REGISTER. THIS IS SEPERATE FROM THE AUTOCONFIG PROCESS.
+	--THIS IS OK. LEAVE IT.
 	romaddr <= '1' WHEN A(6 downto 1) = "100000" ELSE '0'; --01000000
 
 	--icsauto		= autocon & AS & !RAMCONF &  AUTO 		# autocon & AS & !ROMCONF & !AUTO;
@@ -801,7 +810,6 @@ begin
 		
 	--THIS GOES THROUGH AN INVERTING GATE IN THE A2630 (U307). NO NEED FOR THAT, CUZ WE CAN SUPPLY THE CORRECT SIGNAL HERE!
 	--ROMCLK = writecycle & romaddr & !CONFIGED  #  ROMCLK & DS;
-	--ROMCLK <= '1' WHEN ( writecycle = '1' AND romaddr = '1' AND autoconfigcomplete_2630 = '0' ) OR ( ROMCLK = '1' AND nDS = '0' ) ELSE '0';
 	
 	--The 2630 ROM falls into the special register category and is handled differently than the typical AUTOCONFIG sequence
 	--This clocks U303, which latches some data lines to capture the PHANTOM signals, among others
@@ -837,9 +845,12 @@ begin
 
 	--"Normal" state is logic low unless we are DMAing.
 	--MEMLOCK		= access & CONFIGED		# !AS		# EXTERN		# CYCEND;
+	
+	--should configed here actually be z2_ram_configed?
+	
 	nMEMLOCK <= '0' 
 		WHEN
-			( CONFIGED = '1' AND MEMACCESS = '1' )
+			( configed = '1' AND MEMACCESS = '1' )
 			--access & CONFIGED
 		OR
 			( nAS = '1' )
@@ -883,6 +894,7 @@ begin
 	--reflects the state of the CPU's R/W line. U501
 
 	--UDS		= wds & !A0		# rds ;
+	--[UDS, LDS, ARW, AAS].OE = !TRISTATE & offboard ;
 	nUDS <= 'Z' 
 		WHEN 
 			TRISTATE = '1' OR offboard = '0'
@@ -894,6 +906,7 @@ begin
 			'1';
 
 	--LDS		= wds & SIZ1		# wds & !SIZ0		# wds & A0		# rds ;
+	--[UDS, LDS, ARW, AAS].OE = !TRISTATE & offboard ;
 	nLDS <= 'Z'
 		WHEN
 			TRISTATE = '1' OR offboard = '0'
