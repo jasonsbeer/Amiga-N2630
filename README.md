@@ -1,5 +1,5 @@
 # Amiga N2630
-The N2630 is a Motorolla 68030 CPU card with RAM and IDE for the Amiga 2000 family of computers. It is installed in the CPU slot where it immediately upgrades the system to a 25MHz 68030 processor with FPU, 136 megabytes of Fast RAM, and an ATA/IDE port. When desired, the 68030 processor may be disabled in software to run the Amiga 2000 in 68000 mode. This enables compatability with tempermental software. When running in 68000 mode, eight megabytes of Zorro 2 RAM and the ATA/IDE port remain enabled, unless otherwise disabled by the user.
+The N2630 is a Motorolla 68030 CPU card with RAM and IDE for the Amiga 2000 family of computers. It is installed in the CPU slot where it immediately upgrades the system to a 25MHz 68030 processor with FPU, up to 264 megabytes of Fast RAM, and an ATA/IDE port. When desired, the 68030 processor may be disabled in software to run the Amiga 2000 in 68000 mode. This enables compatability with tempermental software. When running in 68000 mode, eight megabytes of Zorro 2 RAM and the ATA/IDE port remain enabled, unless otherwise disabled by the user.
 
 <img src="/Images/N2360_PCB_R1.png" width="750">
 
@@ -7,7 +7,7 @@ The N2630 is a Motorolla 68030 CPU card with RAM and IDE for the Amiga 2000 fami
 1. Motorola 68030 microprocessor running at 25MHz.
 2. Motorola 68882 math coprocessor running at 25MHZ or greater.
 3. Eight megabytes of Zorro 2 RAM.
-4. 128 megabytes of Zorro 3 RAM.
+4. Up to 256 megabytes of Zorro 3 RAM.
 5. PATA/IDE hard drive port.
 
 ## Installation Notes
