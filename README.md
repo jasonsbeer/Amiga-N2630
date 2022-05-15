@@ -23,7 +23,7 @@ Before installing, it is necessary to determine if you have an early, non-cost r
 ## 68000 Mode
 
 ## Memory
-The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAMs are the successors to the Fast Page Memory found in devices such as the Amiga 3000, A2630 processor cards, and other computers of the time. SDRAMs are a very cost effictive way to supply memory to older systems and are readily available from large electronics supply houses.    
+The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM is the successor to Fast Page Memory found in devices such as the Amiga 3000, A2630 processor card, and other computers of the time. SDRAMs are a very cost effictive way to supply memory to older systems and are readily available from large electronics supply houses.    
 ### Zorro 2
 Zorro 2 RAM is the Amiga RAM found in the 24 bit address space of the Motorola 68000 processor. This RAM space can be used by the Motorola 68030 and supports DMA activities on the Zorro 2 bus. When 68000 mode is selected, the Zorro 2 memory expansion remains available to the system. The Zorro 2 RAM may be disabled by adding a jumper to J303. Disabling the Zorro 2 RAM is not recommended for regular use as this will degrade performance of the system.
 
