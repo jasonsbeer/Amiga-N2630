@@ -369,6 +369,25 @@ begin
 	LOW_MEMORY_SPACE <= '1' WHEN A(26) = '0' AND MEMORY_SPACE = '1' ELSE '0';
 	HIGH_MEMORY_SPACE <= '1' WHEN A(26) = '1' AND MEMORY_SPACE = '1' ELSE '0';
 	
+--FOR FUTURE CONSIDERATION...ALLOWING MULTIPLE RAM CONFIGURATIONS UP TO 256MB
+--256MB IS THE GREATEST CAPACITY IN THE TSOP 2 PACKAGE. THIS REQUIRES THE ADDITION OF 3 JUMPERS w/PULLUPS TO CONFIGURE.
+--So, jumper placed = 0 (GND), no jumper = 1
+
+--RAMSIZE = vector (0..2) (JM0..1..2)
+--
+--case ramsize
+--
+--	when "011" then if A(24) = '0' then lowpage else highpage --32MB
+--	when "010" then if A(25) = '0' then lowpage else highpage --64MB
+--	when "001" then if A(26) = '0' then lowpage else highpage --128MB
+--	when "000" then if A(27) = '0' then lowpage else highpage --256MB
+--	
+--	when others ALWAYS lowpage
+--	
+--end case
+--
+--to support 256mb, need to connect through A26 to SDRAM and possibly alter autoconfig
+	
 	--SET THE DYNAMIC BUS SIZING
 	--THIS IS SILLY. COMBINE THESE INTO A SINGLE SET OF OUTPUTS FOR NEXT REVISION.
 	nEM0UUBE <= nUUBE;
