@@ -13,7 +13,7 @@ The N2630 is a Motorolla 68030 CPU card with RAM and IDE for the Amiga 2000 fami
 ## Installation Notes
 This card may be installed in any Amiga 2000 computer. This includes Amiga 2000HD and Amiga 2000 EATX computers. Some Amiga 2000 versions came from the factory with a 68030 card installed. This card will work equally well in those systems. Installation is as simple as inserting the card into the 86 pin CPU/Coprocessor slot of the Amiga computer. There are no software drivers to install.  
 
-Before installing, it is necessary to determine if you have an early, non-cost reduced motherboard. If your motherboard is marked "Made In Germany" and "(C) 1986 Commodore" on the left side of the board, you have a non-cost reduced Amiga 2000 board. An example of a non-cost reduced Amiga 2000 motherboard can be see [here](http://amiga.resource.cx/photos/a2000,1). In the event you have an non-cost reduced motherboard, you must remove the Motorola 68000 processor from the Amiga 2000 motherboard. Unfortunately, it is not possible to run in Motorola 68000 mode on these early revision motherboards. All other Amiga 2000 motherboards should leave the Motorola 68000 in place.
+Before installing, it is necessary to determine if you have an early, non-cost reduced motherboard. If your motherboard is marked "Made In Germany" and "(C) 1986 Commodore" on the left side of the board, you have a non-cost reduced Amiga 2000 board. An example of a non-cost reduced Amiga 2000 motherboard can be see [here](http://amiga.resource.cx/photos/a2000,1). In the event you have an non-cost reduced motherboard, you must remove the Motorola 68000 processor from the Amiga 2000 motherboard and place a jumper at J302. Unfortunately, it is not possible to run in Motorola 68000 mode on these early revision motherboards. All other Amiga 2000 motherboards should leave the Motorola 68000 in place.
 
 (SCSI.DEVICE required in Kickstart for AUTOBOOT)
 
@@ -30,21 +30,21 @@ Zorro 2 RAM is the Amiga RAM found in the 24 bit address space of the Motorola 6
 SPECIAL NOTE: The Zorro 2 SDRAMs at U400 and U401 are called out as 2Mx16 in the BOM. This is the specific size requried to acheive 8MB of Zorro 2 RAM. In the event you are unable to supply this specific size SDRAM, any greater capacity 16 bit wide SDRAM in the 54-TSOP II footprint may by substituted. For example, 4Mx16 could be placed and will function correctly. Zorro 2 RAM is limited to a maximum of 8MB. Placing greater capacity SDRAMs at U400 and U401 will not result in a greater amount of Zorro 2 RAM. 
 
 ### Zorro 3
-Zorro 3 RAM is the Amiga RAM found in the 32 bit address space of the Motorola 68030 processor. Both Zorro 2 and Zorro 3 RAM are used together on the N2630 card. Thus, total memory available to the system will be the sum of the Zorro 2 and Zorro 3 RAM. Zorro 3 SDRAMs may be installed in different configurations to acheive a specific amount of final RAM (Table 1). The indicated jumpers must be set correctly or your system may not function correctly.
+Zorro 3 RAM is the Amiga RAM found in the 32 bit address space of the Motorola 68030 processor. Both Zorro 2 and Zorro 3 RAM are used together on the N2630 card. Thus, total memory available to the system will be the sum of the Zorro 2 and Zorro 3 RAM. Zorro 3 SDRAMs may be installed in different configurations to acheive a specific amount of final RAM (Table 1). The SDRAM footprint is 54-TSOP II. The indicated jumpers must be set as shown or your system may not function correctly.
 
 The Zorro 3 RAM may be disabled by adding a jumper to J305. Disabling the Zorro 3 RAM is not recommended for regular use as this will degrade performance of the 68030.
 
 Table 1. Possible Zorro 3 RAM configurations.  
-Desired RAM (MB)|SDRAM Size|U406|U407|U408|U409|JM0|JM1|JM2
+Desired Zorro 3 RAM (MB)|SDRAM Size|U406|U407|U408|U409|JM0|JM1|JM2
 -|-|-|-|-|-|-|-|-
-16|4MX16|YES<sup>A</sup>|YES|NO<sup>B</sup>|NO|0<sup>C</sup>|0|0
-32|4MX16|YES|YES|YES|YES|1<sup>D</sup>|0|0
-32|8MX16|YES|YES|NO|NO|0|0|1
-64|8MX16|YES|YES|YES|YES|1|0|1
-64|16MX16|YES|YES|NO|NO|0|0|1
-128|16Mx16|YES|YES|YES|YES|1|1|0
-128|32MX16|YES|YES|NO|NO|0|1|0
-256|32MX16|YES|YES|YES|YES|1|1|1
+16|4MX16|YES<sup>A</sup>|YES|NO<sup>B</sup>|NO|Open<sup>C</sup>|Open|Open
+32|4MX16|YES|YES|YES|YES|Shorted<sup>D</sup>|Open|Open
+32|8MX16|YES|YES|NO|NO|Open|Open|Shorted
+64|8MX16|YES|YES|YES|YES|Shorted|Open|Shorted
+64|16MX16|YES|YES|NO|NO|Open|Open|Shorted
+128|16Mx16|YES|YES|YES|YES|Shorted|Shorted|Open
+128|32MX16|YES|YES|NO|NO|Open|Shorted|Open
+256|32MX16|YES|YES|YES|YES|Shorted|Shorted|Shorted
 
 <sup>A</sup> This position to be populated by the SDRAM indicated.  
 <sup>B</sup> This position not populated.  
@@ -55,7 +55,8 @@ Desired RAM (MB)|SDRAM Size|U406|U407|U408|U409|JM0|JM1|JM2
 ## 68882 Math Coprocessor (FPU)
 
 
-## Table 1 REV 1. Configuration Jumper Settings
+## Other Jumper Settings
+### Table 1. Configuration Jumper Settings
 Jumper|Description|Shorted|Open*
 -|-|-|-
 J302|Amiga Version|A2000|B2000
@@ -66,7 +67,7 @@ J600|IDE|Disable|Enable
 
 *The factory configuration for all jumpers is open (no jumper)
 
-## Table 2. Clock Jumper Settings
+### Table 2. Clock Jumper Settings
 Jumper|Description|1-2|2-3
 -|-|-|-
 J201|CPU Clock|28MHz|X1* (25MHz)
