@@ -6,8 +6,8 @@ The N2630 is a Motorolla 68030 CPU card with RAM and IDE for the Amiga 2000 fami
 ## Features
 1. Motorola 68030 microprocessor running at 25MHz.
 2. Motorola 68882 math coprocessor running at 25MHZ or greater.
-3. Eight megabytes of Zorro 2 RAM.
-4. Up to 256 megabytes of Zorro 3 RAM.
+3. Eight megabytes of Zorro 2 Fast RAM.
+4. Up to 256 megabytes of Zorro 3 Fast RAM.
 5. PATA/IDE hard drive port.
 
 ## Installation Notes
