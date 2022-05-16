@@ -34,7 +34,7 @@ Zorro 3 RAM is the Amiga RAM found in the 32 bit address space of the Motorola 6
 
 The Zorro 3 RAM may be disabled by adding a jumper to J305. Disabling the Zorro 3 RAM is not recommended for regular use as this will degrade performance of the 68030.
 
-Table 1. Possible Zorro 3 RAM configurations.  
+**Table 1.** Possible Zorro 3 RAM configurations.
 Desired Zorro 3 RAM (MB)|SDRAM Size|U406|U407|U408|U409|JM0|JM1|JM2
 -|-|-|-|-|-|-|-|-
 16|4MX16|YES<sup>A</sup>|YES|NO<sup>B</sup>|NO|Open<sup>C</sup>|Open|Open
@@ -52,12 +52,15 @@ Desired Zorro 3 RAM (MB)|SDRAM Size|U406|U407|U408|U409|JM0|JM1|JM2
 <sup>D</sup> Jumper placed.  
 ## ATA/IDE Port
 
+
 ## 68882 Math Coprocessor (FPU)
 
 
 ## Other Jumper Settings
-### Table 1. Configuration Jumper Settings
-Jumper|Description|Shorted|Open*
+In the following tables, OPEN indicates no jumper. Shorted indicates the presence of a jumper on the pins indicated. All jumpers must be set correctly or you may encounter unexpected bahaviors or failure to boot.
+
+**Table 2.** Configuration Jumper Settings
+Jumper|Description|Shorted|Open<sup>A</sup>
 -|-|-|-
 J302|Amiga Version|A2000|B2000
 J303|Zorro 2 RAM|Disable|Enable
@@ -65,12 +68,21 @@ J304|OS Mode|Unix|Amiga OS
 J305|Zorro 3 RAM|Disable|Enable
 J600|IDE|Disable|Enable
 
-*The factory configuration for all jumpers is open (no jumper)
+<sup>A</sup>The factory configuration for all jumpers is open (no jumper).  
 
-### Table 2. Clock Jumper Settings
+**Table 3.** SDRAM Refresh Jumper Settings
+Jumper|50MHz<sup>A</sup>|40MHz|33MHz|25MHz
+-|-|-|-|-
+Jxxx|Shorted|Open|Shorted|Open
+Jxx1|Shorted|Shorted|Open|Open
+
+<sup>A</sup>Set jumpers to match CPU clock.
+
+**Table 4.** System Clock Jumper Settings
 Jumper|Description|1-2|2-3
 -|-|-|-
-J201|CPU Clock|28MHz|X1* (25MHz)
-J202|FPU Clock|X1* (25MHz)|X2
+J201|CPU Clock|28MHz|X1<sup>A,B</sup>
+J202|FPU Clock|X1<sup>A</sup>|X2<sup>B</sup>
 
-*Factory default
+<sup>A</sup>Factory default.  
+<sup>B</sup>The clock signal is supplied by X1 or X2 oscillator.
