@@ -32,7 +32,7 @@ Zorro 3 RAM is the Amiga RAM found in the 32 bit address space of the Motorola 6
 The Zorro 3 RAM may be disabled by adding a jumper to J305. Disabling the Zorro 3 RAM is not recommended for regular use as this will degrade performance of the 68030.
 
 **Table 1.** Possible Zorro 3 RAM configurations.
-Desired Zorro 3 RAM (MB)|SDRAM Size|U406|U407|U408|U409|JM0|JM1|JM2
+Desired Zorro</br>3 RAM (MB)|SDRAM</br>Capacity|U406|U407|U408|U409|JM0|JM1|JM2
 -|-|-|-|-|-|-|-|-
 16|4MX16|YES<sup>A</sup>|YES|NO<sup>B</sup>|NO|Open<sup>C</sup>|Open|Open
 32|4MX16|YES|YES|YES|YES|Shorted<sup>D</sup>|Open|Open
@@ -48,7 +48,7 @@ Desired Zorro 3 RAM (MB)|SDRAM Size|U406|U407|U408|U409|JM0|JM1|JM2
 <sup>C</sup> No jumper.  
 <sup>D</sup> Jumper placed.  
 ## ATA/IDE Port
-The N2630 includes an AUTOBOOT<sup>A</sup> ATA/IDE port compatable with hard drives and ATAPI<sup>B</sup> devices. The port supports two devices (master and slave) and operates in PIO mode. The port may be disabled by placing a jumper on J600 (Table 2). For instructions on installing a new hard drive on an Amiga, refer to the [Commodore Hard Drive User's Guide](DataSheet/Commodore_A4000_Amiga_Hard_Drive_Users_Guide.pdf). This manual includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
+The N2630 includes an AUTOBOOT<sup>A</sup> ATA/IDE port compatable with hard drives and ATAPI<sup>B</sup> devices. The port supports two devices (master and slave) and operates in PIO mode. The port may be disabled by placing a jumper on J600 (Table 2). For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Commodore_A4000_Amiga_Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
 
 <sup>A</sup>AUTOBOOT requires Kickstart v37.300 or greater or compatable SCSI.device in Kickstart.  
 <sup>B</sup>ATAPI support included in Kickstart 3.1.4+. Older versions of Kickstart may require installation of third party ATAPI drivers.  
