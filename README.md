@@ -51,7 +51,7 @@ Desired Zorro 3 RAM (MB)|SDRAM Size|U406|U407|U408|U409|JM0|JM1|JM2
 The N2630 includes an AUTOBOOT<sup>A</sup> ATA/IDE port compatable with hard drives and ATAPI<sup>B</sup> devices. The port supports two devices (master and slave) and operates in PIO mode. The port may be disabled by placing a jumper on J600 (Table 2). For instructions on installing a new hard drive on an Amiga, refer to the [Commodore Hard Drive User's Guide](DataSheet/Commodore_A4000_Amiga_Hard_Drive_Users_Guide.pdf). This manual includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
 
 <sup>A</sup>AUTOBOOT requires Kickstart v37.300 or greater or compatable SCSI.device in Kickstart.  
-<sup>B</sup>With Kickstart 3.1.4+. Create a CD0: mountlist item and include device = scsi.device and filesystem = CDFS. Older versions of Kickstart may require installation of atapi.device.  
+<sup>B</sup>ATAPI support included in Kickstart 3.1.4+. Older versions of Kickstart may require installation of atapi.device or simliar.  
 ## 68882 Math Coprocessor (FPU)
 
 
