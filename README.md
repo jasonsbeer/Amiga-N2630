@@ -41,9 +41,9 @@ Desired Zorro 3 RAM (MB)|SDRAM Size|U406|U407|U408|U409|JM0|JM1|JM2
 32|4MX16|YES|YES|YES|YES|Shorted<sup>D</sup>|Open|Open
 32|8MX16|YES|YES|NO|NO|Open|Open|Shorted
 64|8MX16|YES|YES|YES|YES|Shorted|Open|Shorted
-64|16MX16|YES|YES|NO|NO|Open|Open|Shorted
+64|16MX16|YES|YES|NO|NO|Open|Shorted|Open
 128|16Mx16|YES|YES|YES|YES|Shorted|Shorted|Open
-128|32MX16|YES|YES|NO|NO|Open|Shorted|Open
+128|32MX16|YES|YES|NO|NO|Open|Shorted|Shorted
 256|32MX16|YES|YES|YES|YES|Shorted|Shorted|Shorted
 
 <sup>A</sup> This position to be populated by the SDRAM indicated.  
