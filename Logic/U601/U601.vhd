@@ -13,9 +13,10 @@
 -- Dependencies: 
 --
 -- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: MUCH OF THIS LOGIC AND COMMENTS ARE TRANSLATED FROM THE PAL LOGIC FROM DAVE HAYNIE.
---                      EDITS AND ADDITIONS FOR THE N2630 PROJECT MADE BY JASON NEUS.
+-- Revision 1.0 - Original Release
+-- Additional Comments: SPECIAL THANKS TO DAVE HAYNIE FOR RELEASING THE A2630 PAL LOGIC EQUATIONS.
+--                      ORIGINAL PAL EQUATIONS BY C= COMMODORE.
+--                      TRANSLATIONS OF C= LOGIC AND ORIGINAL EQUATIONS FOR THE N2630 PROJECT BY JASON NEUS.
 --
 ----------------------------------------------------------------------------------
 library IEEE;
