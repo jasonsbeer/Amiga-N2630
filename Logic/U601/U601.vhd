@@ -158,7 +158,7 @@ begin
 	--ADDRESS DECODING
 
 	--field cpuaddr	= [A23..13] ;			/* Normal CPU space stuff */
-	chipram <= '1' WHEN A(23 downto 13) >= "00000000000" AND A(23 downto 13) <= "00011111111"  ELSE '0';
+	chipram <= '1' WHEN A(23 downto 13) >= "00000000000" AND A(23 downto 13) <= "00011111111"  ELSE '0'; --That's 4MB of chip ram space available...just FYI
 	--chipram		= (cpuaddr:[000000..1fffff]) ;    /* All Chip RAM */ 0-000111111111111111111111
 	--busspace	= (cpuaddr:[200000..9fffff]) ;    /* Main expansion bus */ 001000000000000000000000-100111111111111111111111
 	ciaspace <= '1' WHEN A(23 downto 13) >= "10100000000" AND A(23 downto 13) <= "10111111111" ELSE '0';
@@ -182,12 +182,12 @@ begin
 	--We have three boards we need to autoconfig, in this order
 	--1. The 68030 board itself
 	--2. The base memory (8MB) without BOOT ROM in the Zorro 2 space
-	--3. The expansion memory (112MB) in the Zorro 3 space. This is done in U602.	
+	--3. The expansion memory in the Zorro 3 space. This is done in U602.	
 
 	--A good explaination of the autoconfig process is given in the Amiga Hardware Reference Manual from Commodore
 	--https://archive.org/details/amiga-hardware-reference-manual-3rd-edition	
 	
-	--ARE WE IN THE AUTOCONFIG ADDRESS SPACE?
+	--ARE WE IN THE Z2 AUTOCONFIG ADDRESS SPACE ($E80000)?
 	
 	autoconfigspace <= '1'
 		WHEN 
@@ -490,9 +490,8 @@ begin
 					CURRENT_STATE <= POWERUP_PRECHARGE;
 					
 				WHEN POWERUP_PRECHARGE =>
-					--nZPRECHARGE <= '1'; --ALL BANKS TO BE PRECHARGED
-					ZMA <= (OTHERS => '0');
-					ZMA(10) <= '1'; --PRECHARGE ALL				
+					ZMA <= ('10000000000'); --PRECHARGE ALL
+					--ZMA(10) <= '1'; --PRECHARGE ALL				
 					nZWE <= '0';
 					nZRAS <= '0';
 					nZCAS <= '1';
@@ -790,9 +789,9 @@ begin
 	PROCESS (CPUCLK) BEGIN
 		IF RISING_EDGE (CPUCLK) THEN
 			IF csauto = '1' THEN
-				IF nAS = '0' THEN
-					csauto <= '1';
-				ELSE
+				IF nAS = '1' THEN
+					--csauto <= '1';
+				--ELSE
 					csauto <= '0';
 				END IF;
 			ELSE
@@ -818,9 +817,9 @@ begin
 		IF RISING_EDGE ( CPUCLK ) THEN
 			IF (ROMCLK = '1') THEN		
 				--ROMCLK is already latched, but if data strobe is still asserted, we need to hold the latch
-				IF (nDS = '0') THEN
-					ROMCLK <= '1';
-				ELSE
+				IF (nDS = '1') THEN
+					--ROMCLK <= '1';
+				--ELSE
 					ROMCLK <= '0';
 				END IF;
 			ELSE
@@ -935,9 +934,9 @@ begin
 		IF RISING_EDGE ( CPUCLK ) THEN
 			IF (nONBOARD = '0') THEN
 				--We are currently in an onboard process. We need to hold it until the address strobe is negated.
-				IF (nAS = '0') THEN
-					nONBOARD <= '0';
-				ELSE
+				IF (nAS = '1') THEN
+					--nONBOARD <= '0';
+				--ELSE
 					nONBOARD <= '1';
 				END IF;
 			ELSE
