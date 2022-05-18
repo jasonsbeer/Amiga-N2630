@@ -646,7 +646,7 @@ begin
 	---------------------------
 	
 	--This sets the direction of the LVC data buffers between the 680x0 and the RAM
-	
+	--We simply go with the inverse of the RW signal.
 	EMDDIR <= NOT RnW;
 	
 	------------------------
@@ -744,13 +744,13 @@ begin
 	--f80000 = 111110000000000000000000
 	--f8fff =   111110001111111111111111
 	
-	readcycle <= '1' WHEN RnW = '1' AND nAS = '0' ELSE '0';
+	--readcycle <= '1' WHEN RnW = '1' AND nAS = '0' ELSE '0';
 	
 	--icsrom		= hirom & !PHANHI & readcycle		# lorom & !PHANLO & readcycle;
 	icsrom <= '1' 
 		WHEN 
-			( hirom = '1' AND PHANTOMHI = '0' AND readcycle = '1' ) OR 
-			( lorom = '1' AND PHANTOMLO = '0' AND readcycle = '1' ) 
+			( hirom = '1' AND PHANTOMHI = '0' AND RnW = '1' AND nAS = '0' ) OR 
+			( lorom = '1' AND PHANTOMLO = '0' AND RnW = '1' AND nAS = '0' ) 
 		ELSE 
 			'0';
 	
@@ -776,10 +776,11 @@ begin
 			
 	--This is the basic ROM chip select logic.  We want ROM to pay attention
 	--to the phantom signals, and only show up on reads. U304
-	
+	--PIN 22		= !CSROM	;	/* Rom chip select */
+	--icsrom is active high
 	--CSROM		= icsrom;
 	--nCSROM <= '0' WHEN icsrom = '1' ELSE '1';
-	nCSROM <= NOT icsrom;
+	nCSROM <= icsrom;
 	
 	--CSAUTO		= icsauto		# CSAUTO & AS; 	
 	--CHIP SELECT FOR AUTOCONFIG
@@ -838,8 +839,8 @@ begin
 	-----------------
 	
 	--MEMLOCK is used to lock out the 68000 state machine during a fast 
-	--system cycle, which is basically either an on-board memory cycle
-	--or an EXTERN (Z3 or FPU) cycle.  Additionally, the 68000 state machine uses
+	--system cycle, which is basically either an on-board memory cycle (Z2)
+	--or an EXTERN cycle (Z3 or FPU).  Additionally, the 68000 state machine uses
 	--this same mechanism to end it's own cycle, so CYCEND also gets
 	--included. U305
 
@@ -951,17 +952,19 @@ begin
 	END PROCESS;
 
 	-----------------------------------
-	-- ADDRESS BUS DIRECTION CONTROL --
+	-- DATA BUS DIRECTION CONTROL --
 	-----------------------------------
 	
-	--This is data direction control
-
-	--!ADDIR		=  BGACK & !RW		# !BGACK &  RW;
-	ADDIR <= '0' --AMIGA WRITING TO 2630
+	--This is data direction control U500
+	--PIN 5		= !BGACK	;	/* '030 Bus grant acknowledge */
+	--PIN 16	= !ADDIR	;	/* Amiga data direction control */
+	--!ADDIR	=  BGACK & !RW		# !BGACK &  RW;
+	--THIS LOOKS BACKWARDS TO ME, BUT THE LOGIC IS TRANSLATED CORRECTLY
+	ADDIR <= '1' --2630 TO THE AMIGA
 		WHEN 
-			( nBGACK = '0' AND RnW = '0' ) OR  
-			( nBGACK = '1' AND RnW = '1' ) 
+			( nBGACK = '0' AND RnW = '0' ) OR  --DMA AND THE DMA DEVICE IS WRITING
+			( nBGACK = '1' AND RnW = '1' )     --NO DMA AND CPU IS READING
 		ELSE 
-			'1'; --2630 WRITING TO THE AMIGA
+			'0'; --AMIGA TO THE 2630
 
 end Behavioral;
