@@ -869,10 +869,16 @@ begin
 	-- DATA STROBES --
 	------------------
 	
+	--WE NEED TO SUPPLY 68000 COMPATABLE DATA STROBES TO THE AMIGA SO THE EXISTING HARDWARE CAN COMMUNICATE WITH THE 68030			
+			
 	--rds		=  ASEN & !CYCEND &  RW & !EXTERN;
+	--Read Data Strobe 
+	--nASEN COMES FROM U503 FLIP FLOP AND IS AS DELAYED CLOCKED BY SCLK
+	--nCYCEND IS END OF SLOW 16 BIT CYCLE
 	rds <= '1' WHEN nASEN = '0' AND nCYCEND = '1' AND RnW = '1' AND nEXTERN = '1' ELSE '0';
 
 	--wds		=  DSEN & !CYCEND & !RW;
+	--Write Data Strobe
 	wds <= '1' WHEN nDSEN = '0' AND nCYCEND = '1' AND RnW = '0' ELSE '0';
 	
 	--offboard	= !(ONBOARD # MEMSEL # EXTERN);
@@ -889,13 +895,16 @@ begin
 					
 	--68000 style data strobes.  These are kept in tri-state when the 
 	--TRISTATE signal is active, or when we're not "offboard".  For 68030
-	--caching, we must always return 16 bits on reads, regardless of the
+	--caching, we must always return 16 bits on reads (rds=1), regardless of the
 	--state of A0, SIZ1, or SIZ2. If the memory access is a normal offboard access, UDS
 	--looks normal.  If the memory access is not offboard, the then UDS
 	--reflects the state of the CPU's R/W line. U501
 
 	--UDS		= wds & !A0		# rds ;
 	--[UDS, LDS, ARW, AAS].OE = !TRISTATE & offboard ;
+	--WHEN WRITE, nUDS IS DRIVEN FROM 68030 DATA BUS WRITE ENABLE SIGNALS
+	--SEE TABLE 7-7 (pp7-23) IN 68030 MANUAL
+	--nUDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D31:24 (UPPER BYTE)
 	nUDS <= 'Z' 
 		WHEN 
 			TRISTATE = '1' OR offboard = '0'
@@ -908,12 +917,15 @@ begin
 
 	--LDS		= wds & SIZ1		# wds & !SIZ0		# wds & A0		# rds ;
 	--[UDS, LDS, ARW, AAS].OE = !TRISTATE & offboard ;
+	--WHEN WRITE, nLDS IS DRIVEN FROM 68030 DATA BUS WRITE ENABLE SIGNALS
+	--SEE TABLE 7-7 (pp7-23) IN 68030 MANUAL
+	--nLDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D23:16 (LOWER BYTE)
 	nLDS <= 'Z'
 		WHEN
 			TRISTATE = '1' OR offboard = '0'
 		ELSE '0'
 			WHEN
-				((wds = '1' AND SIZ(1) = '1') OR 
+				((wds = '1' AND SIZ(1) = '1') OR --68030 WORD TRANSFER SIZE
 				(wds = '1' AND SIZ(0) = '0') OR 
 				(wds = '1' AND A(0) = '1') OR
 				(rds = '1'))
