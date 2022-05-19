@@ -1,22 +1,42 @@
+--This work is shared under the Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) License
+--https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+	
+--You are free to:
+--Share - copy and redistribute the material in any medium or format
+--Adapt - remix, transform, and build upon the material
+
+--Under the following terms:
+
+--Attribution - You must give appropriate credit, provide a link to the license, and indicate if changes were made. 
+--You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+
+--NonCommercial - You may not use the material for commercial purposes.
+
+--ShareAlike - If you remix, transform, or build upon the material, you must distribute your contributions under the 
+--same license as the original.
+
+--No additional restrictions - You may not apply legal terms or technological measures that legally restrict others 
+--from doing anything the license permits.
+
 ----------------------------------------------------------------------------------
 -- Company: 
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    20:06:50 02/10/2022 
--- Design Name:    N2630 U600 CPLD
--- Module Name:    U600 - Behavioral 
+-- Create Date:    09:42:54 02/13/2022 
+-- Design Name:    N2630 U601 CPLD
+-- Module Name:    U601 - Behavioral 
 -- Project Name:   N2630
--- Target Devices: XC9572 100 PIN
+-- Target Devices: XC95144 144 PIN
 -- Tool versions: 
--- Description:    LOGIC EQUATIONS FOR U600 CPLD
+-- Description: 
 --
 -- Dependencies: 
 --
--- Revision: 0.0
--- Revision 0.01 - File Created
--- Additional Comments: MUCH OF THIS LOGIC AND COMMENTS ARE TRANSLATED FROM THE PAL LOGIC FROM DAVE HAYNIE.
---                      EDITS AND ADDITIONS FOR THE N2630 PROJECT MADE BY JASON NEUS.
---
+-- Revision: 
+-- Revision 1.0 - Original Release
+-- Additional Comments: SPECIAL THANKS TO DAVE HAYNIE FOR RELEASING THE A2630 PAL LOGIC EQUATIONS.
+--                      ORIGINAL PAL EQUATIONS BY C= COMMODORE.
+--                      TRANSLATIONS OF C= LOGIC AND ORIGINAL EQUATIONS FOR THE N2630 PROJECT BY JASON NEUS.
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -185,24 +205,27 @@ begin
 		IF (RISING_EDGE (n7M)) THEN
 			IF ( nRESET = '0' OR nBOSS = '0' OR MODE68K = '1' ) THEN		
 				--We do not need to request the bus at this time.
-				--Tristate so we don't interfere with other bus users.
+				--We are BOSS, or we have RESET, or we are in MODE68K
+				--Tristate so we don't interfere with other bus requesters.
 				nABR <= 'Z';
 			ELSE
-				IF nABR = '0' THEN	
+				--THIS CODE IS NEVER EXECUTED BECAUSE OF THE FIRST TEST
+				--IF nABR = '0' THEN	
 					--nABR is asserted, but are we BOSS yet?
-					IF (nRESET = '1' AND nBOSS = '1' AND MODE68K = '0') THEN
-						nABR <= '0';
-					ELSE
-						nABR <= '1';
-					END IF;	
-				ELSE
+				--	IF (nRESET = '1' AND nBOSS = '1' AND MODE68K = '0') THEN
+				--		nABR <= '0';
+				--	ELSE
+				--		nABR <= '1';
+				--	END IF;	
+				--ELSE
 					--nABR is not asserted. Should we?
-					IF (nRESET = '1' AND nAAS = '0' AND nBOSS = '1' AND MODE68K = '0') THEN				
+					--IF (nAAS = '0' AND nBOSS = '1' AND MODE68K = '0') THEN				
+				        IF (nABR = '1' AND nAAS = '0' AND nBOSS = '1' AND MODE68K = '0') THEN
 						nABR <= '0';
 					ELSE
 						nABR <= '1';
 					END IF;
-				END IF;
+				--END IF;
 			END IF;
 		END IF;
 	END PROCESS;
@@ -241,16 +264,17 @@ begin
 		IF (RISING_EDGE (P7M)) THEN
 			IF (nBOSS = '0') THEN
 				--We are already BOSS, hang on to it
-				IF ((nHALT = '1' AND MODE68K = '0' ) OR ( nRESET = '1' AND MODE68K = '0' )) THEN
-					nBOSS <= '0';
-				ELSE 
-					--Drop BOSS because we have reset or switched to 68K mode
+				--IF ((nHALT = '1' AND MODE68K = '0' ) OR ( nRESET = '1' AND MODE68K = '0' )) THEN
+				--	nBOSS <= '0';
+				--ELSE 
+				IF (MODE68K = '0' AND (nHALT = '0' OR nRESET = '0')) THEN
+					--Drop BOSS because we have RESET or HALTed
 					nBOSS <= '1';
 				END IF;
 			ELSE
 				--We are not yet BOSS, try to become BOSS
 				IF 
-					(( nABG = '0' AND nAAS ='1' AND nDTACK = '1' AND nHALT = '1' AND nRESET = '1' AND B2000 = '1' AND MODE68K = '0' ) OR 
+					(( B2000 = '1' AND nABG = '0' AND nAAS ='1' AND nDTACK = '1' AND nHALT = '1' AND nRESET = '1' AND MODE68K = '0' ) OR 
 					( B2000 = '0' AND nHALT ='1' AND nRESET ='1')) 
 				THEN
 					nBOSS <= '0';
@@ -266,7 +290,7 @@ begin
 	--------------
 
 	--This signal is the Amiga bus RW line. This signal tristates when we are 
-	--not boss and when there is a DMA device active, or during an
+	--not boss or when there is a DMA device active, or during an
 	--onboard cycle. It shares the 68030 RW signal with the Amiga 2000 hardware. U501
 
 	--ARW		= RW ;	
@@ -432,13 +456,8 @@ begin
 	sync <= '1' WHEN esync = '0' OR E = '1' ELSE '0'; 
 			
 	--------------------------		
-	-- AMIGA ADDRESS STROBE --
-	--------------------------
-	
-	--as		=  ASEN & !CYCEND & !EXTERN; U501
-	--JN: Assumption is this ABEL equation will return 1 when true...even though it seems backwards here
-	--that's how I made all these internal signals work
-	as <= '1' WHEN nASEN = '0' AND nCYCEND = '1' AND nEXTERN = '1' ELSE '0';
+	-- 68000 ADDRESS STROBE --
+	--------------------------	
 	
 	--offboard	= !(ONBOARD # MEMSEL # EXTERN); U501
 	offboard <= '1' 
@@ -451,6 +470,14 @@ begin
 	--68000 style address strobe. Again, this only becomes active when the
 	--TRISTATE signal is negated and the memory cycle is for an offboard
 	--resource. U501
+			
+	--as		=  ASEN & !CYCEND & !EXTERN; U501
+	--JN: Assumption is this ABEL equation will return 1 when true...even though it seems backwards here
+	--that's how I made all these internal signals work
+	--PIN 2		= !CYCEND	;	/* Cycle end */
+	--PIN 23		= !EXTERN	;	/* Special or daughterboard access */
+	--PIN 14		= !ASEN		;	/* Adress strobe enable delayed */
+	as <= '1' WHEN nASEN = '0' AND nCYCEND = '1' AND nEXTERN = '1' ELSE '0';
 	
 	--OFFBOARD meaning we are accessing something on the A2000 PCB or Zorro 2 Bus
 	
