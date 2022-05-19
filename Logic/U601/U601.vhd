@@ -1,23 +1,22 @@
 --This work is shared under the Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) License
 --https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
-
---Under the following terms:
 	
 --You are free to:
---Share — copy and redistribute the material in any medium or format
---Adapt — remix, transform, and build upon the material
+--Share - copy and redistribute the material in any medium or format
+--Adapt - remix, transform, and build upon the material
 
---Attribution — You must give appropriate credit, provide a link to the license, and indicate if changes were made. 
---	You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+--Under the following terms:
 
---NonCommercial — You may not use the material for commercial purposes.
+--Attribution - You must give appropriate credit, provide a link to the license, and indicate if changes were made. 
+--You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
 
---ShareAlike — If you remix, transform, or build upon the material, you must distribute your contributions under the 
---	same license as the original.
+--NonCommercial - You may not use the material for commercial purposes.
 
---No additional restrictions — You may not apply legal terms or technological measures that legally restrict others 
---	from doing anything the license permits.
+--ShareAlike - If you remix, transform, or build upon the material, you must distribute your contributions under the 
+--same license as the original.
 
+--No additional restrictions - You may not apply legal terms or technological measures that legally restrict others 
+--from doing anything the license permits.
 
 ----------------------------------------------------------------------------------
 -- Company: 
@@ -162,7 +161,7 @@ architecture Behavioral of U601 is
 	SIGNAL icsrom : STD_LOGIC:='0';
 	SIGNAL hirom : STD_LOGIC:='0';
 	SIGNAL lorom : STD_LOGIC:='0';
-	SIGNAL readcycle : STD_LOGIC:='0';
+	--SIGNAL readcycle : STD_LOGIC:='0';
 	SIGNAL writecycle : STD_LOGIC:='0';
 	SIGNAL romaddr : STD_LOGIC := '0';
 	SIGNAL csauto : STD_LOGIC := '0';
@@ -512,7 +511,7 @@ begin
 					CURRENT_STATE <= POWERUP_PRECHARGE;
 					
 				WHEN POWERUP_PRECHARGE =>
-					ZMA <= ('10000000000'); --PRECHARGE ALL
+					ZMA <= ("10000000000"); --PRECHARGE ALL
 					--ZMA(10) <= '1'; --PRECHARGE ALL				
 					nZWE <= '0';
 					nZRAS <= '0';
