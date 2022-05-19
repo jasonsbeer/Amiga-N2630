@@ -577,7 +577,7 @@ begin
 	--in the case that's just prior to that enabling term (what I call CASE 3 
 	--in my timing), the I/O cycle should be held off until the next E cycle.
 	--The 68000 does this, but the above IVMA would run that cycle right away.
-	--The fix to this used here moves the IVMA equation up by one clock cycle,
+	--The fix to this used here moves the IVMA equation up by one E clock cycle,
 	--assuring that a CASE 3 VPA will be delayed.  This adds a potential problem
 	--in that IVMA would is asserted sooner than a 68000 would assert it.  We
 	--know this is no problem for 8520 devices, and /VPA driven devices aren't
@@ -607,7 +607,7 @@ begin
 	
 	--DTACK for 6800 cycle
 	--This was "!A3 & A2 & A1 & !A0 & !IVMA", but I think that may make
-	--the cycle end too early.  So I'm pushing it up by one clock. U506
+	--the cycle end too early.  So I'm pushing it up by one CPU clock. U506
 
 	--PIN 14	= EDTACK	;	/* DTACK for 6800 cycle */
 	--!EDTACK.D	= !A3 & A2 & A1 & A0 & !IVMA;
