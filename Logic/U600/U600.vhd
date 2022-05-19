@@ -459,6 +459,8 @@ begin
 	-- 68000 ADDRESS STROBE --
 	--------------------------	
 	
+	--WE NEED TO SUPPLY A 68000 COMPATABLE ADDRESS STROBE TO THE AMIGA 2000 CHIPSET
+			
 	--offboard	= !(ONBOARD # MEMSEL # EXTERN); U501
 	offboard <= '1' 
 		WHEN 
@@ -547,8 +549,9 @@ begin
 	
 	--This is used to disable the DSACK latch.  EXTERN here is basically 
 	--extra insurance that no board-generated DSACK will come out for 
-	--these special cycles. JN: NO EXTERN IN THE EQUATION...MUST BE AN OLD NOTE
+	--these special cycles. U505. JN: NO EXTERN IN THE EQUATION...MUST BE AN OLD NOTE
 
+	--PIN 6		= !AS		;	/* Adress strobe */
 	--DSACKDIS	= !AS ;
 	nDSACKDIS <= NOT nAS;
 	
@@ -579,8 +582,12 @@ begin
 	--in that IVMA would is asserted sooner than a 68000 would assert it.  We
 	--know this is no problem for 8520 devices, and /VPA driven devices aren't
 	--supported under autoconfig, so we should be OK here. U506
+				
+	--THESE ADDRESS LINES ARE NOT THE 680X0 ADDRESS LINES, BUT THE STATE COUNTER.
   
-	--!IVMA.D		=   !A3 & !A2 & !A1 & !A0 & VPA	# !IVMA & !A3;
+	--PIN 9		= !VPA		;	/* Valid peripheral address */
+	--PIN 13	= IVMA	 	;	/* Internal VMA */
+	--!IVMA.D	=   !A3 & !A2 & !A1 & !A0 & VPA	# !IVMA & !A3;
 	PROCESS ( P7M ) BEGIN
 		IF RISING_EDGE ( P7M ) THEN
 			IF 
@@ -602,8 +609,9 @@ begin
 	--This was "!A3 & A2 & A1 & !A0 & !IVMA", but I think that may make
 	--the cycle end too early.  So I'm pushing it up by one clock. U506
 
+	--PIN 14	= EDTACK	;	/* DTACK for 6800 cycle */
 	--!EDTACK.D	= !A3 & A2 & A1 & A0 & !IVMA;
-	--This is an internal signal and is inverted from the original PAL
+	--This is an internal signal and is inverted from the original PAL <<<----PAY ATTENTION HERE
 	PROCESS ( P7M ) BEGIN
 		IF RISING_EDGE ( P7M ) THEN
 			IF 
