@@ -1,5 +1,7 @@
 --This work is shared under the Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) License
 --https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+
+--Under the following terms:
 	
 --You are free to:
 --Share — copy and redistribute the material in any medium or format
