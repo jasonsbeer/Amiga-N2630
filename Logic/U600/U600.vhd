@@ -23,10 +23,10 @@
 -- Engineer:       JASON NEUS
 -- 
 -- Create Date:    09:42:54 02/13/2022 
--- Design Name:    N2630 U601 CPLD
--- Module Name:    U601 - Behavioral 
+-- Design Name:    N2630 U600 CPLD
+-- Module Name:    U600 - Behavioral 
 -- Project Name:   N2630
--- Target Devices: XC95144 144 PIN
+-- Target Devices: XC9572 64 PIN
 -- Tool versions: 
 -- Description: 
 --
