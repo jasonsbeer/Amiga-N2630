@@ -24,7 +24,7 @@
 -- 
 -- Create Date:    09:42:54 02/13/2022 
 -- Design Name:    N2630 U602 CPLD
--- Module Name:    U600 - Behavioral 
+-- Module Name:    U602 - Behavioral 
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
 -- Tool versions: 
