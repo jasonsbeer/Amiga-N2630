@@ -1,21 +1,40 @@
+--This work is shared under the Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) License
+--https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+	
+--You are free to:
+--Share - copy and redistribute the material in any medium or format
+--Adapt - remix, transform, and build upon the material
+
+--Under the following terms:
+
+--Attribution - You must give appropriate credit, provide a link to the license, and indicate if changes were made. 
+--You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+
+--NonCommercial - You may not use the material for commercial purposes.
+
+--ShareAlike - If you remix, transform, or build upon the material, you must distribute your contributions under the 
+--same license as the original.
+
+--No additional restrictions - You may not apply legal terms or technological measures that legally restrict others 
+--from doing anything the license permits.
+
 ----------------------------------------------------------------------------------
 -- Company: 
--- Engineer: 
+-- Engineer:       JASON NEUS
 -- 
--- Create Date:    08:05:23 04/30/2022 
--- Design Name: 
--- Module Name:    U602 - Behavioral 
--- Project Name: 
--- Target Devices: 
+-- Create Date:    09:42:54 02/13/2022 
+-- Design Name:    N2630 U602 CPLD
+-- Module Name:    U600 - Behavioral 
+-- Project Name:   N2630
+-- Target Devices: XC95144 144 PIN
 -- Tool versions: 
 -- Description: 
 --
 -- Dependencies: 
 --
 -- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
---
+-- Revision 1.0 - Original Release
+-- Additional Comments: EQUATIONS FOR THE N2630 PROJECT BY JASON NEUS.
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -46,6 +65,7 @@ entity U602 is
 				FC : IN STD_LOGIC_VECTOR (2 DOWNTO 0); --68030 FUNCTION CODES
 				SIZ : IN STD_LOGIC_VECTOR (1 DOWNTO 0); --68030 TRANSFER SIZE SIGNALS
 				nBGACK : IN STD_LOGIC; --680x0 BUS GRANT ACK
+	    			--SPEED : IN STD_LOGIC_VECTOR (1 DOWNTO 0); --USER SELECTED SDRAM REFRESH SPEED
 				
 				D : INOUT  STD_LOGIC_VECTOR (31 downto 24);
 				EXTSEL : INOUT STD_LOGIC; --SIGNALS THE OTHER LOGIC THAT WE ARE RESPONDING TO THE RAM ADDRESS SPACE
@@ -113,13 +133,31 @@ architecture Behavioral of U602 is
 	SIGNAL REFRESH_COUNTER : INTEGER RANGE 0 TO 255 := 0;
 	SIGNAL COUNT : INTEGER RANGE 0 TO 3 := 0; --COUNTER FOR SDRAM STARTUP ACTIVITIES
 	
-	CONSTANT REFRESH_COUNTER_DEFAULT : INTEGER := 185;
+	--CONSTANT REFRESH_COUNTER_25 : INTEGER := 185;
+	--CONSTANT REFRESH_COUNTER_33 : INTEGER := 244;
+	--CONSTANT REFRESH_COUNTER_40 : INTEGER := 296;
+	--CONSTANT REFRESH_COUNTER_50 : INTEGER := 370;
+
+	CONSTANT REFRESH_COUNTER_DEFAULT : INTEGER := 185; --25MHz
 	--AT 25MHZ, WE NEED TO REFRESH EVERY 195 CLOCK CYCLES
 	--THIS CAUSES US TO REFRESH 8192 TIMES EVERY 64 MILLISECONDS
 	--WE GO A LITTLE LESS THAN 195 IN CASE REFRESH HITS IN THE MIDDLE OF A RAM ACTION
 	--THAT GIVES US SOME WIGGLE ROOM
 
 begin
+	-------------------------
+	-- AUTOREFRESH COUNTER --
+	-------------------------
+	
+	--SET THE REFRESH COUNTER TO THE NUMBER SPECIFIED BY THE USER VIA JUMPERS	
+	--CASE SPEED (1 DOWNTO 0) IS
+		
+		--WHEN "00" => CONSTANT REFRESH_COUNTER_DEFAULT <= REFRESH_COUNTER_50; --50MHz
+		--WHEN "01" => CONSTANT REFRESH_COUNTER_DEFAULT <= REFRESH_COUNTER_40; --40MHz
+		--WHEN "10" => CONSTANT REFRESH_COUNTER_DEFAULT <= REFRESH_COUNTER_33; --33MHz
+		--WHEN "11" => CONSTANT REFRESH_COUNTER_DEFAULT <= REFRESH_COUNTER_25; --25MHz
+			
+	--END CASE;
 
 	---------------------
 	-- DATA BUS OUTPUT --
@@ -137,7 +175,7 @@ begin
 	-- AUTOCONFIG --
 	----------------
 	
-	--WE WILL AUTOCONFIG THE ZORRO 3 RAM (128MB) HERE
+	--WE AUTOCONFIG THE ZORRO 3 RAM (UP TO 256MB) HERE
 	--BECAUSE THIS IS IN THE ZORRO 3 SPACE, AUTOCONFIG IS DIFFERENT THAN THE ZORRO 2 AUTOCONFIG FOUND IN U601.
 	--THE ZORRO 3 AUTCONFIG SPACE IS AT ADDRESS $FF00xxxx
 	--WE ONLY AUTOCONFIG IF THE 68030 IS NOT IN RESET, THE USER WANTS IT, AND IT HAS NOT YET BEEN COMPLETED
@@ -211,10 +249,12 @@ begin
 	------------------------------------------------------
 
 	--WE ARE GOING TO USE THE AMIGA OS GAYLE IDE INTERFACE
-	--UNFORTUNATELY, THIS MEANS LIMITED PERFORMANCE CAPABILITY, ONLY SUPPORTING PIO 0 WITH UP TO 2 DRIVES.
+	--UNFORTUNATELY, THIS MEANS ONLY SUPPORTING PIO WITH UP TO 2 DRIVES.
 	--BUT IT IS SIMPLE TO IMPLEMENT AND READY OUT OF THE BOX WITH KS => 35.300.
 	--COMPATABILITY CAN BE ADDED TO EARLIER KICKSTARTS BY ADDING THE APPROPRIATE SCSI.DEVICE TO ROM
-	--IN THE FUTURE, I WOULD LIKE TO REPLACE THIS WITH A MORE ROBUST MULTIDRIVE IDE INTERFACE.
+	--IN THE FUTURE, I WOULD LIKE TO REPLACE THIS WITH A MORE ROBUST MULTIPORT IDE INTERFACE PREFERABLY WITH DMA.
+			
+	--PERFORMACE SHOULD BE RESPECTABLE WITH THE 68030, BUT ANEMIC IN 68000 MODE.
 	
 	--GAYLE IS ONLY CONNECTED TO A23..12, SO WE ARE IMITATING THAT HERE
 
@@ -244,22 +284,24 @@ begin
 	END PROCESS;
 	
 	--ARE WE IN THE ASSIGNED ADDRESS SPACE FOR THE IDE CONTROLLER?
-	--GAYLE IDE ADDRESS SPACE IS $0DA0000 - $0DA3FFF. THE ADDRESS SPACE IS HARD CODED AND NEVER CHANGES.
+	--GAYLE IDE ADDRESS SPACE IS $0DA0000 - $0DA3FFF. THE ADDRESS SPACE IS HARD CODED IN GAYLE.
 	--SPACE $0DA4000 - $0DA4FFF IS IDE RESERVED. AFAIK IT WAS NEVER IMPLEMENTED.
 	--WE CONSIDER BGACK BECAUSE WE DON'T WANT TO RESPOND TO DMA GENERATED ADDRESSES.
-	IDE_SPACE <= '1' WHEN (A(23 DOWNTO 12) >= x"DA0" AND A(23 DOWNTO 12) <= x"DA3") AND nAS = '0' AND nBGACK = '1' ELSE '0';
+	--$DA0 = 110110100000, $da3 = 110110100011
+	--IDE_SPACE <= '1' WHEN (A(23 DOWNTO 12) >= x"DA0" AND A(23 DOWNTO 12) <= x"DA3") AND nAS = '0' AND nBGACK = '1' ELSE '0';
+	IDE_SPACE <= '1' WHEN A(23 DOWNTO 14) = "1101101000" AND nAS = '0' AND nBGACK = '1' ELSE '0';
 	
 	--GAYLE SPECS TELL US WHEN THE IDE CHIP SELECT LINES ARE ACTIVE
 	
 	nCS0 <= '0' 
 		WHEN 
-			(A(14 DOWNTO 12) = "000" OR A(14 DOWNTO 12) = "010") AND nAS = '0' AND IDE_SPACE = '1' --$0DA0000 TO $0DA0FFF OR $0DA2000 TO $0DA2FFF
+			(A(13 DOWNTO 12) = "00" OR A(13 DOWNTO 12) = "10") AND nAS = '0' AND IDE_SPACE = '1' --$0DA0000 TO $0DA0FFF OR $0DA2000 TO $0DA2FFF
 		ELSE 
 			'1';
 			
 	nCS1 <= '0' 
 		WHEN 
-			(A(14 DOWNTO 12) = "001" OR A(14 DOWNTO 12) = "011") AND nAS = '0' AND IDE_SPACE = '1' --$0DA1000 TO $0DA1FFF OR $0DA3000 TO $0DA3FFF
+			(A(13 DOWNTO 12) = "01" OR A(13 DOWNTO 12) = "11") AND nAS = '0' AND IDE_SPACE = '1' --$0DA1000 TO $0DA1FFF OR $0DA3000 TO $0DA3FFF
 		ELSE 
 			'1';
 			
@@ -350,7 +392,7 @@ begin
 	------------------------------
 	
 	--ARE WE IN THE Z3 ADDRESS SPACE?
-	--WE CONSIDER BGACK BECAUSE WE DON'T WANT TO RESPOND TO DMA GENERATED ADDRESSES.
+	--WE CONSIDER BGACK BECAUSE WE DON'T WANT TO RESPOND TO DMA GENERATED ADDRESSES, ALTHOUGH THAT SHOULD NEVER HAPPEN HERE BECAUSE
 	--24 BIT DMA CANNOT ACCESS THE ZORRO 3 MEMORY SPACE.
 	--EXTSEL IS A SIGNAL THAT PREVENTS 68K STATE MACHINE ACTIVITIES IN U600. THIS SHOULD NOT CONSIDER ADDRESS STROBE.
 	EXTSEL <= '1' WHEN 
@@ -359,7 +401,8 @@ begin
 			'0';
 	
 	--ARE WE ACCESSING THE Z3 MEMORY?
-	MEMORY_SPACE <= '1' WHEN 
+	MEMORY_SPACE <= '1' 
+		WHEN 
 			EXTSEL = '1' AND nAS = '0'
 		ELSE 
 			'0';
