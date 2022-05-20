@@ -711,6 +711,8 @@ begin
 	--JMODE (Johann's special mode) is active, we can reset the registers
 	--with the CPU.  Otherwise, the registers can only be reset with a cold
 	--reset asserted. U504
+			
+	--nREGRESET OUTPUT GOES TO U303, WHICH IS THE ROM STARTUP LATCH WITH PHANTOM, MODE68K, ETC, SIGNALS
 
 	--REGRESET.D	= !JMODE & HALT & RESET			#  JMODE & RESET;
 	PROCESS ( n7M ) BEGIN
@@ -759,14 +761,15 @@ begin
 	--BGDIS		= !BOSS			# !ABG & DSACK1		# !ABG & AS ;
 	nBGDIS <= '0' WHEN nBOSS = '1' OR ( nABG = '1' AND nDSACK1 = '0' ) OR ( nABG = '1' AND nAS = '0' ) ELSE '1';	
 			
-	--------------------------
-	-- ADDRESS ENABLE HI/LO --
-	--------------------------
+	----------------------------
+	-- DATA BITS ENABLE HI/LO --
+	----------------------------
 	
 	--This handles the data buffer enable, including the 16 to 32 bit data
 	--bus conversion required for DMA cycles.
 
 	--ADOEH		= BOSS &  BGACK &  MEMSEL & AAS & !A1		# BOSS & !BGACK & !MEMSEL &  AS & !ONBOARD & !EXTERN;
+	--ADOEH CONTROLS D31..17. SEE DRSEL SIGNAL (BELOW). U701, U702
 	nADOEH <= '0' 
 		WHEN 
 		--( nBOSS = '0' AND nBGACK = '0' AND nMEMSEL = '0' AND nAAS = '0' AND A1 = '0' ) OR 
@@ -777,6 +780,7 @@ begin
 			'1';
 
 	--ADOEL		= BOSS &  BGACK &  MEMSEL & AAS &  A1;
+	--ADOEL CONTROLS D16..0. U703, U704
 	nADOEL <= '0' 
 		WHEN  
 			nBOSS = '0' AND nBGACK = '0' AND MEMACCESS = '1' AND nAAS = '0' AND A1 = '1'  ELSE '1';
@@ -789,6 +793,8 @@ begin
 	
 	--This selects when we want data latching, which we in fact want only on
 	--read cycles.
+	
+	--THIS CONTROLS DIRECTION OF D31..17, WHICH THE 68030 USES TO COMMUNICATE "DOWN" TO 16 BITS. U701, U702
 
 	--DRSEL		= BOSS & !BGACK & RW;
 	DRSEL <= '1' WHEN nBOSS = '0' AND nBGACK = '1' AND RnW = '1' ELSE '0';
@@ -818,6 +824,12 @@ begin
 	
 	--NOTE: ON THE SCHEMATIC, nDSEN IS ACTIVE LOW, BUT IS TREATED AS ACTIVE HIGH IN THE PAL LOGIC
 
+	--PIN 2		= !ASEN		;	/* Adress strobe enable */
+	--PIN 17	=  DSEN		;	/* Data strobe enable */
+	--PIN 16	= !DSACKEN	;	/* DSACK enable */
+	--PIN 18	= !S7MDIS	;	/* Disable the S7M clock */
+	--PIN 9		= !EXTERN	;	/* Special or daughterboard access */
+			
 	--S7MDIS		= !DSEN & ASEN & !EXTERN & DSACKEN;
 	nS7MDISD <= '0' WHEN nDSEN = '0' AND nASEN = '0' AND nEXTERN = '1' AND nDSACKEN = '0' ELSE '1';
 	
@@ -825,6 +837,8 @@ begin
 	--This one disables the falling edge clock.  This is similarly qualified
 	--with EXTERN. U505
 
+	--PIN 14	=  S_7MDIS	;	/* Disable the S_7M clock */
+			
 	--S_7MDIS.D	= ASEN & !EXTERN & CYCEND;
 	PROCESS ( SCLK ) BEGIN
 		IF RISING_EDGE (SCLK) THEN
@@ -855,6 +869,7 @@ begin
 	--Here we enable data strobe to the A2000.  Are we properly considering
 	--the R/W line here?  EXTERN qualification included here too. U505
 
+	----PIN 17	=  DSEN		;	/* Data strobe enable */
 	--!DSEN.D = ASEN & !EXTERN & CYCEND;
 	PROCESS ( SCLK ) BEGIN
 		IF RISING_EDGE (SCLK) THEN
@@ -871,6 +886,7 @@ begin
 	--register access. U505
 	--THIS IS FOR CYCLES OTHER THAN MEMORY...NEEDS TO STAY
 
+	--PIN 16	= !DSACKEN	;	/* DSACK enable */
 	--!DSACKEN.D	= !DSEN & CYCEND & !EXTERN &   DTACK
 	--		# !DSEN & CYCEND & !EXTERN &  EDTACK
 	--		# !DSEN & CYCEND & !EXTERN & ONBOARD;
