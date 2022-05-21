@@ -72,8 +72,8 @@ J600|IDE|Disable|Enable
 **Table 3.** SDRAM Refresh Jumper Settings
 Jumper|50MHz<sup>A</sup>|40MHz|33MHz|25MHz
 -|-|-|-|-
-Jxxx|Shorted|Open|Shorted|Open
-Jxx1|Shorted|Shorted|Open|Open
+J403|Shorted|Open|Shorted|Open
+J404|Shorted|Shorted|Open|Open
 
 <sup>A</sup>Set jumpers to match CPU clock.
 
