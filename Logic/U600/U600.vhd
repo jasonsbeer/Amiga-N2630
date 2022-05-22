@@ -201,6 +201,8 @@ begin
 	--Request the Amiga 2000 bus so be we can become the BOSS
 	--Bus mastering is supposed to be clocked on the 7MHz rising edge (A2000 technical reference)
 	--Doing it like this avoids combitorial loops and it should work fine
+	--BUS REQUEST HAS A PULLUP ON THE A2000
+	
 	PROCESS (n7M) BEGIN
 		IF (RISING_EDGE (n7M)) THEN
 			IF ( nRESET = '0' OR nBOSS = '0' OR MODE68K = '1' ) THEN		
@@ -209,23 +211,22 @@ begin
 				--Tristate so we don't interfere with other bus requesters.
 				nABR <= 'Z';
 			ELSE
-				--THIS CODE IS NEVER EXECUTED BECAUSE OF THE FIRST TEST
-				--IF nABR = '0' THEN	
+				IF nABR = '0' THEN	
 					--nABR is asserted, but are we BOSS yet?
-				--	IF (nRESET = '1' AND nBOSS = '1' AND MODE68K = '0') THEN
-				--		nABR <= '0';
-				--	ELSE
-				--		nABR <= '1';
-				--	END IF;	
-				--ELSE
+					IF (nRESET = '1' AND nBOSS = '1' AND MODE68K = '0') THEN
+						nABR <= '0';
+					ELSE
+						nABR <= '1';
+					END IF;	
+				ELSE
 					--nABR is not asserted. Should we?
-					--IF (nAAS = '0' AND nBOSS = '1' AND MODE68K = '0') THEN				
-				        IF (nABR = '1' AND nAAS = '0' AND nBOSS = '1' AND MODE68K = '0') THEN
+					IF (nAAS = '0' AND nBOSS = '1' AND MODE68K = '0') THEN				
+				   --IF (nABR = '1' AND nAAS = '0' AND nBOSS = '1' AND MODE68K = '0') THEN
 						nABR <= '0';
 					ELSE
 						nABR <= '1';
 					END IF;
-				--END IF;
+				END IF;
 			END IF;
 		END IF;
 	END PROCESS;
@@ -255,6 +256,7 @@ begin
 	--Check if the bus has been granted and lock in BOSS
 	--Bus mastering is supposed to be clocked on the 7MHz rising edge (A2000 technical reference)
 	--Doing it like this avoids combitorial loops and it should work fine
+	--BOSS HAS A PULLUP ON THE A2000
 	
 	--BOSS		= ABG & !AAS & !DTACK & !HALT & !RESET & B2000 & !MODE68K 
 	--	#  !HALT & !MODE68K & BOSS
@@ -269,7 +271,7 @@ begin
 				--ELSE 
 				IF (MODE68K = '0' AND (nHALT = '0' OR nRESET = '0')) THEN
 					--Drop BOSS because we have RESET or HALTed
-					nBOSS <= '1';
+					nBOSS <= 'Z';
 				END IF;
 			ELSE
 				--We are not yet BOSS, try to become BOSS
@@ -742,10 +744,13 @@ begin
 	--we're RESENB, OK?.  Make sure to consider the effects of this
 	--gated reset on any special use of the ROM configuration register.
 	--Using JMODE it's possible to reset the ROM configuration register
-	--under CPU control, but not if the RESENB line is negated.
+	--under CPU control, but not if the RESENB line is negated. U301
+	
+	--THERE IS A PULLUP ON THE A2000 FOR RESET (RST).
+	--FLOAT RESET UNTIL WE ARE ACTUALLY READY TO USE IT.
 	
 	--RESET		= BOSS & CPURESET & RESENB;
-	nRESET <= '0' WHEN nBOSS = '0' AND nCPURESET ='0' AND RSTENB = '1' ELSE '1';
+	nRESET <= '0' WHEN nBOSS = '0' AND nCPURESET ='0' AND RSTENB = '1' ELSE 'Z';
 	
 	-----------------------------
 	-- 68030 BUS GRANT DISABLE --
