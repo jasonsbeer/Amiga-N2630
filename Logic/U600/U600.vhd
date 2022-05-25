@@ -764,6 +764,12 @@ begin
 	--ABG has already been asserted, we don't disable it unless we're reset.
 
 	--BGDIS		= !BOSS			# !ABG & DSACK1		# !ABG & AS ;
+		
+	--NOTICE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	--REV 1.2 REMOVES THE FLIP FLOP (U502) THAT THIS FEEDS. AS STATED ABOVE, WE CAN'T ASSERT
+	--ABG UNTIL ALL THE 030 CYCLES ARE CLEARED. THIS EQUATION WITH THE FLIP FLOP CONTROLS THAT.
+	--RECREATE THE INTENDED FUNCTIONALITY HERE. AS, DS, BGACK, STERM, DSACK MUST BE NEGATED BEFORE ASSERTING BG.
+	--SEE 030 MANUAL ON BUS MASTERING.
 	nBGDIS <= '0' WHEN nBOSS = '1' OR ( nABG = '1' AND nDSACK1 = '0' ) OR ( nABG = '1' AND nAS = '0' ) ELSE '1';	
 			
 	----------------------------
@@ -813,6 +819,10 @@ begin
 	--but some of it's edges are suppressed.  This lets the 68000 state
 	--machine just skip the unimportant clock edges in the 68000 cycle
 	--and just concentrate on the interesting edges. U708
+			
+	--WARNING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	--REV 1.2 REMOVES THE FLIP FLOP (U503) SCLK FEEDS. THIS APPEARS TO ESSENTIALLY DELAY THE ADDRESS STROBE.
+	--SEE THE 68000 TIMING DIAGRAMS FOR FURTHER INFO.
 	
 	--SCLK		=  CDAC & P14M & !N7M & SN7MDIS		# !CDAC & P14M &  N7M & !S7MDIS;
 	SCLK <= '1' 
@@ -828,6 +838,11 @@ begin
 	--qualified with EXTERN too. U505
 	
 	--NOTE: ON THE SCHEMATIC, nDSEN IS ACTIVE LOW, BUT IS TREATED AS ACTIVE HIGH IN THE PAL LOGIC
+			
+	--WARNING!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	--IN REV 1.2 THE FLIP FLOP THIS FEEDS (U507) HAS BEEN REMOVED.
+	--THIS FEEDS INTO DSACK1 FOR 16 BIT CYCLES (DMA) AND IS ALREADY RECREATED IN U601.
+	--DROP THE RELATED SIGNALS (DSCLK, DSEN, DSACKDIS, ETC).
 
 	--PIN 2		= !ASEN		;	/* Adress strobe enable */
 	--PIN 17	=  DSEN		;	/* Data strobe enable */
