@@ -7,7 +7,7 @@
   (title_block
     (title "Amiga N2630")
     (date "2022-05-26")
-    (rev "2.0")
+    (rev "2.0 QFP")
   )
 
   (lib_symbols
@@ -2052,9 +2052,6 @@
     (path "/00000000-0000-0000-0000-000062089831/da76e925-c171-404a-9e8b-686a189bde5e"
       (reference "J600") (unit 1) (value "IDE DISABLE") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
     )
-    (path "/00000000-0000-0000-0000-0000634ecc15/ab0effbb-23ce-4d13-ac90-3991df9d159c"
-      (reference "R1") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
-    )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-00006219f0d8"
       (reference "R100") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
@@ -2187,6 +2184,9 @@
     (path "/00000000-0000-0000-0000-000061d79ebc/21918b9e-3ddd-481a-8193-37d421f909fb"
       (reference "R236") (unit 1) (value "3.3K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
+    (path "/00000000-0000-0000-0000-000061d79ebc/aa2069e9-b6c4-4ff8-b8e6-7d347248b8e1"
+      (reference "R237") (unit 1) (value "3.3K") (footprint "Resistor_SMD:R_0805_2012Metric")
+    )
     (path "/00000000-0000-0000-0000-000061df74a0/6bfd8888-6913-4f3f-b8f1-3391619694a9"
       (reference "R303") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
@@ -2216,6 +2216,9 @@
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/e7382c88-b830-472b-877a-e2d8270d858e"
       (reference "R405") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/ab0effbb-23ce-4d13-ac90-3991df9d159c"
+      (reference "R406") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000061f83b73"
       (reference "R500") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
@@ -2274,6 +2277,9 @@
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000061f737d0"
       (reference "U204") (unit 2) (value "74AHCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
+    (path "/00000000-0000-0000-0000-000061fbe594/789f0d76-053c-457e-97b1-a1890ca47bbe"
+      (reference "U204") (unit 3) (value "74AHCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+    )
     (path "/00000000-0000-0000-0000-000061d79ebc/61e1f990-e4bf-4c6d-9000-2762ea2f4563"
       (reference "U204") (unit 4) (value "74AHCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
@@ -2286,11 +2292,20 @@
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-0000626c9dd2"
       (reference "U204") (unit 7) (value "74AHCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
+    (path "/00000000-0000-0000-0000-000061fbe594/2fe71c28-959b-4465-9536-0b10e84699f2"
+      (reference "U300") (unit 1) (value "74HCT05") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+    )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000061f6e714"
       (reference "U300") (unit 2) (value "74HCT05") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/ebdeead9-b0c7-486c-835e-c7c4675cabf0"
       (reference "U300") (unit 3) (value "74HCT05") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+    )
+    (path "/00000000-0000-0000-0000-000061fbe594/a754946d-d9d1-4add-9c28-05c026e18446"
+      (reference "U300") (unit 4) (value "74HCT05") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
+    )
+    (path "/00000000-0000-0000-0000-000061fbe594/df70592e-8649-40b6-916d-9b96a20e646d"
+      (reference "U300") (unit 5) (value "74HCT05") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061fbe594/f7f7b2ac-fb26-4737-b0e5-d8dc813d657f"
       (reference "U300") (unit 6) (value "74HCT05") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
