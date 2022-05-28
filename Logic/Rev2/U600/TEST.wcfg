@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="std_logic_1164" />
+            <top_module name="u600" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="6" />
+   <wvobject fp_name="/u600/eclk_counter" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">eclk_counter</obj_property>
+      <obj_property name="ObjectShortName">eclk_counter</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/a7m" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">a7m</obj_property>
+      <obj_property name="ObjectShortName">a7m</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/b2000" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">b2000</obj_property>
+      <obj_property name="ObjectShortName">b2000</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/vmacount" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">vmacount</obj_property>
+      <obj_property name="ObjectShortName">vmacount</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/vmacountreset" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">vmacountreset</obj_property>
+      <obj_property name="ObjectShortName">vmacountreset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/e" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">e</obj_property>
+      <obj_property name="ObjectShortName">e</obj_property>
+   </wvobject>
+</wave_config>
