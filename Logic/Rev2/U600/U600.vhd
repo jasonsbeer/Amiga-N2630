@@ -35,23 +35,28 @@ PORT
 (
 	SDSPEED : IN STD_LOGIC_VECTOR(1 DOWNTO 0); --INPUT FROM J402 AND J403
 	A7M : IN STD_LOGIC; --AMIGA 7MHZ CLOCK	
-	nABG : IN STD_LOGIC; --AMIGA BUS GRANT
 	REFACKZ3 : IN STD_LOGIC; --ZORRO 3 RAM REFRESH ACK FROM U602
 	REFACKZ2 : IN STD_LOGIC; --ZORRO 2 RAM REFRESH ACK FROM U601
 	CPUCLK : IN STD_LOGIC; --68030 CLOCK
 	nVPA : IN STD_LOGIC; --6800 VPA SIGNAL
-	nAS : IN STD_LOGIC; --68030 ADDRESS STROBE
 	B2000 : IN STD_LOGIC; --IS THIS AN A2000 OR B2000
-	nRESET : IN STD_LOGIC; --_RESET SIGNAL
 	nHALT : IN STD_LOGIC; --_HALT SIGNAL	
 	MODE68K : IN STD_LOGIC; --ARE WE IN 68000 MODE (DISABLED)	
 	nDTACK : IN STD_LOGIC; --68000 DATA TRANSFER ACK
 	nABGACK : IN STD_LOGIC; --AMIGA BUS GRANT ACK
 	MEMACCESS : IN STD_LOGIC; --SIGNALS WHEN WE ARE RESPONDING TO A RAM ADDRESS
-	A : IN STD_LOGIC_VECTOR (1 DOWNTO 0); --68030 ADDRESS LINE 1
+	A : IN STD_LOGIC_VECTOR (1 DOWNTO 0); --68030 ADDRESS LINES 0 AND 1
 	SIZ : IN STD_LOGIC_VECTOR (1 DOWNTO 0); --68030 SIZE BITS
+	FC : IN STD_LOGIC_VECTOR (2 DOWNTO 0 ); --68030 FUNCTION CODES
 	nONBOARD : IN STD_LOGIC; --ARE WE USING RESOURCES ON THE 2630?
+	nCPURESET : IN STD_LOGIC; --THE 68030 RESET SIGNAL
+	CONFIGED : IN STD_LOGIC; --ARE WE ALL AUTOCONFIGed?
+	nSTERM : IN STD_LOGIC; --STERM SIGNAL DRIVEN BY U602
+	nC1 : IN STD_LOGIC; --C1 CLOCK
+	nC3 : IN STD_LOGIC; --C3 CLOCK
+	EXTSEL : IN STD_LOGIC; --IS Z3 RAM RESPONDING TO ADDRESS BUS?
 	
+	nAS : INOUT STD_LOGIC; --68030 ADDRESS STROBE
 	nEXTERN : INOUT STD_LOGIC; --ARE WE ACCESSING Z3 MEMORY OR FPU?	
 	nABR : INOUT STD_LOGIC; -- AMIGA BUS REQUEST	
 	nBOSS : INOUT STD_LOGIC; --_BOSS SIGNAL
@@ -64,13 +69,17 @@ PORT
 	ARnW : INOUT STD_LOGIC; --DMA READ/WRITE FROM AMIGA 2000
 	nDSACK1 : INOUT STD_LOGIC; --16 BIT DSACK SIGNAL
 	nBGACK : INOUT STD_LOGIC; --BUS GRANT ACK
+	nRESET : INOUT STD_LOGIC; --_RESET SIGNAL
+	nABG : INOUT STD_LOGIC; --AMIGA BUS GRANT
+	nBG : INOUT STD_LOGIC; --68030 BUS GRANT SIGNAL
 	
+	IPLCLK : OUT STD_LOGIC; --CLOCK PULSE FOR U700
 	DRSEL : OUT STD_LOGIC; --DIRECTION SELECTION FOR U701 U702
 	nADOEL : OUT STD_LOGIC; --BUS DIRECTION CONTROL
 	nADOEH : OUT STD_LOGIC; --BUS DIRECTION CONTROL
 	nLDS : OUT STD_LOGIC; --68000 _LDS
 	nUDS : OUT STD_LOGIC; --68000 _UDS
-	nBR : OUT STD_LOGIC
+	nBR : OUT STD_LOGIC --68030 BUS REQUEST SIGNAL
 	
 );
 
@@ -84,7 +93,8 @@ architecture Behavioral of U600 is
 	SIGNAL CURRENT_STATE : STATE68K;
 	
 	--THESE ARE THE CLOCK CYCLES DEFINED FOR THE SDRAM REFRESH COUNTER
-	SIGNAL REFRESH_COUNTER_DEFAULT : INTEGER := 185;
+	SIGNAL REFRESH_COUNTER_DEFAULT : INTEGER := 511;
+	CONSTANT REFRESH_COUNTER_25 : INTEGER := 185;
 	CONSTANT REFRESH_COUNTER_33 : INTEGER := 244;
 	CONSTANT REFRESH_COUNTER_40 : INTEGER := 296;
 	CONSTANT REFRESH_COUNTER_50 : INTEGER := 370;
@@ -98,17 +108,32 @@ architecture Behavioral of U600 is
 	SIGNAL nLDSOUT : STD_LOGIC; --VALUE FOR _LDS
 	SIGNAL nUDSOUT : STD_LOGIC; --VALUE FOR _UDS
 	SIGNAL offboard : STD_LOGIC; --ARE WE ACCESSING THE AMIGA 2000 BOARD?
-
 	SIGNAL eclk_counter : INTEGER RANGE 0 TO 15 := 0; --4 BIT NUMBER E COUNTER
 	SIGNAL vmacount : INTEGER RANGE 0 TO 15 := 0; --COUNTER FOR E VMA
-	SIGNAL vmacountreset : STD_LOGIC := '0'; --RESET THE VMA COUNTER
 	SIGNAL eclk : STD_LOGIC := '0'; --E SIGNAL FOR "A2000"
 	SIGNAL esync : STD_LOGIC := '0'; --ONE CLOCK DELAY OF E
+	SIGNAL cycend : STD_LOGIC := '1'; --INDICATES THE END OF A 68000 STATE MACHINE CYCLE
 	
-	SIGNAL vmacountresetE : STD_LOGIC := '0';
-	SIGNAL vmacountresetX : STD_LOGIC := '0';
-
+	--CLOCK SIGNALS
+	SIGNAL basis7m : STD_LOGIC;
+	
 begin
+
+	------------
+	-- CLOCKS --
+	------------
+	
+	--THE 7MHzCLOCK CAN BE PULLED FROM THE CPU SLOT OF THE B2000, BUT MUST BE RECREATED
+	--FROM C1 AND C2 ON THE A2000.
+		
+	basis7m <= '1' WHEN ( B2000 = '1' AND A7M = '1' ) OR ( B2000 = '0' AND (nC1 = '1' XOR nC3 = '0' )) ELSE '0';
+	
+	--This clock is used to latch the interrupt lines between the motherboard
+	--and the 68030.  If this isn't done, you'll get phantom interrupts
+	--that you probably won't even notice in AmigaOS, but can be fatal to
+	--time critical interrupt code in UNIX and possibly even AmigaOS. U708
+
+	IPLCLK <= basis7m;
 
 	----------------------------------
 	-- AUTOREFRESH COUNTER SETTINGS --
@@ -122,7 +147,8 @@ begin
 	REFRESH_COUNTER_DEFAULT <=
 		REFRESH_COUNTER_50 WHEN SDSPEED (1 DOWNTO 0) = "00" ELSE
 		REFRESH_COUNTER_40 WHEN SDSPEED (1 DOWNTO 0) = "01" ELSE
-		REFRESH_COUNTER_33 WHEN SDSPEED (1 DOWNTO 0) = "10";
+		REFRESH_COUNTER_33 WHEN SDSPEED (1 DOWNTO 0) = "10" ELSE
+		REFRESH_COUNTER_25 WHEN SDSPEED (1 DOWNTO 0) = "11";
 		
 	---------------------------
 	-- SDRAM REFRESH COUNTER --
@@ -158,8 +184,8 @@ begin
 	--Bus mastering is supposed to be clocked on the 7MHz rising edge (A2000 technical reference).
 	--BUS REQUEST (_BR) HAS A PULLUP ON THE A2000.
 	
-	PROCESS (A7M) BEGIN
-		IF (RISING_EDGE (A7M)) THEN
+	PROCESS (basis7m) BEGIN
+		IF (RISING_EDGE (basis7m)) THEN
 			IF ( nRESET = '0' OR nBOSS = '0' OR MODE68K = '1' ) THEN		
 				--We do not need to request the bus at this time.
 				--We are BOSS, or we have RESET, or we are in 68000 mode.
@@ -216,8 +242,8 @@ begin
 	--	#  !HALT & !MODE68K & BOSS
 	--	# !RESET & !MODE68K & BOSS
 	--	# !B2000 & !HALT & !RESET;
-	PROCESS (A7M) BEGIN
-		IF (RISING_EDGE (A7M)) THEN
+	PROCESS (basis7m) BEGIN
+		IF (RISING_EDGE (basis7m)) THEN
 			IF (nBOSS = '0') THEN
 				--Negate BOSS because we have RESET, HALTed, OR CHANGED TO 68000 MODE.
 				IF (MODE68K = '1' OR nHALT = '0' OR nRESET = '0') THEN					
@@ -237,6 +263,29 @@ begin
 		END IF;
 	END PROCESS;
 	
+	-----------
+	-- RESET --
+	-----------
+	
+	--The RESET output feeds to the /RST signal from the A2000
+	--motherboard.  Which in turn enables the assertion of the /BOSS
+	--line when you're on a B2000.  Which in turn creates the
+	--/CPURESET line.  Together these make the RESET output.	In
+	--order to eliminate the glitch on RESET that this loop makes,
+	--the RESENB input is gated into the creation of RESET.  What
+	--this implies is that the 68020 can't reset the system until
+	--we're RESENB, OK?.  Make sure to consider the effects of this
+	--gated reset on any special use of the ROM configuration register.
+	--Using JMODE it's possible to reset the ROM configuration register
+	--under CPU control, but not if the RESENB line is negated. U301
+	
+	--THERE IS A PULLUP ON THE A2000 FOR RESET (RST).
+	--FLOAT RESET UNTIL WE ARE ACTUALLY READY TO USE IT.
+	
+	--RESET		= BOSS & CPURESET & RESENB;
+	--RSTENB IS ACTIVE WHEN ROM IS CONFIGED...CHEAT HERE AND GO WITH OUR CONFIGED SIGNAL FROM U601
+	nRESET <= '0' WHEN nBOSS = '0' AND nCPURESET ='0' AND CONFIGED = '1' ELSE 'Z';
+	
 	---------------------------
 	-- E AND RELATED SIGNALS --
 	---------------------------
@@ -255,8 +304,8 @@ begin
 	--TRIVIA: E MEANS "ENABLE"
 	--SIMULATED OK! YEAH!
 
-	PROCESS (A7M) BEGIN
-		IF FALLING_EDGE (A7M) AND B2000 = '0' THEN
+	PROCESS (basis7m) BEGIN
+		IF FALLING_EDGE (basis7m) AND B2000 = '0' THEN
 			
 			IF (eclk_counter < 6) THEN
 				eclk <= '0';
@@ -277,9 +326,9 @@ begin
 	--THIS IS OUR E SYNC SIGNAL AND IS ONE 7MHz CLOCK BEHIND E. THIS GIVES US
 	--A WAY TO DETECT THE E FALLING EDGE, WHICH TELLS US WHEN A NEW E CYCLE STARTS.	
 	
-	PROCESS (A7M) BEGIN
+	PROCESS (basis7m) BEGIN
 		
-		IF FALLING_EDGE (A7M) THEN
+		IF FALLING_EDGE (basis7m) THEN
 			esync <= E;
 		END IF;
 		
@@ -289,10 +338,11 @@ begin
 	--VMA IS TO BE ASSERTED WHEN THE PROCESSOR IS SYNCED TO THE E CLOCK. THIS IS DONE IN THE 68000
 	--STATE MACHINE AND IS DISCUSSED IN APPENDIX B OF THE 68000 MANUAL.	
 	--WE USE THIS COUNTER SO WE KNOW WHEN TO ASSERT _VMA AS IT TRACKS WHERE WE ARE IN THE E CYCLE.
+	--THE COUNTER GOES FROM 0 TO 9 TO ACCOUNT FOR THE 10 TOTAL CLOCKS IN AN E CYCLE.
 	
-	PROCESS (A7M) BEGIN	
+	PROCESS (basis7m) BEGIN	
 
-		IF FALLING_EDGE (A7M) THEN
+		IF FALLING_EDGE (basis7m) THEN
 			IF E = '0' AND esync = '1' THEN
 				--RESET THE COUNTER
 				vmacount <= 0;		
@@ -308,23 +358,29 @@ begin
 	-----------------------
 	
 	--THIS IS FOR 16 BIT ASYNC CYCLES THAT WE ARE DOING.
-	--THERE IS ALSO A ROM DSACK ON THE 2630
+	--THERE IS ALSO A ROM DSACK ON THE 2630.
 	
 	PROCESS (CPUCLK) BEGIN
 		IF RISING_EDGE (CPUCLK) THEN
 			
-			IF 
-				edsack = '0' OR --THE END OF A 6800 E CYCLE
-				dsack68 = '0'  --THE END OF A 68000 CYCLE
-			THEN
-				nDSACK1 <= '0';
+			IF cycend = '0' THEN
+			
+				IF 
+					edsack = '0' OR --6800 E CYCLE
+					dsack68 = '0'  --68000 CYCLE
+				THEN
+					nDSACK1 <= '0';
+				ELSE
+					nDSACK1 <= '1';
+				END IF;
+			
 			ELSE
+			
 				nDSACK1 <= 'Z';
 			END IF;
 		
 		END IF;
 	END PROCESS;
-		
 					
 	---------------------------------------
 	-- AMIGA 68030 <-> 68000 BUS CONTROL --
@@ -367,6 +423,16 @@ begin
 	-- 68030 <-> 68000 SIGNALS --
 	-----------------------------
 	
+	--Here's the EXTERN logic.  The EXTERN signal is used to qualify unusual
+	--memory accesses.  There are two kinds, CPU space and daughterboard
+	--space.  CPU space is given by the 68030 function codes.  Daughterboard space
+	--is defined to be a processor access with EXTSEL asserted.  DMA devices 
+	--can't get to daughterboard space. U306
+	--DAUGHTERBOARD MEANS ZORRO 3 RAM IN THIS CONTEXT
+
+	--EXTERN		= cpuspace & !BGACK		# EXTSEL & !BGACK ;
+	nEXTERN <= '0' WHEN ( FC ( 2 downto 0 ) = "111" AND nBGACK = '1' ) OR ( EXTSEL = '1' AND nBGACK = '1' ) ELSE '1';
+	
 	--OFFBOARD ("1") MEANING WE ARE NOT USING ANY RESOURCES ON OUR CARD, WE ARE GOING AFTER SOMETHING ON THE AMIGA 2000
 	offboard <= '1' 
 		WHEN 
@@ -374,23 +440,22 @@ begin
 		ELSE 
 			'0';
 	
-	--WHEN DMA, THE RW SIGNAL FROM THE AMIGA IS LINKED TO THE RW ON OUR CARD
-	--AMIGA TO 68030
-	RnW <= ARnW WHEN nBGACK = '0' ELSE 'Z';
+	-- BIDIRECTIONAL SIGNALS --
+	
+	--68000 TO 68030 - DMAing
+	RnW <= ARnW WHEN nBOSS = '0' AND nBGACK = '0' ELSE 'Z';
+	nAS <= nAAS WHEN nBOSS = '0' AND nBGACK = '0' ELSE 'Z'; --THE A2630 DELAYS THE _AS BY 100ns. nASDELAY <= transport nAS after 100 ns;
 
-	--DURING NON-DMA OPERATION, WE LINK THE 68030 RW SIGNAL TO THE 68000 RW SIGNAL ON THE AMIGA
-	--IT TRISTATES WHEN WE ARE NOT BOSS OR THE ACTION IS STRICTLY ON OUR CARD.
-	--68030 TO AMIGA
-	ARnW <= 'Z' WHEN TRISTATE = '1' OR offboard = '0' ELSE	RnW;
+	--68030 TO 68000 - NOT DMA
+	ARnW <= 'Z' WHEN TRISTATE = '1' OR offboard = '0' ELSE	RnW;	
+	nAAS <= 'Z' WHEN TRISTATE = '1' OR offboard = '0' ELSE nAS;
 	
-	--LOCK THE AMIGA _BGACK TO OUR 68030 nBGACK WHEN WE ARE BOSS.
+	-- UNIDIRECTIONAL SIGNALS --
+	
+	--LOCK THE 68000 TO OUR 68030 WHEN WE ARE BOSS.
 	nBGACK <= nABGACK WHEN nBOSS = '0' ELSE 'Z';
-	
-	--WHEN WE ARE BOSS, WE PASS THE AMIGA BUS REQUEST TO THE 68030.
-	nBR <= nABR WHEN nBOSS = '0' AND nBGACK = '1' ELSE 'Z';
-	
-	--LINK THE 68000 ADDRESS STROBE TO THE 68030 WHEN WE ARE NOT IN DMA
-	nAAS <= nAS WHEN nBGACK = '1' ELSE 'Z';
+	nBR <= nABR WHEN nBOSS = '0' ELSE 'Z';
+	nABG <= nBG WHEN nBOSS = '0' AND nAS = '1' AND nDSACK1 = '1' AND nSTERM = '1' ELSE 'Z';
 	
 	-------------------------
 	-- 68000 STATE MACHINE --
@@ -399,7 +464,7 @@ begin
 	--LOTS OF STUFF GOING ON HERE. WE MUST CONSIDER BOTH 6800 AND 68000 DATA TRANSFERS AND
 	--WE MUST SUPPLY THE APPROPRIATE SUPPORTING SIGNALS AT THE CORRECT TIME. 
 	
-	--DO NOT START A 68000/6800 CYCLE ON FPU OR ON BOARD MEMORY ACCESS.
+	--DO NOT START A 68000/6800 CYCLE ON DMA, FPU, OR ON BOARD MEMORY ACCESS.
 	
 	--FOR 68000 DATA STROBES, SEE TABLE 7-7 (pp7-23) IN 68030 MANUAL
 	--nUDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D31:24 (UPPER BYTE)
@@ -408,118 +473,118 @@ begin
 	nUDS <= nUDSOUT;
 	nLDS <= nLDSOUT;	
 	
-	PROCESS (A7M, nRESET) BEGIN
+	PROCESS (basis7m, nRESET) BEGIN
 	
-		IF (nRESET = '0') THEN
+		IF (nRESET = '0' OR TRISTATE = '1' OR offboard = '0') THEN
+			--DON'T START 68000 CYCLE WHEN WE'RE NOT BOSS, IN A DMA CYCLE, OR ACCESSING ON CARD MEMORY
 			CURRENT_STATE <= S2;
 			nUDSOUT <= 'Z';
 			nLDSOUT <= 'Z';
 	
-		ELSIF RISING_EDGE (A7M) THEN
+		ELSIF RISING_EDGE (basis7m) THEN
 		
-			IF TRISTATE = '1' OR offboard = '0' THEN
-				nUDSOUT <= 'Z';
-				nLDSOUT <= 'Z';
-			ELSE
-		
-				CASE (CURRENT_STATE) IS
+			CASE (CURRENT_STATE) IS
+			
+				WHEN S2 =>
 				
-					WHEN S2 =>
+					IF nAS = '0' THEN 							
+						CURRENT_STATE <= S3;	
+							
+						edsack <= '1';
+						dsack68 <= '1';
+						cycend <= '0';
 					
-						IF nAS = '0' THEN 							
-							CURRENT_STATE <= S3;						
-						
-							IF RnW = '1' THEN 
-								--READ CYCLE, WE CAN ASSERT UDS/LDS IMMEDIATELY
-								--AND WE ALWAYS ASSERT BOTH.
-								nUDSOUT <= '0';
-								nLDSOUT <= '0';
-							END IF;
-						
+						IF RnW = '1' THEN 
+							--READ CYCLE, WE CAN ASSERT UDS/LDS IMMEDIATELY
+							--AND WE ALWAYS ASSERT BOTH.
+							nUDSOUT <= '0';
+							nLDSOUT <= '0';
 						END IF;
-						
-					WHEN S3 =>
-						--NOTHING HERE, GO TO NEXT STATE
-						CURRENT_STATE <= S4;
-						
-					WHEN S4 =>
-						--SOME IMPORTANT STUFF HAPPENS AT S4.
-						--IF THIS IS A 6800 CYCLE, ASSERT VMA IF WE ARE IN SYNC WITH E
-						--IF THIS IS A 68000 READ CYCLE, ASSERT DSACK1.
-						--IF THIS IS A 68000 WRITE CYCLE, ASSERT THE DATA STROBES HERE.						
-						
-						IF (nVPA = '0') THEN
-						
-							IF vmacount = 2 OR vmacount = 3 THEN
-								nVMA <= '0';
-								CURRENT_STATE <= S5;
-							END IF;
-							
-						ELSE
-						
-							IF RnW = '1' THEN
-								dsack68 <= '0';
-							ELSE
-							
-								IF A(0) = '0' THEN
-									nUDSOUT <= '0';
-								ELSE
-									nUDSOUT <= '1';
-								END IF;
-								
-								IF SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' THEN
-									nLDSOUT <= '0';
-								ELSE
-									nLDSOUT <= '1';
-								END IF;
-								
-							END IF;
-						
+					
+					END IF;
+					
+				WHEN S3 =>
+					--NOTHING HERE, GO TO NEXT STATE
+					CURRENT_STATE <= S4;
+					
+				WHEN S4 =>
+					--SOME IMPORTANT STUFF HAPPENS AT S4.
+					--IF THIS IS A 6800 CYCLE, ASSERT VMA IF WE ARE IN SYNC WITH E
+					--IF THIS IS A 68000 READ CYCLE, ASSERT DSACK1.
+					--IF THIS IS A 68000 WRITE CYCLE, ASSERT THE DATA STROBES HERE.						
+					
+					IF (nVPA = '0') THEN
+					
+						IF vmacount = 2 OR vmacount = 3 THEN
+							nVMA <= '0';
 							CURRENT_STATE <= S5;
 						END IF;
 						
-					WHEN S5 =>
-						--IN THE EVENT OF A 6800 CYCLE, WE WAIT HERE UNTIL THE
-						--APPROPRIATE TIME IS REACHED ON E TO ASSERT DSACK.
-						--VMA IS ASSERTED BETWEEN 3 AND 4 CLOCK CYCLES AFTER E GOES TO LOGIC LOW.
-						--THE 68030 DOES NOT NATIVELY SUPPORT 6800 SIGNALS, SO WE ACTUALLY ASSERT DSACK1 HERE.
-						
-						--FOR A 68000 CYCLE, NOTHING HAPPENS HERE, GO TO NEXT STATE
-						
-						IF (nVPA = '0') THEN
-							IF (vmacount = 7) THEN
-								edsack <= '0';
-								CURRENT_STATE <= S6;
-							END IF;
+					ELSE
+					
+						IF RnW = '1' THEN
+							dsack68 <= '0';
 						ELSE
-							CURRENT_STATE <= S6;
-						END IF;
 						
-					WHEN S6 =>
-						--WHEN READ: DATA IS WRITTEN TO THE BUS BY THE DEVICE
-						CURRENT_STATE <= S7;
-						
-					WHEN S7 =>
-						--ASSUMING NO WAIT STATES, THE 68030 SHOULD NEGATE _AS AT THIS TIME
-						--WE WILL NEGATE THE DATA STROBES AND THE END OF CYCLE SIGNALS.
-						
-						IF (nAS = '1') THEN		
-							nUDSOUT <= '1';
-							nLDSOUT <= '1';
-							nVMA <= '1';
-							edsack <= '1';
-							dsack68 <= '1';
+							IF A(0) = '0' THEN
+								nUDSOUT <= '0';
+							ELSE
+								nUDSOUT <= '1';
+							END IF;
 							
-							CURRENT_STATE <= S2;
+							IF SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' THEN
+								nLDSOUT <= '0';
+							ELSE
+								nLDSOUT <= '1';
+							END IF;
+							
 						END IF;
 					
-				END CASE;				
-			END IF;
+						CURRENT_STATE <= S5;
+					END IF;
+					
+				WHEN S5 =>
+					--IN THE EVENT OF A 6800 CYCLE, WE WAIT HERE UNTIL THE
+					--APPROPRIATE TIME IS REACHED ON E TO ASSERT DSACK.
+					--VMA IS ASSERTED BETWEEN 3 AND 4 CLOCK CYCLES AFTER E GOES TO LOGIC LOW.
+					--THE 68030 DOES NOT NATIVELY SUPPORT 6800 SIGNALS, SO WE ACTUALLY ASSERT DSACK1 HERE.
+					
+					--FOR A 68000 CYCLE, NOTHING HAPPENS HERE, GO TO NEXT STATE
+					
+					IF (nVPA = '0') THEN
+						IF (vmacount = 8) THEN
+							edsack <= '0';
+							CURRENT_STATE <= S6;
+						END IF;
+					ELSE
+						CURRENT_STATE <= S6;
+					END IF;
+					
+				WHEN S6 =>
+					--WHEN READ: DATA IS WRITTEN TO THE BUS BY THE DEVICE
+					CURRENT_STATE <= S7;
+					
+				WHEN S7 =>
+					--ASSUMING NO WAIT STATES, THE 68030 SHOULD NEGATE _AS AT THIS TIME
+					--WE WILL NEGATE THE DATA STROBES AND THE END OF CYCLE SIGNALS.
+					
+					IF (nAS = '1') THEN		
+						nUDSOUT <= '1';
+						nLDSOUT <= '1';
+						nVMA <= '1';
+						
+						edsack <= '1';
+						dsack68 <= '1';
+						cycend <= '1';
+						
+						CURRENT_STATE <= S2;
+					END IF;
+				
+			END CASE;
+				
 		END IF;
 	END PROCESS;
 
-			
-	
 
 end Behavioral;
 
