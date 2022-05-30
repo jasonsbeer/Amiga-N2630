@@ -47,9 +47,11 @@ PORT
 	nDS : IN STD_LOGIC; --68030 DATA STROBE
 	SIZ : IN STD_LOGIC_VECTOR (1 downto 0); --SIZE BUS FROM 68030
 	FC : IN STD_LOGIC_VECTOR (2 downto 0); --68030 FUNCTION CODES
+	J404 : IN STD_LOGIC; --CPU CLOCK SPEED
 	
 	MEMACCESS : INOUT STD_LOGIC; --LOGIC HIGH WHEN WE ARE ACCESSING Z2 RAM
 	REFACKZ2 : INOUT STD_LOGIC; --REFRESH ACK
+	CONFIGED : INOUT STD_LOGIC; --ARE WE AUTOCONFIGED?
 	
 	ZBANK0 : OUT STD_LOGIC; --BANK0 SIGNAL
 	ZBANK1 : OUT STD_LOGIC; --BANK1 SIGNAL
@@ -108,14 +110,14 @@ begin
 
 	--EITHER THE 68030 OR DMA FROM THE ZORRO 2 BUS CAN ACCESS ZORRO 2 RAM ON OUR CARD
 	
-	--THIS DETECTS MEMORY ACCESS BY THE 68030
+	--THIS DETECTS A 68030 MEMORY ACCESS
 	cpuaccess <= '1' 
 		WHEN
 			autoconfigcomplete_ZORRO2RAM = '1' AND A(23 downto 21) = baseaddress_ZORRO2RAM AND nAS = '0' AND FC(2 DOWNTO 0) /= "111"
 		ELSE
 			'0';
 	
-	--THIS DETECTS MEMORY ACCESS BY DMA
+	--THIS DETECTS A DMA MEMORY ACCESS
 	dmaaccess <= '1'
 		WHEN
 			autoconfigcomplete_ZORRO2RAM = '1' AND A(23 downto 21) = baseaddress_ZORRO2RAM AND nAAS = '0' AND nBGACK = '0'
@@ -244,12 +246,8 @@ begin
 			--WE CANNOT USE BURST MODE IN Z2 RAM, WHICH ONLY WORKS WITH STERM TERMINATED ACTIONS.
 			--ZORRO 2 RAM ACCESSES ARE ALL ASYNCHROUNOUS.
 			
-			--SDRAM is pretty fast. Most operations will complete in less than one 25MHz clock cycle. Only AUTOREFRESH and 
-			--successive BANK ACTIVE commands take more than one clock cycle. Both are 60ns. 
-			
-			--WE NEED TO ACCOUNT FOR OTHER CLOCK SPEEDS DURING SDRAM OPERATIONS
-			--50MHz IS 20ns PER CYCLE, 40MHz IS 24ns, 33 IS 30ns, 25MHz IS 40ns.
-			
+			--SDRAM is pretty fast. Most operations will complete in less than one 50MHz clock cycle. 
+			--Only AUTOREFRESH takeS more than one clock cycle at 60ns. 			
 			
 			--WE WATCH FOR THE REF(RESH) SIGNAL FROM U600 TO TELL US WHEN TO REFRESH THE SDRAM.
 			--WHEN REF IS ASSERTED, WE WAIT UNTIL WE ARE NOT IN MEMORY CYCLE AND THEN
@@ -285,6 +283,7 @@ begin
 					--First power up or warm reset
 					--200 microsecond is needed to stabilize. We are going to rely on the 
 					--the system reset to give us the needed time, although it might be inadequate.
+					
 					CLKE <= '0'; --DISABLE CLOCK
 					nZWE <= '1';
 					nZRAS <= '1';
@@ -319,15 +318,22 @@ begin
 				WHEN AUTO_REFRESH =>
 					--REFRESH the SDRAM
 					--MUST BE FOLLOWED BY NOPs UNTIL REFRESH COMPLETE
-					--Refresh time is 60ns. Each 25MHz clock period is 40ns.
-					--If we wait two clock cycles, this will allow time for refresh.
+					--Refresh minimum time is 60ns. We must NOP enough clock cycles to meet this requirement.
+					--50MHz IS 20ns PER CYCLE, 40MHz IS 24ns, 33 IS 30ns, 25MHz IS 40ns.
+					--SO, 3 CLOCK CYCLES FOR 50 AND 40 MHz AND 2 CLOCK CYCLES FOR 22 AND 25 MHz.
 					
 					nZWE <= '1';
 					nZRAS <= '0';
 					nZCAS <= '0';
 					nZCS <= '0';
 					
-					COUNT <= 0;
+					IF (J404 = '0') THEN
+						--WE NEED TO ADD A CLOCK CYCLE TO ACHEIVE THE MINIMIM REFRESH TIME OF 60ns
+						COUNT <= 0;
+					ELSE
+						--OUR CLOCK IS SLOW ENOUGH TO ACCOMODATE THE 60ns TIME.
+						COUNT <= 1;
+					END IF;
 					
 					SDRAM_START_REFRESH_COUNT <= '0';
 					CURRENT_STATE <= AUTO_REFRESH_CYCLE;						
@@ -339,17 +345,24 @@ begin
 					nZCAS <= '1';
 					nZCS <= '0';
 					
-					--IF (COUNT = 1) THEN --TWO CLOCK CYCLES HAVE PASSED. WE CAN PROCEED.
-						--DO WE NEED TO REFRESH AGAIN (STARTUP)?
-						IF (SDRAM_START_REFRESH_COUNT = '0') THEN							
+					IF (COUNT = 1) THEN 
+						--ENOUGH CLOCK CYCLES HAVE PASSED. WE CAN PROCEED.
+						
+						IF (SDRAM_START_REFRESH_COUNT = '0') THEN		
+							--DO WE NEED TO REFRESH AGAIN (STARTUP)?
+						
 							CURRENT_STATE <= AUTO_REFRESH;
 							SDRAM_START_REFRESH_COUNT <= '1';
+							
 						ELSE
+						
 							CURRENT_STATE <= RUN_STATE;
+							
 						END IF;
-					--END IF;		
+						
+					END IF;		
 
-					--COUNT <= COUNT + 1;						
+					COUNT <= COUNT + 1;						
 				
 				WHEN RUN_STATE =>
 					--CLOCK EDGE 0
@@ -368,9 +381,9 @@ begin
 						nZWE <= '1';
 						
 						IF (nBGACK = '0') THEN
-							nDTACK <= '1'; --DMA ACCESS, NEGATE BECAUSE _WE_ ARE TALKING TO THE ZORRO 2 BUS NOW							
+							nDTACK <= '1'; --DMA CYCLE						
 						ELSE
-							dsack <= '1'; --NEGATE DSACK BECAUSE _WE_ ARE TALKING TO THE 68030 BUS RIGHT NOW
+							dsack <= '1'; --68030 CYCLE
 						END IF; 
 						
 						CURRENT_STATE <= CAS_STATE;
@@ -378,7 +391,6 @@ begin
 					END IF;
 					
 				WHEN CAS_STATE =>
-					--CLOCK EDGE 1
 					--READ OR WRITE WITH AUTOPRECHARGE
 					
 					ZMA(7 downto 0) <= A(22 downto 15);
@@ -395,12 +407,17 @@ begin
 					--IF THIS IS A READ ACTION, THE CAS LATENCY IS 2 CLOCK CYCLES, SO WE NEED TO WAIT ONE MORE CLOCK BEFORE READING.
 					--DURING DMA, THE REQUESTING DEVICE'S RW SIGNAL IS LOCKED TO OUR RW SIGNAL.
 					
-					--DO WE WANT TO CONSIDER DS ON THE READ ACTION?
-					IF ((RnW = '0') OR (RnW = '1' AND COUNT >= 1)) THEN
+					--680x0 DATA STOBE(S) ASSERT ONE CLOCK AFTER ADDRESS STROBE ON WRITE EVENTS. 
+					--WE ALREADY ACCOUNT FOR THAT IN OUR STATE MACHINE. 
+					--DATA STROBE ASSERTS WITH ADDRESS STROBE ON READ OPERATIONS.
+					
+					IF ((RnW = '0') OR (RnW = '1' AND COUNT = 1)) THEN
 					
 						IF (nBGACK = '0') THEN
 						
-							nDTACK <= '0'; --ASSERT nDTACK SINCE THIS IS A DMA EVENT. DMA DEVICE CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
+							--ASSERT nDTACK SINCE THIS IS A DMA EVENT.
+							--DMA DEVICE CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
+							nDTACK <= '0'; 
 							
 						ELSE
 						
@@ -419,9 +436,9 @@ begin
 				WHEN DATA_STATE =>
 					--RISING CLOCK EDGE 2
 					--THIS IS THE CLOCK EDGE WE EXPECT THE DATA TO BE WRITTEN TO OR READ FROM THE SDRAM
-					--WE NEED TO WAIT 30ns BEFORE ISSUING ANOTHER BANK ACTIVATE COMMAND. NO PROBLEM, SINCE ONE CLOCK CYCLE IS 40ns.
 					
-					IF (MEMACCESS = '0') THEN --THE ADDRESS STROBE HAS NEGATED INDICATING THE END OF THE MEMORY ACCESS
+					IF (MEMACCESS = '0') THEN 
+						--THE ADDRESS STROBE HAS NEGATED INDICATING THE END OF THE MEMORY ACCESS
 						
 						--TRISTATE SO WE DON'T INTERFERE WITH OTHER DEVICES ON THE BUSES
 						dsack <= 'Z';
@@ -439,6 +456,194 @@ begin
 				
 			END CASE;
 				
+		END IF;
+	END PROCESS;
+	
+	---------------------------
+	-- A2630 ROM CHIP SELECT --
+	---------------------------
+	
+	--THE ROM IS PLACED IN THE RESET VECTOR ($000000) WHEN THE SYSTEM FIRST STARTS/RESTARTS.
+	--THE ROM THEN OCCUPIES THE SPACE AT $000000 - $00FFFF.
+	--THIS ALLOWS THE USER TO INTERCEPT THE STARTUP AND MAKE CHANGES VIA THE SOFTWARE INTERFACE.
+	--AS I UNDERSTAND, IT IS TREATED LIKE AN AUTOBOOT ROM IN THIS RESPECT.
+	
+	lorom <= '1' WHEN A(23 DOWNTO 16) = x"00" AND phantomlo = '0' AND RnW = '1' AND nAS = '0' ELSE '0';
+	
+	--ONCE THE ROM IS AUTOCONFIGed, IT IS MOVED TO THE ADDRESS SPACE AT $F80000 - $F8FFFF.
+	--THIS IS THE "NORMAL" PLACE FOR SYSTEM ROMS.
+	
+	hirom <= '1' WHEN A(23 DOWNTO 16) = x"F8" AND phantomhi = '0' AND RnW = '1' AND nAS = '0' ELSE '0';
+	
+	--THE FINAL ROM CHIP SELECT SIGNAL
+	nCSROM <= '0' WHEN lorom = '1' OR hirom = '1' ELSE '1';
+	
+	---------------------------------
+	-- SPECIAL AUTOCONFIG REGISTER --
+	---------------------------------
+	
+	--THE SPECIAL REGISTER FOR THE A2630 RESIDES AT $E80040, LOWER BYTE.
+	--THIS IS USED FOR THE ROM AUTOCONFIG IN PLACE OF THE REGULAR AUTOCONFIG
+	--WRITE REGISTER FOUND AT $E80048. THIS REGISTER MAY APPEAR MULTIPLE TIMES,
+	--UNTIL ROMCONFIGED IS WRITTEN HIGH. OTHERWISE, THE AUTOCONFIG PROCESS
+	--IS IDENTICAL TO ANY OTHER.
+	
+	PROCESS (CPUCLK, regreset) BEGIN
+	
+		IF (regreset = '1') THEN
+			phantomlo <= 0;
+			phantomhi <= 0;
+			romconfiged <= 0;
+			jmode <= 0;
+			MODE68K <= 0;
+	
+		ELSIF RISING_EDGE (CPUCLK) THEN
+		
+			IF (autoconfigspace = '1' AND A(6 downto 1) = "100000" AND nDS = '0' AND nCPURESET = '1' AND romconfiged = '0') THEN
+				phantomlo <= D(16);
+				phantomhi <= D(17);
+				romconfiged <= D(18);
+				jmode <= D(19);
+				MODE68K <= D(20);
+			END IF;
+			
+		END IF;
+		
+	END PROCESS;
+	
+
+	---------------------
+	-- "JOHANN'S" MODE --
+	---------------------
+
+	--This is a special reset used to reset the configuration registers.  If
+   --JMODE (Johann's special mode) is active, we can reset the registers
+   --with the CPU.  Otherwise, the registers can only be reset with a cold
+   --reset asserted.
+	
+	PROCESS (CPUCLK) BEGIN
+	
+		IF RISING_EDGE(CPUCLK) THEN
+			IF (jmode = '0' AND nHALT = '0' AND nRESET = '0') OR (jmode = '1' AND nRESET = '0') THEN
+				regreset <= '1';
+			ELSE
+				regreset <= '0';
+			END IF;
+		END IF;
+		
+	END PROCESS;
+	
+	----------------
+	-- AUTOCONFIG --
+	----------------
+	
+	--IS EVERYTHING CONFIGURED?
+	--WHEN THE ZORRO 2 RAM IS DISABLED BY J303, IT SETS Z2AUTO = 0.
+	CONFIGED <= '1' WHEN (romconfig = '1' AND Z2AUTO = '0') OR (romconfig = '1' AND ramconfig = '1') ELSE '0';	
+
+	--We have three boards we need to autoconfig, in this order
+	--1. The 68030 ROM (SEE ALSO SPECIAL REGISTER, ABOVE)
+	--2. The base memory (8MB) in the Zorro 2 space
+	--3. The expansion memory in the Zorro 3 space. This is done in U602.	
+
+	--A good explaination of the autoconfig process is given in the Amiga Hardware Reference Manual from Commodore
+	--https://archive.org/details/amiga-hardware-reference-manual-3rd-edition	
+	
+	--ARE WE IN THE Z2 AUTOCONFIG ADDRESS SPACE ($E80000)?
+	
+	autoconfigspace <= '1'
+		WHEN 
+			A(23 downto 16) = x"E8" AND nAS = '0' AND CONFIGED = '1'
+		ELSE
+			'0';	
+
+	--THIS CODE DUMPS THE AUTOCONFIG DATA ON TO D(31..28) DEPENDING ON WHAT WE ARE AUTOCONFIGing	
+	--We AUTOCONFIG the 2630 FIRST, then the Zorro 2 RAM
+	D(31 downto 28) <= 
+			D_2630
+				WHEN romconfigured = '0' AND autoconfigspace = '1' AND RnW = '1'
+		ELSE
+			D_ZORRO2RAM 
+				WHEN ramconfiged = '0' AND autoconfigspace ='1' AND RnW = '1'
+		ELSE
+			"ZZZZ";		
+			
+	--Here it is in all its glory...the AUTOCONFIG sequence
+	PROCESS ( CPUCLK, nRESET ) BEGIN
+		IF nRESET = '0' THEN
+			--The computer has been reset
+			
+			CONFIGED <= '0';
+			
+			rambaseaddress <= "000";
+			
+			ramconfiged <= '0';			
+			
+		ELSIF ( FALLING_EDGE (CPUCLK)) THEN
+			IF ( autoconfigspace = '1' AND CONFIGED = '0' ) THEN
+				IF ( RnW = '1' ) THEN
+					--The 680x0 is reading from us
+				
+					CASE A(6 downto 1) IS
+
+						--offset $00
+						WHEN "000000" => 
+							D_2630 <= "1110"; 
+							D_ZORRO2RAM <= "1110"; --er_type: Zorro 2 card without BOOT ROM, LINK TO MEM POOL
+
+						--offset $02
+						WHEN "000001" => 
+							D_2630 <= "0000"; --8MB
+							D_ZORRO2RAM <= "0000"; --er_type: NEXT BOARD NOT RELATED, 0MB
+
+						--offset $04 INVERTED
+						WHEN "000010" => 
+							D_2630 <= "1010";
+							D_ZORRO2RAM <= "1010"; --Product Number Hi Nibble, we are stealing the A2630 product number
+
+						--offset $06 INVERTED
+						WHEN "000011" => 
+							D_2630 <= "1110";
+							D_ZORRO2RAM <= "1111"; --Product Number Lo Nibble
+
+						--offset $0C INVERTED						
+						WHEN "000110" => 
+							D_2630 <= OSMODE & "111"; --THE A2630 CONFIGURES THIS NIBBLE AS "0111" WHEN UNIX, "1111" WHEN AMIGA OS
+							D_ZORRO2RAM <= "1111"; --Reserved: must be zeroes
+
+						--offset $12 INVERTED
+						WHEN "001001" => 
+							D_2630 <= "1111";
+							D_ZORRO2RAM <= "1101"; --MANUFACTURER Number, high byte, low nibble hi byte. Just for fun, lets put C= in here!
+
+						--offset $16 INVERTED
+						WHEN "001011" => 
+							D_2630 <= "1111";
+							D_ZORRO2RAM <= "1101"; --MANUFACTURER Number, low nibble low byte. Just for fun, lets put C= in here!
+
+						WHEN OTHERS => 
+							D_2630 <= "1111";
+							D_ZORRO2RAM <= "1111"; --INVERTED...Reserved offsets and unused offset values are all zeroes
+
+					END CASE;
+					
+
+				ELSIF ( RnW = '0' AND nDS = '0' ) THEN	
+				
+					IF ( A(6 downto 1) = "100100" ) THEN
+							
+						IF ( romconfiged = '1' AND ramconfiged = '0' ) THEN
+						
+							--BASE ADDRESS FOR THE ZORRO 2 RAM
+							rambaseaddress <= D(31 downto 29); 
+							--THE ZORRO 2 RAM IS AUTOCONFIGed
+							ramconfiged <= '1'; 
+							
+						END IF;					
+						
+					END IF;					
+				END IF;
+			END IF;
 		END IF;
 	END PROCESS;
 
