@@ -21,13 +21,7 @@
 
   <sourceproject xmlns="http://www.xilinx.com/XMLSchema" xil_pn:fileType="FILE_XISE" xil_pn:name="U601.xise"/>
 
-  <files xmlns="http://www.xilinx.com/XMLSchema">
-    <file xil_pn:fileType="FILE_LSO" xil_pn:name=".lso"/>
-    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="U601.prj"/>
-    <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="U601.stx"/>
-    <file xil_pn:fileType="FILE_XST" xil_pn:name="U601.xst"/>
-    <file xil_pn:fileType="FILE_DIRECTORY" xil_pn:name="xst"/>
-  </files>
+  <files xmlns="http://www.xilinx.com/XMLSchema"/>
 
   <transforms xmlns="http://www.xilinx.com/XMLSchema"/>
 

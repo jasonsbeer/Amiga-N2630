@@ -37,22 +37,36 @@ PORT
 	RnW : IN STD_LOGIC; --680x0 READ/WRITE
 	REF : IN STD_LOGIC; --SDRAM REFRESH SIGNAL
 	CPUCLK : IN STD_LOGIC; --68030 CLOCK
-	A : IN STD_LOGIC_VECTOR (31 DOWNTO 0); --680x0 ADDRESS LINES
+	A : IN STD_LOGIC_VECTOR (23 DOWNTO 0); --680x0 ADDRESS LINES, ZORRO 2 ADDRESS SPACE
 	nAS : IN STD_LOGIC; --68030 ADDRESS STROBE
 	nAAS : IN STD_LOGIC; --68000 ADDRESS STROBE
+	nDS : IN STD_LOGIC; --68030 DATA STROBE
 	nRESET : IN STD_LOGIC; --AMIGA RESET SIGNAL
 	nBGACK : IN STD_LOGIC; --AMIGA BUS GRANT ACK
 	nUDS : IN STD_LOGIC; --68000 UPPER DATA STROBE
 	nLDS : IN STD_LOGIC; --68000 LOWER DATA STROBE
-	nDS : IN STD_LOGIC; --68030 DATA STROBE
 	SIZ : IN STD_LOGIC_VECTOR (1 downto 0); --SIZE BUS FROM 68030
 	FC : IN STD_LOGIC_VECTOR (2 downto 0); --68030 FUNCTION CODES
 	J404 : IN STD_LOGIC; --CPU CLOCK SPEED
+	OSMODE : IN STD_LOGIC; --J304 UNIX/AMIGA OS
+	nCPURESET : IN STD_LOGIC; --68030 RESET SIGNAL
+	nHALT : IN STD_LOGIC; --68030 HALT
+	Z2AUTO : IN STD_LOGIC; --J303 ZORRO 2 DISABLE
+	DROM : IN STD_LOGIC_VECTOR (20 DOWNTO 16); --THIS IS FOR THE ROM SPECIAL REGISTER
+	EXTSEL : IN STD_LOGIC; --ZORRO 3 RAM IS RESPONDING TO THE ADDRESS
+	nSENSE : IN STD_LOGIC; --68882 SENSE
 	
 	MEMACCESS : INOUT STD_LOGIC; --LOGIC HIGH WHEN WE ARE ACCESSING Z2 RAM
 	REFACKZ2 : INOUT STD_LOGIC; --REFRESH ACK
 	CONFIGED : INOUT STD_LOGIC; --ARE WE AUTOCONFIGED?
+	D : INOUT STD_LOGIC_VECTOR (31 DOWNTO 28); --68030 DATA BUS
 	
+	nFPUCS : OUT STD_LOGIC; --FPU CHIP SELECT
+	nBERR : OUT STD_LOGIC; --BUS ERROR
+	nCIIN : OUT STD_LOGIC; --68030 CACHE ENABLE
+	nAVEC : OUT STD_LOGIC; --AUTO VECTORING
+	MODE68K : OUT STD_LOGIC; --ARE WE IN 68000 MODE?
+	nCSROM : OUT STD_LOGIC; --ROM CHIP SELECT
 	ZBANK0 : OUT STD_LOGIC; --BANK0 SIGNAL
 	ZBANK1 : OUT STD_LOGIC; --BANK1 SIGNAL
 	CLKE : OUT STD_LOGIC; --SDRAM CLOCK ENABLE
@@ -69,6 +83,7 @@ PORT
 	nDSACK0 : OUT STD_LOGIC; --68030 DSACK
 	nDSACK1 : OUT STD_LOGIC;
 	nOVR : OUT STD_LOGIC; --DTACK OVERRIDE
+	ADDIR : OUT STD_LOGIC; --DATA BUS DIRECTION CONTROL AMIGA <-> 68030
 	EMDDIR : OUT STD_LOGIC --DIRECTION OF MEMORY DATA BUS BUFFERS
 	
 
@@ -79,9 +94,27 @@ end U601;
 architecture Behavioral of U601 is
 	
 	--MEMORY ACCESS SIGNALS
-	SIGNAL dmaaccess : STD_LOGIC; --ARE WE IN A DMA MEMORY CYCLE?
-	SIGNAL cpuaccess : STD_LOGIC; --ARE WE IN A CPU MEMORY CYCLE?
-	SIGNAL dsack : STD_LOGIC; --FEEDS THE 68030 DSACK SIGNALS
+	SIGNAL dmaaccess : STD_LOGIC := '0'; --ARE WE IN A DMA MEMORY CYCLE?
+	SIGNAL cpuaccess : STD_LOGIC := '0'; --ARE WE IN A CPU MEMORY CYCLE?
+	SIGNAL dsack : STD_LOGIC := '1'; --FEEDS THE 68030 DSACK SIGNALS
+	
+	--ADDRESS SPACES
+	SIGNAL chipram : STD_LOGIC:='0';
+	SIGNAL ciaspace : STD_LOGIC:='0';
+	SIGNAL chipregs : STD_LOGIC:='0';
+	SIGNAL iospace	 : STD_LOGIC:='0';
+	
+	--68030 FUNCTION CODES
+	SIGNAL userdata : STD_LOGIC:='0';
+	SIGNAL superdata : STD_LOGIC:='0';	
+	SIGNAL cpuspace : STD_LOGIC:='0';
+	
+	--INTERRUPT
+	SIGNAL interruptack : STD_LOGIC:='0';
+	
+	--FPU SIGNALS
+	SIGNAL coppercom : STD_LOGIC:='0';
+	SIGNAL mc68881 : STD_LOGIC:='0';
 	
 	--DEFINE THE SDRAM STATE MACHINE 
 	TYPE SDRAM_STATE IS ( POWERUP, POWERUP_PRECHARGE, MODE_REGISTER, AUTO_REFRESH, AUTO_REFRESH_CYCLE, RUN_STATE, CAS_STATE, DATA_STATE );
@@ -90,11 +123,37 @@ architecture Behavioral of U601 is
 	SIGNAL COUNT : INTEGER RANGE 0 TO 2 := 0; --COUNTER FOR SDRAM STARTUP ACTIVITIES
 
 	--AUTOCONFIG SIGNALS
-	SIGNAL autoconfigcomplete_ZORRO2RAM : STD_LOGIC := '0'; --HAS THE Z2 RAM BEEN AUTOCONFIGED?
-	SIGNAL baseaddress_ZORRO2RAM : STD_LOGIC_VECTOR ( 2 downto 0 ):="000"; --BASE ADDRESS ASSIGNED FOR ZORRO 2 RAM
+	SIGNAL autoconfigspace : STD_LOGIC := '0'; --AUTOCONFIG ADDRESS SPACE
+	SIGNAL romconfiged : STD_LOGIC := '0'; --HAS THE ROM BEEN AUTOCONFIGED?
+	SIGNAL ramconfiged : STD_LOGIC := '0'; --HAS THE Z2 RAM BEEN AUTOCONFIGED?
+	SIGNAL D_ZORRO2RAM : STD_LOGIC_VECTOR (3 DOWNTO 0); --Z2 AUTOCONFIG DATA
+	SIGNAL D_2630 : STD_LOGIC_VECTOR (3 DOWNTO 0); --ROM AUTOCONFIG DATA
+	SIGNAL regreset : STD_LOGIC := '0'; --REGISTER RESET 
+	SIGNAL jmode : STD_LOGIC := '0'; --JMODE
+	SIGNAL phantomlo : STD_LOGIC := '0'; --PHANTOM LOW SIGNAL
+	SIGNAL phantomhi : STD_LOGIC := '0'; --PHANTOM HIGH SIGNAL
+	SIGNAL hirom : STD_LOGIC := '0'; --IS THE ROM IN THE HIGH ADDRESS SPACE?
+	SIGNAL lorom : STD_LOGIC := '0'; --IS THE ROM IN THE LOW ADDRESS SPACE?
+	SIGNAL rambaseaddress : STD_LOGIC_VECTOR (2 DOWNTO 0) := "000"; --RAM BASE ADDRESS
+	SIGNAL acsack : STD_LOGIC; --AUTOCONFIG DSACKn SIGNAL
 	
-
 begin
+
+	chipram <= '1' WHEN A(23 downto 13) >= "00000000000" AND A(23 downto 13) <= "00011111111"  ELSE '0'; 
+	--That's 4MB of chip ram space available...just FYI
+	
+	--chipram		= (cpuaddr:[000000..1fffff]) ;    /* All Chip RAM */ 0-000111111111111111111111
+	--busspace	= (cpuaddr:[200000..9fffff]) ;    /* Main expansion bus */ 001000000000000000000000-100111111111111111111111
+	ciaspace <= '1' WHEN A(23 downto 13) >= "10100000000" AND A(23 downto 13) <= "10111111111" ELSE '0';
+	--ciaspace	= (cpuaddr:[a00000..bfffff]) ;    /* VPA decode */ 101000000000000000000000-101111111111111111111111
+	--extraram	= (cpuaddr:[c00000..cfffff]) ;    /* Motherboard RAM */ 110000000000000000000000-110011111111111111111111
+	chipregs <= '1' WHEN A(23 downto 13) >= "11010000000" AND A(23 downto 13) <= "11011111111" ELSE '0';
+	--chipregs	= (cpuaddr:[d00000..dfffff]) ;    /* Custom chip registers */ 110100000000000000000000-110111111111111111111111
+	iospace <= '1' WHEN A(23 downto 13) >= "11101000000" AND A(23 downto 13) <= "11101111111" ELSE '0';
+	--iospace		= (cpuaddr:[e80000..efffff]) ;    /* I/O expansion bus */ 111010000000000000000000-111011111111111111111111
+	--romspace	= (cpuaddr:[f80000..ffffff]) ;    /* All ROM */ 111110000000000000000000-111111111111111111111111
+
+	cpuspace <= '1' WHEN FC(2 downto 0) = "111" ELSE '0'; --(cpustate:7)
 
 	---------------------------
 	-- MEMORY DATA DIRECTION --
@@ -113,14 +172,14 @@ begin
 	--THIS DETECTS A 68030 MEMORY ACCESS
 	cpuaccess <= '1' 
 		WHEN
-			autoconfigcomplete_ZORRO2RAM = '1' AND A(23 downto 21) = baseaddress_ZORRO2RAM AND nAS = '0' AND FC(2 DOWNTO 0) /= "111"
+			ramconfiged = '1' AND A(23 downto 21) = rambaseaddress AND nAS = '0' AND FC(2 DOWNTO 0) /= "111"
 		ELSE
 			'0';
 	
 	--THIS DETECTS A DMA MEMORY ACCESS
 	dmaaccess <= '1'
 		WHEN
-			autoconfigcomplete_ZORRO2RAM = '1' AND A(23 downto 21) = baseaddress_ZORRO2RAM AND nAAS = '0' AND nBGACK = '0'
+			ramconfiged = '1' AND A(23 downto 21) = rambaseaddress AND nAAS = '0' AND nBGACK = '0'
 		ELSE
 			'0';
 			
@@ -139,11 +198,6 @@ begin
 			dmaaccess = '1' 
 		ELSE 
 			'Z';	
-			
-	--IN OUR LOGIC, nDSACK0 = nDSACK1 WITHOUT EXCEPTION.
-	--WE ARE A 32 BIT PORT, SO WE ALWAYS ASSERT BOTH.
-	nDSACK0 <= dsack;
-	nDSACK1 <= dsack;
 	
 	-------------------------------------
 	-- SDRAM FALLING CLOCK EDGE ACTIONS --
@@ -238,7 +292,6 @@ begin
 				nZCS <= '1';
 				CLKE <= '0';
 				COUNT <= 0;
-				dsack <= 'Z';
 				nDTACK <= 'Z';
 		
 		ELSIF ( RISING_EDGE (CPUCLK) ) THEN
@@ -441,7 +494,7 @@ begin
 						--THE ADDRESS STROBE HAS NEGATED INDICATING THE END OF THE MEMORY ACCESS
 						
 						--TRISTATE SO WE DON'T INTERFERE WITH OTHER DEVICES ON THE BUSES
-						dsack <= 'Z';
+						--dsack <= 'Z';
 						nDTACK <= 'Z';
 						
 						CURRENT_STATE <= RUN_STATE;
@@ -488,23 +541,26 @@ begin
 	--UNTIL ROMCONFIGED IS WRITTEN HIGH. OTHERWISE, THE AUTOCONFIG PROCESS
 	--IS IDENTICAL TO ANY OTHER.
 	
+	--EVEN THOUGH THIS SITS AWAY FROM MOST OF THE AUTOCONFIG STUFF, IT STILL
+	--RESPONDS IN THE AUTOCONFIG SPACE AND DTACK IS HANDLED THERE.
+	
 	PROCESS (CPUCLK, regreset) BEGIN
 	
 		IF (regreset = '1') THEN
-			phantomlo <= 0;
-			phantomhi <= 0;
-			romconfiged <= 0;
-			jmode <= 0;
-			MODE68K <= 0;
+			phantomlo <= '0';
+			phantomhi <= '0';
+			romconfiged <= '0';
+			jmode <= '0';
+			MODE68K <= '0';
 	
-		ELSIF RISING_EDGE (CPUCLK) THEN
+		ELSIF FALLING_EDGE (CPUCLK) THEN
 		
 			IF (autoconfigspace = '1' AND A(6 downto 1) = "100000" AND nDS = '0' AND nCPURESET = '1' AND romconfiged = '0') THEN
-				phantomlo <= D(16);
-				phantomhi <= D(17);
-				romconfiged <= D(18);
-				jmode <= D(19);
-				MODE68K <= D(20);
+				phantomlo <= DROM(16);
+				phantomhi <= DROM(17);
+				romconfiged <= DROM(18);
+				jmode <= DROM(19);
+				MODE68K <= DROM(20);
 			END IF;
 			
 		END IF;
@@ -533,13 +589,59 @@ begin
 		
 	END PROCESS;
 	
+	-----------------------
+	-- DATA TRANSFER ACK --
+	-----------------------
+	
+	--THIS IS FOR 16 BIT ASYNC CYCLES THAT WE ARE DOING.
+	--THIS INCLUDES BOTH RAM ACCESS AND AUTOCONFIG ACTIVITIES.
+	
+	PROCESS (CPUCLK) BEGIN
+		IF RISING_EDGE (CPUCLK) THEN
+			
+			IF autoconfigspace = '1' THEN
+			
+				IF dsack = '0' THEN --THIS IS RAM ACCESS, SO WE ALWAYS RESPOND WITH A 32 BIT PORT
+				
+					nDSACK0 <= '0';
+					nDSACK1 <= '0';
+				
+				ELSE
+				
+					nDSACK0 <= '1';
+					nDSACK1 <= '1';
+				
+				END IF;
+					
+			ELSIF MEMACCESS = '1' THEN
+					
+				IF	acsack = '0' THEN --THIS IS AUTOCONFIG, SO IT IS A 16 BIT DATA TRANSFER
+					
+					nDSACK0 <= '1';
+					nDSACK1 <= '0';
+				
+				ELSE
+				
+					nDSACK0 <= '1';
+					nDSACK1 <= '1';
+					
+				END IF;
+			
+			ELSE
+				nDSACK0 <= 'Z';
+				nDSACK1 <= 'Z';
+			END IF;
+		
+		END IF;
+	END PROCESS;
+	
 	----------------
 	-- AUTOCONFIG --
 	----------------
 	
 	--IS EVERYTHING CONFIGURED?
 	--WHEN THE ZORRO 2 RAM IS DISABLED BY J303, IT SETS Z2AUTO = 0.
-	CONFIGED <= '1' WHEN (romconfig = '1' AND Z2AUTO = '0') OR (romconfig = '1' AND ramconfig = '1') ELSE '0';	
+	CONFIGED <= '1' WHEN (romconfiged = '1' AND Z2AUTO = '0') OR (romconfiged= '1' AND ramconfiged = '1') ELSE '0';	
 
 	--We have three boards we need to autoconfig, in this order
 	--1. The 68030 ROM (SEE ALSO SPECIAL REGISTER, ABOVE)
@@ -553,15 +655,15 @@ begin
 	
 	autoconfigspace <= '1'
 		WHEN 
-			A(23 downto 16) = x"E8" AND nAS = '0' AND CONFIGED = '1'
+			A(23 downto 16) = x"E8" AND nAS = '0' AND CONFIGED = '0'
 		ELSE
-			'0';	
+			'0';				
 
 	--THIS CODE DUMPS THE AUTOCONFIG DATA ON TO D(31..28) DEPENDING ON WHAT WE ARE AUTOCONFIGing	
 	--We AUTOCONFIG the 2630 FIRST, then the Zorro 2 RAM
 	D(31 downto 28) <= 
 			D_2630
-				WHEN romconfigured = '0' AND autoconfigspace = '1' AND RnW = '1'
+				WHEN romconfiged = '0' AND autoconfigspace = '1' AND RnW = '1'
 		ELSE
 			D_ZORRO2RAM 
 				WHEN ramconfiged = '0' AND autoconfigspace ='1' AND RnW = '1'
@@ -570,17 +672,18 @@ begin
 			
 	--Here it is in all its glory...the AUTOCONFIG sequence
 	PROCESS ( CPUCLK, nRESET ) BEGIN
+	
 		IF nRESET = '0' THEN
-			--The computer has been reset
 			
-			CONFIGED <= '0';
-			
-			rambaseaddress <= "000";
-			
+			rambaseaddress <= "000";			
 			ramconfiged <= '0';			
 			
 		ELSIF ( FALLING_EDGE (CPUCLK)) THEN
-			IF ( autoconfigspace = '1' AND CONFIGED = '0' ) THEN
+		
+			IF ( autoconfigspace = '1' ) THEN
+			
+				acsack <= '1';
+			
 				IF ( RnW = '1' ) THEN
 					--The 680x0 is reading from us
 				
@@ -643,9 +746,106 @@ begin
 						
 					END IF;					
 				END IF;
+				
+				acsack <= '0'; --DSACK after each cycle
+				
 			END IF;
 		END IF;
 	END PROCESS;
+	
+	------------------------
+	-- 68030 CACHE ENABLE --
+	------------------------
+	
+	--This is the cache control signal.  We want the cache enabled when we're
+	--in memory, but it can't go for CHIP memory, since Agnus can also write
+	--to that memory.  Expansion bus memory, $C00000 memory, and ROM are prime
+	--targets for caching.  CHIP RAM, all chip registers, and the space we leave
+	--aside for I/O devices shouldn't be cached.  This isn't prefect, as it's
+	--certainly possible to place I/O devices in the normal expansion space, or
+	--RAM in the I/O space.  Note that we always want to cache program, just not
+	--always data.  The "wanna be cached" term doesn't fit, so here's the 
+	--"don't wanna be cached" terms, with inversion. U306
+	
+	--EXTSEL = 1 is when Zorro 3 RAM is responding to the address space (EXTSEL)
+	--So, this original code never caches in Z3 ram. 
+	--Might want to consider looking into that when Z3 ram is present.	
+		
+	userdata	<= '1' WHEN FC( 2 downto 0 ) = "001" ELSE '0'; --(cpustate:1)
+	superdata <= '1' WHEN FC( 2 downto 0 ) = "101" ELSE '0'; --(cpustate:5)
+	
+	nCIIN <= '1' 
+		WHEN
+			EXTSEL = '0' AND (
+			(chipram = '1' AND ( userdata = '1' OR superdata = '1' )) OR
+			--!CACHE = chipram & (userdata # superdata) & !EXTSEL
+			(ciaspace = '1') OR
+			--ciaspace & !EXTSEL
+			(chipregs = '1') OR
+			--chipregs & !EXTSEL
+			(iospace = '1'))
+			--iospace & !EXTSEL
+		ELSE
+			'0';		
+
+	-----------------------
+	-- 6888x CHIP SELECT --
+	-----------------------
+	
+	--This selects the 68881 or 68882 math chip (FPU chip select), as long as there's no DMA 
+	--going on.  If the chip isn't there, we want a bus error generated to 
+	--force an F-line emulation exception.  Add in AS as a qualifier here
+	--if the PAL ever turns out too slow to make FPUCS before AS. U306
+	
+	--field spacetype	= [A19..16] ;
+	--coppercom	= (spacetype:20000) ; 00100000000000000000
+	coppercom <= '1' WHEN A( 19 downto 16 ) = "0010" ELSE '0';
+	--field copperid	= [A15..13] ;	
+	--mc68881	= (copperid:2000) ; 0010000000000000
+	mc68881 <= '1' WHEN A( 15 downto 13 ) = "001" ELSE '0';
+
+	--FPUCS = cpuspace & coppercom & mc68881 & !BGACK;
+	nFPUCS <= '0' WHEN ( cpuspace = '1' AND coppercom = '1' AND mc68881 = '1' AND nBGACK = '1' ) ELSE '1';
+
+	--BERR		= cpuspace & coppercom & mc68881 & !SENSE & !BGACK;
+	--BERR.OE	= cpuspace & coppercom & mc68881 & !SENSE & !BGACK;
+	nBERR <= '0' WHEN ( cpuspace = '1' AND coppercom = '1' AND mc68881 = '1' AND nBGACK = '1' AND nSENSE = '1' ) ELSE 'Z';
+	
+	--------------------
+	-- AUTO VECTORING --
+	--------------------
+	
+	--This forces all interrupts to be serviced by autovectoring.  None
+	--of the built-in devices supply their own vectors, and the system is
+	--generally incompatible with supplied vectors, so this shouldn't be
+	--a problem working all the time.  During DMA we don't want any AVEC
+	--generation, in case the DMA device is like a Boyer HD and doesn't
+	--drive the function codes properly. U306	
+		
+	--field spacetype	= [A19..16] ;
+	--interruptack	= (spacetype:f0000) ;
+	--11110000000000000000
+	interruptack <= '1' WHEN A( 19 downto 16 ) = "1111" ELSE '0';
+
+	--AVEC		= cpuspace & interruptack & !BGACK;
+	nAVEC <= '0' WHEN (cpuspace = '1' AND interruptack = '1' AND nBGACK = '1') ELSE '1';
+
+	-----------------------------------
+	-- DATA BUS DIRECTION CONTROL --
+	-----------------------------------
+	
+	--This is data direction control U500
+	--PIN 5		= !BGACK	;	/* '030 Bus grant acknowledge */
+	--PIN 16	= !ADDIR	;	/* Amiga data direction control */
+	--!ADDIR	=  BGACK & !RW		# !BGACK &  RW;
+	--THIS MAKES SENSE WHEN YOU INCLUDE THE DRSEL SIGNAL TO THE 74FCT646 LOGIC, WHICH HAS SOME WIERD CONFIGURATION SETTINGS
+	ADDIR <= '1' --AMIGA TO 2630
+		WHEN 
+			( nBGACK = '0' AND RnW = '1' ) OR
+			( nBGACK = '1' AND RnW = '0' ) 
+		ELSE 
+			'0'; --2630 TO AMIGA
+
 
 
 end Behavioral;
