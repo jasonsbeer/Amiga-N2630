@@ -1,21 +1,38 @@
+--This work is shared under the Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) License
+--https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+	
+--You are free to:
+--Share - copy and redistribute the material in any medium or format
+--Adapt - remix, transform, and build upon the material
+
+--Under the following terms:
+
+--Attribution - You must give appropriate credit, provide a link to the license, and indicate if changes were made. 
+--You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+
+--NonCommercial - You may not use the material for commercial purposes.
+
+--ShareAlike - If you remix, transform, or build upon the material, you must distribute your contributions under the 
+--same license as the original.
+
+--No additional restrictions - You may not apply legal terms or technological measures that legally restrict others 
+--from doing anything the license permits.
+
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Engineer:       JASON NEUS
 -- 
--- Create Date:    21:04:43 05/22/2022 
--- Design Name: 
--- Module Name:    U601 - Behavioral 
--- Project Name: 
--- Target Devices: 
+-- Create Date:    MAY 30 2022 
+-- Design Name:    N2630 U601 CPLD
+-- Project Name:   A30
+-- Target Devices: XC95144 144 PIN
 -- Tool versions: 
--- Description: 
---
--- Dependencies: 
+-- Description: INCLUDES LOGIC FOR ZORRO 2 AUTOCONFIG, ZORRO2 SDRAM CONTROLLER, AND GENERAL GLUE LOGIC
 --
 -- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
---
+-- Revision 1.0 - Original Release
+-- Additional Comments: SPECIAL THANKS TO DAVE HAYNIE FOR RELEASING THE A2630 PAL LOGIC EQUATIONS.
+--                      ORIGINAL PAL EQUATIONS BY C= COMMODORE.
+--                      TRANSLATIONS AND ORIGINAL EQUATIONS FOR THE A30 PROJECT BY JASON NEUS.
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -83,7 +100,6 @@ PORT
 	nDSACK0 : OUT STD_LOGIC; --68030 DSACK
 	nDSACK1 : OUT STD_LOGIC;
 	nOVR : OUT STD_LOGIC; --DTACK OVERRIDE
-	ADDIR : OUT STD_LOGIC; --DATA BUS DIRECTION CONTROL AMIGA <-> 68030
 	EMDDIR : OUT STD_LOGIC --DIRECTION OF MEMORY DATA BUS BUFFERS
 	
 
@@ -168,6 +184,7 @@ begin
 	---------------
 
 	--EITHER THE 68030 OR DMA FROM THE ZORRO 2 BUS CAN ACCESS ZORRO 2 RAM ON OUR CARD
+	--SIMULATES OK
 	
 	--THIS DETECTS A 68030 MEMORY ACCESS
 	cpuaccess <= '1' 
@@ -775,6 +792,7 @@ begin
 
 				ELSIF ( RnW = '0' AND nDS = '0' ) THEN	
 				
+					--WRITE REGISTER AT OFFSET $48. THIS IS WHERE THE BASE ADDRESS IS ASSIGNED.
 					IF ( A(6 downto 1) = "100100" ) THEN
 							
 						IF ( romconfiged = '1' AND ramconfiged = '0' ) THEN
@@ -871,24 +889,6 @@ begin
 
 	--AVEC		= cpuspace & interruptack & !BGACK;
 	nAVEC <= '0' WHEN (cpuspace = '1' AND interruptack = '1' AND nBGACK = '1') ELSE '1';
-
-	-----------------------------------
-	-- DATA BUS DIRECTION CONTROL --
-	-----------------------------------
-	
-	--This is data direction control U500
-	--PIN 5		= !BGACK	;	/* '030 Bus grant acknowledge */
-	--PIN 16	= !ADDIR	;	/* Amiga data direction control */
-	--!ADDIR	=  BGACK & !RW		# !BGACK &  RW;
-	--THIS MAKES SENSE WHEN YOU INCLUDE THE DRSEL SIGNAL TO THE 74FCT646 LOGIC, WHICH HAS SOME WIERD CONFIGURATION SETTINGS
-	ADDIR <= '1' --AMIGA TO 2630
-		WHEN 
-			( nBGACK = '0' AND RnW = '1' ) OR
-			( nBGACK = '1' AND RnW = '0' ) 
-		ELSE 
-			'0'; --2630 TO AMIGA
-
-
 
 end Behavioral;
 
