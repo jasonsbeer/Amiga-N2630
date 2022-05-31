@@ -2314,10 +2314,10 @@
       (reference "U300") (unit 7) (value "74HCT05") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061fbe594/6c38d31a-a932-4048-8056-0251efe17f0d"
-      (reference "U400") (unit 1) (value "SDRAM_32Mb(2Mx16)") (footprint "Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm")
+      (reference "U400") (unit 1) (value "SDRAM(2Mx16)") (footprint "Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm")
     )
     (path "/00000000-0000-0000-0000-000061fbe594/b4a56360-f77e-44be-b9c9-e2ce8645c5b2"
-      (reference "U401") (unit 1) (value "SDRAM_32Mb(2Mx16)") (footprint "Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm")
+      (reference "U401") (unit 1) (value "SDRAM(2Mx16)") (footprint "Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm")
     )
     (path "/00000000-0000-0000-0000-000061d9c8dc/00000000-0000-0000-0000-000062134e3a"
       (reference "U406") (unit 1) (value "SDRAM(16Mx16)") (footprint "Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm")
