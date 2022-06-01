@@ -2,7 +2,7 @@
 
   (uuid 4ec0ed8c-166a-47de-8b59-4858e5af82d4)
 
-  (paper "B")
+  (paper "A4")
 
   (title_block
     (date "2022-05-31")
@@ -3567,7 +3567,7 @@
     )
   )
 
-  (text "JUMPER SETTINGS" (at 313.69 243.586 0)
+  (text "JUMPER SETTINGS" (at 180.34 175.26 0)
     (effects (font (size 5 5)) (justify left bottom))
     (uuid a572f4fe-5f64-493e-9ab5-1ead6bb4a62c)
   )
