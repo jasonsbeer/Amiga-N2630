@@ -1,21 +1,36 @@
+--This work is shared under the Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) License
+--https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+	
+--You are free to:
+--Share - copy and redistribute the material in any medium or format
+--Adapt - remix, transform, and build upon the material
+
+--Under the following terms:
+
+--Attribution - You must give appropriate credit, provide a link to the license, and indicate if changes were made. 
+--You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+
+--NonCommercial - You may not use the material for commercial purposes.
+
+--ShareAlike - If you remix, transform, or build upon the material, you must distribute your contributions under the 
+--same license as the original.
+
+--No additional restrictions - You may not apply legal terms or technological measures that legally restrict others 
+--from doing anything the license permits.
+
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Engineer:       JASON NEUS
 -- 
--- Create Date:    08:05:23 04/30/2022 
--- Design Name: 
--- Module Name:    U602 - Behavioral 
--- Project Name: 
--- Target Devices: 
+-- Create Date:    MAY 30 2022 
+-- Design Name:    N2630 U602 CPLD
+-- Project Name:   A30
+-- Target Devices: XC95144 144 PIN
 -- Tool versions: 
--- Description: 
---
--- Dependencies: 
+-- Description: INCLUDES LOGIC FOR ZORRO 2 AUTOCONFIG, ZORRO2 SDRAM CONTROLLER, AND GENERAL GLUE LOGIC
 --
 -- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
---
+-- Revision 1.0 - Original Release
+-- Additional Comments: U602 EQUATIONS BY BY JASON NEUS.
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -49,19 +64,21 @@ entity U602 is
 				RAMSIZE : IN STD_LOGIC_VECTOR (2 DOWNTO 0); --RAM SIZE JUMPERS
 				REF : IN STD_LOGIC; --SDRAM REFRESH SIGNAL
 				J404 : IN STD_LOGIC; --CPU CLOCK SPEED
-				Z3AUTO : IN STD_LOGIC; --ZORR 3 RAM DISABLE
-	    			--nCBREQ : IN STD_LOGIC; --68030 CACHE BURST REQUEST
+	    		--nCBREQ : IN STD_LOGIC; --68030 CACHE BURST REQUEST
+				--nIO16 : IN STD_LOGIC; --IDE IO16 SIGNAL, NOT USED.
 				
 				D : INOUT  STD_LOGIC_VECTOR (31 DOWNTO 24);
 				EXTSEL : INOUT STD_LOGIC; --SIGNALS THE OTHER LOGIC THAT WE ARE RESPONDING TO THE RAM ADDRESS SPACE
 				REFACKZ3 : INOUT STD_LOGIC; --REFRESH ACK
 				
-				CONFIGED : OUT STD_LOGIC; --HAS ZORRO 3 RAM BEEN AUTOCONFIGed? ACTIVE HIGH				
+				nZ3CONFIGED : OUT STD_LOGIC; --HAS ZORRO 3 RAM BEEN AUTOCONFIGed? ACTIVE HIGH				
 				nCS0 : OUT STD_LOGIC; --IDE CHIP SELECT 0
 				nCS1 : OUT STD_LOGIC; --IDE CHIP SELECT 1
 				DA : OUT STD_LOGIC_VECTOR (2 DOWNTO 0); --IDE ADDRESS LINES
 				nDIOR : OUT STD_LOGIC; --IDE READ SIGNAL
 				nDIOW : OUT STD_LOGIC; --IDE WRITE SIGNAL
+				IDEDIR : OUT STD_LOGIC; --IDE BUFFER DIRECTION
+				nIDERST : OUT STD_LOGIC; --IDE RESET
 				--nDSACK0 : OUT STD_LOGIC; --68030 ASYNC PORT SIZE SIGNAL
 				nDSACK1 : OUT STD_LOGIC; --68030 ASYNC PORT SIZE SIGNAL
 				nDTACK : OUT STD_LOGIC; --68000 DATA SIGNAL
@@ -78,9 +95,10 @@ entity U602 is
 				EMCLKE : OUT STD_LOGIC; --CLOCK ENABLE LOW BANK
 				nEM0CS : OUT STD_LOGIC; --CHIP SELECT LOW BANK
 				nEM1CS : OUT STD_LOGIC; --CHIP SELECT HIGH BANK
-				nSTERM : OUT STD_LOGIC; --68030 SYNCRONOUS TERMINATION SIGNAL
-	    			--nCBACK : OUT STD_LOGIC --68030 CACHE BURST ACK
-				
+				nSTERM : OUT STD_LOGIC --68030 SYNCRONOUS TERMINATION SIGNAL
+	    		--nCBACK : OUT STD_LOGIC --68030 CACHE BURST ACK
+				--nBERR : OUT STD_LOGIC; --BUS ERROR FOR BURST MODE
+				--nINT2 : OUT STD_LOGIC; --THIS IS CONNECTED BECAUSE IT IS CONNECTED TO GAYLE, BUT NOT USED YET
 			);
 end U602;
 
@@ -90,7 +108,7 @@ architecture Behavioral of U602 is
 	
 	--AUTOCONFIG SIGNALS
 	SIGNAL Z3RAM_BASE_ADDR : STD_LOGIC_VECTOR(3 DOWNTO 0);	
-	SIGNAL Z3_AUTOCONFIG_SPACE :STD_LOGIC := '0'; --ARE WE IN THE ZORRO 3 AUTOCONFIG ADDRESS SPACE?
+	SIGNAL AUTOCONFIG_SPACE :STD_LOGIC := '0'; --ARE WE IN THE ZORRO 3 AUTOCONFIG ADDRESS SPACE?
 	SIGNAL acsack : STD_LOGIC := '1'; --DSACK FOR THE AUTOCONFIG SPACE
 	
 	-- DATA BUS SIGNALS
@@ -122,7 +140,7 @@ begin
 	--SIMULATES OK
 	
 	D(31 DOWNTO 24) <= 
-			DATAOUTAC & "ZZZZ" WHEN Z3_AUTOCONFIG_SPACE = '1'
+			DATAOUTAC & "ZZZZ" WHEN AUTOCONFIG_SPACE = '1'
 		ELSE 
 			DATAOUT; 
 	
@@ -135,7 +153,7 @@ begin
 	--POSSIBLE TO CONFIGURE THIS MEMORY IN THE ZORRO 2 SPACE.
 	--IDE CAN BE DRIVEN IN EITHER MODE.
 	
-	PROCESS (CPUCLK)
+	PROCESS (CPUCLK) BEGIN
 		IF FALLING_EDGE (CPUCLK) THEN
 			
 			IF AUTOCONFIG_SPACE = '1' THEN
@@ -180,7 +198,7 @@ begin
 	
 	--SIGNAL U601 WHEN WE ARE DONE AUTOCONFIGing.
 	--THIS IS EITHER AFTER WE HAVE AUTOCONFIGED OR THE USER HAS DISABLED THE Z3 RAM VIA J305.
-	CONFIGED <= '1' WHEN Z3RAM_CONFIGED = '1' OR Z3AUTO = '0' ELSE '0';
+	nZ3CONFIGED <= '0' WHEN Z3RAM_CONFIGED = '1' OR nZ3DIS = '0' ELSE '0';
 	
 	--ARE WE IN THE Z3 AUTOCONFIG MEMORY SPACE?
 	AUTOCONFIG_SPACE <= '1' WHEN A(31 DOWNTO 24) = x"FF" AND nAS = '0' AND nZ3DIS = '1' AND Z3RAM_CONFIGED = '0' ELSE '0';
@@ -196,8 +214,10 @@ begin
 		
 		ELSIF RISING_EDGE(CPUCLK) THEN
 			--START ZORRO 3 AUTOCONFIG
+			acsack <= '1';
+			
 			IF AUTOCONFIG_SPACE = '1' THEN
-				acsack <= '1';
+				
 				IF RnW = '1' THEN
 					--READ REGISTERS
 			
@@ -302,6 +322,10 @@ begin
 	--IDE_SPACE <= '1' WHEN (A(23 DOWNTO 12) >= x"DA0" AND A(23 DOWNTO 12) <= x"DA3") AND nAS = '0' AND nBGACK = '1' ELSE '0';
 	IDE_SPACE <= '1' WHEN A(23 DOWNTO 14) = "1101101000" AND nAS = '0' AND nBGACK = '1' AND nIDEDIS = '1' ELSE '0';
 	
+	IDEDIR <= NOT RnW;
+	
+	nIDERST <= nRESET;
+	
 	--GAYLE SPECS TELL US WHEN THE IDE CHIP SELECT LINES ARE ACTIVE
 	
 	nCS0 <= '0' 
@@ -332,11 +356,13 @@ begin
 			idesack <= '1';
 		
 		ELSIF (RISING_EDGE(CPUCLK)) THEN
+			
+			idesack <= '1';
 		
 			IF (IDE_SPACE = '1') THEN			
 				--WE ARE IN THE IDE ADDRESS SPACE 
 				--THE TIMINGS HERE MAY NEED SOME TWEAKING, ESPECIALLY BETWEEN 68000 AND 68030 MODE
-				idesack <= '1';
+				
 			
 				 IF (nAS = '0') THEN 
 					--ADDRESS STROBE IS ASSERTED
@@ -402,10 +428,10 @@ begin
 		ELSE 
 			'0';
 			
-	--HERE WE DETERMINE WHERE WE ARE DIRECTING THE CHIP SELECT SIGNALLING FOR THE Z3 SDRAM.
+	--HERE WE DETERMINE WHERE WE ARE DIRECTING THE CHIP SELECT SIGNALING FOR THE Z3 SDRAM.
 	--THESE ARE DRIVEN BY JUMPERS SET BY THE USER THAT ALLOW US TO MAKE DECISIONS WITH THAT INFORMATION.
 	--256MB IS THE GREATEST CAPACITY IN THE TSOP 2 PACKAGE WITH 4 CHIPS, SO THAT IS THE MAX HERE.
-	--ALTHOUGH, THE Z3 BUS SUPPORTS UP TO 1GB OF RAM. SWEET!
+	--ALTHOUGH, THE Z3 BUS SUPPORTS UP TO 1GB OF RAM.
 			
 	PROCESS (CPUCLK) BEGIN
 		IF RISING_EDGE(CPUCLK) THEN
@@ -710,7 +736,7 @@ begin
 					--SET CAS STATE VALUES SO THEY LATCH ON THE NEXT CLOCK EDGE
 					CURRENT_STATE <= CAS_STATE;
 					EMA(9 downto 0) <= A(26 downto 17);
-					EMA(10) <= '1'; --PRECHARGE
+					EMA(10) <= '1'; --AUTO PRECHARGE
 												
 					nEMWE <= '1';
 					nEMRAS <= '1';	
@@ -765,4 +791,3 @@ begin
 	END PROCESS;
 	
 end Behavioral;
-
