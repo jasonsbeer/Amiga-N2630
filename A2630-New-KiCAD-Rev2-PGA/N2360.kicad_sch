@@ -1583,6 +1583,9 @@
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-0000626f3b09"
       (reference "R220") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
+    (path "/00000000-0000-0000-0000-000061d79ebc/ea6cd626-b199-4cf2-8d9b-ea7a1cfa0742"
+      (reference "R221") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
+    )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-0000626f40d6"
       (reference "R222") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
