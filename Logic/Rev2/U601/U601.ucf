@@ -1,7 +1,6 @@
 NET "nHALT"		LOC = "P2" ;
 NET "nCPURESET"	LOC = "P3" ;
 NET "D<29>"		LOC = "P4" ;
-NET "nONBOARD"		LOC = "P6" ;
 NET "D<28>"		LOC = "P7" ;
 NET "nSENSE"		LOC = "P9" ; 
 NET "nFPUCS"		LOC = "P10" ;
@@ -19,6 +18,7 @@ NET "EXTSEL"		LOC = "P22" ;
 NET "nBERR"			LOC = "P23" ;
 NET "REF"		LOC = "P24" ;
 NET "REFACKZ2"		LOC = "P25" ;
+NET "nONBOARD"		LOC = "P28" ;
 NET "CPUCLK"		LOC = "P30" ;
 NET "MEMACCESS"	LOC = "P33" ;
 NET "CONFIGED"		LOC = "P35" ;
