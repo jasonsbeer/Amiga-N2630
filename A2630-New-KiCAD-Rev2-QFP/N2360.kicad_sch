@@ -1112,12 +1112,6 @@
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000061f847b3"
       (reference "#PWR0151") (unit 1) (value "+5V") (footprint "")
     )
-    (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000061f941e9"
-      (reference "#PWR0152") (unit 1) (value "+5V") (footprint "")
-    )
-    (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000061fa2cd6"
-      (reference "#PWR0153") (unit 1) (value "+5V") (footprint "")
-    )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-00006289d1a9"
       (reference "#PWR0154") (unit 1) (value "GND") (footprint "")
     )
@@ -1225,6 +1219,12 @@
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/5a2865a3-13c2-4584-8840-545b61d0ad65"
       (reference "#PWR0202") (unit 1) (value "+5V") (footprint "")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/5182b919-1516-44e4-9461-6043f01da53d"
+      (reference "#PWR?") (unit 1) (value "+3.3V") (footprint "")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/d93ca7e3-2d2a-4917-95f4-216e98489059"
+      (reference "#PWR?") (unit 1) (value "+3.3V") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061d9c8dc/00000000-0000-0000-0000-000062b32a4c"
       (reference "C102") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
