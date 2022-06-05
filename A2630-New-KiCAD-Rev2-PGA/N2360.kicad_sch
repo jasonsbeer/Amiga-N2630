@@ -959,6 +959,9 @@
     (path "/00000000-0000-0000-0000-0000634ecc15/40f8622b-4e6e-4236-a5d6-fa988402837b"
       (reference "#PWR03") (unit 1) (value "GND") (footprint "")
     )
+    (path "/00000000-0000-0000-0000-000061df74a0/7bf97497-1c26-4261-b180-0a72c617dfdc"
+      (reference "#PWR04") (unit 1) (value "GND") (footprint "")
+    )
     (path "/00000000-0000-0000-0000-000061fbe594/bbfbbc47-0d94-43af-a504-7d4dc62695c6"
       (reference "#PWR07") (unit 1) (value "GND") (footprint "")
     )
@@ -1229,9 +1232,6 @@
     (path "/00000000-0000-0000-0000-0000634ecc15/5a2865a3-13c2-4584-8840-545b61d0ad65"
       (reference "#PWR0202") (unit 1) (value "+5V") (footprint "")
     )
-    (path "/00000000-0000-0000-0000-000061df74a0/7bf97497-1c26-4261-b180-0a72c617dfdc"
-      (reference "#PWR?") (unit 1) (value "GND") (footprint "")
-    )
     (path "/00000000-0000-0000-0000-000061d9c8dc/00000000-0000-0000-0000-000062b32a4c"
       (reference "C102") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
@@ -1429,6 +1429,9 @@
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-00006224ffa9"
       (reference "C718") (unit 1) (value "10uF") (footprint "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm")
+    )
+    (path "/00000000-0000-0000-0000-000061df74a0/09626339-3bfc-4cd1-a7ca-65e3aa1d13b0"
+      (reference "C719") (unit 1) (value "10uF") (footprint "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/30ec9d1e-2a98-4009-b845-2064a986995f"
       (reference "C800") (unit 1) (value "10uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
