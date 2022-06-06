@@ -1,8 +1,0 @@
-V3 3
-FL /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601/U601.vhd 2022/04/15.20:54:55 P.20131013
-EN work/U601 1650074097 \
-      FL /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601/U601.vhd \
-      PB ieee/std_logic_1164 1381692176 PB ieee/STD_LOGIC_UNSIGNED 1381692179
-AR work/U601/Behavioral 1650074098 \
-      FL /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601/U601.vhd \
-      EN work/U601 1650074097
