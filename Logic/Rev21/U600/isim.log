@@ -1,0 +1,199 @@
+ISim log file
+Running: /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600_isim_beh.exe -intstyle ise -gui -tclbatch isim.cmd -wdb /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600_isim_beh.wdb 
+ISim P.20131013 (signature 0xfbc00daa)
+----------------------------------------------------------------------
+INFO:Security:61 - The XILINXD_LICENSE_FILE environment variable is not set.
+INFO:Security:63 - The LM_LICENSE_FILE environment variable is not set.
+INFO:Security:68 - For more information or for assistance in obtaining 
+ a license, please run the Xilinx License Configuration Manager
+       (xlcm or "Manage Xilinx Licenses".)
+INFO:Security:68a - user is jason, on host unknown.
+INFO:Security:15 - A feature for ISIM was found but is for the wrong hostid.
+ERROR:Security:14 - No feature was available for 'ISIM'.
+
+Invalid host.
+ The hostid of this system does not match the hostid
+ specified in the license file.
+Feature:       ISIM
+Hostid:        00d8613a015c
+License path:  /home/jason/.Xilinx/Xilinx.lic:/mnt/work/ISE/14.7/ISE_DS/ISE//data/*.lic:/mnt/work/ISE/14.7/ISE_DS/ISE//coregen/core_licenses/Xilinx.lic:/mnt/work/ISE/14.7/ISE_DS/ISE//coregen/core_licenses/XilinxFree.lic:/mnt/work/ISE/14.7/ISE_DS/EDK/data/core_licenses/Xilinx.lic:
+FLEXnet Licensing error:-9,57
+For further information, refer to the FLEXnet Licensing documentation,
+available at "www.flexerasoftware.com".
+----------------------------------------------------------------------
+WARNING: A full ISim License cannot be checked out due to the issues listed above. Please use Xilinx License Configuration Manager to fix these issues in order to check out a full ISim license.
+WARNING: ISim will run in Lite mode. Please refer to the ISim documentation for more information on the differences between the Lite and the Full version.
+This is a Lite version of ISim.
+Time resolution is 1 ps
+# onerror resume
+# wave add /
+# run 1000 ns
+Simulator is doing circuit initialization process.
+Finished circuit initialization process.
+# isim force add /u600/b2000 0 -radix bin
+# isim force add /u600/a7m 1 -radix bin -value 0 -radix bin -time 35 ns -repeat 70 ns
+# isim force add /u600/nberr 1 -radix bin
+# isim force add /u600/nvpa 1 -radix bin
+# isim force add /u600/nboss 0 -radix bin
+# isim force add /u600/nreset 1 -radix bin
+# run 1.00us
+# isim force add /u600/rnw 1 -radix bin
+# isim force add /u600/nas 1 -radix bin
+# run 1.00us
+# run 1.00us
+# isim force add /u600/basis7m 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
+# run 1.00us
+# run 1.00us
+# isim force add /u600/nas 0 -radix bin -cancel 10 ps
+# isim force add /u600/nas 0 -radix bin -cancel 10 ps
+# run 1.00us
+# isim force add /u600/nas 0 -radix bin
+# run 1.00us
+# run 1.00us
+# isim force add /u600/offboard 1 -radix bin
+# run 1.00us
+# isim force add /u600/ndtack 0 -radix bin
+# run 1.00us
+# isim force add /u600/nas 1 -radix bin
+# run 1.00us
+# isim force add /u600/rnw 0 -radix bin
+# isim force add /u600/nas 0 -radix bin
+# run 1.00us
+# isim force add /u600/a 00 -radix bin
+# isim force add /u600/nas 1 -radix bin
+# run 1.00us
+# isim force add /u600/nas 0 -radix bin
+# run 1.00us
+# isim force add /u600/ndtack 1 -radix bin
+# isim force add /u600/nas 1 -radix bin
+# run 1.00us
+# isim force add /u600/a 11 -radix bin
+# isim force add /u600/nas 0 -radix bin
+# run all
+Stopped at time : 386234260 ns : File "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd" Line 137
+ISim P.20131013 (signature 0xfbc00daa)
+----------------------------------------------------------------------
+INFO:Security:61 - The XILINXD_LICENSE_FILE environment variable is not set.
+INFO:Security:63 - The LM_LICENSE_FILE environment variable is not set.
+INFO:Security:68 - For more information or for assistance in obtaining 
+ a license, please run the Xilinx License Configuration Manager
+       (xlcm or "Manage Xilinx Licenses".)
+INFO:Security:68a - user is jason, on host unknown.
+INFO:Security:15 - A feature for ISIM was found but is for the wrong hostid.
+ERROR:Security:14 - No feature was available for 'ISIM'.
+
+Invalid host.
+ The hostid of this system does not match the hostid
+ specified in the license file.
+Feature:       ISIM
+Hostid:        00d8613a015c
+License path:  /home/jason/.Xilinx/Xilinx.lic:/mnt/work/ISE/14.7/ISE_DS/ISE//data/*.lic:/mnt/work/ISE/14.7/ISE_DS/ISE//coregen/core_licenses/Xilinx.lic:/mnt/work/ISE/14.7/ISE_DS/ISE//coregen/core_licenses/XilinxFree.lic:/mnt/work/ISE/14.7/ISE_DS/EDK/data/core_licenses/Xilinx.lic:
+FLEXnet Licensing error:-9,57
+For further information, refer to the FLEXnet Licensing documentation,
+available at "www.flexerasoftware.com".
+----------------------------------------------------------------------
+WARNING: A full ISim License cannot be checked out due to the issues listed above. Please use Xilinx License Configuration Manager to fix these issues in order to check out a full ISim license.
+WARNING: ISim will run in Lite mode. Please refer to the ISim documentation for more information on the differences between the Lite and the Full version.
+This is a Lite version of ISim.
+# run 1000 ns
+Simulator is doing circuit initialization process.
+Finished circuit initialization process.
+# isim force add /u600/b2000 0 -radix bin
+# isim force add /u600/nreset 1 -radix bin
+# isim force add /u600/offboard 1 -radix bin
+# isim force add /u600/basis7m 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
+# isim force add /u600/rnw 0 -radix bin
+# isim force add /u600/a 11 -radix bin
+# run 1.00us
+# isim force add /u600/nberr 1 -radix bin
+# isim force add /u600/nvpa 1 -radix bin
+# run 1.00us
+# isim force add /u600/ndtack 1 -radix bin
+# run 1.00us
+# isim force add /u600/nas 0 -radix bin
+# run 1.00us
+# isim force add /u600/tristate 0 -radix bin
+# run 1.00us
+# isim force add /u600/ndtack 0 -radix bin
+# run 1.00us
+# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
+# run 1.00us
+# isim force add /u600/ndtack 1 -radix bin
+# isim force add /u600/nas 1 -radix bin
+# run 1.00us
+# isim force add /u600/nas 0 -radix bin
+# run all
+Stopped at time : 83809960 ns : File "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd" Line 137
+# isim force add /u600/nberr 0 -radix bin
+# run 1.00us
+# isim force add /u600/nberr 1 -radix bin
+# isim force add /u600/nas 1 -radix bin
+# run 1.00us
+# isim force add /u600/rnw 1 -radix bin
+# run 1.00us
+# isim force add /u600/nas 0 -radix bin
+# run 1.00us
+# isim force add /u600/nberr 0 -radix bin
+# run 1.00us
+# isim force add /u600/nas 1 -radix bin
+# run 1.00us
+# isim force add /u600/nberr 1 -radix bin
+# run 1.00us
+# isim force add /u600/nas 0 -radix bin
+# run 1.00us
+# isim force add /u600/nvpa 0 -radix bin
+# run 1.00us
+ISim P.20131013 (signature 0xfbc00daa)
+----------------------------------------------------------------------
+INFO:Security:61 - The XILINXD_LICENSE_FILE environment variable is not set.
+INFO:Security:63 - The LM_LICENSE_FILE environment variable is not set.
+INFO:Security:68 - For more information or for assistance in obtaining 
+ a license, please run the Xilinx License Configuration Manager
+       (xlcm or "Manage Xilinx Licenses".)
+INFO:Security:68a - user is jason, on host unknown.
+INFO:Security:15 - A feature for ISIM was found but is for the wrong hostid.
+ERROR:Security:14 - No feature was available for 'ISIM'.
+
+Invalid host.
+ The hostid of this system does not match the hostid
+ specified in the license file.
+Feature:       ISIM
+Hostid:        00d8613a015c
+License path:  /home/jason/.Xilinx/Xilinx.lic:/mnt/work/ISE/14.7/ISE_DS/ISE//data/*.lic:/mnt/work/ISE/14.7/ISE_DS/ISE//coregen/core_licenses/Xilinx.lic:/mnt/work/ISE/14.7/ISE_DS/ISE//coregen/core_licenses/XilinxFree.lic:/mnt/work/ISE/14.7/ISE_DS/EDK/data/core_licenses/Xilinx.lic:
+FLEXnet Licensing error:-9,57
+For further information, refer to the FLEXnet Licensing documentation,
+available at "www.flexerasoftware.com".
+----------------------------------------------------------------------
+WARNING: A full ISim License cannot be checked out due to the issues listed above. Please use Xilinx License Configuration Manager to fix these issues in order to check out a full ISim license.
+WARNING: ISim will run in Lite mode. Please refer to the ISim documentation for more information on the differences between the Lite and the Full version.
+This is a Lite version of ISim.
+# run 1000 ns
+Simulator is doing circuit initialization process.
+Finished circuit initialization process.
+# run 1.00us
+# isim force add /u600/b2000 0 -radix bin
+# isim force add /u600/nreset 1 -radix bin
+# isim force add /u600/offboard 1 -radix bin
+# isim force add /u600/basis7m 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
+# isim force add /u600/nvpa 1 -radix bin
+# isim force add /u600/nberr 1 -radix bin
+# isim force add /u600/nboss 0 -radix bin
+# isim force add /u600/rnw 1 -radix bin
+# isim force add /u600/ndtack 1 -radix bin
+# isim force add /u600/nas 1 -radix bin
+# run 1.00us
+# isim force add /u600/a 11 -radix bin
+# run 1.00us
+# run 1.00us
+# run 1.00us
+# run 1.00us
+# run 1.00us
+# run 1.00us
+# isim force add /u600/nas 0 -radix bin
+# run 1.00us
+# isim force add /u600/nvpa 0 -radix bin
+# run 1.00us
+# isim force add /u600/nas 1 -radix bin
+# isim force add /u600/nvpa 1 -radix bin
+# run 1.00us
+# exit 0
