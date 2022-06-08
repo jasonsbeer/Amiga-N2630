@@ -152,7 +152,7 @@ architecture Behavioral of U601 is
 	SIGNAL phantomhi : STD_LOGIC := '0'; --PHANTOM HIGH SIGNAL
 	SIGNAL hirom : STD_LOGIC := '0'; --IS THE ROM IN THE HIGH ADDRESS SPACE?
 	SIGNAL lorom : STD_LOGIC := '0'; --IS THE ROM IN THE LOW ADDRESS SPACE?
-	SIGNAL rambaseaddress : STD_LOGIC_VECTOR (2 DOWNTO 0) := "000"; --RAM BASE ADDRESS
+	--SIGNAL rambaseaddress : STD_LOGIC_VECTOR (2 DOWNTO 0) := "000"; --RAM BASE ADDRESS
 	SIGNAL acsack : STD_LOGIC; --AUTOCONFIG DSACKn SIGNAL
 	
 begin
@@ -190,20 +190,20 @@ begin
 	
 	--THIS DETECTS A 68030 MEMORY ACCESS
 	--THE 8MB DATA SPACE USES UP TO (AND INCLUDING) A22.
-	--THIS MEANS WHEN 8MBs ARE INSTALLED, WE SHOULD RESPOND TO A23..22 = 01 OR 10.
-	--WITH 4MBs INSTALLED, WE SHOULD RESPOND TO ADDRESS 010 AND 001.
-	--WITH 2MBs INSTALLED, WE SHOULD RESPOND TO ADDRESS 0010 AND 0001.
-	--THIS BASICALLY MEANS IT DOESN'T MATTER WHAT BASE ADDRESS AUTOCONFIG ASSIGNS, AS IT MUST RESIDE IN THE ABOVE RANGE(S).
+	--THIS MEANS WHEN 8MBs ARE INSTALLED, WE RESPOND WHEN A23 = BASEADDRESS(3) (MUST BE = 1?).
+	--WITH 4MBs INSTALLED, WE RESPOND WHEN A23..22 = BASEADDRESS(3..2)
+	--WITH 2MBs INSTALLED, WE RESPOND WHEN A23..21 = BASEADDRESS(3..1).
+	--WITH 1MB INSTALLED, WE RESPOND WHEN A23..20 = BASEADDRESS(3..0).
 	cpuaccess <= '1' 
 		WHEN
-			ramconfiged = '1' AND (A(23 downto 22) = "10" OR A(23 downto 22) = "11") AND nAS = '0' AND FC(2 DOWNTO 0) /= "111"
+			ramconfiged = '1' AND A(23) = '1' AND nAS = '0' AND FC(2 DOWNTO 0) /= "111"
 		ELSE
 			'0';
 	
 	--THIS DETECTS A DMA MEMORY ACCESS
 	dmaaccess <= '1'
 		WHEN
-			ramconfiged = '1' AND (A(23 downto 22) = "10" OR A(23 downto 22) = "11") AND nAAS = '0' AND nBGACK = '0'
+			ramconfiged = '1' AND A(23) = '1' AND nAAS = '0' AND nBGACK = '0'
 		ELSE
 			'0';
 			
@@ -485,12 +485,12 @@ begin
 							nDTACK <= '1'; --DMA CYCLE	
 						END IF; 
 						
-						COUNT <= 0;
+						--COUNT <= 0;
 					END IF;
 					
 				WHEN RAS_STATE =>	
 					
-					--AKA BANK ACTIVATE IN SDRAM DATA SHEETS
+					--BANK ACTIVATE
 					--SET CAS STATE VALUES SO THEY LATCH ON THE NEXT CLOCK EDGE
 					CURRENT_STATE <= CAS_STATE;
 					ZMA(7 downto 0) <= A(22 downto 15);
@@ -541,15 +541,15 @@ begin
 							dsack <= '0'; 
 							
 						END IF;
-					ELSE
-						COUNT <= COUNT + 1;
+					--ELSE
+						--COUNT <= COUNT + 1;
 					END IF;	
 					
 					
 					IF (MEMACCESS = '0') THEN 
 						--THE ADDRESS STROBE HAS NEGATED INDICATING THE END OF THE MEMORY ACCESS.
 						
-						--TRISTATE SO WE DON'T INTERFERE WITH OTHER DEVICES ON THE BUSES.
+						--TRISTATE SO WE DON'T INTERFERE WITH OTHER DEVICES ON THE BUS.
 						--DSACK AUTOMATICALLY HI Z's WHEN MEMACCESS = 0, BUT WE SET IT HIGH HERE
 						--SO IT DOESN'T MESS UP THE NEXT CYCLE.
 						dsack <= '1';
@@ -609,8 +609,8 @@ begin
 			
 				IF acsack = '0' THEN 
 					--THIS IS AUTOCONFIG, SO IT IS A 16 BIT DATA TRANSFER
-					nDSACK0 <= '0';
-					nDSACK1 <= '1';
+					nDSACK0 <= '1';
+					nDSACK1 <= '0';
 				
 				ELSE
 				
@@ -744,14 +744,13 @@ begin
 	
 		IF nRESET = '0' THEN
 			
-			rambaseaddress <= "000";			
-			ramconfiged <= '0';			
+			--rambaseaddress <= "000";			
+			ramconfiged <= '0';	
+			acsack <= '1';
 			
 		ELSIF ( FALLING_EDGE (CPUCLK)) THEN
 		
 			IF ( autoconfigspace = '1' ) THEN
-			
-				acsack <= '1';
 			
 				IF ( RnW = '1' ) THEN
 					--The 680x0 is reading from us
@@ -817,8 +816,12 @@ begin
 					END IF;					
 				END IF;
 				
-				acsack <= '0'; --DSACK after each cycle
+				--DSACK after each cycle
+				acsack <= '0'; 
 				
+			ELSE
+				--WE ARE NOT IN THE AUTOCONFIG SPACE (_AS NEGATED), NEGATE AUTOCONFIG DSACK
+				acsack <= '1';
 			END IF;
 		END IF;
 	END PROCESS;
