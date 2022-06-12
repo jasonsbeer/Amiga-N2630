@@ -69,9 +69,10 @@ entity U602 is
 				
 				D : INOUT  STD_LOGIC_VECTOR (31 DOWNTO 24);
 				EXTSEL : INOUT STD_LOGIC; --SIGNALS THE OTHER LOGIC THAT WE ARE RESPONDING TO THE RAM ADDRESS SPACE
-				REFACKZ3 : INOUT STD_LOGIC; --REFRESH ACK
+				REFACKZ3 : INOUT STD_LOGIC; --REFRESH ACK				
+				nINT2 : INOUT STD_LOGIC; --INT2 DRIVEN BY IDE INTRQ
 				
-				Z3CONFIGED : OUT STD_LOGIC; --HAS ZORRO 3 RAM BEEN AUTOCONFIGed? ACTIVE HIGH				
+				nZ3CONFIGED : OUT STD_LOGIC; --HAS ZORRO 3 RAM BEEN AUTOCONFIGed? ACTIVE HIGH				
 				nCS0 : OUT STD_LOGIC; --IDE CHIP SELECT 0
 				nCS1 : OUT STD_LOGIC; --IDE CHIP SELECT 1
 				DA : OUT STD_LOGIC_VECTOR (2 DOWNTO 0); --IDE ADDRESS LINES
@@ -117,6 +118,14 @@ architecture Behavioral of U602 is
 	
 	--IDE RELATED SIGNALS
 	SIGNAL idesack : STD_LOGIC := '1'; --DSACK FOR THE IDE SPACE
+	SIGNAL gaylesack : STD_LOGIC := '1'; --SDACK FOR ANY ACTIONS IN THE GAYLE REGISTERS
+	SIGNAL gaylecount : INTEGER RANGE 0 TO 3; --PART OF THE GAYLE CONFIGURATION
+	SIGNAL gayleconfiged : STD_LOGIC := '0'; --IS GAYLE CONFIGURED?
+	SIGNAL gaylespace : STD_LOGIC := '0'; --ARE WE IN ANY OF THE GAYLE REGISTER SPACES?
+	SIGNAL ideintenable : STD_LOGIC := '0'; --IDE INTERRUPTS ENABLED
+	SIGNAL lastint : STD_LOGIC := '0'; --TRACKS THE STATE OF THE IDE INTERRUPT REQUEST
+	SIGNAL intchange : STD_LOGIC := '0'; --HAS THE IDE INTERRUPT REQUEST CHANGED?
+	SIGNAL intchangeack : STD_LOGIC := '0'; --REGISTER $DA9000 HAS BEEN READ
 
 	--MEMORY SIGNALS
 	SIGNAL MEMORY_SPACE : STD_LOGIC := '0'; --ARE WE IN THE ZORRO 3 MEMORY SPACE?
@@ -128,6 +137,13 @@ architecture Behavioral of U602 is
 	TYPE SDRAM_STATE IS ( PRESTART, POWERUP, POWERUP_PRECHARGE, MODE_REGISTER, AUTO_REFRESH, AUTO_REFRESH_CYCLE, RUN_STATE, RAS_STATE, CAS_STATE );	
 	SIGNAL CURRENT_STATE : SDRAM_STATE;
 	SIGNAL SDRAM_START_REFRESH_COUNT : STD_LOGIC := '0'; --WE NEED TO REFRESH TWICE UPON STARTUP	
+	
+	SIGNAL CE : STD_LOGIC := '0';
+	SIGNAL PRE : STD_LOGIC := '0';
+	SIGNAL FFD : STD_LOGIC := '0';
+	SIGNAL C : STD_LOGIC := '0';
+	SIGNAL Q : STD_LOGIC := '0';
+	SIGNAL intlast : STD_LOGIC := '0';
 
 begin
 
@@ -163,9 +179,9 @@ begin
 					nDSACK1 <= '1';
 				END IF;
 					
-			ELSIF IDE_SPACE = '1' THEN
+			ELSIF IDE_SPACE = '1' OR gaylespace = '1' THEN
 				
-				IF idesack = '0' THEN
+				IF idesack = '0' OR gaylesack = '0' THEN
 					IF MODE68K = '0' THEN						
 						nDSACK1 <= '0';
 					ELSE
@@ -198,8 +214,7 @@ begin
 	
 	--SIGNAL U601 WHEN WE ARE DONE AUTOCONFIGing.
 	--THIS IS EITHER AFTER WE HAVE AUTOCONFIGED OR THE USER HAS DISABLED THE Z3 RAM VIA J305.
-	--WE ARE BASICALLY TELLING U601 THAT WE ARE DONE DOING WHAT NEEDS TO BE DONE.
-	Z3CONFIGED <= '1' WHEN Z3RAM_CONFIGED = '1' OR nZ3DIS = '0' ELSE '0';
+	nZ3CONFIGED <= '0' WHEN Z3RAM_CONFIGED = '1' OR nZ3DIS = '0' ELSE '0';
 	
 	--ARE WE IN THE Z3 AUTOCONFIG MEMORY SPACE?
 	AUTOCONFIG_SPACE <= '1' WHEN A(31 DOWNTO 24) = x"FF" AND nAS = '0' AND nZ3DIS = '1' AND Z3RAM_CONFIGED = '0' ELSE '0';
@@ -296,27 +311,165 @@ begin
 	--BIT 7 IS SET HIGH TO INDICATE THE IRQ. THE OTHER BITS ARE ALL FOR THE PCMCIA, SETTING BIT 0 HIGH DISABLES IT.
 	--THE INTERUPT REQUEST IS ACKNOWLEDGED WITH THE REGISTER AT $DA9000. THERE IS NOT A HARDWARE INTERUPT ACK, SO JUST FYI.	
 	
-	--SIMULATES OK
+	--PASS THE IDE DEVICE INTRQ SIGNAL TO _INT2 WHEN INTERRUPTS ARE ENABLED
+	--_INT2 HAS A PULLUP ON THE A2000
+	nINT2 <= '0' WHEN INTRQ = '1' AND ideintenable = '1' ELSE 'Z';
 	
-	PROCESS (CPUCLK) BEGIN
-		IF (RISING_EDGE (CPUCLK)) THEN
+	--CATCH WHEN THE INTERRUPT STATUS CHANGES
+	process (C, nRESET, PRE) begin
+    if nRESET = '0' then
+      Q <= '0';
+    elsif PRE = '1' then
+      Q <= '1';
+    elsif rising_edge(C) then
+      if CE = '1' then
+        Q <= FFD;
+      end if;
+    end if;
+  end process;
+
+  
+--	CE <= '1' WHEN gaylespace = '1' ELSE '0';
+--	PRE <= '1' WHEN INTRQ = '1' AND lastint = '0' AND ideintenable = '1' ELSE '0';
+--	FFD <= '1' WHEN D(31) = Q ELSE '0';
+--	C <= NOT nDS;
+--  
+--	PROCESS (FFD, nRESET, PRE) BEGIN
+--		
+--		IF nRESET = '0' THEN
+--			Q <= '0';
+--		ELSIF PRE = '1' THEN
+--			Q <= '1';
+--		ELSIF RISING_EDGE (C) THEN
+--			IF CE = '1' THEN
+--				Q <= FFD;
+--			END IF;
+--		END IF;
+--	END PROCESS;
+
+	
+	PROCESS (nDS, nRESET) BEGIN
+	
+		IF nRESET = '0' THEN
 		
-			IF (RnW = '1' AND nAS = '0' AND nIDEDIS = '1') THEN
+			gayleconfiged <= '0';
+			gaylecount <= 0;
+			gaylesack <= '1';
+			lastint <= '0';
+			nINT2 <= 'Z';
+	
+		ELSIF (FALLING_EDGE (nDS)) THEN
+		
+--			
+--			--RESET THE INTCHANGE SIGNAL IF IT HAS BEEN READ IN THE $DA9000 REGISTER AND _AS IS NEGATED
+--			IF intchangeack = '1' AND nAS = '1' THEN
+--				intchange <= '0';
+--				intchangeack <= '0';
+--			END IF;
+--			
+--			--TRACK WHEN THE IRQ STATUS HAS CHANGED AND HOLD THE VALUE UNTIL 
+--			--THE $DA9000 REGISTER IS READ.
+--			IF lastint /= INTRQ THEN
+--				intchange <= '1';
+--			END IF;
+--			
+--			--GRAB THE VALUE OF THE CURRENT INTRQ FOR NEXT CLOCK CYCLE
+--			lastint <= INTRQ;
+			
+			--DEAL WITH THE GAYLE REGISTERS
+			IF (nIDEDIS = '1') THEN
 			
 				CASE A(23 DOWNTO 12) IS
 					
 					--11010000 = $D0 = ECS Gayle
 					--11010001 = $D1 = AGA Gayle
-					--THIS GAYLE DETECTION IS NOT CORRECT...WHEN ADDRESS IS $DE1000, BIT 7 IS READ.
+					--GAYLE_ID CONFIGURATION REGISTER IS AT $DE1000. WHEN ADDRESS IS $DE1000 AND R_W IS READ, BIT 7 IS READ.
 					--THIS HAPPENS 4 TIMES IN A ROW , READING BIT 7 ONLY, WHICH ID's GAYLE.
 					--SO, FOR 4 READS IN A ROW, RETURN 1,1,0,1 ON BIT 7. THEN THE GAYLE REGISTER IS SET.
 					--IF $00 IS WRITTEN TO $DE1000, THAT MEANS THE REGISTER HAS BEEN RESET AND WE NEED TO RE-ESTABLISH GAYLE.
 					
-					WHEN x"DE1" => DATAOUT <= x"DF"; --GAYLE_ID is at $DE1000. Return $DF (11011111).
-					WHEN x"DAA" => DATAOUT <= x"80"; --INTENA (enable ide interupts) AT $DAA000, Return $80 (10000000).
-					WHEN x"DA8" => DATAOUT <= INTRQ & "0000001"; --IDE Device Interrupt Request on data bit 7 at $DA8000.
-					WHEN OTHERS => DATAOUT <= (OTHERS => 'Z');
+					WHEN x"DE1" => 
+						--THIS IS THE GAYLE ID REGISTER
+						
+						gaylespace <= '1';
+						
+						IF (RnW = '1') THEN
+						
+							IF gaylecount = 0 OR gaylecount = 1 OR gaylecount = 3 THEN
+								DATAOUT <= x"FF"; --RETURNS 11111111
+							ELSIF gaylecount = 2 THEN
+								DATAOUT <= x"7F"; --RETURNS 01111111						
+							END IF;
+							
+							gaylecount <= gaylecount + 1;
+						
+						ELSIF (RnW = '0') THEN
+							--GAYLE REGISTER IS TO BE RESET ON ANY WRITE TO THIS ADDRESS.						
+							gaylecount <= 0;
+						END IF;	
+
+						gaylesack <= '0'; --16 BIT DATA TRANSFER ACK
+					
+					--THE REGISTER AT $DAA000 ENABLES IDE INTERRUPTS.
+					--GAYLE SPECS SAY "BIT 15: ENABLES GENERATION OF AN INT2 ON STATUS CHANGE 
+					--OF THE INTERRUPT LINE OF THE IDE INTERFACE."
+					
+					WHEN x"DAA" => 
+					
+						gaylespace <= '1';
+					
+						IF RnW = '0' THEN
+							ideintenable <= D(31); --1 = ENABLE, 0 = DISABLE
+						ELSE
+							DATAOUT <= ideintenable & "0000001";
+						END IF;
+						
+						gaylesack <= '0';						
+					
+					--WHEN THE IDE DEVICE REQUESTS AN INTERRUPT VIA THE INTRQ SIGNAL,
+					--WE DO TWO THINGS: WE ASSERT _INT2 AND SET BIT 7 OF THE REGISTER AT $DA8000.
+					--THIS TELLS AMIGA OS THAT THE INT2 IS ASSERTED BY THE IDE DEVICE. INTRQ IS ACTIVE HIGH.
+					
+					WHEN x"DA8" =>
+						gaylespace <= '1';
+						
+						IF RnW = '1' THEN
+							DATAOUT <= INTRQ & "0000001";
+							gaylesack <= '0';	
+						END IF;
+										
+					
+					--THE REGISTER AT $DA9000 IS USED TO TELL AMIGA OS THAT THE INTERRUPT REQUEST HAS CHANGED.
+					--SET BIT 7 TO INDICATE THE IDE INTERRUPT IS UNCHANGED FROM THE PREVIOUS CLOCK.
+					
+					--110110101001000000000000
+					WHEN x"DA9" =>
+						gaylespace <= '1';
+
+--						IF RnW = '1' THEN
+--							IF intchange = '1' THEN
+--								--THE INTERRUPT STATE HAS CHANGED
+--								DATAOUT <= "01111111";
+--								intchangeack <= '1';
+--							ELSE
+--								--BIT 7 IS HIGH AS LONG AS THE STATE IS UNCHANGED
+--								DATAOUT <= "11111111";
+--							END IF;
+--						END IF;								
+						
+						gaylesack <= '0';						
+					
+					WHEN OTHERS => 
+						--WHEN WE'RE NOT IN A GAYLE REGISTER
+						gaylespace <= '0';
+						DATAOUT <= (OTHERS => 'Z');
+						
 				END CASE;
+			
+			ELSE
+				
+				gaylesack <= '1';
+				gaylespace <= '0';
 				
 			END IF;
 			
@@ -329,23 +482,25 @@ begin
 	--WE CONSIDER BGACK BECAUSE WE DON'T WANT TO RESPOND TO DMA GENERATED ADDRESSES.
 	--$DA0 = 110110100000, $da3 = 110110100011
 	--IDE_SPACE <= '1' WHEN (A(23 DOWNTO 12) >= x"DA0" AND A(23 DOWNTO 12) <= x"DA3") AND nAS = '0' AND nBGACK = '1' ELSE '0';
-	IDE_SPACE <= '1' WHEN A(23 DOWNTO 14) = "1101101000" AND nAS = '0' AND nBGACK = '1' AND nIDEDIS = '1' ELSE '0';
+	IDE_SPACE <= '1' WHEN A(23 DOWNTO 14) = "1101101000" AND nAS = '0' AND nBGACK = '1' AND gayleconfiged = '1' ELSE '0';
 	
+	--SETS THE DIRECTION OF THE IDE BUFFERS
 	IDEDIR <= NOT RnW;
 	
+	--WE PASS THE COMPUTER RESET SIGNAL TO THE IDE DRIVE
 	nIDERST <= nRESET;
 	
 	--GAYLE SPECS TELL US WHEN THE IDE CHIP SELECT LINES ARE ACTIVE
 	
 	nCS0 <= '0' 
 		WHEN 
-			(A(13 DOWNTO 12) = "00" OR A(13 DOWNTO 12) = "10") AND nAS = '0' AND IDE_SPACE = '1' --$0DA0000 TO $0DA0FFF OR $0DA2000 TO $0DA2FFF
+			(A(14 DOWNTO 12) = "000" OR A(14 DOWNTO 12) = "010") AND nAS = '0' AND IDE_SPACE = '1' --$0DA0000 TO $0DA0FFF OR $0DA2000 TO $0DA2FFF
 		ELSE 
 			'1';
 			
 	nCS1 <= '0' 
 		WHEN 
-			(A(13 DOWNTO 12) = "01" OR A(13 DOWNTO 12) = "11") AND nAS = '0' AND IDE_SPACE = '1' --$0DA1000 TO $0DA1FFF OR $0DA3000 TO $0DA3FFF
+			(A(14 DOWNTO 12) = "001" OR A(14 DOWNTO 12) = "011") AND nAS = '0' AND IDE_SPACE = '1' --$0DA1000 TO $0DA1FFF OR $0DA3000 TO $0DA3FFF
 		ELSE 
 			'1';
 			
@@ -365,7 +520,8 @@ begin
 			idesack <= '1';
 		
 		ELSIF (RISING_EDGE(CPUCLK)) THEN
-			
+		
+			intlast <= INTRQ;
 			idesack <= '1';
 		
 			IF (IDE_SPACE = '1') THEN			
