@@ -378,13 +378,16 @@ begin
 								ideintenable <= D(31); --1 = ENABLE, 0 = DISABLE
 							ELSE
 								DATAOUTGAYLE <= ideintenable;
-							END IF;						
+							END IF;		
+								
+							gaylesack <= '0';
 						
 						--THE REGISTER AT $DA8000 IDENTIFIES THE IDE DEVICE AS THE SOURCE OF THE IRQ.						
 						WHEN x"8" =>
 							
 							IF RnW = '1' AND ideintenable = '1' THEN
 								DATAOUTGAYLE <= intreq;
+								gaylesack <= '0';
 							END IF;											
 						
 						--WHEN THERE IS A NEW IDE IRQ, WE SET THIS TO '1'. AMIGA OS SETS TO '0' WHEN IT IS DONE HANDLING THE IRQ.
@@ -396,18 +399,17 @@ begin
 								CLRINT <= NOT D(31);
 							END IF;	
 							
+							gaylesack <= '0';
+							
 						WHEN OTHERS =>
 							DATAOUTGAYLE <= 'Z';
 						
 					END CASE;
 					
-					--DSACK/DTACK WHATEVER JUST HAPPENED IN THE GAYLE REGISTERS
-					gaylesack <= '0';
-					
 				END IF;
 			
 			ELSE		
-			
+				
 				gaylesack <= '1';
 				
 			END IF;
@@ -449,13 +451,11 @@ begin
 			nDIOW <= '1';
 			idesack <= '1';
 		
-		ELSIF (RISING_EDGE(CPUCLK)) THEN
-		
-			idesack <= '1';
+		ELSIF (RISING_EDGE(CPUCLK)) THEN			
 		
 			IF (IDE_SPACE = '1') THEN			
 				--WE ARE IN THE IDE ADDRESS SPACE 
-				--THE TIMINGS HERE MAY NEED SOME TWEAKING, ESPECIALLY BETWEEN 68000 AND 68030 MODE
+				--THE TIMINGS HERE WILL NEED SOME TWEAKING, ESPECIALLY BETWEEN 68000 AND 68030 MODE
 				
 			
 				 IF (nAS = '0') THEN 
@@ -493,6 +493,8 @@ begin
 				--SET IN A "NOP" STATE
 				nDIOR <= '1';
 				nDIOW <= '1';
+						
+				idesack <= '1';
 					
 			END IF;
 		
@@ -505,13 +507,14 @@ begin
 	------------------------------
 	
 	--ARE WE IN THE Z3 ADDRESS SPACE?
-	--WE CONSIDER BGACK BECAUSE WE DON'T WANT TO RESPOND TO DMA GENERATED ADDRESSES, ALTHOUGH 
-	--THAT SHOULD NEVER HAPPEN HERE BECAUSE 24 BIT DMA CANNOT ACCESS THE ZORRO 3 MEMORY SPACE.
+	--WE DO NOT CONSIDER BGACK BECAUSE 24 BIT DMA CANNOT ACCESS THE ZORRO 3 MEMORY SPACE.
 	--EXTSEL IS A SIGNAL THAT PREVENTS 68K STATE MACHINE ACTIVITIES IN U600. 
 	--THIS SHOULD NOT CONSIDER ADDRESS STROBE.
 	
+	--THE BASE ADDRESS EQUATION IS GOING TO NEED SOME TWEEKING TO SUPPORT 32 - 256 MBs.
+	
 	EXTSEL <= '1' WHEN 
-			A(31 DOWNTO 28) = Z3RAM_BASE_ADDR AND nBGACK = '1' AND Z3RAM_CONFIGED = '1' AND FC(2 DOWNTO 0) /= "111" 
+			A(31 DOWNTO 28) = Z3RAM_BASE_ADDR AND Z3RAM_CONFIGED = '1' AND FC(2 DOWNTO 0) /= "111" 
 		ELSE 
 			'0';
 	
