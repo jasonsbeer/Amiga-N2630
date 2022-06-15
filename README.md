@@ -35,13 +35,13 @@ The Zorro 3 RAM may be disabled by adding a jumper to J305. Disabling the Zorro 
 Desired Zorro</br>3 RAM (MB)|SDRAM</br>Capacity|U406|U407|U408|U409|J400|J401|J402
 -|-|-|-|-|-|-|-|-
 16|4MX16|YES<sup>A</sup>|YES|NO<sup>B</sup>|NO|Open<sup>C</sup>|Open|Open
-32|4MX16|YES|YES|YES|YES|Shorted<sup>D</sup>|Open|Open
+32|4MX16|YES|YES|YES|YES|Shorted<sup>D</sup>|Open|Shorted
 32|8MX16|YES|YES|NO|NO|Open|Open|Shorted
-64|8MX16|YES|YES|YES|YES|Shorted|Open|Shorted
+64|8MX16|YES|YES|YES|YES|Shorted|Shorted|Open
 64|16MX16|YES|YES|NO|NO|Open|Shorted|Open
-128|16Mx16|YES|YES|YES|YES|Shorted|Shorted|Open
+128|16Mx16|YES|YES|YES|YES|Shorted|Shorted|Shorted
 128|32MX16|YES|YES|NO|NO|Open|Shorted|Shorted
-256|32MX16|YES|YES|YES|YES|Shorted|Shorted|Shorted
+256|32MX16|YES|YES|YES|YES|Shorted|Open|Open
 
 <sup>A</sup> This position to be populated by the SDRAM indicated.  
 <sup>B</sup> This position not populated.  
