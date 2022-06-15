@@ -1,4 +1,3 @@
-Capacities when using nMx16 SDRAM.,,,,,,,
 Address Lines,68030 Address Line,Addresses,Storage Cap (Bits),Storage Cap (Bytes),Storage Cap (KB),Storage Cap (MB),Notes
 ,0,x,,,,,Part of the port sizing
 ,1,x,,,,,Part of the port sizing
