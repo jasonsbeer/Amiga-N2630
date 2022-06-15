@@ -24,7 +24,7 @@ The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM
 ### Zorro 2
 Zorro 2 RAM is the Amiga RAM found in the 24 bit address space of the Motorola 68000 processor. This RAM space can be used by the Motorola 68030 and supports DMA activities of the Zorro 2 bus. When 68000 mode is selected, the Zorro 2 memory expansion remains available to the system. The Zorro 2 RAM may be disabled by adding a jumper to J303. Disabling the Zorro 2 RAM is not recommended for regular use as this will degrade performance of the system.
 
-SPECIAL NOTE: The Zorro 2 SDRAMs at U400 and U401 are called out as 2Mx16 in the BOM. This is the specific size requried to acheive 8MB of Zorro 2 RAM. In the event you are unable to supply this specific size SDRAM, any greater capacity 16 bit wide SDRAM in the 54-TSOP II footprint may by substituted. For example, 4Mx16 could be placed and will function correctly. Zorro 2 RAM is limited to a maximum of 8MB. Placing greater capacity SDRAMs at U400 and U401 will not result in a greater amount of Zorro 2 RAM. 
+SPECIAL NOTE: The Zorro 2 SDRAMs at U400 and U401 are called out as 1Mx16 in the BOM. This is the specific size requried to acheive 8MB of Zorro 2 RAM. In the event you are unable to supply this specific size SDRAM, any greater capacity 16 bit wide SDRAM in the 54-TSOP II footprint may by substituted. For example, 4Mx16 could be placed and will function correctly. Zorro 2 RAM is limited to a maximum of 8MB. Placing greater capacity SDRAMs at U400 and U401 will not result in a greater amount of Zorro 2 RAM. 
 
 ### Zorro 3
 Zorro 3 RAM is the Amiga RAM found in the 32 bit address space of the Motorola 68030 processor. Both Zorro 2 and Zorro 3 RAM are used together on the N2630 card. Thus, total memory available to the system will be the sum of the Zorro 2 and Zorro 3 RAM. Zorro 3 SDRAMs may be installed in different configurations to acheive a specific amount of final RAM (Table 1). The SDRAM footprint is 54-TSOP II. The indicated jumpers must be set as shown or your system may not function correctly.
@@ -34,14 +34,14 @@ The Zorro 3 RAM may be disabled by adding a jumper to J305. Disabling the Zorro 
 **Table 1.** Possible Zorro 3 RAM configurations.
 Desired Zorro</br>3 RAM (MB)|SDRAM</br>Capacity|U406|U407|U408|U409|J400|J401|J402
 -|-|-|-|-|-|-|-|-
-16|4MX16|YES<sup>[A]</sup>|YES|NO<sup>[B]</sup>|NO|Open<sup>[C]</sup>|Open|Open
-32|4MX16|YES|YES|YES|YES|Shorted<sup>[D]</sup>|Open|Shorted
-32|8MX16|YES|YES|NO|NO|Open|Open|Shorted
-64|8MX16|YES|YES|YES|YES|Shorted|Shorted|Open
-64|16MX16|YES|YES|NO|NO|Open|Shorted|Open
-128|16Mx16|YES|YES|YES|YES|Shorted|Shorted|Shorted
-128|32MX16|YES|YES|NO|NO|Open|Shorted|Shorted
-256|32MX16|YES|YES|YES|YES|Shorted|Open|Open
+16|2MX16|YES<sup>[A]</sup>|YES|NO<sup>[B]</sup>|NO|Open<sup>[C]</sup>|Open|Open
+32|2MX16|YES|YES|YES|YES|Shorted<sup>[D]</sup>|Open|Shorted
+32|4MX16|YES|YES|NO|NO|Open|Open|Shorted
+64|4MX16|YES|YES|YES|YES|Shorted|Shorted|Open
+64|8MX16|YES|YES|NO|NO|Open|Shorted|Open
+128|8Mx16|YES|YES|YES|YES|Shorted|Shorted|Shorted
+128|16MX16|YES|YES|NO|NO|Open|Shorted|Shorted
+256|16MX16|YES|YES|YES|YES|Shorted|Open|Open
 
 <sup>A</sup> This position to be populated by the SDRAM indicated.  
 <sup>B</sup> This position not populated.  
