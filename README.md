@@ -20,11 +20,12 @@ Before installing, it is necessary to determine if you have an early, non-cost r
 ## 68000 Mode
 
 ## Memory
-The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM is the successor to Fast Page Memory found in devices such as the Amiga 3000, A2630 processor card, and other computers of the time. SDRAMs are a very cost effictive way to supply memory to older systems and are readily available either new or from unused memory modules.    
+The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM is the successor to Fast Page Memory found in devices such as the Amiga 3000, A2630 processor card, and other computers of the time. SDRAMs are a very cost effictive way to supply memory to older systems and are readily available either new or from unused memory modules. 
+
 ### Zorro 2
 Zorro 2 RAM is the Amiga RAM found in the 24 bit address space of the Motorola 68000 processor. This RAM space can be used by the Motorola 68030 and supports DMA activities of the Zorro 2 bus. When 68000 mode is selected, the Zorro 2 memory expansion remains available to the system. The Zorro 2 RAM may be disabled by adding a jumper to J303. Disabling the Zorro 2 RAM is not recommended for regular use as this will degrade performance of the system.
 
-SPECIAL NOTE: The Zorro 2 SDRAMs at U400 and U401 are called out as 1Mx16 in the BOM. This is the specific size requried to acheive 8MB of Zorro 2 RAM. In the event you are unable to supply this specific size SDRAM, any greater capacity 16 bit wide SDRAM in the 54-TSOP II footprint may by substituted. For example, 4Mx16 could be placed and will function correctly. Zorro 2 RAM is limited to a maximum of 8MB. Placing greater capacity SDRAMs at U400 and U401 will not result in a greater amount of Zorro 2 RAM. 
+TECHNICAL NOTE: The Zorro 2 SDRAMs at U400 and U401 are called out as 2Mx16 in the BOM. While this is technically too large in capacity, it should simplify sourcing as all SDRAM footprints on the N2630 are the same. Any SDRAM in the 54-TSOP II footprint may be placed. However, it is not possible to achieve more than 8 megabytes of Zorro 2 RAM capacity.
 
 ### Zorro 3
 Zorro 3 RAM is the Amiga RAM found in the 32 bit address space of the Motorola 68030 processor. Both Zorro 2 and Zorro 3 RAM are used together on the N2630 card. Thus, total memory available to the system will be the sum of the Zorro 2 and Zorro 3 RAM. Zorro 3 SDRAMs may be installed in different configurations to acheive a specific amount of final RAM (Table 1). The SDRAM footprint is 54-TSOP II. The indicated jumpers must be set as shown or your system may not function correctly.
