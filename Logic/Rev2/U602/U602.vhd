@@ -23,7 +23,7 @@
 -- 
 -- Create Date:    MAY 30 2022 
 -- Design Name:    N2630 U602 CPLD
--- Project Name:   A30
+-- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
 -- Tool versions: 
 -- Description: INCLUDES LOGIC FOR ZORRO 3 AUTOCONFIG, ZORRO 3 SDRAM CONTROLLER, AND GAYLE IDE CONTROLLER
