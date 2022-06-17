@@ -21,9 +21,9 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    MAY 30 2022 
+-- Create Date:    JUNE 16 2022 
 -- Design Name:    N2630 U601 CPLD
--- Project Name:   A30
+-- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
 -- Tool versions: 
 -- Description: INCLUDES LOGIC FOR ZORRO 2 AUTOCONFIG, ZORRO2 SDRAM CONTROLLER, AND GENERAL GLUE LOGIC
@@ -152,7 +152,7 @@ architecture Behavioral of U601 is
 	SIGNAL phantomhi : STD_LOGIC := '0'; --PHANTOM HIGH SIGNAL
 	SIGNAL hirom : STD_LOGIC := '0'; --IS THE ROM IN THE HIGH ADDRESS SPACE?
 	SIGNAL lorom : STD_LOGIC := '0'; --IS THE ROM IN THE LOW ADDRESS SPACE?
-	--SIGNAL rambaseaddress : STD_LOGIC_VECTOR (2 DOWNTO 0) := "000"; --RAM BASE ADDRESS
+	SIGNAL rambaseaddress : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --RAM BASE ADDRESS
 	SIGNAL acsack : STD_LOGIC; --AUTOCONFIG DSACKn SIGNAL
 	
 begin
@@ -188,22 +188,23 @@ begin
 	--EITHER THE 68030 OR DMA FROM THE ZORRO 2 BUS CAN ACCESS ZORRO 2 RAM ON OUR CARD
 	--SIMULATES OK
 	
+	--THE 8MB DATA SPACE USES UP TO (AND INCLUDING) A21.
+	--THIS MEANS WHEN 8MBs ARE INSTALLED, WE RESPOND WHEN A23..22 = BASEADDRESS.
+	--WITH 4MBs INSTALLED, WE RESPOND WHEN A23..21 = BASEADDRESS.
+	--WITH 2MBs INSTALLED, WE RESPOND WHEN A23..20 = BASEADDRESS.
+	--WITH 1MB INSTALLED, WE RESPOND WHEN A23..19 = BASEADDRESS.
+	
 	--THIS DETECTS A 68030 MEMORY ACCESS
-	--THE 8MB DATA SPACE USES UP TO (AND INCLUDING) A22.
-	--THIS MEANS WHEN 8MBs ARE INSTALLED, WE RESPOND WHEN A23 = BASEADDRESS(3) (MUST BE = 1?).
-	--WITH 4MBs INSTALLED, WE RESPOND WHEN A23..22 = BASEADDRESS(3..2)
-	--WITH 2MBs INSTALLED, WE RESPOND WHEN A23..21 = BASEADDRESS(3..1).
-	--WITH 1MB INSTALLED, WE RESPOND WHEN A23..20 = BASEADDRESS(3..0).
 	cpuaccess <= '1' 
 		WHEN
-			ramconfiged = '1' AND A(23) = '1' AND nAS = '0' AND FC(2 DOWNTO 0) /= "111"
+			ramconfiged = '1' AND A(23 DOWNTO 22) = rambaseaddress AND nAS = '0' AND cpuspace = '0'
 		ELSE
 			'0';
 	
 	--THIS DETECTS A DMA MEMORY ACCESS
 	dmaaccess <= '1'
 		WHEN
-			ramconfiged = '1' AND A(23) = '1' AND nAAS = '0' AND nBGACK = '0'
+			ramconfiged = '1' AND A(23 DOWNTO 22) = rambaseaddress AND nAAS = '0' AND nBGACK = '0'
 		ELSE
 			'0';
 			
@@ -493,7 +494,8 @@ begin
 					--BANK ACTIVATE
 					--SET CAS STATE VALUES SO THEY LATCH ON THE NEXT CLOCK EDGE
 					CURRENT_STATE <= CAS_STATE;
-					ZMA(7 downto 0) <= A(22 downto 15);
+					ZMA(6 downto 0) <= A(21 downto 15);
+					ZMA(7) <= '0';
 					ZMA(8) <= '0';
 					ZMA(9) <= '0';
 					ZMA(10) <= '1'; --PRECHARGE
@@ -705,7 +707,7 @@ begin
 	
 	--IS EVERYTHING WE WANT CONFIGURED?
 	--WHEN THE ZORRO 2 RAM IS DISABLED BY J303, IT SETS Z2AUTO = 0.
-	--U602 WILL ASSERT Z3CONFIGED EVEN IF Z3 RAM IS DISABLED.
+	--U602 WILL ASSERT Z3CONFIGED WHEN Z3 RAM HAS BEEN AUTOCONFIGed OR IF Z3 RAM IS DISABLED.
 	CONFIGED <= '1' WHEN Z3CONFIGED = '1' AND ((romconfiged = '1' AND Z2AUTO = '0') OR (romconfiged= '1' AND ramconfiged = '1')) ELSE '0';	
 
 	--We have three boards we need to autoconfig, in this order
@@ -744,7 +746,7 @@ begin
 	
 		IF nRESET = '0' THEN
 			
-			--rambaseaddress <= "000";			
+			rambaseaddress <= "00";			
 			ramconfiged <= '0';	
 			acsack <= '1';
 			
@@ -807,8 +809,7 @@ begin
 						IF ( romconfiged = '1' AND ramconfiged = '0' ) THEN
 						
 							--BASE ADDRESS FOR THE ZORRO 2 RAM
-							--rambaseaddress <= D(31 downto 29); 
-							--THE ZORRO 2 RAM IS AUTOCONFIGed
+							rambaseaddress <= D(31 downto 30);
 							ramconfiged <= '1'; 
 							
 						END IF;					
