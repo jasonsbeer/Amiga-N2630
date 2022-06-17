@@ -6425,7 +6425,7 @@
     (property "Reference" "R706" (id 0) (at 70.358 71.9836 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "1k" (id 1) (at 70.358 74.295 0)
+    (property "Value" "1K" (id 1) (at 70.358 74.295 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "Resistor_SMD:R_0805_2012Metric" (id 2) (at 66.802 73.152 90)
