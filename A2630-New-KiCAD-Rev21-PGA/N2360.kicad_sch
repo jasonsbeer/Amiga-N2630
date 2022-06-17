@@ -849,7 +849,8 @@
     )
   )
 
-  (text "CHANGED ROUTE OF _BG\nUPDATED BLOCK DIAGRAM" (at 32.385 227.965 0)
+  (text "CHANGED ROUTE OF _BG\nUPDATED BLOCK DIAGRAM\nCONNECTED _ONBOARD BETWEEN U600 & 601"
+    (at 32.385 227.965 0)
     (effects (font (size 2 2)) (justify left bottom))
     (uuid 01a3dc02-2653-4d8b-84d9-a929adf1cb0d)
   )
@@ -1294,7 +1295,7 @@
       (reference "C220") (unit 1) (value "0.1uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-00006353b771"
-      (reference "C300") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
+      (reference "C300") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-000061d9c8dc/00000000-0000-0000-0000-000062f57967"
       (reference "C406") (unit 1) (value "0.33uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
@@ -1321,16 +1322,16 @@
       (reference "C413") (unit 1) (value "0.33uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/e3a5749a-06b1-4652-8d14-c1188ceff788"
-      (reference "C418") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
+      (reference "C418") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/f5409630-eb22-4a5f-83e0-a76f7645f97a"
-      (reference "C419") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
+      (reference "C419") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/92b829ac-b135-4d17-a413-fe66f5f0b73a"
-      (reference "C420") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
+      (reference "C420") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/94826e71-e4c9-47cd-9978-67efa513fa1e"
-      (reference "C421") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
+      (reference "C421") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-000061d9c8dc/47237a30-5dd2-4ae9-9ffc-945423ba4f5f"
       (reference "C422") (unit 1) (value "0.33uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
@@ -1384,7 +1385,7 @@
       (reference "C605") (unit 1) (value "0.1uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-00006353d849"
-      (reference "C606") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
+      (reference "C606") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-000062089831/7fe9de19-9c81-40a2-a5bf-845f55fe22c0"
       (reference "C607") (unit 1) (value "0.1uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
@@ -1456,13 +1457,13 @@
       (reference "C805") (unit 1) (value "10uF") (footprint "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/e2cede5f-1a19-467f-9f46-a0e8e0a1caae"
-      (reference "C900") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
+      (reference "C900") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/975ee057-ed5e-43b5-9db5-9030e0584272"
-      (reference "C901") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
+      (reference "C901") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/52c6e3e6-d3c1-4d90-b616-c66a78fd0aa3"
-      (reference "C902") (unit 1) (value "0.22uf") (footprint "Capacitor_SMD:C_0805_2012Metric")
+      (reference "C902") (unit 1) (value "0.22uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/530da3a7-2703-4790-b4ff-b781e3a8b1bf"
       (reference "CN5") (unit 1) (value "ATA/IDE") (footprint "N2630:ATA_Header_2x20_P2.54mm")
@@ -1696,7 +1697,7 @@
       (reference "R704") (unit 1) (value "47") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-000062551812"
-      (reference "R706") (unit 1) (value "1k") (footprint "Resistor_SMD:R_0805_2012Metric")
+      (reference "R706") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-000062dfcaac"
       (reference "RN104") (unit 1) (value "1K") (footprint "Resistor_THT:R_Array_SIP9")
