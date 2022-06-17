@@ -3066,7 +3066,7 @@
   )
 
   (symbol (lib_id "Mechanical:MountingHole_Pad") (at 350.52 139.7 270) (unit 1)
-    (in_bom yes) (on_board yes) (fields_autoplaced)
+    (in_bom no) (on_board yes) (fields_autoplaced)
     (uuid 11fa98c4-76ea-4b7a-9c5d-cfc352756daf)
     (property "Reference" "H2" (id 0) (at 354.33 138.8653 90)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -3173,7 +3173,7 @@
   )
 
   (symbol (lib_id "Mechanical:MountingHole_Pad") (at 350.52 133.985 270) (unit 1)
-    (in_bom yes) (on_board yes) (fields_autoplaced)
+    (in_bom no) (on_board yes) (fields_autoplaced)
     (uuid 34a1482d-98d3-4b42-9f72-ac093a98bf7e)
     (property "Reference" "H1" (id 0) (at 354.33 133.1503 90)
       (effects (font (size 1.27 1.27)) (justify left))

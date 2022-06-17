@@ -5500,7 +5500,7 @@
   )
 
   (symbol (lib_id "N2630:Amiga-2000-CPU-Slot") (at 103.505 185.42 0) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid 00000000-0000-0000-0000-000061df9cd8)
     (property "Reference" "CN700" (id 0) (at 100.965 128.905 0)
       (effects (font (size 1.27 1.27)) (justify left))
