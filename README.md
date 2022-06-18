@@ -19,11 +19,11 @@ Before installing, it is necessary to determine if you have an early, non-cost r
 
 ## 68000 Mode
 
-## Memory
+## FAST RAM
 The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM is the successor to Fast Page Memory found in devices such as the Amiga 3000, A2630 processor card, and other computers of the time. SDRAMs are a very cost effictive way to supply memory to older systems and are readily available either new or from unused memory modules. 
 
 ### Zorro 2
-Zorro 2 RAM is the Amiga RAM found in the 24 bit address space of the Motorola 68000 processor. The Zorro 2 RAM on the N2630 is accessed by the 68030 in a full 32 bit wide data bus and supports DMA activities of the Zorro 2 bus. Using the N2630 Zorro 2 RAM will result in greater performance in 68030 mode when compared to other expansion RAM on the Zorro 2 bus. When 68000 mode is selected, the Zorro 2 memory expansion remains available to the system. The Zorro 2 RAM may be disabled by adding a jumper to J303. Disabling the Zorro 2 RAM is not recommended for regular use as this will degrade performance of the system.
+Zorro 2 RAM is the Amiga RAM found in the 24 bit address space of the Motorola 68000 processor. The Zorro 2 RAM on the N2630 is accessed by the 68030 as a 32-bit data bus and supports DMA activities of the Zorro 2 bus. Using the N2630 Zorro 2 RAM will result in greater performance in 68030 mode when compared to other RAM on the Zorro 2 bus. When 68000 mode is selected, the Zorro 2 memory expansion remains available to the system. The Zorro 2 RAM may be disabled by adding a jumper to J303. Disabling the Zorro 2 RAM is not recommended for regular use as this will degrade performance of the system.
 
 NOTE: Any SDRAM at least 1Mx16 in capacity in the 54-TSOP II footprint may be placed. However, it is not possible to achieve more than 8 megabytes of Zorro 2 RAM capacity. 
 
@@ -56,7 +56,7 @@ The N2630 includes an AUTOBOOT<sup>[A]</sup> ATA/IDE port compatable with hard d
 <sup>B</sup>ATAPI support included in Kickstart 3.1.4+. Older versions of Kickstart may require installation of third party ATAPI drivers.  
 
 ## 68882 Math Coprocessor (FPU)
-The Motorolla 68882 (or 68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the 68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator. The PLCC-68 footprint is supported, which is available up to 40MHz.
+The Motorolla 68882 (or 68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the 68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 4, J202). The PLCC-68 footprint is supported, which is available up to 40MHz.
 
 ## Other Jumper Settings
 In the following tables, OPEN indicates no jumper. Shorted indicates the presence of a jumper on the pins indicated. All jumpers must be set correctly or you may encounter unexpected bahaviors or failure to boot.
