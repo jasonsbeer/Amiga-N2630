@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JUNE 19, 2022 
+-- Create Date:    JUNE 24, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -206,15 +206,18 @@ begin
 	
 	PROCESS (basis7m) BEGIN
 		IF (RISING_EDGE (basis7m)) THEN
-			IF ( nRESET = '0' OR nBOSS = '0' OR MODE68K = '1' ) THEN		
+		
+			IF (nRESET = '0' OR nBOSS = '0' OR MODE68K = '1' ) THEN		
 				--We do not need to request the bus at this time.
-				--We are BOSS, or we have RESET, or we are in 68000 mode.
+				--We are BOSS or we are in 68000 mode.
 				--Tristate so we don't interfere with other bus requesters on the Amiga 2000.
 				nABR <= 'Z';
-			ELSE
+				
+			ELSE		
+			
 				IF nABR = '0' THEN	
 					--nABR is asserted, but are we BOSS yet?
-					IF (nRESET = '1' AND nBOSS = '1' AND MODE68K = '0') THEN
+					IF (nBOSS = '1' AND MODE68K = '0') THEN
 						nABR <= '0';
 					ELSE
 						nABR <= '1';
@@ -227,7 +230,9 @@ begin
 						nABR <= '1';
 					END IF;
 				END IF;
+				
 			END IF;
+			
 		END IF;
 	END PROCESS;
 
@@ -257,23 +262,21 @@ begin
 	--Bus mastering is supposed to be clocked on the 7MHz rising edge (A2000 technical reference)
 	--Doing it like this avoids combitorial loops and it should work fine
 	--BOSS HAS A PULLUP ON THE A2000
-	
-	--BOSS		= ABG & !AAS & !DTACK & !HALT & !RESET & B2000 & !MODE68K 
-	--	#  !HALT & !MODE68K & BOSS
-	--	# !RESET & !MODE68K & BOSS
-	--	# !B2000 & !HALT & !RESET;
+
 	PROCESS (basis7m) BEGIN
 		IF (RISING_EDGE (basis7m)) THEN
 			IF (nBOSS = '0') THEN
-				--Negate BOSS because we have RESET, HALTed, OR CHANGED TO 68000 MODE.
-				IF (MODE68K = '1' OR nHALT = '0' OR nRESET = '0') THEN					
+				--HOLD BOSS UNTIL ONE OF THE CONDITION BELOW IS FALSE
+				IF ( nHALT = '1' AND MODE68K = '0') OR ( nRESET = '1' AND MODE68K = '0' ) THEN
+					nBOSS <= '0';
+				ELSE
 					nBOSS <= 'Z';
 				END IF;
 			ELSE
-				--ACCORDING TO THE 68000 MANUAL, WE SHOULD NOT ASSERT _BGACK (_BOSS) UNTIL _AS AND _DTACK ARE NEGATED.
+				--ASSERT _BGACK (_BOSS) WHEN THE 68000 HAS FINISHED ITS CURRENT CYCLE (_AS AND _DTACK ARE NEGATED).
 				IF 
-					(( B2000 = '1' AND nABG = '0' AND nAAS ='1' AND nDTACK = '1' AND nHALT = '1' AND nRESET = '1' AND MODE68K = '0' ) OR 
-					( B2000 = '0' AND nHALT ='1' AND nRESET ='1')) 
+					( B2000 = '1' AND nABG = '0' AND nAAS ='1' AND nDTACK = '1' AND nHALT = '1' AND nRESET = '1' AND MODE68K = '0' ) OR 
+					( B2000 = '0' AND nHALT ='1' AND nRESET ='1') 
 				THEN
 					nBOSS <= '0';
 				ELSE
@@ -526,7 +529,7 @@ begin
 	nUDS <= nUDSOUT;
 	nLDS <= nLDSOUT;	
 	
-	PROCESS (basis7m, nRESET) BEGIN
+	PROCESS (basis7m, nRESET, TRISTATE, offboard) BEGIN
 	
 		IF (nRESET = '0' OR TRISTATE = '1' OR offboard = '0') THEN
 			--DON'T START 68000 CYCLE WHEN WE'RE NOT BOSS, IN A DMA CYCLE, ACCESSING IDE, OR ACCESSING N2630 MEMORY
