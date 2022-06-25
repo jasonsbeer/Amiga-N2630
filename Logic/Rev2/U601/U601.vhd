@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JUNE 16 2022 
+-- Create Date:    JUNE 25, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -80,7 +80,7 @@ PORT
 	D : INOUT STD_LOGIC_VECTOR (31 DOWNTO 28); --68030 DATA BUS
 	nCSROM : INOUT STD_LOGIC; --ROM CHIP SELECT
 	
-	nONBOARD : OUT STD_LOGIC; --ARE WE IN THE ROM OR AUTOCONFIG SPACE?
+	nONBOARD : INOUT STD_LOGIC; --ARE WE IN THE ROM OR AUTOCONFIG SPACE?
 	nFPUCS : OUT STD_LOGIC; --FPU CHIP SELECT
 	nBERR : OUT STD_LOGIC; --BUS ERROR
 	nCIIN : OUT STD_LOGIC; --68030 CACHE ENABLE
@@ -153,7 +153,7 @@ architecture Behavioral of U601 is
 	SIGNAL hirom : STD_LOGIC := '0'; --IS THE ROM IN THE HIGH ADDRESS SPACE?
 	SIGNAL lorom : STD_LOGIC := '0'; --IS THE ROM IN THE LOW ADDRESS SPACE?
 	SIGNAL rambaseaddress : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --RAM BASE ADDRESS
-	SIGNAL acsack : STD_LOGIC; --AUTOCONFIG DSACKn SIGNAL
+	--SIGNAL acsack : STD_LOGIC; --AUTOCONFIG DSACKn SIGNAL
 	
 begin
 
@@ -607,19 +607,19 @@ begin
 	PROCESS (CPUCLK) BEGIN
 		IF RISING_EDGE (CPUCLK) THEN
 			
-			IF autoconfigspace = '1' THEN
+			IF nONBOARD = '0' AND nDS = '0' THEN
 			
-				IF acsack = '0' THEN 
-					--THIS IS AUTOCONFIG, SO IT IS A 16 BIT DATA TRANSFER
+				--IF acsack = '0' THEN 
+					--THIS IS AUTOCONFIG OR ROM, SO IT IS A 16 BIT DATA TRANSFER
 					nDSACK0 <= '1';
 					nDSACK1 <= '0';
 				
-				ELSE
+				--ELSE
 				
-					nDSACK0 <= '1';
-					nDSACK1 <= '1';
+					--nDSACK0 <= '1';
+					--nDSACK1 <= '1';
 				
-				END IF;
+				--END IF;
 					
 			ELSIF MEMACCESS = '1' THEN
 				--THIS IS RAM ACCESS, SO WE ALWAYS RESPOND WITH A 32 BIT PORT
@@ -689,7 +689,7 @@ begin
 	
 		ELSIF FALLING_EDGE (CPUCLK) THEN
 		
-			IF (autoconfigspace = '1' AND A(6 downto 1) = "100000" AND nDS = '0' AND nCPURESET = '1' AND romconfiged = '0') THEN
+			IF (autoconfigspace = '1' AND A(6 downto 1) = "100000" AND RnW = '0' AND nDS = '0' AND nCPURESET = '1' AND romconfiged = '0') THEN
 				phantomlo <= DROM(16);
 				phantomhi <= DROM(17);
 				romconfiged <= DROM(18);
@@ -748,7 +748,7 @@ begin
 			
 			rambaseaddress <= "00";			
 			ramconfiged <= '0';	
-			acsack <= '1';
+			--acsack <= '1';
 			
 		ELSIF ( FALLING_EDGE (CPUCLK)) THEN
 		
@@ -803,9 +803,14 @@ begin
 
 				ELSIF ( RnW = '0' AND nDS = '0' ) THEN	
 				
-					--WRITE REGISTER AT OFFSET $48. THIS IS WHERE THE BASE ADDRESS IS ASSIGNED.
 					IF ( A(6 downto 1) = "100100" ) THEN
-							
+						--WRITE REGISTER AT OFFSET $48. THIS IS WHERE THE BASE ADDRESS IS ASSIGNED.
+						
+						--THERE MIGHT BE A CASE WHERE WE ARE HAVE JUST CONFIGED THE ROM WHERE
+						--WE GET TO THIS ADDRESS AND MISTAKENLY THINK IT'S THE RAM BEING CONFIGURED
+						--FOOD FOR THOUGHT. IN THAT CASE WE NEED TO WAIT UNTIL WE GET TO THE NEXT
+						--AUTOCONFIG CYCLE TO ENTER THE BELOW CODE.
+						
 						IF ( romconfiged = '1' AND ramconfiged = '0' ) THEN
 						
 							--BASE ADDRESS FOR THE ZORRO 2 RAM
@@ -818,11 +823,11 @@ begin
 				END IF;
 				
 				--DSACK after each cycle
-				acsack <= '0'; 
+				--acsack <= '0'; 
 				
-			ELSE
+			--ELSE
 				--WE ARE NOT IN THE AUTOCONFIG SPACE (_AS NEGATED), NEGATE AUTOCONFIG DSACK
-				acsack <= '1';
+				--acsack <= '1';
 			END IF;
 		END IF;
 	END PROCESS;
