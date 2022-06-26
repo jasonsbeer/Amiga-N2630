@@ -437,9 +437,12 @@ begin
 			'1';
 	
 	--ADOEL		= BOSS &  BGACK &  MEMSEL & AAS &  A1;
-	--ADOEL CONTROLS D16..0. U703, U704
+	--ADOEL CONTROLS D16..0. U703, U704 AND SHOULD ONLY BE ACTIVE DURING DMA.
 	nADOEL <= '0' 
-		WHEN nBOSS = '0' AND nBGACK = '0' AND MEMACCESS = '1' AND nAAS = '0' AND A(1) = '0'  ELSE '1';
+		WHEN 
+			nBOSS = '0' AND nBGACK = '0' AND MEMACCESS = '1' AND nAAS = '0' AND A(1) = '0' 
+		ELSE 
+			'1';
 	
 	--This selects when we want data latching, which we in fact want only on
 	--read cycles.
@@ -476,7 +479,13 @@ begin
 	--ADDRESS DRIVEN.
 
 	--EXTERN		= cpuspace & !BGACK		# EXTSEL & !BGACK ;
-	nEXTERN <= '0' WHEN nBGACK = '1' AND (FC ( 2 downto 0 ) = "111" OR EXTSEL = '1') ELSE '1';
+	
+	--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	--I TOOK OUT EXTSEL HERE WHILE PROTOTYPING BECUASE THERE IS NOTHING DRIVING IT SANS U602.
+	--PUT BACK IN OR SOMEHOW ADDRESS IN THE FUTURE. WITH EXTSEL IN THE EQUATION, EXTERN WAS ALWAYS '0'.
+	
+	--nEXTERN <= '0' WHEN nBGACK = '1' AND (FC ( 2 downto 0 ) = "111" OR EXTSEL = '1') ELSE '1';
+	nEXTERN <= '0' WHEN nBGACK = '1' AND FC ( 2 downto 0 ) = "111" ELSE '1';
 	
 	--OFFBOARD ("1") MEANING WE ARE NOT USING ANY RESOURCES ON OUR CARD, WE ARE GOING AFTER SOMETHING ON THE AMIGA 2000
 	offboard <= '1' 
