@@ -4762,7 +4762,7 @@
       (effects (font (size 1.27 1.27)) (justify right) hide)
     )
   )
-  (global_label "68KMODE" (shape input) (at 37.465 155.575 180) (fields_autoplaced)
+  (global_label "MODE68K" (shape input) (at 37.465 155.575 180) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify right))
     (uuid 42f2d1e7-7603-4fe5-9824-9f195d2ddd84)
     (property "Intersheet References" "${INTERSHEET_REFS}" (id 0) (at 26.2508 155.4956 0)
