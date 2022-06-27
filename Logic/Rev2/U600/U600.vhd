@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JUNE 25, 2022 
+-- Create Date:    JUNE 26, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -108,7 +108,7 @@ end U600;
 architecture Behavioral of U600 is
 
 	--DEFINE THE 68000 STATE MACHINE STATES
-	TYPE STATE68K IS ( S2, S3, S4, S5, S7 );
+	TYPE STATE68K IS ( S1, S2, S3, S4, S7 );
 	SIGNAL CURRENT_STATE : STATE68K;
 	
 	--THESE ARE THE CLOCK CYCLES DEFINED FOR THE SDRAM REFRESH COUNTER
@@ -498,11 +498,11 @@ begin
 	
 	--68000 TO 68030 - DMAing
 	RnW <= ARnW WHEN nBOSS = '0' AND nBGACK = '0' ELSE 'Z';
-	nAS <= nAAS WHEN nBOSS = '0' AND nBGACK = '0' ELSE 'Z'; --THE A2630 DELAYS THE _AS BY 100ns. nASDELAY <= transport nAS after 100 ns;
+	nAS <= nAAS WHEN nBOSS = '0' AND nBGACK = '0' ELSE 'Z';
 
 	--68030 TO 68000 - NOT DMA
 	ARnW <= 'Z' WHEN TRISTATE = '1' OR offboard = '0' ELSE	RnW;	
-	nAAS <= 'Z' WHEN TRISTATE = '1' OR offboard = '0' ELSE nAS;
+	--nAAS <= 'Z' WHEN TRISTATE = '1' OR offboard = '0' ELSE nAS;
 	
 	-- UNIDIRECTIONAL SIGNALS --
 	
@@ -543,7 +543,9 @@ begin
 		IF (nRESET = '0' OR TRISTATE = '1' OR offboard = '0') THEN
 			--DON'T START 68000 CYCLE WHEN WE'RE NOT BOSS, IN A DMA CYCLE, ACCESSING IDE, OR ACCESSING N2630 MEMORY
 			--BOILED DOWN, DON'T START THE STATE MACHINE UNLESS WE ARE ACCESSING DEVICES ON THE AMIGA 2000 BOARD.
-			CURRENT_STATE <= S2;
+			CURRENT_STATE <= S1;
+			
+			nAAS <= 'Z';
 			nUDSOUT <= 'Z';
 			nLDSOUT <= 'Z';
 			nVMA <= '1';
@@ -555,37 +557,39 @@ begin
 		
 			CASE (CURRENT_STATE) IS
 			
-				WHEN S2 =>
+				WHEN S1 =>
 				
 					IF nAS = '0' THEN 							
-						CURRENT_STATE <= S3;	
+						CURRENT_STATE <= S2;	
 							
 						edsack <= '1';
 						dsack68 <= '1';
 						cycend <= '0';
+						
+						--PREPARE SETTINGS TO IMPLEMENT IN STATE 2
+						nAAS <= '0';
 					
 						IF RnW = '1' THEN 
-							--READ CYCLE, WE CAN ASSERT UDS/LDS IMMEDIATELY
-							--AND WE ALWAYS ASSERT BOTH.
+							--READ CYCLE, WE CAN ASSERT UDS/LDS WITH 
+							--ADDRESS STROBE AND WE ALWAYS ASSERT BOTH.
 							nUDSOUT <= '0';
 							nLDSOUT <= '0';
 						END IF;
 					
 					END IF;
 					
+				WHEN S2 =>
+					--NOTHING ELSE HERE, GO TO NEXT STATE
+					CURRENT_STATE <= S3;
+					
 				WHEN S3 =>
-					--NOTHING HERE, GO TO NEXT STATE
+					
 					CURRENT_STATE <= S4;
 					
-				WHEN S4 =>
-					--SOME IMPORTANT STUFF HAPPENS AT S4.
-					--IF THIS IS A 6800 CYCLE, ASSERT _VMA IF WE ARE IN SYNC WITH E
-					--IF THIS IS A 68000 CYCLE, LOOK FOR ASSERTION OF _DTACK.
-					--IF THIS IS A 68000 WRITE CYCLE, ASSERT THE DATA STROBES HERE.
-							
-					IF RnW = '0' THEN
+					--IF THIS IS A WRITE CYCLE, WE SET THE DATA STROBES
+					--TO BE IMPLEMENTED IN STATE 4.
+					IF RnW = '0' THEN						
 						
-						--ASSERT 68000 DATA STROBES ON WRITE CYCLE
 						IF A(0) = '0' THEN
 							nUDSOUT <= '0';
 						ELSE
@@ -600,13 +604,19 @@ begin
 
 					END IF;
 					
+				WHEN S4 =>
+					--SOME IMPORTANT STUFF HAPPENS AT S4.
+					--IF THIS IS A 6800 CYCLE, ASSERT _VMA IF WE ARE IN SYNC WITH E
+					--IF THIS IS A 68000 CYCLE, LOOK FOR ASSERTION OF _DTACK.
+					--IF THIS IS A 68000 WRITE CYCLE, ASSERT THE DATA STROBES HERE.
+					
 					IF (nVPA = '0') THEN
 						--THIS IS A 6800 CYCLE, WE WAIT HERE UNTIL THE
 						--APPROPRIATE TIME IS REACHED ON E TO ASSERT _VMA, WHICH IS 
 						--BETWEEN 3 AND 4 CLOCK CYCLES AFTER E GOES TO LOGIC LOW.
 						IF vmacount = 1 OR vmacount = 2 THEN
 							nVMA <= '0';
-							CURRENT_STATE <= S5;
+							CURRENT_STATE <= S7;
 						END IF;
 						
 					ELSE
@@ -617,7 +627,7 @@ begin
 							--STATE. OTHERWISE, INSERT WAIT STATES UNTIL 
 							--DTACK OR BERR IS ASSERTED.
 							dsack68 <= '0';
-							CURRENT_STATE <= S5;
+							CURRENT_STATE <= S7;
 						ELSIF (nBERR = '0') THEN
 							--TARGET DEVICE HAS ASSERTED BERR. THE CURRENT CYCLE WILL
 							--COMPLETE, BUT NO DATA TRANSFER WILL OCCUR. GO TO S7 AND
@@ -627,20 +637,20 @@ begin
 						
 					END IF;
 					
-				WHEN S5 =>
+				--WHEN S5 =>
 					
 					--THE 68030 DOES NOT NATIVELY SUPPORT 6800 SIGNALS, SO WE NEED ASSERT _DSACK1
 					--AT THE CORRECT TIME TO TELL THE 68030 TO COMPLETE THE CYCLE.					
 					--FOR A 68000 CYCLE, NOTHING HAPPENS HERE, GO TO NEXT STATE
 					
-					IF (nVPA = '0') THEN
-						IF (vmacount = 6) THEN
-							edsack <= '0';
-							CURRENT_STATE <= S7;
-						END IF;
-					ELSE
-						CURRENT_STATE <= S7;
-					END IF;
+					--IF (nVPA = '0') THEN
+					--	IF (vmacount = 6) THEN
+					--		edsack <= '0';
+					--		CURRENT_STATE <= S7;
+					--	END IF;
+					--ELSE
+					--	CURRENT_STATE <= S7;
+					--END IF;
 					
 				--WHEN S6 =>
 					--WHEN READ: DATA IS WRITTEN TO THE BUS BY THE DEVICE
@@ -648,12 +658,30 @@ begin
 					--CURRENT_STATE <= S7;
 					
 				WHEN S7 =>
+					
+					--THE 68030 DOES NOT NATIVELY SUPPORT 6800 SIGNALS, SO WE NEED 
+					--ASSERT _DSACK1 AT THE CORRECT TIME TO TELL THE 68030 TO
+					--COMPLETE THE CYCLE.		
+					
+					--WE ARE CHEATING A BIT BY PUTTING IT HERE IN STATE 7, BUT THAT 
+					--WORKS BECAUSE WE SIT IN THIS STATE UNTIL _AS IS NEGATED AND 
+					--THAT WILL NOT HAPPEN UNTIL WE ASSERT DSACK IN RESPONSE TO nVPA.					
+					
+					IF (nVPA = '0') THEN
+						IF (vmacount = 6) THEN
+							edsack <= '0';
+						END IF;
+					END IF;				
+				
 					--AFTER ANY WAIT STATES, THE 68030 WILL NEGATE _AS AT THE END OF THE CYCLE.
 					--IN REPSONSE, WE WILL NEGATE _UDS AND _LDS AND OUR END OF CYCLE SIGNAL.
 					--IN THE EVENT WHERE BERR IS ASSERTED, THE PROCESSOR WILL
 					--NEGATE _AS AT S9. IN THAT EVET, WE WAIT HERE UNTIL _AS NEGATES.
 					
-					IF (nAS = '1') THEN		
+					IF (nAS = '1') THEN	
+
+						nAAS <= '1';
+					
 						nUDSOUT <= '1';
 						nLDSOUT <= '1';
 						nVMA <= '1';
@@ -662,7 +690,7 @@ begin
 						dsack68 <= '1';
 						cycend <= '1';
 						
-						CURRENT_STATE <= S2;
+						CURRENT_STATE <= S1;
 					END IF;
 				
 			END CASE;
