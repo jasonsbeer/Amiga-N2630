@@ -570,8 +570,10 @@ begin
 	END PROCEDURE;
 
 	--FALLING EDGE AND RISING EDGE DETECTION
-	fedge <= '1' WHEN edge(0) = '0' AND edge(1) = '1' ELSE '0';
-	redge <= '1' WHEN edge(0) = '1' AND edge(1) = '0' ELSE '0';
+	--REMEMBER, THIS ACTUALLY REFLECTS THE STATE OF THE PREVIOUS CLOCK EDGE,
+	--SO WE NEED TO INVERT.
+	fedge <= '1' WHEN edge(0) = '1' AND edge(1) = '0' ELSE '0';
+	redge <= '1' WHEN edge(0) = '0' AND edge(1) = '1' ELSE '0';
 		
 	--68000 DATA STROBE OUTPUTS
 	
