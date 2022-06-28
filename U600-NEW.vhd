@@ -122,8 +122,7 @@ architecture Behavioral of U600 is
 	SIGNAL REFRESH_COUNTER : INTEGER RANGE 0 TO 511 := 0; --9 BIT NUMBER
 	
 	--68000 STATE MACHINE SIGNALS
-	SIGNAL dsack68 : STD_LOGIC := '1'; --DSACK FOR 680000 CYCLES
-	SIGNAL edsack : STD_LOGIC := '1'; --DSACK FOR 6800 CYCLES
+	SIGNAL dsack68 : STD_LOGIC := '1'; --DSACK FOR 6800/68000 CYCLES
 	SIGNAL nLDSOUT : STD_LOGIC := '1'; --VALUE FOR _LDS
 	SIGNAL nUDSOUT : STD_LOGIC := '1'; --VALUE FOR _UDS
 	SIGNAL offboard : STD_LOGIC := '0'; --ARE WE ACCESSING THE AMIGA 2000 BOARD?
@@ -393,14 +392,7 @@ begin
 			
 			IF cycend = '0' THEN
 			
-				IF 
-					edsack = '0' OR --6800 E CYCLE
-					dsack68 = '0'  --68000 CYCLE
-				THEN
-					nDSACK1 <= '0';
-				ELSE
-					nDSACK1 <= '1';
-				END IF;
+				nDSACK1 <= dsack68;
 			
 			ELSE
 			
@@ -585,7 +577,7 @@ begin
 	PROCESS (basis7m, nRESET, TRISTATE, offboard) BEGIN
 	
 		IF (nRESET = '0' OR TRISTATE = '1' OR offboard = '0') THEN
-			--DON'T START 68000 CYCLE WHEN WE'RE NOT BOSS, IN A DMA CYCLE, ACCESSING IDE, OR ACCESSING N2630 MEMORY
+			--DON'T START 68000 CYCLE WHEN WE'RE NOT BOSS, IN A DMA CYCLE, ACCESSING IDE, OR ACCESSING N2630 MEMORY.
 			--BOILED DOWN, DON'T START THE STATE MACHINE UNLESS WE ARE ACCESSING DEVICES ON THE AMIGA 2000 BOARD.
 			CURRENT_STATE <= S1;
 			
@@ -593,7 +585,6 @@ begin
 			nUDSOUT <= 'Z';
 			nLDSOUT <= 'Z';
 			nVMA <= '1';
-			edsack <= '1';
 			dsack68 <= '1';
 			cycend <= '1';
 	
@@ -606,7 +597,6 @@ begin
 					IF nAS = '0' AND fedge = '1' THEN 							
 						CURRENT_STATE <= S2;	
 							
-						edsack <= '1';
 						dsack68 <= '1';
 						cycend <= '0';
 						
@@ -671,11 +661,10 @@ begin
 							END IF;
 						
 						ELSE
-						
+							
 							IF (nDTACK = '0' OR nBERR = '0') THEN
-								--IF THE TARGET DEVICE HAS ASSERTED DTACK OR BERR, WE PASS
-								--OTHERWISE, INSERT WAIT STATES UNTIL DTACK OR BERR IS ASSERTED.
-								--dsack68 <= '0';
+								--WHEN THE TARGET DEVICE HAS ASSERTED _DTACK OR _BERR, WE CONTINUE ON.
+								--OTHERWISE, INSERT WAIT STATES UNTIL _DTACK OR _BERR IS ASSERTED.
 								CURRENT_STATE <= S5;
 							END IF;
 
@@ -701,7 +690,7 @@ begin
 							--COMPLETE THE CYCLE.
 							
 							IF (vmacount = 5 OR vmacount = 6) THEN
-								edsack <= '0';
+								dsack68 <= '0';
 								CURRENT_STATE <= S7;
 							END IF;
 
@@ -720,10 +709,10 @@ begin
 					
 				WHEN S7 =>
 				
-					--AFTER ANY WAIT STATES, THE 68000 WILL LATCH DATA ON THE FALLING EDGE OF S7 AND NEGATE 
-					--DATA TRANSFER SIGNALS. WE NEGATE _UDS AND _LDS AND OUR END OF CYCLE SIGNAL. 
-					--IN THE EVENT WHERE BERR IS ASSERTED, THE PROCESSOR WILL NEGATE _AS AT S9.
-					--IN THAT EVENT, WE WAIT HERE UNTIL _AS NEGATES.
+					--THE 68030 WILL LATCH DATA ON THE FALLING EDGE OF S7 AND NEGATE 
+					--DATA TRANSFER SIGNALS. WE THEN NEGATE ALL 68000 DATA TRANSFER SIGNALS. 
+					--IN THE EVENT WHERE _BERR IS ASSERTED, THE 68000 NORMALLY NEGATES _AS AT S9.
+					--IN EITHER EVENT, WE JUST WAIT HERE UNTIL _AS NEGATES.
 					
 					IF (nAS = '1' AND fedge = '1') THEN	
 
@@ -733,11 +722,11 @@ begin
 						nLDSOUT <= '1';
 						nVMA <= '1';
 						
-						edsack <= '1';
 						dsack68 <= '1';
 						cycend <= '1';
 						
 						CURRENT_STATE <= S1;
+								
 					END IF;
 				
 			END CASE;
