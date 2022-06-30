@@ -162,7 +162,7 @@ begin
 	
 	--chipram		= (cpuaddr:[000000..1fffff]) ;    /* All Chip RAM */ 0-000111111111111111111111
 	--busspace	= (cpuaddr:[200000..9fffff]) ;    /* Main expansion bus */ 001000000000000000000000-100111111111111111111111
-	ciaspace <= '1' WHEN A(23 downto 13) >= "10100000000" AND A(23 downto 13) <= "10111111111" ELSE '0';
+	ciaspace <= '1' WHEN A(23 downto 12) >= x"A00" AND A(23 downto 12) <= x"BFF" ELSE '0';
 	--ciaspace	= (cpuaddr:[a00000..bfffff]) ;    /* VPA decode */ 101000000000000000000000-101111111111111111111111
 	--extraram	= (cpuaddr:[c00000..cfffff]) ;    /* Motherboard RAM */ 110000000000000000000000-110011111111111111111111
 	chipregs <= '1' WHEN A(23 downto 13) >= "11010000000" AND A(23 downto 13) <= "11011111111" ELSE '0';
