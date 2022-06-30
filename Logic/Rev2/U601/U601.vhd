@@ -152,7 +152,7 @@ architecture Behavioral of U601 is
 	SIGNAL phantomhi : STD_LOGIC := '0'; --PHANTOM HIGH SIGNAL
 	SIGNAL hirom : STD_LOGIC := '0'; --IS THE ROM IN THE HIGH ADDRESS SPACE?
 	SIGNAL lorom : STD_LOGIC := '0'; --IS THE ROM IN THE LOW ADDRESS SPACE?
-	SIGNAL rambaseaddress : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --RAM BASE ADDRESS
+	SIGNAL rambaseaddress : STD_LOGIC_VECTOR (2 DOWNTO 0) := "000"; --RAM BASE ADDRESS
 	--SIGNAL acsack : STD_LOGIC; --AUTOCONFIG DSACKn SIGNAL
 	
 begin
@@ -195,14 +195,14 @@ begin
 	--THIS DETECTS A 68030 MEMORY ACCESS
 	cpuaccess <= '1' 
 		WHEN
-			ramconfiged = '1' AND A(23 DOWNTO 22) = rambaseaddress AND nAS = '0' AND cpuspace = '0'
+			ramconfiged = '1' AND (A(23 DOWNTO 21) = rambaseaddress OR A(23 DOWNTO 21) = rambaseaddress + 1) AND nAS = '0'  AND nBGACK = '1' AND cpuspace = '0'
 		ELSE
 			'0';
 	
 	--THIS DETECTS A DMA MEMORY ACCESS
 	dmaaccess <= '1'
 		WHEN
-			ramconfiged = '1' AND A(23 DOWNTO 22) = rambaseaddress AND nAAS = '0' AND nBGACK = '0'
+			ramconfiged = '1' AND (A(23 DOWNTO 21) = rambaseaddress OR A(23 DOWNTO 21) = rambaseaddress + 1) AND nAAS = '0' AND nBGACK = '0'
 		ELSE
 			'0';
 			
@@ -814,7 +814,7 @@ begin
 						IF ( romconfiged = '1' AND ramconfiged = '0' ) THEN
 						
 							--BASE ADDRESS FOR THE ZORRO 2 RAM
-							rambaseaddress <= D(31 downto 30);
+							rambaseaddress <= D(31 downto 29);
 							ramconfiged <= '1'; 
 							
 						END IF;					
