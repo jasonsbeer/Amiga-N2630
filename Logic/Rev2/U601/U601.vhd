@@ -158,7 +158,6 @@ architecture Behavioral of U601 is
 begin
 
 	chipram <= '1' WHEN A(23 downto 12) >= x"000" AND A(23 downto 12) <= x"1FF"  ELSE '0'; 
-	--That's 4MB of chip ram space available...just FYI	
 	--chipram		= (cpuaddr:[000000..1fffff]) ;    /* All Chip RAM */ 0-000111111111111111111111
 	--busspace	= (cpuaddr:[200000..9fffff]) ;    /* Main expansion bus */ 001000000000000000000000-100111111111111111111111
 	ciaspace <= '1' WHEN A(23 downto 12) >= x"A00" AND A(23 downto 12) <= x"BFF" ELSE '0';
