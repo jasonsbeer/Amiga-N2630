@@ -157,17 +157,16 @@ architecture Behavioral of U601 is
 	
 begin
 
-	chipram <= '1' WHEN A(23 downto 13) >= "00000000000" AND A(23 downto 13) <= "00011111111"  ELSE '0'; 
-	--That's 4MB of chip ram space available...just FYI
-	
+	chipram <= '1' WHEN A(23 downto 12) >= x"000" AND A(23 downto 12) <= x"1FF"  ELSE '0'; 
+	--That's 4MB of chip ram space available...just FYI	
 	--chipram		= (cpuaddr:[000000..1fffff]) ;    /* All Chip RAM */ 0-000111111111111111111111
 	--busspace	= (cpuaddr:[200000..9fffff]) ;    /* Main expansion bus */ 001000000000000000000000-100111111111111111111111
 	ciaspace <= '1' WHEN A(23 downto 12) >= x"A00" AND A(23 downto 12) <= x"BFF" ELSE '0';
 	--ciaspace	= (cpuaddr:[a00000..bfffff]) ;    /* VPA decode */ 101000000000000000000000-101111111111111111111111
 	--extraram	= (cpuaddr:[c00000..cfffff]) ;    /* Motherboard RAM */ 110000000000000000000000-110011111111111111111111
-	chipregs <= '1' WHEN A(23 downto 13) >= "11010000000" AND A(23 downto 13) <= "11011111111" ELSE '0';
+	chipregs <= '1' WHEN A(23 downto 12) >= x"D00" AND A(23 downto 12) <= x"DFF" ELSE '0';
 	--chipregs	= (cpuaddr:[d00000..dfffff]) ;    /* Custom chip registers */ 110100000000000000000000-110111111111111111111111
-	iospace <= '1' WHEN A(23 downto 13) >= "11101000000" AND A(23 downto 13) <= "11101111111" ELSE '0';
+	iospace <= '1' WHEN A(23 downto 12) >= x"E80" AND A(23 downto 12) <= x"EFF" ELSE '0';
 	--iospace		= (cpuaddr:[e80000..efffff]) ;    /* I/O expansion bus */ 111010000000000000000000-111011111111111111111111
 	--romspace	= (cpuaddr:[f80000..ffffff]) ;    /* All ROM */ 111110000000000000000000-111111111111111111111111
 
