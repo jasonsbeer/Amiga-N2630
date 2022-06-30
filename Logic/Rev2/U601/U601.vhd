@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JUNE 25, 2022 
+-- Create Date:    JUNE 30, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -846,28 +846,23 @@ begin
 	--certainly possible to place I/O devices in the normal expansion space, or
 	--RAM in the I/O space.  Note that we always want to cache program, just not
 	--always data.  The "wanna be cached" term doesn't fit, so here's the 
-	--"don't wanna be cached" terms, with inversion. U306
-	
-	--EXTSEL = 1 is when Zorro 3 RAM is responding to the address space (EXTSEL)
-	--So, this original code never caches in Z3 ram. 
-	--Might want to consider looking into that when Z3 ram is present.	
+	--"don't wanna be cached" terms, with inversion. U306	
 		
 	userdata	<= '1' WHEN FC( 2 downto 0 ) = "001" ELSE '0'; --(cpustate:1)
 	superdata <= '1' WHEN FC( 2 downto 0 ) = "101" ELSE '0'; --(cpustate:5)
 	
-	nCIIN <= '1' 
-		WHEN
-			EXTSEL = '0' AND (
-			(chipram = '1' AND ( userdata = '1' OR superdata = '1' )) OR
+	nCIIN <= '0' 
+		WHEN			
+			(chipram = '1' AND ( userdata = '1' OR superdata = '1' ) AND EXTSEL = '0') OR
 			--!CACHE = chipram & (userdata # superdata) & !EXTSEL
-			(ciaspace = '1') OR
+			(ciaspace = '1'  AND EXTSEL = '0') OR
 			--ciaspace & !EXTSEL
-			(chipregs = '1') OR
+			(chipregs = '1'  AND EXTSEL = '0') OR
 			--chipregs & !EXTSEL
-			(iospace = '1'))
+			(iospace = '1'  AND EXTSEL = '0')
 			--iospace & !EXTSEL
 		ELSE
-			'0';		
+			'1';		
 
 	-----------------------
 	-- 6888x CHIP SELECT --
