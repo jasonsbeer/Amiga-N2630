@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JUNE 30, 2022 
+-- Create Date:    JULY 1, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -144,6 +144,7 @@ architecture Behavioral of U601 is
 	SIGNAL autoconfigspace : STD_LOGIC := '0'; --AUTOCONFIG ADDRESS SPACE
 	SIGNAL romconfiged : STD_LOGIC := '0'; --HAS THE ROM BEEN AUTOCONFIGED?
 	SIGNAL ramconfiged : STD_LOGIC := '0'; --HAS THE Z2 RAM BEEN AUTOCONFIGED?
+	SIGNAL boardconfiged : STD_LOGIC := '0'; --HAS THE ROM AND Z2 RAM FINISHED CONFIGURING?
 	SIGNAL D_ZORRO2RAM : STD_LOGIC_VECTOR (3 DOWNTO 0); --Z2 AUTOCONFIG DATA
 	SIGNAL D_2630 : STD_LOGIC_VECTOR (3 DOWNTO 0); --ROM AUTOCONFIG DATA
 	SIGNAL regreset : STD_LOGIC := '0'; --REGISTER RESET 
@@ -152,8 +153,7 @@ architecture Behavioral of U601 is
 	SIGNAL phantomhi : STD_LOGIC := '0'; --PHANTOM HIGH SIGNAL
 	SIGNAL hirom : STD_LOGIC := '0'; --IS THE ROM IN THE HIGH ADDRESS SPACE?
 	SIGNAL lorom : STD_LOGIC := '0'; --IS THE ROM IN THE LOW ADDRESS SPACE?
-	SIGNAL rambaseaddress : STD_LOGIC_VECTOR (2 DOWNTO 0) := "000"; --RAM BASE ADDRESS
-	--SIGNAL acsack : STD_LOGIC; --AUTOCONFIG DSACKn SIGNAL
+	SIGNAL rambaseaddress : STD_LOGIC_VECTOR (2 DOWNTO 0) := "000"; --RAM BASE ADDRESS	
 	
 begin
 
@@ -593,6 +593,8 @@ begin
 	--THE FINAL ROM CHIP SELECT SIGNAL
 	nCSROM <= '0' WHEN lorom = '1' OR hirom = '1' ELSE '1';	
 	
+	--ASSERT _ONBOARD WHENEVER WE ARE IN THE ROM OR AUTOCONFIG SPACE
+	--A SEPERATE SIGNAL, MEMACCESS, IS ASSERTED WHEN WE ARE IN THE RAM SPACE.
 	nONBOARD <= '0' WHEN nCSROM = '0' OR autoconfigspace = '1' ELSE '1';
 	
 	-----------------------
@@ -606,22 +608,29 @@ begin
 	PROCESS (CPUCLK) BEGIN
 		IF RISING_EDGE (CPUCLK) THEN
 			
-			IF nONBOARD = '0' AND nDS = '0' THEN
+			IF nONBOARD = '0' THEN
+				
+				--ROM OR AUTOCONFIG 16 BIT PORT
+				--THE 27C256 EPROM NEEDS 40-75ns TO STABILIZE DATA.
+				--THIS DELAYS DSACK BY ONE CLOCK CYCLE AND DATA IS LATCHED ON THE NEXT CLOCK...IS THIS ENOUGH?
+				--THAT'S 80ns AT 25MHz...SHOULD BE. 40ns AT 50MHz...MIGHT BE.
 			
-				--IF acsack = '0' THEN 
-					--THIS IS AUTOCONFIG OR ROM, SO IT IS A 16 BIT DATA TRANSFER
+				IF nDS = '0' THEN 
+					
 					nDSACK0 <= '1';
 					nDSACK1 <= '0';
 				
-				--ELSE
+				ELSE
 				
-					--nDSACK0 <= '1';
-					--nDSACK1 <= '1';
+					nDSACK0 <= '1';
+					nDSACK1 <= '1';
 				
-				--END IF;
+				END IF;
 					
 			ELSIF MEMACCESS = '1' THEN
+				
 				--THIS IS RAM ACCESS, SO WE ALWAYS RESPOND WITH A 32 BIT PORT
+				
 				IF	dsack = '0' THEN 
 					
 					nDSACK0 <= '0';
@@ -705,9 +714,9 @@ begin
 	----------------
 	
 	--IS EVERYTHING WE WANT CONFIGURED?
-	--WHEN THE ZORRO 2 RAM IS DISABLED BY J303, IT SETS Z2AUTO = 0.
+	--THIS IS PASSED TO THE _COPCFG SIGNAL 
 	--U602 WILL ASSERT Z3CONFIGED WHEN Z3 RAM HAS BEEN AUTOCONFIGed OR IF Z3 RAM IS DISABLED.
-	CONFIGED <= '1' WHEN Z3CONFIGED = '1' AND ((romconfiged = '1' AND Z2AUTO = '0') OR (romconfiged= '1' AND ramconfiged = '1')) ELSE '0';	
+	CONFIGED <= '1' WHEN Z3CONFIGED = '1' AND BOARDCONFIGED = '1' ELSE '0';	
 
 	--We have three boards we need to autoconfig, in this order
 	--1. The 68030 ROM (SEE ALSO SPECIAL REGISTER, ABOVE)
@@ -715,15 +724,19 @@ begin
 	--3. The expansion memory in the Zorro 3 space. This is done in U602.	
 
 	--A good explaination of the autoconfig process is given in the Amiga Hardware Reference Manual from Commodore
-	--https://archive.org/details/amiga-hardware-reference-manual-3rd-edition	
+	--https://archive.org/details/amiga-hardware-reference-manual-3rd-edition
+			
+	--BOARDCONFIGED IS ASSERTED WHEN WE ARE DONE CONFIGING THE ROM AND ZORRO 2 MEMORY
+	--WHEN THE ZORRO 2 RAM IS DISABLED BY J303, IT SETS Z2AUTO = 0.
+	boardconfiged <= '1' WHEN (romconfiged = '1' AND Z2AUTO = '0') OR (romconfiged= '1' AND ramconfiged = '1') ELSE <= '0';
 	
 	--WE IN THE Z2 AUTOCONFIG ADDRESS SPACE ($E80000).
-	--THIS IS QUALIFIED BY CONFIGED SO WE STOP RESPONDING TO THE AUTOCONFIG 
+	--THIS IS QUALIFIED BY BOARDCONFIGED SO WE STOP RESPONDING TO THE AUTOCONFIG 
 	--SPACE ONCE WE ARE COMPLETELY CONFIGURED.
 	--11101000
 	autoconfigspace <= '1'
 		WHEN 
-			A(23 downto 16) = x"E8" AND nAS = '0' AND CONFIGED = '0'
+			A(23 downto 16) = x"E8" AND nAS = '0' AND boardconfiged = '0'
 		ELSE
 			'0';				
 
@@ -748,9 +761,9 @@ begin
 			
 			rambaseaddress <= "00";			
 			ramconfiged <= '0';	
-			--acsack <= '1';
+			--dsack <= '1';
 			
-		ELSIF ( FALLING_EDGE (CPUCLK)) THEN
+		ELSIF ( RISING_EDGE (CPUCLK)) THEN
 		
 			IF ( autoconfigspace = '1' ) THEN
 			
@@ -799,7 +812,9 @@ begin
 							D_ZORRO2RAM <= "1111"; --INVERTED...Reserved offsets and unused offset values are all zeroes
 
 					END CASE;
-					
+						
+					--DSACK after each cycle
+					--dsack <= '0'; 
 
 				ELSIF ( RnW = '0' AND nDS = '0' ) THEN	
 				
@@ -817,17 +832,17 @@ begin
 							rambaseaddress <= D(31 downto 29);
 							ramconfiged <= '1'; 
 							
-						END IF;					
+						END IF;	
+							
+						--DSACK after each cycle
+						--dsack <= '0'; 
 						
-					END IF;					
+					END IF;	
+						
 				END IF;
-				
-				--DSACK after each cycle
-				--acsack <= '0'; 
-				
 			--ELSE
 				--WE ARE NOT IN THE AUTOCONFIG SPACE (_AS NEGATED), NEGATE AUTOCONFIG DSACK
-				--acsack <= '1';
+				--dsack <= '1';
 			END IF;
 		END IF;
 	END PROCESS;
