@@ -668,30 +668,36 @@ begin
 				WHEN S6 =>
 					--DATA IS WRITTEN TO THE BUS AT THIS STATE
 
-					IF redge = '1' THEN 
-					
-						IF (nVPA = '0') THEN
-							--THE 68030 DOES NOT NATIVELY SUPPORT 6800 SIGNALS, SO WE NEED 
-							--ASSERT _DSACK1 AT THE CORRECT TIME, BASED ON E, TO TELL THE 68030 TO
-							--COMPLETE THE CYCLE.
-							
-							IF (vmacount = 5 OR vmacount = 6) THEN
-								nDSACK1 <= '0';
-							END IF;
-
-						ELSE					
-							--EVEN THOUGH DTACK IS ASSERTED IN S4, WE NEED TO WAIT
-							--UNTIL ENOUGH TIME HAS PASSED TO ALLOW DATA TO BE STABLE ON THE
-							--BUS. THIS GETS THE TIMING RIGHT FOR THE 68000 ARCHITECTURE.
-							--OTHERWISE WE RISK LATCHING TOO EARLY.
-
-							nDSACK1 <= nDTACK;
-
-						END IF;	
-					
-						CURRENT_STATE <= S7;
+					IF (nVPA = '0') THEN
+						--THE 68030 DOES NOT NATIVELY SUPPORT 6800 SIGNALS, SO WE NEED 
+						--ASSERT _DSACK1 AT THE CORRECT TIME, BASED ON E, TO TELL THE 68030 TO
+						--COMPLETE THE CYCLE.
 						
-					END IF;
+						IF (vmacount = 5 OR vmacount = 6) THEN
+							nDSACK1 <= '0';
+						END IF;
+						
+						IF nDSACK1 = '0' AND redge = '1' THEN 
+					
+							CURRENT_STATE <= S7;
+						
+						END IF;
+
+					ELSE					
+						--EVEN THOUGH DTACK IS ASSERTED IN S4, WE NEED TO WAIT
+						--UNTIL ENOUGH TIME HAS PASSED TO ALLOW DATA TO BE STABLE ON THE
+						--BUS. THIS GETS THE TIMING RIGHT FOR THE 68000 ARCHITECTURE.
+						--OTHERWISE WE RISK LATCHING TOO EARLY.
+
+						nDSACK1 <= nDTACK;
+						
+						IF redge = '1' THEN 
+					
+							CURRENT_STATE <= S7;
+						
+						END IF;
+
+					END IF;	
 					
 				WHEN S7 =>
 				
