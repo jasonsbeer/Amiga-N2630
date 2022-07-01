@@ -310,7 +310,8 @@ begin
 	
 	--RESET		= BOSS & CPURESET & RESENB;
 	--RSTENB IS ACTIVE WHEN ROM IS CONFIGED...CHEAT HERE AND GO WITH OUR CONFIGED SIGNAL FROM U601
-	nRESET <= '0' WHEN nBOSS = '0' AND nCPURESET ='0' AND CONFIGED = '1' ELSE 'Z';
+	--RSTENB IN REV 9 2630 IS TIED TO +5V, SO WE SHOULD BE ABLE TO IGNORE IT HERE.
+	nRESET <= '0' WHEN nBOSS = '0' AND nCPURESET ='0' ELSE 'Z';
 	
 	---------------------------
 	-- E AND RELATED SIGNALS --
@@ -475,7 +476,7 @@ begin
 	nAS <= nAAS WHEN nBOSS = '0' AND nBGACK = '0' ELSE 'Z';
 
 	--68030 TO 68000 - NOT DMA
-	ARnW <= 'Z' WHEN TRISTATE = '1' OR offboard = '0' ELSE	RnW;	
+	--ARnW <= 'Z' WHEN TRISTATE = '1' OR offboard = '0' ELSE RnW;
 	--nAAS <= 'Z' WHEN TRISTATE = '1' OR offboard = '0' ELSE nAS;
 	
 	-- UNIDIRECTIONAL SIGNALS --
@@ -560,6 +561,7 @@ begin
 			CURRENT_STATE <= S1;
 			
 			nAAS <= 'Z';
+			ARnW <= 'Z';
 			nUDSOUT <= 'Z';
 			nLDSOUT <= 'Z';
 			nVMA <= '1';
@@ -572,6 +574,8 @@ begin
 			
 				WHEN S1 =>
 				
+					ARnW <= '1';
+				
 					IF fedge = '1' THEN
 						IF nAS = '0' THEN
 							IF smgo = 1 THEN
@@ -582,6 +586,7 @@ begin
 								
 								--PREPARE SETTINGS TO IMPLEMENT IN STATE 2
 								nAAS <= '0';
+								ARnW <= RnW;
 							
 								IF RnW = '1' THEN 
 									--READ CYCLE, WE CAN ASSERT UDS/LDS WITH 
@@ -709,6 +714,7 @@ begin
 					IF (nAS = '1') AND fedge = '1' THEN	
 
 						nAAS <= '1';
+						ARnW <= '1';
 					
 						nUDSOUT <= '1';
 						nLDSOUT <= '1';
