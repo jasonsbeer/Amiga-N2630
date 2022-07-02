@@ -134,10 +134,12 @@ architecture Behavioral of U600 is
 	
 	--CLOCK SIGNALS
 	SIGNAL basis7m : STD_LOGIC := '0';
-	SIGNAL edge : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --STATE MACHINE EDGE DETECTION
+	--SIGNAL edge : STD_LOGIC_VECTOR (4 DOWNTO 0) := "00000"; --STATE MACHINE EDGE DETECTION
 	SIGNAL fedge : STD_LOGIC := '0'; --FALLING EDGE
 	SIGNAL redge : STD_LOGIC := '0'; --RISING EDGE
-	SIGNAL smgo : INTEGER RANGE 0 TO 1 := 0; --STATE MACHINE GO
+	--SIGNAL delayedge : STD_LOGIC := '0'; --DELAY EDGE
+	SIGNAL smgo : STD_LOGIC := '0'; --STATE MACHINE GO
+	SIGNAL delay7m : STD_LOGIC := '0'; --DELAYED 7MHz CLOCK FOR EDGE DETECTION
 
 begin
 
@@ -524,23 +526,32 @@ begin
 	--EVENTS SO WE ASSERT/NEGATE AT THE EXACT MOMENT SPECIFIED IN THE 68000 DATA SHEET.
 
 	--THIS PROCEDURE IS USED TO TRACK WHETHER THE STATE MACHINE 
-	--IS ON A FALLING EDGE OR RISING EDGE. THIS IS A SIMPLE
-	--2 BIT SHIFT REGISTER.
+	--IS ON A FALLING EDGE OR RISING EDGE.
 
 	PROCESS (CPUCLK) BEGIN
 	
 		IF RISING_EDGE(CPUCLK) THEN
 			
-			edge(0) <= basis7m;
-			edge(1) <= edge(0);
+			--edge(0) <= basis7m;
+			--edge(4 DOWNTO 1) <= edge(3 DOWNTO 0);
+			delay7m <= basis7m;
+			
+			IF nAS = '0' AND smgo = '0' AND fedge = '1' THEN
+				smgo <= '1';
+			ELSIF nAS = '1' THEN
+				smgo <= '0';
+			END IF;
 			
 		END IF;
 
 	END PROCESS;
 
 	--FALLING EDGE AND RISING EDGE DETECTION.
-	fedge <= '1' WHEN edge(0) = '0' AND edge(1) = '1' ELSE '0';
-	redge <= '1' WHEN edge(0) = '1' AND edge(1) = '0' ELSE '0';
+	--fedge <= '1' WHEN edge(0) = '0' AND edge(1) = '1' ELSE '0';
+	--redge <= '1' WHEN edge(0) = '1' AND edge(1) = '0' ELSE '0';
+	--delayedge <= '1' WHEN edge(3) = '0' AND edge(4) = '1' ELSE '0';
+	fedge <= '1' WHEN basis7m = '0' AND delay7m = '1' ELSE '0';
+	redge <= '1' WHEN basis7m = '1' AND delay7m = '0' ELSE '0';
 		
 	--68000 DATA STROBE OUTPUTS
 	--FOR 68000 DATA STROBES, SEE TABLE 7-7 (pp7-23) IN 68030 MANUAL
@@ -565,7 +576,6 @@ begin
 			nLDSOUT <= 'Z';
 			nVMA <= 'Z';
 			nDSACK1 <= 'Z';
-			--smgo <= 0;
 	
 		ELSIF RISING_EDGE(CPUCLK) THEN
 		
@@ -575,9 +585,7 @@ begin
 				
 					ARnW <= '1';
 				
-					IF fedge = '1' THEN
-						IF nAS = '0' THEN
-							IF smgo = 1 THEN
+					IF nAS = '0' AND smgo = '1' THEN
 											
 								CURRENT_STATE <= S2;	
 									
@@ -594,23 +602,17 @@ begin
 									nLDSOUT <= '0';
 								END IF;
 							
-							ELSE
-							
-								smgo <= smgo +1;
-							
-							END IF;
-						END IF;
 					END IF;
 					
 				WHEN S2 =>
 					--NOTHING ELSE HERE, GO TO NEXT STATE
-					IF redge = '1' THEN
+					IF fedge = '1' THEN
 						CURRENT_STATE <= S3;
 					END IF;
 					
 				WHEN S3 =>
 					
-					IF fedge = '1' THEN
+					IF redge = '1' THEN
 
 						CURRENT_STATE <= S4;
 					
@@ -639,7 +641,7 @@ begin
 					--IF THIS IS A 68000 CYCLE, LOOK FOR ASSERTION OF _DTACK.
 					--IF THIS IS A 68000 WRITE CYCLE, ASSERT THE DATA STROBES HERE (SET PREVIOUSLY).
 					
-					IF redge = '1' THEN
+					IF fedge = '1' THEN
 
 						IF (nVPA = '0') THEN
 							--THIS IS A 6800 CYCLE, WE WAIT HERE UNTIL THE
@@ -665,7 +667,7 @@ begin
 				WHEN S5 =>
 					--NOTHING HERE. GO TO NEXT STATE ON FALLING EDGE.					
 					
-					IF fedge = '1' THEN
+					IF redge = '1' THEN
 						CURRENT_STATE <= S6;
 					END IF;
 
@@ -695,7 +697,7 @@ begin
 
 						nDSACK1 <= nDTACK;
 						
-						IF redge = '1' THEN 
+						IF fedge = '1' THEN 
 					
 							CURRENT_STATE <= S7;
 						
@@ -710,18 +712,18 @@ begin
 					--IN THE EVENT WHERE _BERR IS ASSERTED, THE 68000 NORMALLY NEGATES _AS AT S9.
 					--IN EITHER EVENT, WE JUST WAIT HERE UNTIL _AS NEGATES.
 					
-					IF nAS = '1' AND fedge = '1' THEN	
-
-						nAAS <= '1';
-						ARnW <= '1';
+					nAAS <= '1';
+					ARnW <= '1';
+				
+					nUDSOUT <= '1';
+					nLDSOUT <= '1';
+					nVMA <= '1';
 					
-						nUDSOUT <= '1';
-						nLDSOUT <= '1';
-						nVMA <= '1';
+					nDSACK1 <= '1';
+					
+					IF nAS = '1' AND redge = '1' THEN	
 						
-						nDSACK1 <= '1';
-						
-						smgo <= 0;
+						--smgo <= 0;
 						CURRENT_STATE <= S1;
 								
 					END IF;
