@@ -195,14 +195,14 @@ begin
 	--THIS DETECTS A 68030 MEMORY ACCESS
 	cpuaccess <= '1' 
 		WHEN
-			ramconfiged = '1' AND (A(23 DOWNTO 21) = rambaseaddress OR A(23 DOWNTO 21) = rambaseaddress + 1) AND nAS = '0'  AND nBGACK = '1' AND cpuspace = '0'
+			ramconfiged = '1' AND A(23 DOWNTO 21) = rambaseaddress AND nAS = '0'  AND nBGACK = '1' AND cpuspace = '0'
 		ELSE
 			'0';
 	
 	--THIS DETECTS A DMA MEMORY ACCESS
 	dmaaccess <= '1'
 		WHEN
-			ramconfiged = '1' AND (A(23 DOWNTO 21) = rambaseaddress OR A(23 DOWNTO 21) = rambaseaddress + 1) AND nAAS = '0' AND nBGACK = '0'
+			ramconfiged = '1' AND A(23 DOWNTO 21) = rambaseaddress AND nAAS = '0' AND nBGACK = '0'
 		ELSE
 			'0';
 			
@@ -582,20 +582,20 @@ begin
 	--THIS ALLOWS THE USER TO INTERCEPT THE STARTUP AND MAKE CHANGES VIA THE SOFTWARE INTERFACE.
 	--AS I UNDERSTAND, IT IS TREATED LIKE AN AUTOBOOT ROM IN THIS RESPECT.
 	
-	lorom <= '1' WHEN A(23 DOWNTO 16) = x"00" AND phantomlo = '0' AND RnW = '1' AND nAS = '0' ELSE '0';
+	lorom <= '1' WHEN A(23 DOWNTO 16) = x"00" AND phantomlo = '0' ELSE '0';
 	
 	--ONCE THE ROM IS AUTOCONFIGed, IT IS MOVED TO THE ADDRESS SPACE AT $F80000 - $F8FFFF.
 	--THIS IS THE "NORMAL" PLACE FOR SYSTEM ROMS.
 	
 	--11111000
-	hirom <= '1' WHEN A(23 DOWNTO 16) = x"F8" AND phantomhi = '0' AND RnW = '1' AND nAS = '0' ELSE '0';
+	hirom <= '1' WHEN A(23 DOWNTO 16) = x"F8" AND phantomhi = '0' ELSE '0';
 	
 	--THE FINAL ROM CHIP SELECT SIGNAL
-	nCSROM <= '0' WHEN lorom = '1' OR hirom = '1' ELSE '1';	
+	nCSROM <= '0' WHEN (lorom = '1' OR hirom = '1') AND RnW = '1' AND nAS = '0' ELSE '1';	
 	
 	--ASSERT _ONBOARD WHENEVER WE ARE IN THE ROM OR AUTOCONFIG SPACE
 	--A SEPERATE SIGNAL, MEMACCESS, IS ASSERTED WHEN WE ARE IN THE RAM SPACE.
-	nONBOARD <= '0' WHEN nCSROM = '0' OR autoconfigspace = '1' ELSE '1';
+	nONBOARD <= '0' WHEN hirom = '1' OR lorom = '1' OR autoconfigspace = '1' ELSE '1';
 	
 	-----------------------
 	-- DATA TRANSFER ACK --
@@ -728,15 +728,15 @@ begin
 			
 	--BOARDCONFIGED IS ASSERTED WHEN WE ARE DONE CONFIGING THE ROM AND ZORRO 2 MEMORY
 	--WHEN THE ZORRO 2 RAM IS DISABLED BY J303, IT SETS Z2AUTO = 0.
-	boardconfiged <= '1' WHEN (romconfiged = '1' AND Z2AUTO = '0') OR (romconfiged= '1' AND ramconfiged = '1') ELSE <= '0';
+	boardconfiged <= '1' WHEN (romconfiged = '1' AND Z2AUTO = '0') OR (romconfiged= '1' AND ramconfiged = '1') ELSE '0';
 	
-	--WE IN THE Z2 AUTOCONFIG ADDRESS SPACE ($E80000).
+	--WE ARE IN THE Z2 AUTOCONFIG ADDRESS SPACE ($E80000).
 	--THIS IS QUALIFIED BY BOARDCONFIGED SO WE STOP RESPONDING TO THE AUTOCONFIG 
 	--SPACE ONCE WE ARE COMPLETELY CONFIGURED.
 	--11101000
 	autoconfigspace <= '1'
 		WHEN 
-			A(23 downto 16) = x"E8" AND nAS = '0' AND boardconfiged = '0'
+			A(23 downto 16) = x"E8" AND boardconfiged = '0'
 		ELSE
 			'0';				
 
@@ -759,13 +759,13 @@ begin
 	
 		IF nRESET = '0' THEN
 			
-			rambaseaddress <= "00";			
+			rambaseaddress <= "000";			
 			ramconfiged <= '0';	
 			--dsack <= '1';
 			
 		ELSIF ( RISING_EDGE (CPUCLK)) THEN
 		
-			IF ( autoconfigspace = '1' ) THEN
+			IF ( autoconfigspace = '1' AND nAS = '0' ) THEN
 			
 				IF ( RnW = '1' ) THEN
 					--The 680x0 is reading from us
@@ -920,4 +920,3 @@ begin
 	nAVEC <= '0' WHEN (cpuspace = '1' AND interruptack = '1' AND nBGACK = '1') ELSE '1';
 
 end Behavioral;
-
