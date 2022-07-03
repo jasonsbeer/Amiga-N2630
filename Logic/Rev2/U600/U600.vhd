@@ -557,13 +557,13 @@ begin
 			--DELAYED 7MHz CLOCK FOR EDGE DETECTION
 			delay7m <= basis7m;
 			
-			--THE A2630 DELAYS THE START OF THE STATE MACHINE BY 100ns
-			--AND THEN THROUGH A FLIP FLOP TRIGGERED BY THE 7MHz CLOCK, 
+			--THE A2630 DELAYS THE START OF THE STATE MACHINE BY DELAYING _AS BY 100ns
+			--AND THEN ROUTING IT THROUGH A FLIP FLOP TRIGGERED BY THE 7MHz CLOCK, 
 			--BASICALLY DELAYING TWO CLOCKS. HERE, WE DELAY BY ONE CLOCK CYCLE.
-			IF nAS = '0' AND smgo = '0' AND fedge = '1' THEN
-				smgo <= '1';
-			ELSIF nAS = '1' THEN
-				smgo <= '0';
+			IF smgo = '0' THEN
+				IF nAS = '0' AND fedge = '1' THEN
+					smgo <= '1';
+				END IF;
 			END IF;			
 		
 			CASE (CURRENT_STATE) IS
@@ -653,7 +653,7 @@ begin
 					END IF;
 					
 				WHEN S5 =>
-					--NOTHING HERE. GO TO NEXT STATE ON FALLING EDGE.					
+					--NOTHING HERE. GO TO NEXT STATE.					
 					
 					IF redge = '1' THEN
 						CURRENT_STATE <= S6;
@@ -671,7 +671,7 @@ begin
 							nDSACK1 <= '0';
 						END IF;
 						
-						IF nDSACK1 = '0' AND redge = '1' THEN 
+						IF nDSACK1 = '0' AND fedge = '1' THEN 
 					
 							CURRENT_STATE <= S7;
 						
@@ -698,7 +698,6 @@ begin
 					--THE 68030 WILL LATCH DATA ON THE FALLING EDGE OF S7 AND NEGATE 
 					--DATA TRANSFER SIGNALS. WE THEN NEGATE ALL 68000 DATA TRANSFER SIGNALS. 
 					--IN THE EVENT WHERE _BERR IS ASSERTED, THE 68000 NORMALLY NEGATES _AS AT S9.
-					--IN EITHER EVENT, WE JUST WAIT HERE UNTIL _AS NEGATES.
 					
 					nAAS <= '1';
 					ARnW <= '1';
@@ -709,7 +708,7 @@ begin
 					
 					nDSACK1 <= '1';
 					
-					IF nAS = '1' AND redge = '1' THEN	
+					IF redge = '1' THEN	
 						
 						smgo <= 0;
 						CURRENT_STATE <= S1;
