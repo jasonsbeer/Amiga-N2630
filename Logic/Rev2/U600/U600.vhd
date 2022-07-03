@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JULY 1, 2022 
+-- Create Date:    JULY 2, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -521,35 +521,10 @@ begin
 	--     M68030            25        40        0   20   40   60   80  N/A  N/A
 	--     M68030            50        20        0   10   20   30   40  N/A  N/A
 
-	--WE ARE USING THE 68030 CLOCK TO TRIGGER EVENTS SO WE CAN SEE WHEN THE 7MHz CLOCK
-	--TRANSITIONS LOW TO HIGH OR HIGH TO LOW. THIS INFORMATION LETS US REALLY FINE TUNE
+	--WE ARE USING 7MHz CLOCK TRANSITIONS TO FINE TUNE 68000 STATE MACHINE
 	--EVENTS SO WE ASSERT/NEGATE AT THE EXACT MOMENT SPECIFIED IN THE 68000 DATA SHEET.
 
-	--THIS PROCEDURE IS USED TO TRACK WHETHER THE STATE MACHINE 
-	--IS ON A FALLING EDGE OR RISING EDGE.
-
-	PROCESS (CPUCLK) BEGIN
-	
-		IF RISING_EDGE(CPUCLK) THEN
-			
-			--edge(0) <= basis7m;
-			--edge(4 DOWNTO 1) <= edge(3 DOWNTO 0);
-			delay7m <= basis7m;
-			
-			IF nAS = '0' AND smgo = '0' AND fedge = '1' THEN
-				smgo <= '1';
-			ELSIF nAS = '1' THEN
-				smgo <= '0';
-			END IF;
-			
-		END IF;
-
-	END PROCESS;
-
-	--FALLING EDGE AND RISING EDGE DETECTION.
-	--fedge <= '1' WHEN edge(0) = '0' AND edge(1) = '1' ELSE '0';
-	--redge <= '1' WHEN edge(0) = '1' AND edge(1) = '0' ELSE '0';
-	--delayedge <= '1' WHEN edge(3) = '0' AND edge(4) = '1' ELSE '0';
+	--7MHz FALLING EDGE AND RISING EDGE DETECTION.
 	fedge <= '1' WHEN basis7m = '0' AND delay7m = '1' ELSE '0';
 	redge <= '1' WHEN basis7m = '1' AND delay7m = '0' ELSE '0';
 		
@@ -578,29 +553,42 @@ begin
 			nDSACK1 <= 'Z';
 	
 		ELSIF RISING_EDGE(CPUCLK) THEN
+			
+			--DELAYED 7MHz CLOCK FOR EDGE DETECTION
+			delay7m <= basis7m;
+			
+			--THE A2630 DELAYS THE START OF THE STATE MACHINE BY 100ns
+			--AND THEN THROUGH A FLIP FLOP TRIGGERED BY THE 7MHz CLOCK, 
+			--BASICALLY DELAYING TWO CLOCKS. HERE, WE DELAY BY ONE CLOCK CYCLE.
+			IF nAS = '0' AND smgo = '0' AND fedge = '1' THEN
+				smgo <= '1';
+			ELSIF nAS = '1' THEN
+				smgo <= '0';
+			END IF;			
 		
 			CASE (CURRENT_STATE) IS
 			
 				WHEN S1 =>
 				
+					--READ/WRITE IS ALWAYS SET HIGH BEFORE THE CYCLE STARTS
 					ARnW <= '1';
 				
-					IF nAS = '0' AND smgo = '1' THEN
+					IF smgo = '1' THEN
 											
-								CURRENT_STATE <= S2;	
-									
-								nDSACK1 <= '1';
-								
-								--PREPARE SETTINGS TO IMPLEMENT IN STATE 2
-								nAAS <= '0';
-								ARnW <= RnW;
-							
-								IF RnW = '1' THEN 
-									--READ CYCLE, WE CAN ASSERT UDS/LDS WITH 
-									--ADDRESS STROBE AND WE ALWAYS ASSERT BOTH.
-									nUDSOUT <= '0';
-									nLDSOUT <= '0';
-								END IF;
+						CURRENT_STATE <= S2;	
+				
+						nDSACK1 <= '1';
+
+						--PREPARE SETTINGS TO IMPLEMENT IN STATE 2
+						nAAS <= '0';
+						ARnW <= RnW;
+
+						IF RnW = '1' THEN 
+							--READ CYCLE, WE CAN ASSERT UDS/LDS WITH 
+							--ADDRESS STROBE AND WE ALWAYS ASSERT BOTH.
+							nUDSOUT <= '0';
+							nLDSOUT <= '0';
+						END IF;
 							
 					END IF;
 					
@@ -618,7 +606,7 @@ begin
 					
 						--IF THIS IS A WRITE CYCLE, WE SET THE DATA STROBES
 						--TO BE IMPLEMENTED IN STATE 4.
-						IF RnW = '0' THEN						
+						IF ARnW = '0' THEN						
 						
 							IF A(0) = '0' THEN
 								nUDSOUT <= '0';
@@ -695,7 +683,7 @@ begin
 						--BUS. THIS GETS THE TIMING RIGHT FOR THE 68000 ARCHITECTURE.
 						--OTHERWISE WE RISK LATCHING TOO EARLY.
 
-						nDSACK1 <= nDTACK;
+						nDSACK1 <= '0';
 						
 						IF fedge = '1' THEN 
 					
@@ -723,7 +711,7 @@ begin
 					
 					IF nAS = '1' AND redge = '1' THEN	
 						
-						--smgo <= 0;
+						smgo <= 0;
 						CURRENT_STATE <= S1;
 								
 					END IF;
