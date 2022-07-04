@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JULY 2, 2022 
+-- Create Date:    JULY 3, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -560,10 +560,9 @@ begin
 			--THE A2630 DELAYS THE START OF THE STATE MACHINE BY DELAYING _AS BY 100ns
 			--AND THEN ROUTING IT THROUGH A FLIP FLOP TRIGGERED BY THE 7MHz CLOCK, 
 			--BASICALLY DELAYING TWO CLOCKS. HERE, WE DELAY BY ONE CLOCK CYCLE.
-			IF smgo = '0' THEN
-				IF nAS = '0' AND fedge = '1' THEN
-					smgo <= '1';
-				END IF;
+
+			IF smgo = '0' AND nAS = '0' AND fedge = '1' THEN
+				smgo <= '1';
 			END IF;			
 		
 			CASE (CURRENT_STATE) IS
