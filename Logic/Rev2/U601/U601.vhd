@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JULY 1, 2022 
+-- Create Date:    JULY 4, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -582,20 +582,37 @@ begin
 	--THIS ALLOWS THE USER TO INTERCEPT THE STARTUP AND MAKE CHANGES VIA THE SOFTWARE INTERFACE.
 	--AS I UNDERSTAND, IT IS TREATED LIKE AN AUTOBOOT ROM IN THIS RESPECT.
 	
-	lorom <= '1' WHEN A(23 DOWNTO 16) = x"00" AND phantomlo = '0' ELSE '0';
+	lorom <= '1' WHEN A(23 DOWNTO 16) = x"00" AND phantomlo = '0' AND RnW = '1' ELSE '0';
 	
 	--ONCE THE ROM IS AUTOCONFIGed, IT IS MOVED TO THE ADDRESS SPACE AT $F80000 - $F8FFFF.
 	--THIS IS THE "NORMAL" PLACE FOR SYSTEM ROMS.
 	
 	--11111000
-	hirom <= '1' WHEN A(23 DOWNTO 16) = x"F8" AND phantomhi = '0' ELSE '0';
+	hirom <= '1' WHEN A(23 DOWNTO 16) = x"F8" AND phantomhi = '0' AND RnW = '1' ELSE '0';
 	
 	--THE FINAL ROM CHIP SELECT SIGNAL
-	nCSROM <= '0' WHEN (lorom = '1' OR hirom = '1') AND RnW = '1' AND nAS = '0' ELSE '1';	
+	nCSROM <= '0' WHEN nAS = '0' AND (lorom = '1' OR hirom = '1') ELSE '1';	
 	
 	--ASSERT _ONBOARD WHENEVER WE ARE IN THE ROM OR AUTOCONFIG SPACE
 	--A SEPERATE SIGNAL, MEMACCESS, IS ASSERTED WHEN WE ARE IN THE RAM SPACE.
-	nONBOARD <= '0' WHEN hirom = '1' OR lorom = '1' OR autoconfigspace = '1' ELSE '1';
+	
+	--ONBOARD		= icsrom OR icsauto OR (ONBOARD & AS);
+	
+	PROCESS (nAS) BEGIN
+	
+		IF FALLING_EDGE (nAS) THEN	
+		
+			IF hirom = '1' OR lorom = '1' OR autoconfigspace = '1' THEN
+				nONBOARD <= '0';
+			ELSE
+				nONBOARD <= '1';
+			END IF;
+			
+		END IF;
+		
+	END PROCESS;
+	
+	--nONBOARD <= '0' WHEN hirom = '1' OR lorom = '1' OR autoconfigspace = '1' ELSE '1';
 	
 	-----------------------
 	-- DATA TRANSFER ACK --
@@ -606,7 +623,7 @@ begin
 	--SIMULATES OK
 	
 	PROCESS (CPUCLK) BEGIN
-		IF RISING_EDGE (CPUCLK) THEN
+		IF FALLING_EDGE (CPUCLK) THEN
 			
 			IF nONBOARD = '0' THEN
 				

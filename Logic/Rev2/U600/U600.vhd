@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JULY 3, 2022 
+-- Create Date:    JULY 5, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -134,12 +134,12 @@ architecture Behavioral of U600 is
 	
 	--CLOCK SIGNALS
 	SIGNAL basis7m : STD_LOGIC := '0';
-	--SIGNAL edge : STD_LOGIC_VECTOR (4 DOWNTO 0) := "00000"; --STATE MACHINE EDGE DETECTION
+	SIGNAL edge : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --STATE MACHINE EDGE DETECTION
 	SIGNAL fedge : STD_LOGIC := '0'; --FALLING EDGE
 	SIGNAL redge : STD_LOGIC := '0'; --RISING EDGE
 	--SIGNAL delayedge : STD_LOGIC := '0'; --DELAY EDGE
-	SIGNAL smgo : STD_LOGIC := '0'; --STATE MACHINE GO
-	SIGNAL delay7m : STD_LOGIC := '0'; --DELAYED 7MHz CLOCK FOR EDGE DETECTION
+	--SIGNAL smgo : STD_LOGIC := '0'; --STATE MACHINE GO
+	--SIGNAL delay7m : STD_LOGIC := '0'; --DELAYED 7MHz CLOCK FOR EDGE DETECTION
 
 begin
 
@@ -475,10 +475,6 @@ begin
 	--68000 TO 68030 - DMAing
 	RnW <= ARnW WHEN nBOSS = '0' AND nBGACK = '0' ELSE 'Z';
 	nAS <= nAAS WHEN nBOSS = '0' AND nBGACK = '0' ELSE 'Z';
-
-	--68030 TO 68000 - NOT DMA
-	--ARnW <= 'Z' WHEN TRISTATE = '1' OR offboard = '0' ELSE RnW;
-	--nAAS <= 'Z' WHEN TRISTATE = '1' OR offboard = '0' ELSE nAS;
 	
 	-- UNIDIRECTIONAL SIGNALS --
 	
@@ -523,10 +519,18 @@ begin
 
 	--WE ARE USING 7MHz CLOCK TRANSITIONS TO FINE TUNE 68000 STATE MACHINE
 	--EVENTS SO WE ASSERT/NEGATE AT THE EXACT MOMENT SPECIFIED IN THE 68000 DATA SHEET.
+	
+	--7MHz EDGE DETECTION
+	PROCESS (CPUCLK) BEGIN
+		IF FALLING_EDGE(CPUCLK) THEN
+			edge(0) <= basis7m;
+			edge(1) <= edge(0);
+		END IF;
+	END PROCESS;
 
 	--7MHz FALLING EDGE AND RISING EDGE DETECTION.
-	fedge <= '1' WHEN basis7m = '0' AND delay7m = '1' ELSE '0';
-	redge <= '1' WHEN basis7m = '1' AND delay7m = '0' ELSE '0';
+	fedge <= '1' WHEN edge(0) = '0' AND edge(1) = '1' ELSE '0';
+	redge <= '1' WHEN edge(0) = '1' AND edge(1) = '0' ELSE '0';
 		
 	--68000 DATA STROBE OUTPUTS
 	--FOR 68000 DATA STROBES, SEE TABLE 7-7 (pp7-23) IN 68030 MANUAL
@@ -540,7 +544,7 @@ begin
 	
 	PROCESS (CPUCLK, nRESET, TRISTATE, offboard) BEGIN
 	
-		IF (nRESET = '0' OR TRISTATE = '1' OR offboard = '0') THEN
+		IF (nRESET = '0' OR offboard = '0' OR TRISTATE = '1' ) THEN 
 			--DON'T START 68000 CYCLE WHEN WE'RE NOT BOSS, IN A DMA CYCLE, ACCESSING IDE, OR ACCESSING N2630 MEMORY.
 			--BOILED DOWN, DON'T START THE STATE MACHINE UNLESS WE ARE ACCESSING DEVICES ON THE AMIGA 2000 BOARD.
 			CURRENT_STATE <= S1;
@@ -552,18 +556,7 @@ begin
 			nVMA <= 'Z';
 			nDSACK1 <= 'Z';
 	
-		ELSIF RISING_EDGE(CPUCLK) THEN
-			
-			--DELAYED 7MHz CLOCK FOR EDGE DETECTION
-			delay7m <= basis7m;
-			
-			--THE A2630 DELAYS THE START OF THE STATE MACHINE BY DELAYING _AS BY 100ns
-			--AND THEN ROUTING IT THROUGH A FLIP FLOP TRIGGERED BY THE 7MHz CLOCK, 
-			--BASICALLY DELAYING TWO CLOCKS. HERE, WE DELAY BY ONE CLOCK CYCLE.
-
-			IF smgo = '0' AND nAS = '0' AND fedge = '1' THEN
-				smgo <= '1';
-			END IF;			
+		ELSIF RISING_EDGE(CPUCLK) THEN		
 		
 			CASE (CURRENT_STATE) IS
 			
@@ -572,7 +565,7 @@ begin
 					--READ/WRITE IS ALWAYS SET HIGH BEFORE THE CYCLE STARTS
 					ARnW <= '1';
 				
-					IF smgo = '1' THEN
+					IF nAS = '0' AND redge = '1' THEN --smgo = '1' AND 
 											
 						CURRENT_STATE <= S2;	
 				
@@ -588,13 +581,23 @@ begin
 							nUDSOUT <= '0';
 							nLDSOUT <= '0';
 						END IF;
+						
+					ELSE
+					
+						CURRENT_STATE <= S1;
 							
 					END IF;
 					
 				WHEN S2 =>
 					--NOTHING ELSE HERE, GO TO NEXT STATE
 					IF fedge = '1' THEN
+					
 						CURRENT_STATE <= S3;
+						
+					ELSE
+				
+						CURRENT_STATE <= S2;
+					
 					END IF;
 					
 				WHEN S3 =>
@@ -605,7 +608,7 @@ begin
 					
 						--IF THIS IS A WRITE CYCLE, WE SET THE DATA STROBES
 						--TO BE IMPLEMENTED IN STATE 4.
-						IF ARnW = '0' THEN						
+						IF RnW = '0' THEN						
 						
 							IF A(0) = '0' THEN
 								nUDSOUT <= '0';
@@ -617,9 +620,14 @@ begin
 								nLDSOUT <= '0';
 							ELSE
 								nLDSOUT <= '1';
-							END IF;
+							END IF;							
+							
 						END IF;
-
+						
+					ELSE
+					
+						CURRENT_STATE <= S3;
+						
 					END IF;
 					
 				WHEN S4 =>
@@ -634,9 +642,16 @@ begin
 							--THIS IS A 6800 CYCLE, WE WAIT HERE UNTIL THE
 							--APPROPRIATE TIME IS REACHED ON E TO ASSERT _VMA, WHICH IS 
 							--BETWEEN 3 AND 4 CLOCK CYCLES AFTER E GOES TO LOGIC LOW.
+							
 							IF vmacount = 1 OR vmacount = 2 THEN
+							
 								nVMA <= '0';
-								CURRENT_STATE <= S6;
+								CURRENT_STATE <= S5;
+								
+							ELSE
+					
+								CURRENT_STATE <= S4;
+						
 							END IF;
 						
 						ELSE
@@ -644,7 +659,13 @@ begin
 							IF (nDTACK = '0' OR nBERR = '0') THEN
 								--WHEN THE TARGET DEVICE HAS ASSERTED _DTACK OR _BERR, WE CONTINUE ON.
 								--OTHERWISE, INSERT WAIT STATES UNTIL _DTACK OR _BERR IS ASSERTED.
+								
 								CURRENT_STATE <= S5;
+								
+							ELSE
+					
+								CURRENT_STATE <= S4;
+						
 							END IF;
 
 						END IF;
@@ -654,8 +675,14 @@ begin
 				WHEN S5 =>
 					--NOTHING HERE. GO TO NEXT STATE.					
 					
-					IF redge = '1' THEN
+					IF redge = '1' THEN					
+					
 						CURRENT_STATE <= S6;
+						
+					ELSE
+					
+						CURRENT_STATE <= S5;
+						
 					END IF;
 
 				WHEN S6 =>
@@ -666,13 +693,14 @@ begin
 						--ASSERT _DSACK1 AT THE CORRECT TIME, BASED ON E, TO TELL THE 68030 TO
 						--COMPLETE THE CYCLE.
 						
-						IF (vmacount = 5 OR vmacount = 6) THEN
-							nDSACK1 <= '0';
-						END IF;
+						IF vmacount = 8 AND fedge = '1' THEN
 						
-						IF nDSACK1 = '0' AND fedge = '1' THEN 
-					
+							nDSACK1 <= '0';					
 							CURRENT_STATE <= S7;
+							
+						ELSE
+					
+							CURRENT_STATE <= S6;							
 						
 						END IF;
 
@@ -682,11 +710,14 @@ begin
 						--BUS. THIS GETS THE TIMING RIGHT FOR THE 68000 ARCHITECTURE.
 						--OTHERWISE WE RISK LATCHING TOO EARLY.
 
-						nDSACK1 <= '0';
-						
 						IF fedge = '1' THEN 
 					
+							nDSACK1 <= '0';
 							CURRENT_STATE <= S7;
+							
+						ELSE
+					
+							CURRENT_STATE <= S6;
 						
 						END IF;
 
@@ -694,23 +725,30 @@ begin
 					
 				WHEN S7 =>
 				
-					--THE 68030 WILL LATCH DATA ON THE FALLING EDGE OF S7 AND NEGATE 
+					--THE 68000 LATCHES DATA ON THE FALLING EDGE OF S7 AND NEGATES 
 					--DATA TRANSFER SIGNALS. WE THEN NEGATE ALL 68000 DATA TRANSFER SIGNALS. 
 					--IN THE EVENT WHERE _BERR IS ASSERTED, THE 68000 NORMALLY NEGATES _AS AT S9.
 					
-					nAAS <= '1';
-					ARnW <= '1';
-				
-					nUDSOUT <= '1';
-					nLDSOUT <= '1';
-					nVMA <= '1';
+					IF nAS = '1' THEN
 					
-					nDSACK1 <= '1';
+						nAAS <= '1';
+						ARnW <= '1';
 					
-					IF redge = '1' THEN	
+						nUDSOUT <= '1';
+						nLDSOUT <= '1';
+						nVMA <= '1';
 						
-						smgo <= 0;
+						nDSACK1 <= '1';
+					
+					END IF;
+					
+					IF nAAS = '1' AND redge = '1' THEN	
+						
 						CURRENT_STATE <= S1;
+						
+					ELSE
+					
+						CURRENT_STATE <= S7;
 								
 					END IF;
 				
