@@ -155,6 +155,10 @@ architecture Behavioral of U601 is
 	SIGNAL lorom : STD_LOGIC := '0'; --IS THE ROM IN THE LOW ADDRESS SPACE?
 	SIGNAL rambaseaddress : STD_LOGIC_VECTOR (2 DOWNTO 0) := "000"; --RAM BASE ADDRESS	
 	
+	--ROM RELATED SIGNALS
+	CONSTANT DELAYVALUE : INTEGER := 3;
+	SIGNAL dsackdelay : STD_LOGIC_VECTOR ( DELAYVALUE DOWNTO 0 ) := (OTHERS => '0') ; --DELAY DSACK CYCLE
+	
 begin
 
 	chipram <= '1' WHEN A(23 downto 12) >= x"000" AND A(23 downto 12) <= x"1FF"  ELSE '0'; 
@@ -457,6 +461,11 @@ begin
 						
 							CURRENT_STATE <= RUN_STATE;
 							
+							nZCS <= '1';
+							nZRAS <= '1';	
+							nZCAS <= '1';							
+							nZWE <= '1';
+							
 						END IF;
 						
 					END IF;		
@@ -623,26 +632,33 @@ begin
 	--SIMULATES OK
 	
 	PROCESS (CPUCLK) BEGIN
-		IF FALLING_EDGE (CPUCLK) THEN
+		IF RISING_EDGE (CPUCLK) THEN
 			
 			IF nONBOARD = '0' THEN
 				
 				--ROM OR AUTOCONFIG 16 BIT PORT
 				--THE 27C256 EPROM NEEDS 40-75ns TO STABILIZE DATA.
 				--THIS DELAYS DSACK BY ONE CLOCK CYCLE AND DATA IS LATCHED ON THE NEXT CLOCK...IS THIS ENOUGH?
-				--THAT'S 80ns AT 25MHz...SHOULD BE. 40ns AT 50MHz...MIGHT BE.
+				--CURRENTLY THIS WILL LATCH 120ns AFTER ASSERTION OF _DS AT 25MHz
 			
-				IF nDS = '0' THEN 
+				IF nDS = '0' AND dsackdelay(DELAYVALUE) = '1' THEN				
 					
 					nDSACK0 <= '1';
 					nDSACK1 <= '0';
+				
+				ELSIF nDS = '0' AND dsackdelay(DELAYVALUE) = '0' THEN
+				
+					dsackdelay(0) <= '1';
+					dsackdelay(DELAYVALUE DOWNTO 1) <= dsackdelay(DELAYVALUE-1 DOWNTO 0);
 				
 				ELSE
 				
 					nDSACK0 <= '1';
 					nDSACK1 <= '1';
+					dsackdelay <= (OTHERS => '0');
 				
 				END IF;
+				
 					
 			ELSIF MEMACCESS = '1' THEN
 				
@@ -661,8 +677,11 @@ begin
 				END IF;
 			
 			ELSE
+			
 				nDSACK0 <= 'Z';
 				nDSACK1 <= 'Z';
+				dsackdelay <= (OTHERS => '0');
+				
 			END IF;
 		
 		END IF;
