@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JULY 5, 2022 
+-- Create Date:    JULY 7, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -91,6 +91,8 @@ PORT
 	nABG : INOUT STD_LOGIC; --AMIGA BUS GRANT
 	nBG : INOUT STD_LOGIC; --68030 BUS GRANT SIGNAL
 	
+	redge : INOUT STD_LOGIC := '0';
+	
 	ADDIR : OUT STD_LOGIC; --DIRECTION/LATCH OF 74FTC624 LOGIC
 	IPLCLK : OUT STD_LOGIC; --CLOCK PULSE FOR U700
 	DRSEL : OUT STD_LOGIC; --DIRECTION SELECTION FOR U701 U702
@@ -136,10 +138,7 @@ architecture Behavioral of U600 is
 	SIGNAL basis7m : STD_LOGIC := '0';
 	SIGNAL edge : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --STATE MACHINE EDGE DETECTION
 	SIGNAL fedge : STD_LOGIC := '0'; --FALLING EDGE
-	SIGNAL redge : STD_LOGIC := '0'; --RISING EDGE
-	--SIGNAL delayedge : STD_LOGIC := '0'; --DELAY EDGE
-	--SIGNAL smgo : STD_LOGIC := '0'; --STATE MACHINE GO
-	--SIGNAL delay7m : STD_LOGIC := '0'; --DELAYED 7MHz CLOCK FOR EDGE DETECTION
+	--SIGNAL redge : STD_LOGIC := '0'; --RISING EDGE
 
 begin
 
@@ -553,7 +552,7 @@ begin
 			ARnW <= 'Z';
 			nUDSOUT <= 'Z';
 			nLDSOUT <= 'Z';
-			nVMA <= 'Z';
+			nVMA <= '1';
 			nDSACK1 <= 'Z';
 	
 		ELSIF RISING_EDGE(CPUCLK) THEN		
