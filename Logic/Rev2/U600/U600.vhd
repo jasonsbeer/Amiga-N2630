@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JULY 7, 2022 
+-- Create Date:    JULY 10, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -91,7 +91,7 @@ PORT
 	nABG : INOUT STD_LOGIC; --AMIGA BUS GRANT
 	nBG : INOUT STD_LOGIC; --68030 BUS GRANT SIGNAL
 	
-	redge : INOUT STD_LOGIC := '0';
+	--redge : INOUT STD_LOGIC := '0';
 	
 	ADDIR : OUT STD_LOGIC; --DIRECTION/LATCH OF 74FTC624 LOGIC
 	IPLCLK : OUT STD_LOGIC; --CLOCK PULSE FOR U700
@@ -110,7 +110,7 @@ end U600;
 architecture Behavioral of U600 is
 
 	--DEFINE THE 68000 STATE MACHINE STATES
-	TYPE STATE68K IS ( S1, S2, S3, S4, S5, S6, S7 );
+	TYPE STATE68K IS ( S0, S1, S2, S3, S4, S5, S6, S7 );
 	SIGNAL CURRENT_STATE : STATE68K;
 	
 	--THESE ARE THE CLOCK CYCLES DEFINED FOR THE SDRAM REFRESH COUNTER
@@ -136,8 +136,8 @@ architecture Behavioral of U600 is
 	
 	--CLOCK SIGNALS
 	SIGNAL basis7m : STD_LOGIC := '0';
-	SIGNAL edge : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --STATE MACHINE EDGE DETECTION
-	SIGNAL fedge : STD_LOGIC := '0'; --FALLING EDGE
+	--SIGNAL edge : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --STATE MACHINE EDGE DETECTION
+	--SIGNAL fedge : STD_LOGIC := '0'; --FALLING EDGE
 	--SIGNAL redge : STD_LOGIC := '0'; --RISING EDGE
 
 begin
@@ -515,21 +515,6 @@ begin
 	--     M68000          7.16       139        0   70  140  210  280  350  420  
 	--     M68030            25        40        0   20   40   60   80  N/A  N/A
 	--     M68030            50        20        0   10   20   30   40  N/A  N/A
-
-	--WE ARE USING 7MHz CLOCK TRANSITIONS TO FINE TUNE 68000 STATE MACHINE
-	--EVENTS SO WE ASSERT/NEGATE AT THE EXACT MOMENT SPECIFIED IN THE 68000 DATA SHEET.
-	
-	--7MHz EDGE DETECTION
-	PROCESS (CPUCLK) BEGIN
-		IF FALLING_EDGE(CPUCLK) THEN
-			edge(0) <= basis7m;
-			edge(1) <= edge(0);
-		END IF;
-	END PROCESS;
-
-	--7MHz FALLING EDGE AND RISING EDGE DETECTION.
-	fedge <= '1' WHEN edge(0) = '0' AND edge(1) = '1' ELSE '0';
-	redge <= '1' WHEN edge(0) = '1' AND edge(1) = '0' ELSE '0';
 		
 	--68000 DATA STROBE OUTPUTS
 	--FOR 68000 DATA STROBES, SEE TABLE 7-7 (pp7-23) IN 68030 MANUAL
@@ -541,12 +526,14 @@ begin
 
 	--THE STATE MACHINE
 	
-	PROCESS (CPUCLK, nRESET, TRISTATE, offboard) BEGIN
+	PROCESS (CPUCLK, offboard, TRISTATE) BEGIN
 	
-		IF (nRESET = '0' OR offboard = '0' OR TRISTATE = '1' ) THEN 
+		IF (offboard = '0' OR TRISTATE = '1') THEN 
+			--nGRESET MIGHT BE APPROPRIATE HERE, BUT NOT nRESET! SHOULDN'T BE NECESSARY BECAUSE THAT WOULD BE REDUNDANT WITH 
+			--nBOSS IN THE offboard EQUATION.
 			--DON'T START 68000 CYCLE WHEN WE'RE NOT BOSS, IN A DMA CYCLE, ACCESSING IDE, OR ACCESSING N2630 MEMORY.
 			--BOILED DOWN, DON'T START THE STATE MACHINE UNLESS WE ARE ACCESSING DEVICES ON THE AMIGA 2000 BOARD.
-			CURRENT_STATE <= S1;
+			CURRENT_STATE <= S0;
 			
 			nAAS <= 'Z';
 			ARnW <= 'Z';
@@ -558,17 +545,34 @@ begin
 		ELSIF RISING_EDGE(CPUCLK) THEN		
 		
 			CASE (CURRENT_STATE) IS
+				
+				WHEN S0 =>
+				
+					nAAS <= '1';
+					ARnW <= '1';
+				
+					nUDSOUT <= '1';
+					nLDSOUT <= '1';
+					
+					nDSACK1 <= '1';
+					
+					
+					IF nAS = '0' AND basis7m = '0' THEN 
+					
+						CURRENT_STATE <= S1;	
+						
+					ELSE
+					
+						CURRENT_STATE <= S0;	
+					
+					END IF;
+					
 			
 				WHEN S1 =>
 				
-					--READ/WRITE IS ALWAYS SET HIGH BEFORE THE CYCLE STARTS
-					ARnW <= '1';
-				
-					IF nAS = '0' AND redge = '1' THEN --smgo = '1' AND 
+					IF basis7m = '1' THEN 
 											
 						CURRENT_STATE <= S2;	
-				
-						nDSACK1 <= '1';
 
 						--PREPARE SETTINGS TO IMPLEMENT IN STATE 2
 						nAAS <= '0';
@@ -589,7 +593,7 @@ begin
 					
 				WHEN S2 =>
 					--NOTHING ELSE HERE, GO TO NEXT STATE
-					IF fedge = '1' THEN
+					IF basis7m = '0' THEN
 					
 						CURRENT_STATE <= S3;
 						
@@ -601,7 +605,7 @@ begin
 					
 				WHEN S3 =>
 					
-					IF redge = '1' THEN
+					IF basis7m = '1' THEN
 
 						CURRENT_STATE <= S4;
 					
@@ -635,7 +639,7 @@ begin
 					--IF THIS IS A 68000 CYCLE, LOOK FOR ASSERTION OF _DTACK.
 					--IF THIS IS A 68000 WRITE CYCLE, ASSERT THE DATA STROBES HERE (SET PREVIOUSLY).
 					
-					IF fedge = '1' THEN
+					IF basis7m = '0' THEN
 
 						IF (nVPA = '0') THEN
 							--THIS IS A 6800 CYCLE, WE WAIT HERE UNTIL THE
@@ -674,7 +678,7 @@ begin
 				WHEN S5 =>
 					--NOTHING HERE. GO TO NEXT STATE.					
 					
-					IF redge = '1' THEN					
+					IF basis7m = '1' THEN					
 					
 						CURRENT_STATE <= S6;
 						
@@ -692,7 +696,7 @@ begin
 						--ASSERT _DSACK1 AT THE CORRECT TIME, BASED ON E, TO TELL THE 68030 TO
 						--COMPLETE THE CYCLE.
 						
-						IF vmacount = 8 AND fedge = '1' THEN
+						IF vmacount = 8 AND basis7m = '0' THEN
 						
 							nDSACK1 <= '0';					
 							CURRENT_STATE <= S7;
@@ -709,7 +713,7 @@ begin
 						--BUS. THIS GETS THE TIMING RIGHT FOR THE 68000 ARCHITECTURE.
 						--OTHERWISE WE RISK LATCHING TOO EARLY.
 
-						IF fedge = '1' THEN 
+						IF basis7m = '0' THEN 
 					
 							nDSACK1 <= '0';
 							CURRENT_STATE <= S7;
@@ -741,9 +745,9 @@ begin
 					
 					END IF;
 					
-					IF nAAS = '1' AND redge = '1' THEN	
+					IF nAAS = '1' AND basis7m = '1' THEN	
 						
-						CURRENT_STATE <= S1;
+						CURRENT_STATE <= S0;
 						
 					ELSE
 					
