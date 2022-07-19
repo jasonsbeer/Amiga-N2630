@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JULY 16, 2022 
+-- Create Date:    JULY 18, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -82,7 +82,7 @@ PORT
 	D : INOUT STD_LOGIC_VECTOR (31 DOWNTO 28); --68030 DATA BUS
 	nCSROM : INOUT STD_LOGIC; --ROM CHIP SELECT
 	
-	SMDIS : INOUT STD_LOGIC; --STATE MACHINE DISABLE (WAS nONBOARD)
+	SMDIS : INOUT STD_LOGIC := '0'; --STATE MACHINE DISABLE (WAS nONBOARD)
 	nFPUCS : OUT STD_LOGIC; --FPU CHIP SELECT
 	nBERR : OUT STD_LOGIC; --BUS ERROR
 	nCIIN : OUT STD_LOGIC; --68030 CACHE ENABLE
@@ -198,13 +198,13 @@ begin
 	--THE AMIGA ADDRESS BUFFERS CONTROL THE FLOW OF THE ADDRESS BUS.
 	--WHEN WE ARE BOSS, THE DATA FLOWS FROM THE 2630 TO THE AMIGA 2000.
 	--WHEN WE ARE BOSS AND IN A DMA CYCLE, THE DATA FLOWS FROM THE AMIGA 2000 TO THE 2630.
+	--WHEN IN 68K MODE, THE DATA FLOWS TO THE 2630.
 	
 	--THE ADDRESS BUFFER DIRECTION
 	--AADIR <= '1' WHEN (nBOSS = '0' AND nBGACK = '1') ELSE '0';
 	AADIR <= nBGACK;	
 	
 	--ENABLE THE BUFFERS WHEN WE ARE BOSS OR WHEN WE ARE IN 68K MODE.
-	--BASICALLY, ALL THE TIME!
 	--nAAENA <= '0' WHEN nBOSS = '0' OR MODE68K = '1' ELSE '1'; 
 	nAAENA <= nBOSS;
 	
@@ -373,6 +373,7 @@ begin
 				
 					--TIME TO REFRESH THE SDRAM, BUT ONLY IF WE ARE NOT IN THE MIDDLE OF A MEMORY ACCESS CYCLE
 					IF nMEMZ2 = '1' THEN
+					
 						CURRENT_STATE <= AUTO_REFRESH;
 						nZWE <= '1';
 						nZRAS <= '0';
@@ -380,22 +381,26 @@ begin
 						nZCS <= '0';
 						
 						REFACKZ2 <= '1';
+						
 					END IF;
+					
 				END IF;
 					
 			ELSE
 				
 				IF (REFACKZ2 = '1') THEN
+				
 					--NEGATE REFACKZ2
 					REFACKZ2 <= '0';
+					
 				END IF;
 				
 			END IF;
 		
 			--PROCEED WITH SDRAM STATE MACHINE
-			--THE FIRST STATES ARE TO INITIALIZE THE SDRAM, WHICH WE ALWAYS DO
-			--THE LATER STATES ARE TO UTILIZE THE SDRAM, WHICH ONLY HAPPENS IF MEMACCESS = 1
-			--THIS MEANS THE ADDRESS STROBE IS ASSERTED, WE ARE IN THE ZORRO 2 ADDRESS SPACE, AND THE RAM IS AUTOCONFIGured
+			--THE FIRST STATES ARE TO INITIALIZE THE SDRAM, WHICH WE ALWAYS DO.
+			--THE LATER STATES ARE TO UTILIZE THE SDRAM, WHICH ONLY HAPPENS IF nMEMZ2 IS ASSERTED.
+			--THIS MEANS THE ADDRESS STROBE IS ASSERTED, WE ARE IN THE ZORRO 2 ADDRESS SPACE, AND THE RAM IS AUTOCONFIGured.
 			CASE CURRENT_STATE IS
 			
 				WHEN PRESTART =>
@@ -617,17 +622,17 @@ begin
 	--AT THAT TIME, THE ROM RESPONDS IN THE SPACE AT $000000 - $00FFFF.
 	--THE ROM WILL STOP RESPONDING ONCE phantomlo IS SET = 1 AFTER CONFIGURATION.
 	
-	lorom <= '1' WHEN A(23 DOWNTO 16) = x"00" AND phantomlo = '0' AND RnW = '1' ELSE '0';
+	lorom <= '1' WHEN A(23 DOWNTO 16) = x"00" AND phantomlo = '0' AND RnW = '1' AND nAS = '0' ELSE '0';
 	
 	--AFTERWARD, THE ROM IS THEN MOVED TO THE ADDRESS SPACE AT $F80000 - $F8FFFF.
 	--THIS IS THE "NORMAL" PLACE FOR SYSTEM ROMS.
 	--THE ROM WILL STOP RESPONDING ONCE phantomhi IS SET = 1 AFTER CONFIGURATION.
 	
 	--11111000
-	hirom <= '1' WHEN A(23 DOWNTO 16) = x"F8" AND phantomhi = '0' AND RnW = '1' ELSE '0';
+	hirom <= '1' WHEN A(23 DOWNTO 16) = x"F8" AND phantomhi = '0' AND RnW = '1' AND nAS = '0' ELSE '0';
 	
 	--THE FINAL ROM CHIP SELECT SIGNAL
-	nCSROM <= '0' WHEN nAS = '0' AND (lorom = '1' OR hirom = '1') ELSE '1';	
+	nCSROM <= '0' WHEN lorom = '1' OR hirom = '1' ELSE '1';	
 	
 	---------------------------
 	-- ROM DATA TRANSFER ACK --
@@ -645,21 +650,16 @@ begin
 				--THE 27C256 EPROM NEEDS 40-75ns TO STABILIZE DATA.
 				--THIS DELAYS DSACK BY THE NUMBER OF CLOCKS DEFINED BY DELAYVALUE.
 			
-				IF nDS = '0' AND dsackdelay(DELAYVALUE) = '1' THEN				
+				IF dsackdelay(DELAYVALUE) = '1' THEN				
 					
 					nDSACK1 <= '0';
 				
-				ELSIF nDS = '0' AND dsackdelay(DELAYVALUE) = '0' THEN
+				ELSIF dsackdelay(DELAYVALUE) = '0' THEN
 				
 					nDSACK1 <= '1';
 					
 					dsackdelay(0) <= '1';
 					dsackdelay(DELAYVALUE DOWNTO 1) <= dsackdelay(DELAYVALUE-1 DOWNTO 0);
-				
-				ELSE
-				
-					nDSACK1 <= '1';
-					dsackdelay <= (OTHERS => '0');
 				
 				END IF;	
 
@@ -681,6 +681,8 @@ begin
 				nDSACK0 <= 'Z';
 				nDSACK1 <= 'Z';
 				
+				dsackdelay <= (OTHERS => '0');
+				
 			END IF;
 		
 		END IF;
@@ -693,13 +695,13 @@ begin
 	
 	--ASSERT SMDIS (STATE MACHINE DISABLE) WHENEVER WE ARE ACCESSING A RESOURCE
 	--ON THE 2630 CARD. THIS INCLUDES ROM, AUTOCONFIG, IDE, ZORRO 2, OR ZORRO 3 
-	--MEMORY SPACES. THE PREVENTS THE 68000 STATE MACHINE FROM STARTING.
+	--MEMORY SPACES. THIS PREVENTS THE 68000 STATE MACHINE FROM STARTING.
 	
-	PROCESS (nAS) BEGIN
+	PROCESS (CPUCLK) BEGIN
 	
-		IF FALLING_EDGE (nAS) THEN	
+		IF RISING_EDGE (CPUCLK) THEN	
 		
-			IF hirom = '1' OR lorom = '1' OR autoconfigspace = '1' OR nIDEACCESS = '0' OR nMEMZ2 = '0' OR nMEMZ3 = '0' THEN
+			IF (hirom = '1' OR lorom = '1' OR autoconfigspace = '1' OR nIDEACCESS = '0' OR nMEMZ2 = '0' OR nMEMZ3 = '0') OR (SMDIS = '1' AND nAS = '0') THEN
 			
 				SMDIS <= '1';
 				
@@ -714,9 +716,9 @@ begin
 	END PROCESS;
 	
 	
-	---------------------
-	-- "JOHANN'S" MODE --
-	---------------------
+	-------------------
+	-- JOHANN'S MODE --
+	-------------------
 
 	--This is a special reset used to reset the ROM configuration registers.  If
    --JMODE (Johann's special mode) is active, we can reset the registers
@@ -798,7 +800,7 @@ begin
 	--11101000
 	autoconfigspace <= '1'
 		WHEN 
-			A(23 downto 16) = x"E8" AND boardconfiged = '0'
+			A(23 downto 16) = x"E8" AND boardconfiged = '0' AND nAS = '0'
 		ELSE
 			'0';				
 
@@ -829,7 +831,7 @@ begin
 		
 			IF autoconfigspace = '1' THEN
 			
-				IF RnW = '1' AND nAS = '0' THEN
+				IF RnW = '1' THEN
 					--The 680x0 is reading from us
 				
 					CASE A(6 downto 1) IS
