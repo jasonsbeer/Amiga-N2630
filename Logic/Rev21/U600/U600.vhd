@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JULY 18, 2022 
+-- Create Date:    JULY 19, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -129,6 +129,7 @@ architecture Behavioral of U600 is
 	SIGNAL esync : STD_LOGIC := '0'; --ONE CLOCK DELAY OF E
 	SIGNAL DSACKEN : STD_LOGIC := '0'; --ENABLE _DSACK1
 	SIGNAL STATE7 : STD_LOGIC := '0'; --ARE WE IN 68000 STATE 7?
+	SIGNAL STATE7EN : STD_LOGIC := '0';
 	
 	--CLOCK SIGNALS
 	SIGNAL basis7m : STD_LOGIC := '0';
@@ -617,7 +618,8 @@ begin
 						IF vmacount = 1 OR vmacount = 2 THEN
 								
 							nVMA <= '0';
-							DSACKEN <= '1';
+							--DSACKEN <= '1';
+							STATE7EN <= '1';
 							CURRENT_STATE <= S6;
 							
 						END IF;
@@ -629,7 +631,8 @@ begin
 							--WHEN THE TARGET DEVICE HAS ASSERTED _DTACK OR _BERR, WE CONTINUE ON.
 							--OTHERWISE, INSERT WAIT STATES UNTIL _DTACK OR _BERR IS ASSERTED.
 									
-							DSACKEN <= '1';
+							--DSACKEN <= '1';
+							STATE7EN <= '1';
 							CURRENT_STATE <= S6;
 							
 						END IF;
@@ -653,7 +656,8 @@ begin
 					nVMA <= '1';
 					nUDSOUT <= '1';
 					nLDSOUT <= '1';					
-					DSACKEN <= '0';
+					DSACKEN <= '1';
+					STATE7EN <= '0';
 
 			END CASE;
 
@@ -672,7 +676,7 @@ begin
 
 			IF sm_enabled = '1' THEN
 
-				IF STATE7 = '1' AND DSACKEN = '1' THEN 
+				IF STATE7 = '1' AND DSACKEN = '1'THEN 
 
 					--ASSERT _DSACK1.
 					nDSACK1 <= '0';
@@ -684,7 +688,7 @@ begin
 				
 				ELSE
 
-					--WE ARE IN A STATE MACHINE CYCLE, BUT NOT STATE 7.
+					--WE ARE IN A STATE MACHINE CYCLE, BUT NOT READY TO ASSERT.
 					nDSACK1 <= '1';
 					
 				END IF;
@@ -710,7 +714,7 @@ begin
 
 		IF FALLING_EDGE (basis7m) THEN 
 		
-			IF DSACKEN = '1' THEN
+			IF STATE7EN = '1' THEN
 
 				--WE ARE IN STATE 7
 
