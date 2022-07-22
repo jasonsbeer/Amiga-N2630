@@ -6,7 +6,7 @@
 
   (title_block
     (title "Amiga N2630")
-    (date "2022-06-05")
+    (date "2022-07-21")
     (rev "2.1 QFP")
   )
 
@@ -1024,7 +1024,7 @@
   )
 
   (no_connect (at 366.395 88.265) (uuid 4d35ea55-4d22-4db1-bdf4-dcb9ec34834f))
-  (no_connect (at 320.675 88.265) (uuid 4d35ea55-4d22-4db1-bdf4-dcb9ec34834f))
+  (no_connect (at 320.675 88.265) (uuid 4d35ea55-4d22-4db1-bdf4-dcb9ec348350))
 
   (bus_entry (at 81.28 157.48) (size -2.54 -2.54)
     (stroke (width 0) (type default) (color 0 0 0 0))
