@@ -83,11 +83,10 @@ J404|Shorted|Shorted|Open|Open
 **Table 4.** System Clock Jumper Settings
 Jumper|Description|1-2|2-3
 -|-|-|-
-J201|CPU Clock|28MHz|X1<sup>[A,B]</sup>
-J202|FPU Clock|X1<sup>A</sup>|X2<sup>[B]</sup>
+J202|FPU Clock|X1<sup>[A]</sup>|X2<sup>[B]</sup>
 
-<sup>A</sup>Factory default.  
-<sup>B</sup>The clock signal is supplied by X1 or X2 oscillator.
+<sup>A</sup>FPU clock from X1. Factory default.  
+<sup>B</sup>FPU clock from X2.
 
 ## Acknowledgements
 Dave Haynie for providing the A2630 PAL logic.  
