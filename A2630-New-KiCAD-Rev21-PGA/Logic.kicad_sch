@@ -6,8 +6,8 @@
 
   (title_block
     (title "Amiga N2630")
-    (date "2022-07-21")
-    (rev "2.1 QFP")
+    (date "2022-07-22")
+    (rev "2.1")
   )
 
   (lib_symbols
@@ -4226,11 +4226,6 @@
     (uuid ffdbacfb-a89a-4cc2-b876-2fab45dc3e59)
   )
 
-  (text "THESE NEED TO BE MUXED WITH D15..0\nIF IT IS TO WORK IN 68000 MODE"
-    (at 229.489 170.688 0)
-    (effects (font (size 3 3)) (justify left bottom))
-    (uuid 12fcb82c-cd49-4292-b130-b409a5448525)
-  )
   (text "IDE INTERFACE" (at 258.445 25.4 0)
     (effects (font (size 3 3)) (justify left bottom))
     (uuid 181a4bfc-179c-4791-a9ec-f21d6817fcb3)
