@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JULY 20, 2022 
+-- Create Date:    JULY 28, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -411,7 +411,7 @@ begin
 	nADOEH <= '0' 
 		WHEN 
 			--( nBOSS = '0' AND nBGACK = '1' AND MEMACCESS = '0' AND nAS = '0' AND nONBOARD = '1' AND nEXTERN = '1' ) 
-			( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0' AND nAAS = '0' ) OR
+			( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0' AND nAS = '0' ) OR
 			( nBOSS = '0' AND nBGACK = '0' AND nMEMZ2 = '0' AND nAAS = '0' AND A(1) = '1' )  
 			--OR ( nBOSS = '1' AND MODE68K = '1' AND nBGACK = '1' AND nMEMZ2 = '0' AND nAAS = '0' ) 
 			--OR ( nBOSS = '1' AND MODE68K = '1' AND nBGACK = '1' AND nIDEACCESS AND nAAS = '0' )
@@ -438,8 +438,7 @@ begin
 	--TO A 74xx245, FOR EXAMPLE.
 
 	--DRSEL		= BOSS & !BGACK & RW;
-	--DRSEL <= '1' WHEN nBOSS = '0' AND nBGACK = '1' AND RnW = '1' ELSE '0';
-	DRSEL <= '0';
+	DRSEL <= '1' WHEN nBOSS = '0' AND nBGACK = '1' AND RnW = '1' ELSE '0';
 	
 	--This is data direction control U500
 	--PIN 5		= !BGACK	;	/* '030 Bus grant acknowledge */
@@ -523,10 +522,10 @@ begin
 	--68000 DATA STROBE OUTPUTS
 	--FOR 68000 DATA STROBES, SEE TABLE 7-7 (pp7-23) IN 68030 MANUAL
 	--nUDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D31:24 (UPPER BYTE)
-	--nLDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D23:16 (LOWER BYTE)
+	--nLDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D23:16 (LOWER BYTE)	
 	
-	nUDS <= nUDSOUT WHEN dsenable = '1' ELSE 'Z';
-	nLDS <= nLDSOUT WHEN dsenable = '1' ELSE 'Z';	
+	nUDS <= nUDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	nLDS <= nLDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';	
 
 	--THE STATE MACHINE
 
@@ -547,7 +546,7 @@ begin
 			CURRENT_STATE <= S0;
 
 		ELSIF RISING_EDGE (basis7m) THEN
-
+			
 			--MOST OF THE INTERESTING STATES ARE FIRED ON THE RISING EDGE.
 			--THE ONLY EXCEPTION IS S7, WHICH IS ON THE FALLING EDGE.
 			--WE ACTUALLY END UP 
@@ -558,14 +557,15 @@ begin
 
 					--STATE 0 IS THE START OF A CYCLE.
 					--WATCH FOR ASSERTION OF _AS TO TRIGGER THE START OF A CYCLE.
-					--WE WANT TO WAIT UNTIL THE CLOCK IS HIGH SO WE START IN STATE 0, NOT STATE 1.					
+					--WE WANT TO WAIT UNTIL THE 7MHz CLOCK IS HIGH SO WE START IN STATE 0, NOT STATE 1.					
 					--WE CONSIDER _DSACK1 TO ENSURE WE DON'T START IF THE PREVIOUS
 					--CYCLE IS NOT YET COMPLETE IN A BACK-TO-BACK SITUATION.
 					--THAT SHOULD NEVER HAPPEN, BUT, YOU KNOW.
 					
-					DSACKEN <= '0';					
+					DSACKEN <= '0';
+					nVMA <= '1';					
 
-					IF nAS = '0' AND nDSACK1 /= '0' THEN
+					IF nAS = '0' AND nDSACK1 = '1' THEN
 					
 						CURRENT_STATE <= S2;
 
@@ -617,15 +617,17 @@ begin
 						--APPROPRIATE TIME IS REACHED ON E TO ASSERT _VMA, WHICH IS 
 						--BETWEEN 3 AND 4 CLOCK CYCLES AFTER E GOES TO LOGIC LOW.
 							
-						IF nVMA = '1' AND vmacount = 1 THEN
+						IF nVMA = '1' AND (vmacount = 1 OR vmacount = 2) THEN
 								
-							nVMA <= '0';
+							nVMA <= '0';	
 							STATE7EN <= '1';
 							
 						ELSIF nVMA = '0' AND vmacount = 8 THEN						
 							
 							--NOW WAIT UNTIL WE ARE ON THE RIGHT SPOT IN E TO LATCH THE DATA.
 							CURRENT_STATE <= S6;
+							DSACKEN <= '1';
+							STATE7EN <= '0';
 						
 						END IF;
 					
@@ -637,8 +639,8 @@ begin
 							--WHEN THE TARGET DEVICE HAS ASSERTED _DTACK OR _BERR, WE CONTINUE ON.
 							--OTHERWISE, INSERT WAIT STATES UNTIL _DTACK OR _BERR IS ASSERTED.
 									
-							STATE7EN <= '1';
 							CURRENT_STATE <= S6;
+							STATE7EN <= '1';
 							
 						END IF;
 
@@ -655,14 +657,21 @@ begin
 
 					CURRENT_STATE <= S0;
 					ARnW <= '1';
-					nAAS <= '1';
-					nVMA <= '1';
-					--nUDSOUT <= '1';
-					--nLDSOUT <= '1';	
-					
+					nAAS <= '1';		
 					dsenable <= '0';
-					DSACKEN <= '1';
-					STATE7EN <= '0';
+					
+					IF nVMA = '0' THEN
+					
+						nVMA <= '1';
+						DSACKEN <= '0';
+						
+					ELSE
+					
+						STATE7EN <= '0';
+						DSACKEN <= '1';
+						
+					END IF;
+					
 
 			END CASE;
 
@@ -679,9 +688,9 @@ begin
 
 		IF RISING_EDGE (CPUCLK) THEN
 
-			IF sm_enabled = '1' THEN
+			IF sm_enabled = '1' THEN			
 
-				IF STATE7 = '1' AND DSACKEN = '1'THEN 
+				IF STATE7 = '1' AND DSACKEN = '1' THEN 
 
 					--ASSERT _DSACK1.
 					nDSACK1 <= '0';
@@ -716,19 +725,7 @@ begin
 
 		IF FALLING_EDGE (basis7m) THEN 
 		
-			IF STATE7EN = '1' THEN
-
-				--WE ASSERT STATE7 TO QUALIFY WE ARE READY FOR A DSACK1 AT THE RIGHT TIME.
-
-				STATE7 <= '1';
-
-			ELSIF STATE7 = '1' AND DSACKEN = '1' THEN
-
-				--NEGATE STATE7 WHEN WE NO LONGER WANT TO ASSERT DSACK1.
-
-				STATE7 <= '0';
-
-			END IF;
+			STATE7 <= STATE7EN;
 
 		END IF;
 

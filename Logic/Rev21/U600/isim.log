@@ -30,72 +30,347 @@ Time resolution is 1 ps
 # run 1000 ns
 Simulator is doing circuit initialization process.
 Finished circuit initialization process.
-# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
-# run .25us
-# isim force add /u600/dsacken 1 -radix bin
-# isim force add /u600/state7 1 -radix bin
-# run .25us
-# isim force add /u600/nas 0 -radix bin
-# run .25us
-# run .25us
-# isim force add /u600/dsacken 0 -radix bin
-# run .25us
-# run .25us
-# isim force add /u600/state7 0 -radix bin
-# run .25us
-# isim force add /u600/nas 1 -radix bin
-# run .25us
 # isim force add /u600/basis7m 1 -radix bin -value 0 -radix bin -time 69500 ps -repeat 139 ns
-# run .25us
-# run .25us
-# run .25us
-# run .25us
+# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/b2000 0 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
 # isim force add /u600/rnw 1 -radix bin
-# run .1us
-# run .1us
-# run .1us
+# isim force add /u600/nas 1 -radix bin
+# run 0.1us
+# isim force add /u600/smdis 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/smdis 0 -radix bin
+# isim force add /u600/nas 0 -radix bin
+# isim force add /u600/nvpa 0 -radix bin
+# run 0.01us
+# isim force add /u600/nbgack 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.1us
+# run 0.1us
+# run 0.1us
 # isim force add /u600/tristate 0 -radix bin
-# isim force add /u600/sm_enabled 1 -radix bin
-# isim force add /u600/nas 0 -radix bin
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# isim force add /u600/ndtack 0 -radix bin
-# run .1us
-# run .1us
-# run .1us
-# isim force add /u600/nas 1 -radix bin
-# run .1us
-# isim force add /u600/nas 0 -radix bin
-# isim force add /u600/ndtack 0 -radix bin
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# isim force add /u600/nas 1 -radix bin
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# isim force add /u600/nas 0 -radix bin
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
 ISim P.20131013 (signature 0xfbc00daa)
 ----------------------------------------------------------------------
 INFO:Security:61 - The XILINXD_LICENSE_FILE environment variable is not set.
@@ -123,72 +398,217 @@ This is a Lite version of ISim.
 # run 1000 ns
 Simulator is doing circuit initialization process.
 Finished circuit initialization process.
+# isim force add /u600/basis7m 1 -radix bin -value 0 -radix bin -time 69500 ps -repeat 139 ns
 # isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
-# isim force add /u600/basis7m 0 -radix bin -value 1 -radix bin -time 69500 ps -repeat 139 ns
+# isim force add /u600/b2000 0 -radix bin
 # isim force add /u600/tristate 0 -radix bin
-# isim force add /u600/sm_enabled 1 -radix bin
+# isim force add /u600/smdis 1 -radix bin
 # isim force add /u600/rnw 1 -radix bin
 # isim force add /u600/nas 1 -radix bin
-# isim force add /u600/ndtack 0 -radix bin
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
+# isim force add /u600/nvpa 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/nbgack 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/smdis 0 -radix bin
 # isim force add /u600/nas 0 -radix bin
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# run .1us
-# isim force add /u600/nas 1 -radix bin
-# run .1us
-# run .1us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# isim force add /u600/nas 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# isim force add /u600/nas 1 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
 ISim P.20131013 (signature 0xfbc00daa)
 ----------------------------------------------------------------------
 INFO:Security:61 - The XILINXD_LICENSE_FILE environment variable is not set.
@@ -216,39 +636,420 @@ This is a Lite version of ISim.
 # run 1000 ns
 Simulator is doing circuit initialization process.
 Finished circuit initialization process.
-# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
 # isim force add /u600/basis7m 1 -radix bin -value 0 -radix bin -time 69500 ps -repeat 139 ns
+# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
+# isim force add /u600/b2000 0 -radix bin
 # isim force add /u600/tristate 0 -radix bin
-# isim force add /u600/sm_enabled 1 -radix bin
+# isim force add /u600/smdis 1 -radix bin
 # isim force add /u600/rnw 1 -radix bin
 # isim force add /u600/nas 1 -radix bin
-# isim force add /u600/ndtack 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# isim force add /u600/nvpa 1 -radix bin
+# isim force add /u600/nbgack 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
 # isim force add /u600/nas 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# isim force add /u600/nvpa 0 -radix bin
+# run 0.1us
+# run 0.1us
+# isim force add /u600/smdis 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
 # isim force add /u600/nas 1 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nvpa 1 -radix bin
+# isim force add /u600/a[0] 0 -radix bin
+# isim force add /u600/a[1] 1 -radix bin
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/a[0] 0 -radix bin
+# run 0.1us
+# isim force add /u600/a[0] 0 -radix bin
+# run 0.1us
+# run 0.1us
+# isim force add /u600/a 10 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/nas 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/smdis 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/smdis 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/siz[0] 1 -radix bin
+# isim force add /u600/smdis 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/smdis 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/siz[0] 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/nvpa 0 -radix bin
+# isim force add /u600/smdis 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/smdis 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
 ISim P.20131013 (signature 0xfbc00daa)
 ----------------------------------------------------------------------
 INFO:Security:61 - The XILINXD_LICENSE_FILE environment variable is not set.
@@ -276,47 +1077,182 @@ This is a Lite version of ISim.
 # run 1000 ns
 Simulator is doing circuit initialization process.
 Finished circuit initialization process.
-# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
 # isim force add /u600/basis7m 1 -radix bin -value 0 -radix bin -time 69500 ps -repeat 139 ns
+# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
+# isim force add /u600/b2000 0 -radix bin
 # isim force add /u600/tristate 0 -radix bin
-# isim force add /u600/sm_enabled 1 -radix bin
+# isim force add /u600/smdis 1 -radix bin
+# isim force add /u600/a[0] 0 -radix bin
+# isim force add /u600/siz[0] 1 -radix bin
 # isim force add /u600/rnw 1 -radix bin
 # isim force add /u600/nas 1 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# isim force add /u600/nbgack 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/nvpa 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/smdis 0 -radix bin
 # isim force add /u600/nas 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# isim force add /u600/ndtack 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/siz[0] 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/rnw 0 -radix bin
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
 ISim P.20131013 (signature 0xfbc00daa)
 ----------------------------------------------------------------------
 INFO:Security:61 - The XILINXD_LICENSE_FILE environment variable is not set.
@@ -344,67 +1280,62 @@ This is a Lite version of ISim.
 # run 1000 ns
 Simulator is doing circuit initialization process.
 Finished circuit initialization process.
-# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
 # isim force add /u600/basis7m 1 -radix bin -value 0 -radix bin -time 69500 ps -repeat 139 ns
+# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
+# isim force add /u600/b2000 0 -radix bin
 # isim force add /u600/tristate 0 -radix bin
-# isim force add /u600/sm_enabled 1 -radix bin
+# isim force add /u600/smdis 0 -radix bin
+# isim force add /u600/a[0] 0 -radix bin
+# isim force add /u600/siz[0] 0 -radix bin
 # isim force add /u600/rnw 1 -radix bin
 # isim force add /u600/nas 1 -radix bin
-# isim force add /u600/ndtack 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/nbgack 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/nvpa 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
 # isim force add /u600/nas 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# isim force add /u600/nas 1 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# isim force add /u600/nas 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# isim force add /u600/nas 1 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
 ISim P.20131013 (signature 0xfbc00daa)
 ----------------------------------------------------------------------
 INFO:Security:61 - The XILINXD_LICENSE_FILE environment variable is not set.
@@ -432,87 +1363,203 @@ This is a Lite version of ISim.
 # run 1000 ns
 Simulator is doing circuit initialization process.
 Finished circuit initialization process.
-# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
 # isim force add /u600/basis7m 1 -radix bin -value 0 -radix bin -time 69500 ps -repeat 139 ns
+# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
+# isim force add /u600/b2000 0 -radix bin
 # isim force add /u600/tristate 0 -radix bin
-# isim force add /u600/sm_enabled 1 -radix bin
+# isim force add /u600/smdis 0 -radix bin
+# isim force add /u600/a[0] 0 -radix bin
+# isim force add /u600/siz[0] 0 -radix bin
 # isim force add /u600/rnw 1 -radix bin
 # isim force add /u600/nas 1 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# isim force add /u600/ndtack 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# isim force add /u600/nvpa 0 -radix bin
+# isim force add /u600/nbgack 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
 # isim force add /u600/nas 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 0 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# isim force add /u600/rnw 0 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
 ISim P.20131013 (signature 0xfbc00daa)
 ----------------------------------------------------------------------
 INFO:Security:61 - The XILINXD_LICENSE_FILE environment variable is not set.
@@ -540,39 +1587,317 @@ This is a Lite version of ISim.
 # run 1000 ns
 Simulator is doing circuit initialization process.
 Finished circuit initialization process.
-# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
 # isim force add /u600/basis7m 1 -radix bin -value 0 -radix bin -time 69500 ps -repeat 139 ns
+# isim force add /u600/basis7m 1 -radix bin -value 0 -radix bin -time 69500 ps -repeat 139 ns
+# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
+# isim force add /u600/b2000 0 -radix bin
 # isim force add /u600/tristate 0 -radix bin
-# isim force add /u600/sm_enabled 1 -radix bin
+# isim force add /u600/smdis 0 -radix bin
+# isim force add /u600/a[0] 0 -radix bin
+# isim force add /u600/siz[0] 0 -radix bin
 # isim force add /u600/rnw 1 -radix bin
 # isim force add /u600/nas 1 -radix bin
-# isim force add /u600/ndtack 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# isim force add /u600/nvpa 0 -radix bin
+# isim force add /u600/nbgack 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
 # isim force add /u600/nas 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
 # isim force add /u600/nas 1 -radix bin
-# run .05us
-# run .05us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 0 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/ndsack1 1 -radix bin
+# run 0.1us
+# isim force remove /u600/ndsack1
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# isim force add /u600/smdis 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/smdis 0 -radix bin
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 0 -radix bin
+# isim force add /u600/rnw 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
 ISim P.20131013 (signature 0xfbc00daa)
 ----------------------------------------------------------------------
 INFO:Security:61 - The XILINXD_LICENSE_FILE environment variable is not set.
@@ -600,49 +1925,107 @@ This is a Lite version of ISim.
 # run 1000 ns
 Simulator is doing circuit initialization process.
 Finished circuit initialization process.
-# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
 # isim force add /u600/basis7m 1 -radix bin -value 0 -radix bin -time 69500 ps -repeat 139 ns
+# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 19500 ps -repeat 39 ns
+# isim force add /u600/b2000 0 -radix bin
 # isim force add /u600/tristate 0 -radix bin
-# isim force add /u600/sm_enabled 1 -radix bin
+# isim force add /u600/smdis 0 -radix bin
+# isim force add /u600/a[0] 0 -radix bin
+# isim force add /u600/siz[0] 0 -radix bin
+# isim force add /u600/smdis 1 -radix bin
 # isim force add /u600/rnw 1 -radix bin
 # isim force add /u600/nas 1 -radix bin
-# isim force add /u600/ndtack 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# isim force add /u600/nvpa 0 -radix bin
+# isim force add /u600/nbgack 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/smdis 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
 # isim force add /u600/nas 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
 # isim force add /u600/nas 1 -radix bin
-# run .05us
-# run .05us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
 ISim P.20131013 (signature 0xfbc00daa)
 ----------------------------------------------------------------------
 INFO:Security:61 - The XILINXD_LICENSE_FILE environment variable is not set.
@@ -670,58 +2053,98 @@ This is a Lite version of ISim.
 # run 1000 ns
 Simulator is doing circuit initialization process.
 Finished circuit initialization process.
-# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
 # isim force add /u600/basis7m 1 -radix bin -value 0 -radix bin -time 69500 ps -repeat 139 ns
+# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 19500 ps -repeat 39 ns
+# isim force add /u600/b2000 0 -radix bin
 # isim force add /u600/tristate 0 -radix bin
-# isim force add /u600/sm_enabled 1 -radix bin
+# isim force add /u600/smdis 1 -radix bin
+# isim force add /u600/a[0] 0 -radix bin
+# isim force add /u600/siz[0] 0 -radix bin
 # isim force add /u600/rnw 1 -radix bin
 # isim force add /u600/nas 1 -radix bin
-# isim force add /u600/ndtack 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# isim force add /u600/nvpa 0 -radix bin
+# isim force add /u600/nbgack 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/smdis 0 -radix bin
+# run 0.1us
+# run 0.1us
 # isim force add /u600/nas 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
 # isim force add /u600/nas 1 -radix bin
-# run .05us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
 # isim force add /u600/nas 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# isim force add /u600/nas 1 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
+# run 0.1us
+# run 0.1us
+# run 0.1us
 ISim P.20131013 (signature 0xfbc00daa)
 ----------------------------------------------------------------------
 INFO:Security:61 - The XILINXD_LICENSE_FILE environment variable is not set.
@@ -749,257 +2172,285 @@ This is a Lite version of ISim.
 # run 1000 ns
 Simulator is doing circuit initialization process.
 Finished circuit initialization process.
-# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
 # isim force add /u600/basis7m 1 -radix bin -value 0 -radix bin -time 69500 ps -repeat 139 ns
-# show driver /u600/tristate
-Driver for /u600/tristate
-	'0'	: /u600/:460
-		  in File "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600.vhd" Line 460
-
+# isim force add /u600/cpuclk 1 -radix bin -value 0 -radix bin -time 20 ns -repeat 40 ns
+# isim force add /u600/b2000 0 -radix bin
 # isim force add /u600/tristate 0 -radix bin
-# isim force add /u600/sm_enabled 1 -radix bin
+# isim force add /u600/smdis 1 -radix bin
+# isim force add /u600/a[0] 0 -radix bin
+# isim force add /u600/siz[0] 0 -radix bin
 # isim force add /u600/rnw 1 -radix bin
 # isim force add /u600/nas 1 -radix bin
+# isim force add /u600/nvpa 0 -radix bin
+# isim force add /u600/nbgack 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/smdis 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 0 -radix bin
+# isim force add /u600/rnw 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/nas 1 -radix bin
+# run 0.01us
+# run 0.01us
+# isim force add /u600/rnw 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/nvpa 1 -radix bin
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# isim force add /u600/nas 0 -radix bin
+# run 0.1us
+# run 0.1us
 # isim force add /u600/ndtack 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# isim force add /u600/nas 0 -radix bin
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .05us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
 # isim force add /u600/nas 1 -radix bin
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
 # isim force add /u600/nas 0 -radix bin
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
 # isim force add /u600/nas 1 -radix bin
-# run .01us
-# run .01us
-# run .01us
-# run .01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/rnw 0 -radix bin
 # isim force add /u600/nas 0 -radix bin
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
+# run 0.1us
+# run 0.1us
+# run 0.1us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
+# run 0.01us
 # isim force add /u600/nas 1 -radix bin
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# isim force add /u600/nas 0 -radix bin
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# isim force add /u600/nas 1 -radix bin
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
-# run .01us
+# run 0.01us
+# run 0.01us
+# isim force add /u600/rnw 1 -radix bin
+# run 0.1us
 # exit 0
