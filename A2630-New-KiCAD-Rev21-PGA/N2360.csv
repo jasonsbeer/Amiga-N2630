@@ -1,193 +1,48 @@
-Reference,Value
-C204,0.22uF
-C211,22pF
-C212,22pF
-C213,22pF
-CX1,0.01uF
-CX2,0.01uF
-J201,25/28
-J202,25/FPU
-R100,1K
-R101,1K
-R102,1K
-R103,1K
-R104,1K
-R105,1K
-R106,1K
-R131,1K
-R203,68
-R204,68
-R207,68
-R209,68
-R210,68
-R211,68
-R212,47
-R213,47
-R216,47
-R217,1K
-R218,1K
-R219,1K
-R220,1K
-R221,1K
-R222,1K
-R223,1K
-R224,1K
-R225,1K
-R226,1K
-R227,1K
-R228,3.3K
-R229,3.3K
-R230,3.3K
-R231,3.3K
-R232,3.3K
-R233,3.3K
-R234,3.3K
-R235,3.3K
-R236,3.3K
-R237,3.3K
-RN104,1K
-RN105,1K
-RN106,1K
-RN107,1K
-RN108,1K
-RN109,1K
-RN110,1K
-U200,MC68030
-U201,MC68882
-U204,74AHCT04
-X1,25MHz
-X2,25MHz
-C200,0.1uF
-C201,0.1uF
-C202,0.1uF
-C205,330pF
-C206,0.1uF
-C208,0.1uF
-C209,0.22uF
-C214,0.1uF
-C215,0.1uF
-C216,0.1uF
-C218,0.1uF
-C219,0.1uF
-C220,0.1uF
-C300,0.22uF
-C418,0.22uF
-C419,0.22uF
-C420,0.22uF
-C421,0.22uF
-C606,0.22uF
-C800,10uF
-C801,10uF
-C802,10uF
-C803,47uF
-C804,10uF
-C805,10uF
-C900,0.22uF
-C901,0.22uF
-C902,0.22uF
-CN5,ATA/IDE
-CN6,LED
-R405,1K
-R406,1K
-R500,1K
-R501,1K
-R502,1K
-R600,2.7K
-U300,74HCT05
-U418,74LVC245
-U419,74LVC245
-U420,74LVC245
-U421,74LVC245
-U606,74HCT244
-U800,LM1117-3.3
-U900,74HCT245
-U901,74HCT245
-U902,74HCT125
-C102,0.22uF
-C103,0.22uF
-C406,0.33uF
-C407,0.33uF
-C408,0.33uF
-C409,0.33uF
-C410,0.33uF
-C411,0.33uF
-C412,0.33uF
-C413,0.33uF
-C422,0.33uF
-C423,0.33uF
-C424,0.33uF
-C425,0.33uF
-C426,0.33uF
-J400,Jumper_NO_Small
-J401,Jumper_NO_Small
-J402,Jumper_NO_Small
-J403,Jumper_NO_Small
-J404,Jumper_NO_Small
-R400,1K
-R401,1K
-R402,1K
-R403,1K
-R404,1K
-U102,27C256
-U103,27C256
-U406,SDRAM(16Mx16)
-U407,SDRAM(16Mx16)
-U408,SDRAM(16Mx16)
-U409,SDRAM(16Mx16)
-C700,0.22uF
-C701,0.22uF
-C702,0.22uF
-C703,0.22uF
-C704,0.22uF
-C705,0.22uF
-C706,0.22uF
-C707,0.22uF
-C712,10uF
-C713,47uF
-C714,10uF
-C718,10uF
-C719,10uF
-J302,Jumper_NO_Small
-J303,Jumper_NO_Small
-J304,Jumper_NO_Small
-J305,Z3 DISABLE
-R303,1K
-R304,1K
-R305,1K
-R306,1K
-R706,1K
-U700,74HCT174
-U701,74FCT646
-U702,74FCT646
-U703,74HCT245
-U704,74HCT245
-U705,74HCT245
-U706,74HCT245
-U707,74HCT245
-C427,0.33uF
-C428,0.33uF
-C429,0.33uF
-C430,0.33uF
-C431,0.33uF
-C432,0.33uF
-U400,SDRAM(2Mx16)
-U401,SDRAM(2Mx16)
-C600,0.1uF
-C601,0.1uF
-C602,0.1uF
-C603,0.1uF
-C604,0.1uF
-C605,0.1uF
-C607,0.1uF
-C608,0.1uF
-C609,0.1uF
-C610,0.1uF
-CN600,CPLD0
-CN601,CPLD1
-CN602,CPLD2
-J600,IDE DISABLE
-R601,1K
-R704,47
-U600,XC9572XL-VQ64
-U601,XC95144XL-TQ144
-U602,XC95144XL-TQ144
+Reference, Quantity, Value, Footprint, Datasheet, Digikey
+C200 C201 C202 C206 C208 C214 C215 C216 C218 C219 C220 C600 C601 C602 C603 C604 C605 C607 C608 C609 C610 ,21,"0.1uF","Capacitor_SMD:C_0805_2012Metric",""
+C102 C103 C204 C209 C300 C418 C419 C420 C421 C606 C700 C701 C702 C703 C704 C705 C706 C707 C900 C901 C902 ,21,"0.22uF","Capacitor_SMD:C_0805_2012Metric",""
+C205 ,1,"330pF","Capacitor_SMD:C_0805_2012Metric",""
+C211 C212 C213 ,3,"22pF","Capacitor_SMD:C_0805_2012Metric",""
+C406 C407 C408 C409 C410 C411 C412 C413 C422 C423 C424 C425 C426 C427 C428 C429 C430 C431 C432 ,19,"0.33uF","Capacitor_SMD:C_0805_2012Metric",""
+C800 C801 ,2,"4.7uF","Capacitor_SMD:C_0805_2012Metric",""
+C712 C714 C718 C719 C802 C804 C805 ,7,"10uF","Capacitor_THT:CP_Radial_D5.0mm_P2.00mm",""
+C713 C803 ,2,"47uF","Capacitor_THT:CP_Radial_D5.0mm_P2.00mm",""
+CN5 ,1,"ATA/IDE","N2630:ATA_Header_2x20_P2.54mm",""
+CN6 ,1,"LED","Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical",""
+CN600 ,1,"CPLD0","Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical",""
+CN601 ,1,"CPLD1","Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical",""
+CN602 ,1,"CPLD2","Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical",""
+CX1 CX2 ,2,"0.01uF","Capacitor_SMD:C_0805_2012Metric",""
+J202 ,1,"25/FPU","Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical",""
+J305 ,1,"Z3 DISABLE","Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",""
+J302 J303 J304 J400 J401 J402 J403 J404 ,8,"Jumper_NO_Small","Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",""
+J600 ,1,"IDE DISABLE","Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",""
+JT1 ,1,"MODE68K","Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",""
+JT2 ,1,"SMDIS","Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",""
+JT3 ,1,"_Z3CONFIGED","Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",""
+JT4 ,1,"_IDEACCESS","Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",""
+JT5 ,1,"_MEMZ3","Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",""
+JT6 ,1,"_MEMZ2","Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",""
+R100 R101 R102 R103 R104 R105 R106 R131 R217 R218 R219 R220 R221 R222 R223 R224 R225 R226 R227 R303 R304 R305 R306 R400 R401 R402 R403 R404 R405 R406 R407 R408 R501 R601 R706 ,35,"1K","Resistor_SMD:R_0805_2012Metric",""
+R203 R204 R207 R209 R210 R211 ,6,"68","Resistor_SMD:R_0805_2012Metric",""
+R212 R213 R216 ,3,"47","Resistor_SMD:R_0805_2012Metric",""
+R228 R229 R230 R231 R232 R233 R234 R235 R236 R237 ,10,"3.3K","Resistor_SMD:R_0805_2012Metric",""
+R600 ,1,"2.7K","Resistor_SMD:R_0805_2012Metric",""
+RN104 RN105 RN106 RN107 RN108 RN109 RN110 ,7,"1K","Resistor_THT:R_Array_SIP9","http://www.vishay.com/docs/31509/csc.pdf"
+U102 U103 ,2,"27C256","Package_DIP:DIP-28_W15.24mm","http://ww1.microchip.com/downloads/en/DeviceDoc/doc0014.pdf"
+U200 ,1,"MC68030","N2630:MC68030-PGA","https://www.alldatasheet.com/datasheet-pdf/pdf/122371/MOTOROLA/MC68030FE25.html"
+U201 ,1,"MC68882","Package_LCC:PLCC-68_THT-Socket","http://bitsavers.trailing-edge.com/components/motorola/68000/MC68881_MC68882_Floating-Point_Coprocessor_Users_Manual_1ed_1987.pdf"
+U204 ,1,"74AHCT04","Package_SO:SOIC-14_3.9x8.7mm_P1.27mm","https://assets.nexperia.com/documents/data-sheet/74HC_HCT04.pdf","296-31832-1-ND"
+U300 ,1,"74HCT04","Package_SO:SOIC-14_3.9x8.7mm_P1.27mm","http://www.ti.com/lit/gpn/sn74LS05"
+U400 U401 ,2,"SDRAM(2Mx16)","Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm",""
+U406 U407 U408 U409 ,4,"SDRAM(16Mx16)","Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm",""
+U418 U419 U420 U421 ,4,"74LVC245","Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm","http://www.ti.com/lit/gpn/sn74LS245"
+U600 ,1,"XC9572XL-VQ64","Package_QFP:TQFP-64_10x10mm_P0.5mm","http://www.xilinx.com/support/documentation/data_sheets/ds057.pdf"
+U601 U602 ,2,"XC95144XL-TQ144","Package_QFP:TQFP-144_20x20mm_P0.5mm","https://www.xilinx.com/support/documentation/data_sheets/ds056.pdf"
+U606 ,1,"74HCT244","Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm","http://www.ti.com/lit/ds/symlink/sn74ls241.pdf"
+U700 ,1,"74HCT174","Package_SO:SOIC-16_3.9x9.9mm_P1.27mm","http://www.ti.com/lit/gpn/sn74LS174"
+U701 U702 ,2,"74FCT646","Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm","","296-33244-5-ND"
+U800 ,1,"AP7361C-33ER","Package_TO_SOT_SMD:SOT-223-3_TabPin2","https://www.diodes.com/assets/Datasheets/AP7361C.pdf"
+U703 U704 U705 U706 U707 U900 U901 ,7,"74HCT245","Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm","http://www.ti.com/lit/gpn/sn74LS245"
+U902 ,1,"74HCT125","Package_SO:SOIC-14_3.9x8.7mm_P1.27mm","http://www.ti.com/lit/gpn/sn74LS125"
+X1 X2 ,2,"25MHz","Oscillator:Oscillator_DIP-8","https://abracon.com/Oscillators/ACH.pdf","535-9175-5-ND"
