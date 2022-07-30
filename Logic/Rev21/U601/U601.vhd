@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JULY 18, 2022 
+-- Create Date:    JULY 29, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -77,7 +77,7 @@ PORT
 	nBOSS : IN STD_LOGIC; --BOSS SIGNAL
 	
 	nMEMZ2 : INOUT STD_LOGIC; --ARE WE ACCESSING ZORRO 2 RAM ADDRESS SPACE
-	REFACKZ2 : INOUT STD_LOGIC; --REFRESH ACK
+	nREFACKZ2 : INOUT STD_LOGIC; --REFRESH ACK
 	CONFIGED : INOUT STD_LOGIC; --ARE WE AUTOCONFIGED?
 	D : INOUT STD_LOGIC_VECTOR (31 DOWNTO 28); --68030 DATA BUS
 	nCSROM : INOUT STD_LOGIC; --ROM CHIP SELECT
@@ -351,7 +351,7 @@ begin
 				CLKE <= '0';
 				COUNT <= 0;
 				nDTACK <= 'Z';
-				REFACKZ2 <= '0';
+				nREFACKZ2 <= '1';
 				dsack <= '1';
 		
 		ELSIF ( FALLING_EDGE (CPUCLK) ) THEN
@@ -369,7 +369,7 @@ begin
 			
 			IF (REF = '1') THEN
 			
-				IF (REFACKZ2 = '0') THEN
+				IF (nREFACKZ2 = '1') THEN
 				
 					--TIME TO REFRESH THE SDRAM, BUT ONLY IF WE ARE NOT IN THE MIDDLE OF A MEMORY ACCESS CYCLE
 					IF nMEMZ2 = '1' THEN
@@ -380,7 +380,7 @@ begin
 						nZCAS <= '0';
 						nZCS <= '0';
 						
-						REFACKZ2 <= '1';
+						nREFACKZ2 <= '0';
 						
 					END IF;
 					
@@ -388,10 +388,10 @@ begin
 					
 			ELSE
 				
-				IF (REFACKZ2 = '1') THEN
+				IF (nREFACKZ2 = '0') THEN
 				
 					--NEGATE REFACKZ2
-					REFACKZ2 <= '0';
+					nREFACKZ2 <= '1';
 					
 				END IF;
 				
@@ -410,7 +410,7 @@ begin
 					nZWE <= '1';
 					nZRAS <= '1';
 					nZCAS <= '1';
-					nZCS <= '0'; --NOP STATE
+					nZCS <= '1'; --NOP STATE
 					CURRENT_STATE <= POWERUP;
 			
 				WHEN POWERUP =>
@@ -419,8 +419,6 @@ begin
 					--the system reset to give us the needed time, although it might be inadequate.
 
 					CURRENT_STATE <= POWERUP_PRECHARGE;
-					
-					--POWERUP PRECHARGE SETTINGS WILL BE LATCHED ON THE NEXT CLOCK EDGE
 					ZMA <= ("10000000000"); --PRECHARGE ALL			
 					nZWE <= '0';
 					nZRAS <= '0';
@@ -429,6 +427,7 @@ begin
 					CLKE <= '1';
 					
 				WHEN POWERUP_PRECHARGE =>
+				
 					CURRENT_STATE <= MODE_REGISTER;
 					ZMA <= "01000100000"; --PROGRAM THE SDRAM...NO READ OR WRITE BURST, CAS LATENCY=2,
 					nZWE <= '0';
@@ -437,9 +436,16 @@ begin
 					nZCS <= '0';	
 				
 				WHEN MODE_REGISTER =>
+				
 					--TWO CLOCK CYCLES ARE NEEDED FOR THE REGISTER TO, WELL, REGISTER
 					
-					IF (COUNT = 1) THEN
+					IF (COUNT = 0) THEN
+						--NOP ON THE SECOND CLOCK DURING MODE REGISTER
+						nZWE <= '1';
+						nZRAS <= '1';
+						nZCAS <= '1';
+						nZCS <= '1';
+					ELSE
 						--NOW NEED TO REFRESH TWICE
 						CURRENT_STATE <= AUTO_REFRESH;
 						nZWE <= '1';
@@ -469,7 +475,7 @@ begin
 					nZWE <= '1';
 					nZRAS <= '1';
 					nZCAS <= '1';
-					nZCS <= '0';
+					nZCS <= '1';
 					
 				WHEN AUTO_REFRESH_CYCLE =>
 					
@@ -503,9 +509,8 @@ begin
 					COUNT <= COUNT + 1;						
 				
 				WHEN RUN_STATE =>
-					--CLOCK EDGE 0
 					
-					IF (nMEMZ2 = '0' AND nMEMZ3 = '1') THEN 
+					IF nMEMZ2 = '0' THEN 
 					
 						--WE ARE IN THE Z2 MEMORY SPACE WITH THE ADDRESS STROBE ASSERTED.
 						--I HAVE INCLUDED A CHECK FOR THE Z3 MEMORY SPACE TO AVOID ERRONEOUS ACCESS.
@@ -521,11 +526,17 @@ begin
 						nZCAS <= '1';							
 						nZWE <= '1';
 						
-						IF (nBGACK = '0') THEN
-							nDTACK <= '1'; --DMA CYCLE	
-						END IF; 
+						--IF THIS IS A WRITE ACTION, WE CAN IMMEDIATELY DSACK/DTACK.
+						--680x0 DATA STOBE(S) ASSERT ONE CLOCK AFTER ADDRESS STROBE ON WRITE EVENTS.
+						--DATA STROBE ASSERTS WITH ADDRESS STROBE ON READ OPERATIONS.
+						IF (RnW = '0') THEN
+							
+							--68030 CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
+							--ASSERTING BOTH DSACKs TELLS THE 68030 THAT THIS IS A 32 BIT PORT.
+							dsack <= '0';
+							
+						END IF;
 						
-						--COUNT <= 0;
 					END IF;
 					
 				WHEN RAS_STATE =>	
@@ -542,72 +553,45 @@ begin
 					nZCS <= '0';
 					nZRAS <= '1';	
 					nZCAS <= '0';	
-					nZWE <= RnW;
-					
-					--IF THIS IS A WRITE ACTION, WE CAN IMMEDIATELY DSACK/DTACK.
-					--680x0 DATA STOBE(S) ASSERT ONE CLOCK AFTER ADDRESS STROBE ON WRITE EVENTS.
-					--DATA STROBE ASSERTS WITH ADDRESS STROBE ON READ OPERATIONS.
-					IF (RnW = '0') THEN
-						IF (nBGACK = '0') THEN
-						
-							--ASSERT nDTACK SINCE THIS IS A DMA EVENT.
-							--DMA DEVICE CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
-							nDTACK <= '0'; 
-							
-						ELSE
-						
-							--68030 CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
-							--ASSERTING BOTH DSACKs TELLS THE 68030 THAT THIS IS A 32 BIT PORT.
-							dsack <= '0'; 
-							
-						END IF;
-					END IF;
+					nZWE <= RnW;	
 					
 				WHEN CAS_STATE =>
 					
-					--IF THIS IS A READ ACTION, THE CAS LATENCY IS 2 CLOCK CYCLES, SO WE NEED TO WAIT TO HERE.
+					--IF THIS IS A READ ACTION, THE CAS LATENCY IS 2 CLOCK CYCLES.
+					
+					--WE NOP FOR THE REMAINING CYCLES.
+					nZCS <= '1';
+					nZRAS <= '1';	
+					nZCAS <= '1';							
+					nZWE <= '1';
 					
 					IF (RnW = '1') THEN
-					
-						IF (nBGACK = '0') THEN
 						
-							--ASSERT nDTACK SINCE THIS IS A DMA EVENT.
-							--DMA DEVICE CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
-							nDTACK <= '0'; 
-							
-						ELSE
+						--68030 CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
+						--ASSERTING BOTH DSACKs TELLS THE 68030 THAT THIS IS A 32 BIT PORT.
+						dsack <= '0'; 
 						
-							--68030 CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
-							--ASSERTING BOTH DSACKs TELLS THE 68030 THAT THIS IS A 32 BIT PORT.
-							dsack <= '0'; 
-							
-						END IF;
-					--ELSE
-						--COUNT <= COUNT + 1;
 					END IF;	
 					
 					
-					IF (nMEMZ2 = '0') THEN 
+					IF (nMEMZ2 = '1') THEN 
 						--THE ADDRESS STROBE HAS NEGATED INDICATING THE END OF THE MEMORY ACCESS.
 						
 						--TRISTATE SO WE DON'T INTERFERE WITH OTHER DEVICES ON THE BUS.
 						--DSACK AUTOMATICALLY HI Z's WHEN MEMACCESS = 0, BUT WE SET IT HIGH HERE
 						--SO IT DOESN'T MESS UP THE NEXT CYCLE.
 						dsack <= '1';
-						nDTACK <= 'Z';
 						
 						--IN THE EVENT WE HAVE A REFRESH ASSERTED AND WAITING,
 						--WE DON'T WANT TO INTERFERE WITH THAT.
-						IF REF = '0' THEN 
-							CURRENT_STATE <= RUN_STATE;
 						
-							nZCS <= '1';
-							nZRAS <= '1';	
-							nZCAS <= '1';							
-							nZWE <= '1';
+						IF REF = '0' THEN 
+						
+							CURRENT_STATE <= RUN_STATE;						
+							
 						END IF;
 						
-					END IF;					
+					END IF;	
 				
 			END CASE;
 				
@@ -652,10 +636,11 @@ begin
 			
 				IF dsackdelay(DELAYVALUE) = '1' THEN				
 					
+					nDSACK0 <= '1';
 					nDSACK1 <= '0';
 				
-				ELSIF dsackdelay(DELAYVALUE) = '0' THEN
-				
+				ELSIF dsackdelay(DELAYVALUE) = '0' THEN				
+					
 					nDSACK1 <= '1';
 					
 					dsackdelay(0) <= '1';
@@ -666,7 +651,7 @@ begin
 			ELSIF autoconfigspace = '1' THEN
 			
 				--WE ARE IN THE AUTOCONFIG ADDRESS SPACE
-			
+				nDSACK0 <= '1';
 				nDSACK1 <= acdsack;
 				
 			ELSIF nMEMZ2 = '0' THEN
