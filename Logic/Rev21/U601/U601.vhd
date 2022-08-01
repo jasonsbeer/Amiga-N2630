@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JULY 30, 2022 
+-- Create Date:    JULY 31, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -149,8 +149,8 @@ architecture Behavioral of U601 is
 	SIGNAL romconfiged : STD_LOGIC := '0'; --HAS THE ROM BEEN AUTOCONFIGED?
 	SIGNAL ramconfiged : STD_LOGIC := '0'; --HAS THE Z2 RAM BEEN AUTOCONFIGED?
 	SIGNAL boardconfiged : STD_LOGIC := '0'; --HAS THE ROM AND Z2 RAM FINISHED CONFIGURING?
-	SIGNAL D_ZORRO2RAM : STD_LOGIC_VECTOR (3 DOWNTO 0); --Z2 AUTOCONFIG DATA
-	SIGNAL D_2630 : STD_LOGIC_VECTOR (3 DOWNTO 0); --ROM AUTOCONFIG DATA
+	SIGNAL D_ZORRO2RAM : STD_LOGIC_VECTOR (3 DOWNTO 0) := "0000"; --Z2 AUTOCONFIG DATA
+	SIGNAL D_2630 : STD_LOGIC_VECTOR (3 DOWNTO 0) := "0000"; --ROM AUTOCONFIG DATA
 	SIGNAL regreset : STD_LOGIC := '0'; --REGISTER RESET 
 	SIGNAL jmode : STD_LOGIC := '0'; --JMODE
 	SIGNAL phantomlo : STD_LOGIC := '0'; --PHANTOM LOW SIGNAL
@@ -158,7 +158,6 @@ architecture Behavioral of U601 is
 	SIGNAL hirom : STD_LOGIC := '0'; --IS THE ROM IN THE HIGH ADDRESS SPACE?
 	SIGNAL lorom : STD_LOGIC := '0'; --IS THE ROM IN THE LOW ADDRESS SPACE?
 	SIGNAL rambaseaddress : STD_LOGIC_VECTOR (2 DOWNTO 0) := "000"; --RAM BASE ADDRESS	
-	SIGNAL acdsack : STD_LOGIC := '1';
 	
 	--ROM RELATED SIGNALS
 	CONSTANT DELAYVALUE : INTEGER := 3;
@@ -253,9 +252,9 @@ begin
 		ELSE 
 			'Z';	
 	
-	-------------------------------------
-	-- SDRAM FALLING CLOCK EDGE ACTIONS --
-	-------------------------------------
+	-----------------------------
+	-- SDRAM DATA MASK ACTIONS --
+	-----------------------------
 	
 	PROCESS ( CPUCLK ) BEGIN
 		
@@ -618,17 +617,17 @@ begin
 	--AT THAT TIME, THE ROM RESPONDS IN THE SPACE AT $000000 - $00FFFF.
 	--THE ROM WILL STOP RESPONDING ONCE phantomlo IS SET = 1 AFTER CONFIGURATION.
 	
-	lorom <= '1' WHEN A(23 DOWNTO 16) = x"00" AND phantomlo = '0' AND RnW = '1' AND nAS = '0' ELSE '0';
+	lorom <= '1' WHEN A(23 DOWNTO 16) = x"00" AND phantomlo = '0' AND RnW = '1' ELSE '0';
 	
 	--AFTERWARD, THE ROM IS THEN MOVED TO THE ADDRESS SPACE AT $F80000 - $F8FFFF.
 	--THIS IS THE "NORMAL" PLACE FOR SYSTEM ROMS.
 	--THE ROM WILL STOP RESPONDING ONCE phantomhi IS SET = 1 AFTER CONFIGURATION.
 	
 	--11111000
-	hirom <= '1' WHEN A(23 DOWNTO 16) = x"F8" AND phantomhi = '0' AND RnW = '1' AND nAS = '0' ELSE '0';
+	hirom <= '1' WHEN A(23 DOWNTO 16) = x"F8" AND phantomhi = '0' AND RnW = '1' ELSE '0';
 	
 	--THE FINAL ROM CHIP SELECT SIGNAL
-	nCSROM <= '0' WHEN lorom = '1' OR hirom = '1' ELSE '1';	
+	nCSROM <= '0' WHEN (lorom = '1' OR hirom = '1') AND nAS = '0' ELSE '1';	
 	
 	---------------------------
 	-- ROM DATA TRANSFER ACK --
@@ -663,8 +662,17 @@ begin
 			ELSIF autoconfigspace = '1' THEN
 			
 				--WE ARE IN THE AUTOCONFIG ADDRESS SPACE
-				nDSACK0 <= '1';
-				nDSACK1 <= acdsack;
+				IF nAS = '0'  THEN
+				
+					nDSACK0 <= '1';
+					nDSACK1 <= '0';
+					
+				ELSE
+				
+					nDSACK0 <= '1';
+					nDSACK1 <= '1';
+					
+				END IF;
 				
 			ELSIF nMEMZ2 = '0' THEN
 			
@@ -698,7 +706,11 @@ begin
 	
 		IF RISING_EDGE (CPUCLK) THEN	
 		
-			IF (hirom = '1' OR lorom = '1' OR autoconfigspace = '1' OR nIDEACCESS = '0' OR nMEMZ2 = '0' OR nMEMZ3 = '0') OR (SMDIS = '1' AND nAS = '0') THEN
+			IF ((hirom = '1' OR lorom = '1' OR autoconfigspace = '1') AND nAS = '0') OR 
+				(nIDEACCESS = '0' OR nMEMZ2 = '0' OR nMEMZ3 = '0') OR 
+				(SMDIS = '1' AND nAS = '0') 
+				
+			THEN
 			
 				SMDIS <= '1';
 				
@@ -797,7 +809,7 @@ begin
 	--11101000
 	autoconfigspace <= '1'
 		WHEN 
-			A(23 downto 16) = x"E8" AND boardconfiged = '0' AND nAS = '0'
+			A(23 downto 16) = x"E8" AND boardconfiged = '0'
 		ELSE
 			'0';				
 
@@ -811,7 +823,7 @@ begin
 				WHEN romconfiged = '0' AND autoconfigspace = '1' AND RnW = '1'
 		ELSE
 			D_ZORRO2RAM 
-				WHEN autoconfigspace ='1' AND RnW = '1'
+				WHEN autoconfigspace ='1' AND RnW = '1' AND nAS = '0'
 		ELSE
 			"ZZZZ";		
 			
@@ -822,13 +834,12 @@ begin
 			
 			rambaseaddress <= "000";			
 			ramconfiged <= '0';	
-			acdsack <= '1';
 			
 		ELSIF ( RISING_EDGE (CPUCLK)) THEN
 		
 			IF autoconfigspace = '1' THEN
 			
-				IF RnW = '1' THEN
+				IF RnW = '1' AND nAS = '0' THEN
 					--The 680x0 is reading from us
 				
 					CASE A(6 downto 1) IS
@@ -872,9 +883,13 @@ begin
 							D_2630 <= "1111";
 							D_ZORRO2RAM <= "1111"; --INVERTED...Reserved offsets and unused offset values are all zeroes
 
-					END CASE;
+					END CASE;					
 
 				ELSIF ( RnW = '0' AND nDS = '0' ) THEN	
+				
+					--THE TIMING HERE ASSERTS DSACK1 IN 68030 STATE 2, AS REQUIRED FOR NO WAIT STATES.
+					--_DS IS ASSERTED IN S3, SO WE LATCH THE INCOMING DATA ON THE RISING EDGE OF S4.
+					--ALL SHOULD BE GOOD.
 				
 					IF ( A(6 downto 1) = "100100" ) THEN
 						--WRITE REGISTER AT OFFSET $48. THIS IS WHERE THE BASE ADDRESS IS ASSIGNED.
@@ -894,15 +909,9 @@ begin
 						
 					END IF;	
 						
-				END IF;			
-				
-				--DSACK AFTER EACH CYCLE
-				acdsack <= '0';
+				END IF;					
 				
 			END IF;
-			
-			--WE ARE IN THE AUTOCONFIG SPACE, BUT _AS IS NOT ASSERTED
-			acdsack <= '1';
 			
 		END IF;
 		
