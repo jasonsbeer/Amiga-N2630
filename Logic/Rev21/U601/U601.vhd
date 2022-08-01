@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JULY 31, 2022 
+-- Create Date:    AUGUST 1, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -157,7 +157,8 @@ architecture Behavioral of U601 is
 	SIGNAL phantomhi : STD_LOGIC := '0'; --PHANTOM HIGH SIGNAL
 	SIGNAL hirom : STD_LOGIC := '0'; --IS THE ROM IN THE HIGH ADDRESS SPACE?
 	SIGNAL lorom : STD_LOGIC := '0'; --IS THE ROM IN THE LOW ADDRESS SPACE?
-	SIGNAL rambaseaddress : STD_LOGIC_VECTOR (2 DOWNTO 0) := "000"; --RAM BASE ADDRESS	
+	SIGNAL rambaseaddress0 : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --RAM BASE ADDRESS	
+	SIGNAL rambaseaddress1 : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --RAM BASE ADDRESS	
 	
 	--ROM RELATED SIGNALS
 	CONSTANT DELAYVALUE : INTEGER := 3;
@@ -225,14 +226,21 @@ begin
 	--THIS DETECTS A 68030 MEMORY ACCESS
 	cpuaccess <= '1' 
 		WHEN
-			ramconfiged = '1' AND A(23 DOWNTO 21) = rambaseaddress AND nAS = '0' AND nBGACK = '1' AND FC(2 downto 0) /= "111"
+			( A(23 DOWNTO 22) = rambaseaddress0 OR A(23 DOWNTO 22) = rambaseaddress1 ) AND
+			ramconfiged = '1' AND 
+			nAS = '0' AND 
+			nBGACK = '1' AND 
+			FC(2 downto 0) /= "111"
 		ELSE
 			'0';
 	
 	--THIS DETECTS A DMA MEMORY ACCESS
 	dmaaccess <= '1'
 		WHEN
-			ramconfiged = '1' AND A(23 DOWNTO 21) = rambaseaddress AND nAAS = '0' AND nBGACK = '0'
+			( A(23 DOWNTO 22) = rambaseaddress0 OR A(23 DOWNTO 22) = rambaseaddress1 ) AND
+			ramconfiged = '1' AND 
+			nAAS = '0' AND 
+			nBGACK = '0'
 		ELSE
 			'0';
 			
@@ -900,9 +908,22 @@ begin
 						--AUTOCONFIG CYCLE TO ENTER THE BELOW CODE.
 						
 						IF ( romconfiged = '1' AND ramconfiged = '0' ) THEN
+							
+							--THIS IS THE ZORRO 2 RAM BASE ADDRESS FOR OUR 8 MEGABYTES.
+							--THERE ARE TWO POSSIBLE SLOTS FOR THIS SPACE...01 AND 10.
+							
+							IF D(31 downto 30) = "01" THEN
+								
+								rambaseaddress0 <= "01";
+								rambaseaddress1 <= "10";
 						
-							--BASE ADDRESS FOR THE ZORRO 2 RAM
-							rambaseaddress <= D(31 downto 29);
+							ELSE
+								--ADDRESS "10"
+								rambaseaddress0 <= "10";
+								rambaseaddress1 <= "11";
+					
+							END IF;
+								
 							ramconfiged <= '1'; 
 							
 						END IF;								
