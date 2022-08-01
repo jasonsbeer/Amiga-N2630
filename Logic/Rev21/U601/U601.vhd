@@ -1004,6 +1004,12 @@ begin
 	--a problem working all the time.  During DMA we don't want any AVEC
 	--generation, in case the DMA device is like a Boyer HD and doesn't
 	--drive the function codes properly. U306	
+			
+	--SOME TRIVIA (AND SPECULATION)...JEFF BOYER HAD A HAND IN DESIGNING SOME OF THE FIRST ZORRO 2
+	--PERIPHERALS AT COMMODORE. SUCH CARDS INCLUDE THE A2052 RAM EXPANSION AND THE A2090 AND A2091
+	--HARD DRIVE CARDS. AT MIMINUM, HE HAD A HAND IN DEVELOPING THE ORIGINAL DMAC CHIP FOUND ON THE 
+	--A2090/A2091. THUS, IT SEEMS THE "BOYER HD" REFERENCED ABOVE IS, IN FACT, THE A2090 HARD DRIVE
+	--CONTROLLER.
 		
 	--field spacetype	= [A19..16] ;
 	--interruptack	= (spacetype:f0000) ;
