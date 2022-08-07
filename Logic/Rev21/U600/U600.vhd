@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JULY 28, 2022 
+-- Create Date:    August 6, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -131,6 +131,7 @@ architecture Behavioral of U600 is
 	SIGNAL DSACKEN : STD_LOGIC := '0'; --ENABLE _DSACK1
 	SIGNAL STATE7 : STD_LOGIC := '0'; --ARE WE IN 68000 STATE 7?
 	SIGNAL STATE7EN : STD_LOGIC := '0';
+	--SIGNAL delaycycle : STD_LOGIC := '0'; --DELAY THE START OF THE STATE MACHINE
 	
 	--CLOCK SIGNALS
 	SIGNAL basis7m : STD_LOGIC := '0';
@@ -509,6 +510,18 @@ begin
 	-- 68000 STATE MACHINE --
 	-------------------------
 	
+	
+--	PROCESS (CPUCLK) BEGIN
+--		IF RISING_EDGE (CPUCLK) THEN
+--			IF nAS = '0' THEN
+--				delaycycle <= '1';
+--			ELSE
+--				delaycycle <= '0';
+--			END IF;
+--		END IF;
+--	END PROCESS;
+	
+	
 	--THIS IS HOW THE 68030 COMMUNICATES WITH THE AMIGA 2000 BOARD, WHICH ONLY 
 	--UNDERSTANDS MC68000. WITH THIS STATE MACHINE, WE SLOW THINGS DOWN
 	--BY USING THE 7MHz CLOCK TO HELP SUPPLY 68000 COMPATABLE SIGNALS AND TIMINGS.
@@ -542,7 +555,7 @@ begin
 
 			ARnW <= 'Z';
 			nAAS <= 'Z';
-			nVMA <= 'Z';
+			nVMA <= '1';
 			DSACKEN <= '0';
 			dsenable <= '0';
 			STATE7EN <= '0';

@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    AUGUST 5, 2022 
+-- Create Date:    AUGUST 6, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -82,7 +82,7 @@ PORT
 	D : INOUT STD_LOGIC_VECTOR (31 DOWNTO 28); --68030 DATA BUS
 	nCSROM : INOUT STD_LOGIC; --ROM CHIP SELECT
 	
-	SMDIS : INOUT STD_LOGIC := '0'; --STATE MACHINE DISABLE (WAS nONBOARD)
+	SMDIS : INOUT STD_LOGIC := '1'; --STATE MACHINE DISABLE (WAS nONBOARD)
 	nFPUCS : OUT STD_LOGIC; --FPU CHIP SELECT
 	nBERR : OUT STD_LOGIC; --BUS ERROR
 	nCIIN : OUT STD_LOGIC; --68030 CACHE ENABLE
@@ -125,6 +125,8 @@ architecture Behavioral of U601 is
 	--SIGNAL ciaspace : STD_LOGIC:='0';
 	--SIGNAL chipregs : STD_LOGIC:='0';
 	--SIGNAL iospace	 : STD_LOGIC:='0';
+	SIGNAL memaccess : STD_LOGIC := '0';
+	SIGNAL onboard : STD_LOGIC := '0';
 	
 	--68030 FUNCTION CODES
 	--SIGNAL userdata : STD_LOGIC:='0';
@@ -715,28 +717,79 @@ begin
 	--ON THE 2630 CARD. THIS INCLUDES ROM, AUTOCONFIG, IDE, ZORRO 2, OR ZORRO 3 
 	--MEMORY SPACES. THIS PREVENTS THE 68000 STATE MACHINE FROM STARTING.
 	
+	onboard <= '1' WHEN hirom = '1' OR lorom = '1' OR autoconfigspace = '1' ELSE '0';
+	memaccess <= '1' WHEN nIDEACCESS = '0' OR nMEMZ2 = '0' OR nMEMZ3 = '0' ELSE '0';	
+	
 	PROCESS (CPUCLK) BEGIN
 	
 		IF RISING_EDGE (CPUCLK) THEN	
 		
-			IF ((hirom = '1' OR lorom = '1' OR autoconfigspace = '1') AND nAS = '0') OR 
-				(nIDEACCESS = '0' OR nMEMZ2 = '0' OR nMEMZ3 = '0') OR 
-				(SMDIS = '1' AND nAS = '0') 
+			IF nAS = '0' THEN
+		
+				IF onboard = '1' OR memaccess = '1' THEN
 				
-			THEN
-			
-				SMDIS <= '1';
+					SMDIS <= '1';
+					
+				ELSE
+				
+					SMDIS <= '0';
+					
+				END IF;
 				
 			ELSE
 			
-				SMDIS <= '0';
+				SMDIS <= '1';
 				
 			END IF;
-			
+		
 		END IF;
 		
 	END PROCESS;
 	
+	
+--	PROCESS (nAS) BEGIN
+--	
+--		IF FALLING_EDGE (nAS) THEN	
+--		
+--			IF (hirom = '1' OR lorom = '1' OR autoconfigspace = '1') OR 
+--				(nIDEACCESS = '0' OR nMEMZ2 = '0' OR nMEMZ3 = '0')
+--				
+--			THEN
+--			
+--				SMDIS <= '1';
+--				
+--			ELSE
+--			
+--				SMDIS <= '0';
+--				
+--			END IF;
+--			
+--		END IF;
+--		
+--	END PROCESS;
+	
+--	PROCESS (CPUCLK) BEGIN
+--	
+--		IF RISING_EDGE (CPUCLK) THEN	
+--		
+--			IF ((hirom = '1' OR lorom = '1' OR autoconfigspace = '1') AND nAS = '0') OR 
+--				(nIDEACCESS = '0' OR nMEMZ2 = '0' OR nMEMZ3 = '0') OR 
+--				(SMDIS = '1' AND nAS = '0') 
+--				
+--			THEN
+--			
+--				SMDIS <= '1';
+--				
+--			ELSE
+--			
+--				SMDIS <= '0';
+--				
+--			END IF;
+--			
+--		END IF;
+--		
+--	END PROCESS;
+--	
 	
 	-------------------
 	-- JOHANN'S MODE --
