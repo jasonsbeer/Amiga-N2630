@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    August 6, 2022 
+-- Create Date:    August 7, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -510,7 +510,6 @@ begin
 	-- 68000 STATE MACHINE --
 	-------------------------
 	
-	
 --	PROCESS (CPUCLK) BEGIN
 --		IF RISING_EDGE (CPUCLK) THEN
 --			IF nAS = '0' THEN
@@ -542,8 +541,11 @@ begin
 	--nUDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D31:24 (UPPER BYTE)
 	--nLDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D23:16 (LOWER BYTE)	
 	
+	--nUDS <= A(0) WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
 	nUDS <= nUDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	nLDS <= nLDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';	
+	nLDS <= nLDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	--nLDSOUT <= '0' WHEN SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' ELSE '1';
+	--nLDS <= nLDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
 
 	--THE STATE MACHINE
 
@@ -567,7 +569,8 @@ begin
 			
 			--MOST OF THE INTERESTING STATES ARE FIRED ON THE RISING EDGE.
 			--THE ONLY EXCEPTION IS S7, WHICH IS ON THE FALLING EDGE.
-			--WE ACTUALLY END UP 
+			
+			--NOW, THE STATE MACHINE
 			
 			CASE (CURRENT_STATE) IS
 
@@ -578,10 +581,8 @@ begin
 					--WE WANT TO WAIT UNTIL THE 7MHz CLOCK IS HIGH SO WE START IN STATE 0, NOT STATE 1.					
 					--WE CONSIDER _DSACK1 TO ENSURE WE DON'T START IF THE PREVIOUS
 					--CYCLE IS NOT YET COMPLETE IN A BACK-TO-BACK SITUATION.
-					--THAT SHOULD NEVER HAPPEN, BUT, YOU KNOW.
 					
-					DSACKEN <= '0';
-					nVMA <= '1';					
+					DSACKEN <= '0';			
 
 					IF nAS = '0' AND nDSACK1 = '1' THEN
 					
@@ -589,8 +590,8 @@ begin
 
 						nAAS <= '0';	
 						ARnW <= RnW;
-
-						--PREP THE DATA STROBES	
+						
+						--PREP THE DATA STROBES
 						IF A(0) = '0' THEN
 							nUDSOUT <= '0';
 						ELSE
@@ -616,12 +617,8 @@ begin
 
 					CURRENT_STATE <= S4;
 
-					--DURING A WRITE CYCLE, ASSERT DATA STROBES AT S4.
-					IF RnW = '0' THEN						
-						
-						dsenable <= '1';
-
-					END IF;
+					--DURING A WRITE CYCLE, ASSERT DATA STROBES AT S4.	
+					dsenable <= '1';
 
 				WHEN S4 =>
 
@@ -638,17 +635,14 @@ begin
 						IF nVMA = '1' AND (vmacount = 1 OR vmacount = 2) THEN
 								
 							nVMA <= '0';	
-							STATE7EN <= '1';
 							
-						ELSIF nVMA = '0' AND vmacount = 8 THEN						
+						ELSIF nVMA = '0' AND vmacount = 7 THEN						
 							
 							--NOW WAIT UNTIL WE ARE ON THE RIGHT SPOT IN E TO LATCH THE DATA.
 							CURRENT_STATE <= S6;
-							DSACKEN <= '1';
-							STATE7EN <= '0';
+							STATE7EN <= '1';
 						
-						END IF;
-					
+						END IF;					
 							
 					ELSE
 								
@@ -674,21 +668,14 @@ begin
 					--ONE CLOCK EARLIER IN E CYCLES.			
 
 					CURRENT_STATE <= S0;
+					
 					ARnW <= '1';
 					nAAS <= '1';		
-					dsenable <= '0';
+					nVMA <= '1';
 					
-					IF nVMA = '0' THEN
-					
-						nVMA <= '1';
-						DSACKEN <= '0';
-						
-					ELSE
-					
-						STATE7EN <= '0';
-						DSACKEN <= '1';
-						
-					END IF;
+					dsenable <= '0';					
+					STATE7EN <= '0';
+					DSACKEN <= '1';
 					
 
 			END CASE;
