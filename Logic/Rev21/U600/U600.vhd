@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    August 7, 2022 
+-- Create Date:    August 8, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -131,7 +131,7 @@ architecture Behavioral of U600 is
 	SIGNAL DSACKEN : STD_LOGIC := '0'; --ENABLE _DSACK1
 	SIGNAL STATE7 : STD_LOGIC := '0'; --ARE WE IN 68000 STATE 7?
 	SIGNAL STATE7EN : STD_LOGIC := '0';
-	--SIGNAL delaycycle : STD_LOGIC := '0'; --DELAY THE START OF THE STATE MACHINE
+	SIGNAL cycle : STD_LOGIC := '0'; --DELAY THE START OF THE STATE MACHINE
 	
 	--CLOCK SIGNALS
 	SIGNAL basis7m : STD_LOGIC := '0';
@@ -417,7 +417,8 @@ begin
 	nADOEH <= '0' 
 		WHEN 
 			--( nBOSS = '0' AND nBGACK = '1' AND MEMACCESS = '0' AND nAS = '0' AND nONBOARD = '1' AND nEXTERN = '1' ) 
-			( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0' AND nAS = '0' ) OR
+			--( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0' AND nAS = '0' ) OR
+			( nBOSS = '0' AND nBGACK = '1' AND sm_enabled = '1' AND nAS = '0' ) OR
 			( nBOSS = '0' AND nBGACK = '0' AND nMEMZ2 = '0' AND nAAS = '0' AND A(1) = '1' )  
 			--OR ( nBOSS = '1' AND MODE68K = '1' AND nBGACK = '1' AND nMEMZ2 = '0' AND nAAS = '0' ) 
 			--OR ( nBOSS = '1' AND MODE68K = '1' AND nBGACK = '1' AND nIDEACCESS AND nAAS = '0' )
@@ -499,25 +500,36 @@ begin
 	
 	sm_enabled <= '1' 
 		WHEN 
-			--(nONBOARD = '1' AND MEMACCESS = '0' AND nEXTERN = '1')
 			SMDIS = '0' AND 
 			nBGACK = '1' AND 
-			FC ( 2 downto 0 ) /= "111"
+			FC ( 2 downto 0 ) /= "111" AND
+			TRISTATE = '0'
 		ELSE 
 			'0';
 			
 	-------------------------
 	-- 68000 STATE MACHINE --
 	-------------------------
-	
---	PROCESS (CPUCLK) BEGIN
---		IF RISING_EDGE (CPUCLK) THEN
---			IF nAS = '0' THEN
---				delaycycle <= '1';
+
+--	PROCESS (nAS) BEGIN
+--	
+--		IF FALLING_EDGE(nAS) THEN
+--		
+--			--PREP THE DATA STROBES
+--			IF A(0) = '0' THEN
+--				nUDSOUT <= '0';
 --			ELSE
---				delaycycle <= '0';
+--				nUDSOUT <= '1';
 --			END IF;
+--
+--			IF SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' THEN
+--				nLDSOUT <= '0';
+--			ELSE
+--				nLDSOUT <= '1';
+--			END IF;	
+--			
 --		END IF;
+--		
 --	END PROCESS;
 	
 	
@@ -541,23 +553,28 @@ begin
 	--nUDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D31:24 (UPPER BYTE)
 	--nLDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D23:16 (LOWER BYTE)	
 	
-	--nUDS <= A(0) WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
 	nUDS <= nUDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
 	nLDS <= nLDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	--nLDSOUT <= '0' WHEN SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' ELSE '1';
-	--nLDS <= nLDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	
+	--AMIGA ADDRESS STROBE AND AMIGA READ/WRITE SIGNALS ARE HERE.
+	--THERE ARE HERE AND NOT "INSIDE" THE STATE MACHINE SO THEY ASSERT
+	--TOGETHER AND WITH THE ADDRESS STROBES. THERE WAS SOME DELAY ISSUES
+	--WHEN THEY WERE "IN" THE STATE MACHINE CODE.
+	
+	nAAS <= '0' WHEN cycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	ARnW <= RnW WHEN cycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';	
 
 	--THE STATE MACHINE
 
-	PROCESS (basis7m, TRISTATE, sm_enabled) BEGIN
+	PROCESS (basis7m, sm_enabled) BEGIN
 
-		IF TRISTATE = '1' OR sm_enabled = '0' THEN
-
-			--WE WANT TO TRISTATE THESE SIGNALS WHEN THE STATE MACHINE IS NOT ACTIVE.
-
-			ARnW <= 'Z';
-			nAAS <= 'Z';
+		IF sm_enabled = '0' THEN
+		
+			--RESET THE STATE MACHINE SIGNALS
+			
 			nVMA <= '1';
+			
+			cycle <= '0';
 			DSACKEN <= '0';
 			dsenable <= '0';
 			STATE7EN <= '0';
@@ -586,10 +603,7 @@ begin
 
 					IF nAS = '0' AND nDSACK1 = '1' THEN
 					
-						CURRENT_STATE <= S2;
-
-						nAAS <= '0';	
-						ARnW <= RnW;
+						CURRENT_STATE <= S2;		
 						
 						--PREP THE DATA STROBES
 						IF A(0) = '0' THEN
@@ -603,8 +617,11 @@ begin
 						ELSE
 							nLDSOUT <= '1';
 						END IF;	
-
-						--DURING A READ CYCLE, ASSERT DATA STROBES WITH THE ADDRESS STROBE.
+						
+						--ACTIVATE nAAS AND ARnW
+						cycle <= '1';
+						
+						--DURING A READ CYCLE, ASSERT DATA STROBES WITH THE ADDRESS STROBE.						
 						IF RnW = '1' THEN						
 							
 							dsenable <= '1';
@@ -661,16 +678,16 @@ begin
 				WHEN S6 =>
 
 					--AT S6, DATA IS PLACED ON THE BUS WHEN READING.
-					--WE WANT TO ASSERT _DSACK1 ON THE FALLING EDGE OF S7.
-					--TO ACCOMPLISH THAT, WE ASSERT THE DSACK ENABLE SIGNAL, 
-					--WHICH IS THEN HANDLED BY ANOTHER CLOCKED PROCESS THAT 
-					--WORKS ON THE FALLING EDGE OF THE 7MHz CLOCK. THIS PROCESS IS
-					--ONE CLOCK EARLIER IN E CYCLES.			
+					--WE ASSERT _DSACK1 ON THE RISING EDGE OF THE 25MHZ
+					--CLOCK WHEN STATE7 AND DSACKEN ARE BOTH HIGH. THIS
+					--ACTUALLY HAPPENS IN 68000 STATE 0, BUT WE ARE LATCHING
+					--THE DATA SO WE HAVE AN ENTIRE CLOCK CYCLE TO GET IT.
+					--THIS PROCESS IS DONE BEFORE LEAVING 68000 STATE 0, SO IT WORKS.
 
 					CURRENT_STATE <= S0;
 					
-					ARnW <= '1';
-					nAAS <= '1';		
+					cycle <= '0';
+					
 					nVMA <= '1';
 					
 					dsenable <= '0';					
