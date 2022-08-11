@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    August 8, 2022 
+-- Create Date:    August 10, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -553,8 +553,18 @@ begin
 	--nUDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D31:24 (UPPER BYTE)
 	--nLDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D23:16 (LOWER BYTE)	
 	
-	nUDS <= nUDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	nLDS <= nLDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	--nUDS <= nUDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	--nLDS <= nLDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	
+	nUDS <= nUDSOUT 
+		WHEN (cycle = '1' AND RnW = '1') OR dsenable = '1'
+		ELSE '1' WHEN sm_enabled = '1' 
+		ELSE 'Z';
+		
+	nLDS <= nLDSOUT 
+		WHEN (cycle = '1' AND RnW = '1') OR dsenable = '1'
+		ELSE '1' WHEN sm_enabled = '1' 
+		ELSE 'Z';
 	
 	--AMIGA ADDRESS STROBE AND AMIGA READ/WRITE SIGNALS ARE HERE.
 	--THERE ARE HERE AND NOT "INSIDE" THE STATE MACHINE SO THEY ASSERT
@@ -622,11 +632,11 @@ begin
 						cycle <= '1';
 						
 						--DURING A READ CYCLE, ASSERT DATA STROBES WITH THE ADDRESS STROBE.						
-						IF RnW = '1' THEN						
+						--IF RnW = '1' THEN						
 							
-							dsenable <= '1';
+							--dsenable <= '1';
 
-						END IF;
+						--END IF;
 
 					END IF;
 
