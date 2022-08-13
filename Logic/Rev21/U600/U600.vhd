@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    August 10, 2022 
+-- Create Date:    August 12, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -311,6 +311,7 @@ begin
 	--RESET		= BOSS & CPURESET & RESENB;
 	--RSTENB IS ACTIVE WHEN ROM IS CONFIGED...CHEAT HERE AND GO WITH OUR CONFIGED SIGNAL FROM U601
 	--RSTENB IN REV 9 2630 IS TIED TO +5V, SO WE SHOULD BE ABLE TO IGNORE IT HERE.
+	--THIS IS WORKING, AS DEMONSTRATED BY EARLY ISSUES IN THE PROJECT.
 	nRESET <= '0' WHEN nBOSS = '0' AND nCPURESET ='0' ELSE 'Z';
 	
 	---------------------------
@@ -418,7 +419,8 @@ begin
 		WHEN 
 			--( nBOSS = '0' AND nBGACK = '1' AND MEMACCESS = '0' AND nAS = '0' AND nONBOARD = '1' AND nEXTERN = '1' ) 
 			--( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0' AND nAS = '0' ) OR
-			( nBOSS = '0' AND nBGACK = '1' AND sm_enabled = '1' AND nAS = '0' ) OR
+			( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0') OR --NEW TRY. nAS IS ALREADY CONSIDERED IN THE SMDIS LOGIC.
+			--( nBOSS = '0' AND nBGACK = '1' AND sm_enabled = '1' AND nAS = '0' ) OR ==>NOOOOOOOOOOOOOOOOOOOOOOOOOO!!!!!!!<==
 			( nBOSS = '0' AND nBGACK = '0' AND nMEMZ2 = '0' AND nAAS = '0' AND A(1) = '1' )  
 			--OR ( nBOSS = '1' AND MODE68K = '1' AND nBGACK = '1' AND nMEMZ2 = '0' AND nAAS = '0' ) 
 			--OR ( nBOSS = '1' AND MODE68K = '1' AND nBGACK = '1' AND nIDEACCESS AND nAAS = '0' )
@@ -634,7 +636,7 @@ begin
 						--DURING A READ CYCLE, ASSERT DATA STROBES WITH THE ADDRESS STROBE.						
 						--IF RnW = '1' THEN						
 							
-							--dsenable <= '1';
+						--	dsenable <= '1';
 
 						--END IF;
 
