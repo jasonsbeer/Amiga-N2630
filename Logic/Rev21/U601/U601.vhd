@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    AUGUST 6, 2022 
+-- Create Date:    AUGUST 13, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -161,6 +161,7 @@ architecture Behavioral of U601 is
 	SIGNAL lorom : STD_LOGIC := '0'; --IS THE ROM IN THE LOW ADDRESS SPACE?
 	SIGNAL rambaseaddress0 : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --RAM BASE ADDRESS	
 	SIGNAL rambaseaddress1 : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --RAM BASE ADDRESS	
+	--SIGNAL acsack : STD_LOGIC := '0'; --DSACK FOR THE AUTOCONFIG
 	
 	--ROM RELATED SIGNALS
 	CONSTANT DELAYVALUE : INTEGER := 1;
@@ -206,7 +207,7 @@ begin
 	--AADIR <= '1' WHEN (nBOSS = '0' AND nBGACK = '1') ELSE '0';
 	AADIR <= nBGACK;	
 	
-	--ENABLE THE BUFFERS WHEN WE ARE BOSS OR WHEN WE ARE IN 68K MODE.
+	--ENABLE THE ADDRESS BUFFERS WHEN WE ARE BOSS OR WHEN WE ARE IN 68K MODE.
 	--LOOKING AT THE LOGIC BELOW, WE BASICALLY NEVER DISABLE THE BUFFERS.
 	--THIS MEANS WE COULD TIE IT TO GROUND?
 	--nAAENA <= '0' WHEN nBOSS = '0' OR MODE68K = '1' ELSE '1'; 
@@ -677,7 +678,7 @@ begin
 			ELSIF autoconfigspace = '1' THEN
 			
 				--WE ARE IN THE AUTOCONFIG ADDRESS SPACE
-				IF nAS = '0'  THEN
+				IF nAS = '0' THEN
 				
 					nDSACK0 <= '1';
 					nDSACK1 <= '0';
@@ -746,51 +747,6 @@ begin
 		
 	END PROCESS;
 	
-	
---	PROCESS (nAS) BEGIN
---	
---		IF FALLING_EDGE (nAS) THEN	
---		
---			IF (hirom = '1' OR lorom = '1' OR autoconfigspace = '1') OR 
---				(nIDEACCESS = '0' OR nMEMZ2 = '0' OR nMEMZ3 = '0')
---				
---			THEN
---			
---				SMDIS <= '1';
---				
---			ELSE
---			
---				SMDIS <= '0';
---				
---			END IF;
---			
---		END IF;
---		
---	END PROCESS;
-	
---	PROCESS (CPUCLK) BEGIN
---	
---		IF RISING_EDGE (CPUCLK) THEN	
---		
---			IF ((hirom = '1' OR lorom = '1' OR autoconfigspace = '1') AND nAS = '0') OR 
---				(nIDEACCESS = '0' OR nMEMZ2 = '0' OR nMEMZ3 = '0') OR 
---				(SMDIS = '1' AND nAS = '0') 
---				
---			THEN
---			
---				SMDIS <= '1';
---				
---			ELSE
---			
---				SMDIS <= '0';
---				
---			END IF;
---			
---		END IF;
---		
---	END PROCESS;
---	
-	
 	-------------------
 	-- JOHANN'S MODE --
 	-------------------
@@ -823,11 +779,12 @@ begin
 	--IS IDENTICAL TO ANY OTHER.
 	
 	--EVEN THOUGH THIS ISN'T WITH THE AUTOCONFIG STUFF, IT STILL
-	--RESPONDS IN THE AUTOCONFIG SPACE, WITH DTACK HANDLED THERE.
+	--RESPONDS IN THE AUTOCONFIG SPACE, WITH _DSACK1 HANDLED THERE.
 	
 	PROCESS (CPUCLK, regreset) BEGIN
 	
 		IF (regreset = '1') THEN
+		
 			phantomlo <= '0';
 			phantomhi <= '0';
 			romconfiged <= '0';
@@ -867,7 +824,7 @@ begin
 			
 	--BOARDCONFIGED IS ASSERTED WHEN WE ARE DONE CONFIGING THE ROM AND ZORRO 2 MEMORY
 	--WHEN THE ZORRO 2 RAM IS DISABLED BY J303, IT SETS Z2AUTO = 0.
-	boardconfiged <= '1' WHEN (romconfiged = '1' AND Z2AUTO = '0') OR (romconfiged= '1' AND ramconfiged = '1') ELSE '0';
+	boardconfiged <= '1' WHEN (romconfiged = '1' AND Z2AUTO = '0') OR (romconfiged = '1' AND ramconfiged = '1') ELSE '0';
 	
 	--WE ARE IN THE Z2 AUTOCONFIG ADDRESS SPACE ($E80000).
 	--THIS IS QUALIFIED BY BOARDCONFIGED SO WE STOP RESPONDING TO THE AUTOCONFIG 
@@ -919,7 +876,7 @@ begin
 						--offset $02
 						WHEN "000001" => 
 							D_2630 <= "0000"; --8MB
-							D_ZORRO2RAM <= "0000"; --er_type: NEXT BOARD NOT RELATED, 0MB
+							D_ZORRO2RAM <= "0000"; --er_type: NEXT BOARD NOT RELATED, 8MB
 
 						--offset $04 INVERTED
 						WHEN "000010" => 
@@ -930,6 +887,11 @@ begin
 						WHEN "000011" => 
 							D_2630 <= "1110";
 							D_ZORRO2RAM <= "1111"; --Product Number Lo Nibble
+							
+						--offset $08 INVERTED
+						WHEN "000100" =>
+							D_2630 <= "1111"; 
+							D_ZORRO2RAM <= "0011"; --PREFER 8 MEG SPACE, CAN'T BE SHUT UP
 
 						--offset $0C INVERTED						
 						WHEN "000110" => 
@@ -966,7 +928,8 @@ begin
 						--FOOD FOR THOUGHT. IN THAT CASE WE NEED TO WAIT UNTIL WE GET TO THE NEXT
 						--AUTOCONFIG CYCLE TO ENTER THE BELOW CODE.
 						
-						IF ( romconfiged = '1' AND ramconfiged = '0' ) THEN
+						--IF ( romconfiged = '1' AND ramconfiged = '0' ) THEN
+						IF ( romconfiged = '1' ) THEN
 							
 							--THIS IS THE ZORRO 2 RAM BASE ADDRESS FOR OUR 8 MEGABYTES.
 							--THERE ARE TWO POSSIBLE SLOTS FOR THIS SPACE...01 AND 10.
