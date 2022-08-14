@@ -987,9 +987,10 @@ begin
 			--chipregs & !EXTSEL
 			--(iospace = '1'  AND EXTSEL = '0')
 			--iospace & !EXTSEL
-			nMEMZ2 = '0' OR
-			nMEMZ3 = '0' OR
-			( A(23 DOWNTO 16) >= x"F8" AND A(23 DOWNTO 16) <= x"FF" )
+			
+			--nMEMZ2 = '0' OR
+			nMEMZ3 = '0'
+			--( A(23 DOWNTO 16) >= x"F8" AND A(23 DOWNTO 16) <= x"FF" )
 		ELSE
 			'0';		
 

@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    August 13, 2022 
+-- Create Date:    August 14, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -558,27 +558,27 @@ begin
 	--nUDS <= nUDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
 	--nLDS <= nLDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
 	
---	nUDS <= nUDSOUT 
---		WHEN (cycle = '1' AND RnW = '1') OR dsenable = '1'
---		ELSE '1' WHEN sm_enabled = '1' 
---		ELSE 'Z';
-
 	nUDS <= nUDSOUT 
-		WHEN dsenable = '1' AND RnW = '0' --FOR WRITES
-		ELSE '0' WHEN cycle = '1' AND RnW = '1' --ALWAYS RETURN 16 BIT READS FOR CACHING (pp7-26 68030 Manual)
+		WHEN (cycle = '1' AND RnW = '1') OR dsenable = '1'
 		ELSE '1' WHEN sm_enabled = '1' 
 		ELSE 'Z';
-		
---	nLDS <= nLDSOUT 
---		WHEN (cycle = '1' AND RnW = '1') OR dsenable = '1'
+
+--	nUDS <= nUDSOUT 
+--		WHEN dsenable = '1' AND RnW = '0' --FOR WRITES
+--		ELSE '0' WHEN cycle = '1' AND RnW = '1' --ALWAYS RETURN 16 BIT READS FOR CACHING (pp7-26 68030 Manual)
 --		ELSE '1' WHEN sm_enabled = '1' 
 --		ELSE 'Z';
-
+		
 	nLDS <= nLDSOUT 
-		WHEN dsenable = '1' AND RnW = '0' --FOR WRITES
-		ELSE '0' WHEN cycle = '1' AND RnW = '1' --ALWAYS RETURN 16 BIT READS FOR CACHING (pp7-26 68030 Manual)
+		WHEN (cycle = '1' AND RnW = '1') OR dsenable = '1'
 		ELSE '1' WHEN sm_enabled = '1' 
 		ELSE 'Z';
+
+--	nLDS <= nLDSOUT 
+--		WHEN dsenable = '1' AND RnW = '0' --FOR WRITES
+--		ELSE '0' WHEN cycle = '1' AND RnW = '1' --ALWAYS RETURN 16 BIT READS FOR CACHING (pp7-26 68030 Manual)
+--		ELSE '1' WHEN sm_enabled = '1' 
+--		ELSE 'Z';
 	
 	--AMIGA ADDRESS STROBE AND AMIGA READ/WRITE SIGNALS ARE HERE.
 	--THERE ARE HERE AND NOT "INSIDE" THE STATE MACHINE SO THEY ASSERT
@@ -646,8 +646,7 @@ begin
 						--ACTIVATE nAAS AND ARnW
 						cycle <= '1';
 						
-						--DURING A READ CYCLE, ASSERT DATA STROBES WITH THE ADDRESS STROBE.	
-						--this was still in the previous build (8-12-22)
+						--DURING A READ CYCLE, ASSERT DATA STROBES WITH THE ADDRESS STROBE.
 						--IF RnW = '1' THEN						
 							
 						--	dsenable <= '1';
@@ -678,11 +677,12 @@ begin
 						IF nVMA = '1' AND (vmacount = 1 OR vmacount = 2) THEN
 								
 							nVMA <= '0';	
-							
-						ELSIF nVMA = '0' AND vmacount = 7 THEN						
+						
+						ELSIF nVMA = '0' AND vmacount = 8 THEN						
 							
 							--NOW WAIT UNTIL WE ARE ON THE RIGHT SPOT IN E TO LATCH THE DATA.
 							CURRENT_STATE <= S6;
+							DSACKEN <= '1';
 							STATE7EN <= '1';
 						
 						END IF;					
@@ -718,8 +718,7 @@ begin
 					
 					dsenable <= '0';					
 					STATE7EN <= '0';
-					DSACKEN <= '1';
-					
+					DSACKEN <= NOT DSACKEN;					
 
 			END CASE;
 
