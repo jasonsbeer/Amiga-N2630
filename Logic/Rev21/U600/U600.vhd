@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    August 12, 2022 
+-- Create Date:    August 13, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -558,13 +558,25 @@ begin
 	--nUDS <= nUDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
 	--nLDS <= nLDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
 	
+--	nUDS <= nUDSOUT 
+--		WHEN (cycle = '1' AND RnW = '1') OR dsenable = '1'
+--		ELSE '1' WHEN sm_enabled = '1' 
+--		ELSE 'Z';
+
 	nUDS <= nUDSOUT 
-		WHEN (cycle = '1' AND RnW = '1') OR dsenable = '1'
+		WHEN dsenable = '1' AND RnW = '0' --FOR WRITES
+		ELSE '0' WHEN cycle = '1' AND RnW = '1' --ALWAYS RETURN 16 BIT READS FOR CACHING (pp7-26 68030 Manual)
 		ELSE '1' WHEN sm_enabled = '1' 
 		ELSE 'Z';
 		
+--	nLDS <= nLDSOUT 
+--		WHEN (cycle = '1' AND RnW = '1') OR dsenable = '1'
+--		ELSE '1' WHEN sm_enabled = '1' 
+--		ELSE 'Z';
+
 	nLDS <= nLDSOUT 
-		WHEN (cycle = '1' AND RnW = '1') OR dsenable = '1'
+		WHEN dsenable = '1' AND RnW = '0' --FOR WRITES
+		ELSE '0' WHEN cycle = '1' AND RnW = '1' --ALWAYS RETURN 16 BIT READS FOR CACHING (pp7-26 68030 Manual)
 		ELSE '1' WHEN sm_enabled = '1' 
 		ELSE 'Z';
 	
@@ -618,6 +630,7 @@ begin
 						CURRENT_STATE <= S2;		
 						
 						--PREP THE DATA STROBES
+						
 						IF A(0) = '0' THEN
 							nUDSOUT <= '0';
 						ELSE
@@ -633,7 +646,8 @@ begin
 						--ACTIVATE nAAS AND ARnW
 						cycle <= '1';
 						
-						--DURING A READ CYCLE, ASSERT DATA STROBES WITH THE ADDRESS STROBE.						
+						--DURING A READ CYCLE, ASSERT DATA STROBES WITH THE ADDRESS STROBE.	
+						--this was still in the previous build (8-12-22)
 						--IF RnW = '1' THEN						
 							
 						--	dsenable <= '1';
