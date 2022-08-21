@@ -134,6 +134,7 @@ architecture Behavioral of U600 is
 	SIGNAL STATE7 : STD_LOGIC := '0'; --ARE WE IN 68000 STATE 7?
 	SIGNAL STATE7EN : STD_LOGIC := '0';
 	SIGNAL cycle : STD_LOGIC := '0'; --DELAY THE START OF THE STATE MACHINE
+	SIGNAL arwout : STD_LOGIC := '1'; --READ/WRITE SIGNAL FOR THE AMIGA
 	
 	--CLOCK SIGNALS
 	SIGNAL basis7m : STD_LOGIC := '0';
@@ -614,7 +615,7 @@ begin
 	--WHEN THEY WERE "IN" THE STATE MACHINE CODE.
 	
 	nAAS <= '0' WHEN cycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	ARnW <= RnW WHEN cycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';	
+	ARnW <= arwout WHEN cycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';	
 
 	--THE STATE MACHINE
 
@@ -651,11 +652,17 @@ begin
 					--WE CONSIDER _DSACK1 TO ENSURE WE DON'T START IF THE PREVIOUS
 					--CYCLE IS NOT YET COMPLETE IN A BACK-TO-BACK SITUATION.
 					
-					--DSACKEN <= '0';			
+					--DSACKEN <= '0';		
+
+					--HOLD THE _VMA SIGNAL.
+					nVMA <= '1';	
+
+					--SET THE READ/WRITE SIGNAL
+					arwout <= RnW;					
 
 					IF nAS = '0' AND nDSACK1 = '1' THEN
 					
-						CURRENT_STATE <= S2;		
+						CURRENT_STATE <= S2;	
 						
 						--PREP THE DATA STROBES
 						
@@ -702,6 +709,28 @@ begin
 						--APPROPRIATE TIME IS REACHED ON E TO ASSERT _VMA, WHICH IS 
 						--BETWEEN 3 AND 4 CLOCK CYCLES AFTER E GOES TO LOGIC LOW.
 							
+--						IF nVMA = '1' AND (vmacount = 1 OR vmacount = 2) THEN
+--								
+--							nVMA <= '0';
+--							DSACKEN <= '1';
+--							
+--						ELSIF nVMA = '0' AND vmacount = 7 THEN
+--							
+--							STATE7EN <= '1';
+--						
+--						ELSIF nVMA = '0' AND vmacount = 8 THEN						
+--							
+--							--NOW WAIT UNTIL WE ARE ON THE RIGHT SPOT IN E TO LATCH THE DATA.
+--							--ACCORING TO THE MC6800 MANUAL, THE TIME FROM ASSERTION OF _VMA
+--							--TO THE TIME DATA BECOMES VALID FOR A READ IS 605ns. THIS IS 
+--							--APPROX 4.3 7.16MHz CLOCK CYCLES.
+--							
+--							CURRENT_STATE <= S6;
+--							DSACKEN <= '0';
+--							STATE7EN <= '0';
+--						
+--						END IF;			
+
 						IF nVMA = '1' AND (vmacount = 1 OR vmacount = 2) THEN
 								
 							nVMA <= '0';	
@@ -717,7 +746,7 @@ begin
 							DSACKEN <= '1';
 							STATE7EN <= '1';
 						
-						END IF;					
+						END IF;	
 							
 					ELSE
 								
@@ -746,7 +775,7 @@ begin
 					cycle <= '0';
 					
 					nVMA <= '1';
-					
+					arwout <= '1';
 					dsenable <= '0';					
 					STATE7EN <= '0';
 					DSACKEN <= '0';					
@@ -768,7 +797,7 @@ begin
 
 			IF sm_enabled = '1' THEN			
 
-				IF STATE7 = '1' AND DSACKEN = '1' THEN 
+				IF STATE7 = '1' AND DSACKEN = '1' AND nAS = '0' THEN 
 
 					--ASSERT _DSACK1.
 					nDSACK1 <= '0';
