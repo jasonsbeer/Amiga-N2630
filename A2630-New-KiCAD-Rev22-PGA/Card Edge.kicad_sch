@@ -6,7 +6,7 @@
 
   (title_block
     (title "Amiga N2630")
-    (date "2022-08-05")
+    (date "2022-08-20")
     (rev "2.2")
   )
 
@@ -5472,10 +5472,10 @@
       (effects (font (size 1.27 1.27)) hide)
     )
   )
-  (global_label "7M" (shape input) (at 26.67 50.546 180) (fields_autoplaced)
+  (global_label "_7M" (shape input) (at 26.67 50.546 180) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify right))
     (uuid 76b1f930-b646-4a31-9fd8-fb6fe8176ea4)
-    (property "Intersheet References" "${INTERSHEET_REFS}" (id 0) (at 21.6848 50.6254 0)
+    (property "Intersheet References" "${INTERSHEET_REFS}" (id 0) (at 20.7172 50.4666 0)
       (effects (font (size 1.27 1.27)) (justify right) hide)
     )
   )
