@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    August 21, 2022 
+-- Create Date:    August 22, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -135,6 +135,9 @@ architecture Behavioral of U600 is
 	SIGNAL STATE7EN : STD_LOGIC := '0';
 	SIGNAL cycle : STD_LOGIC := '0'; --DELAY THE START OF THE STATE MACHINE
 	SIGNAL arwout : STD_LOGIC := '1'; --READ/WRITE SIGNAL FOR THE AMIGA
+	--SIGNAL edge : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --TRACK THE EDGE OF THE 7MHz CLOCK
+	--SIGNAL lastedge : STD_LOGIC; --LAST 7MHz EDGE
+	SIGNAL aasout : STD_LOGIC := '1'; --ENABLE AMIGA ADDRESS STROBE
 	
 	--CLOCK SIGNALS
 	SIGNAL basis7m : STD_LOGIC := '0';
@@ -584,11 +587,63 @@ begin
 	--nUDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D31:24 (UPPER BYTE)
 	--nLDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D23:16 (LOWER BYTE)	
 	
+--	PROCESS (CPUCLK) BEGIN
+--	
+--		IF RISING_EDGE (CPUCLK) THEN
+--		
+--			--SET AMIGA DATA STROBES
+--			IF STATE7 = '0' AND ((cycle = '1' AND RnW = '1') OR dsenable = '1') THEN
+--			
+--				nUDS <= nUDSOUT;
+--				nLDS <= nLDSOUT;
+--					
+--			ELSIF sm_enabled = '1' THEN
+--			
+--				nUDS <= '1';
+--				nLDS <= '1';
+--				
+--			ELSE 
+--			
+--				nUDS <= 'Z';
+--				nLDS <= 'Z';
+--				
+--			END IF;
+--			
+--			--SET AMIGA ADDRESS STROBE
+--			IF cycle = '1' AND STATE7 = '0' THEN 
+--			
+--				nAAS <= '0';
+--			
+--			ELSIF sm_enabled = '1' THEN
+--			
+--				nAAS <= '1'; 
+--			
+--			ELSE 
+--			
+--				nAAS <= 'Z';
+--				
+--			END IF;
+--		
+--		END IF;
+--		
+--		--SET R/W
+--		IF sm_enabled = '1' THEN
+--			
+--			ARnW <= arwout;
+--			
+--		ELSE
+--		
+--			ARnW <= 'Z';
+--			
+--		END IF;
+--		
+--	END PROCESS;
+	
 	--nUDS <= nUDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
 	--nLDS <= nLDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
 	
 	nUDS <= nUDSOUT 
-		WHEN (cycle = '1' AND RnW = '1') OR dsenable = '1'
+		WHEN ( STATE7 = '0' OR nVMA = '0' ) AND ((cycle = '1' AND RnW = '1') OR dsenable = '1')
 		ELSE '1' WHEN sm_enabled = '1' 
 		ELSE 'Z';
 
@@ -599,7 +654,7 @@ begin
 --		ELSE 'Z';
 		
 	nLDS <= nLDSOUT 
-		WHEN (cycle = '1' AND RnW = '1') OR dsenable = '1'
+		WHEN ( STATE7 = '0' OR nVMA = '0' ) AND ((cycle = '1' AND RnW = '1') OR dsenable = '1')
 		ELSE '1' WHEN sm_enabled = '1' 
 		ELSE 'Z';
 
@@ -614,10 +669,33 @@ begin
 	--TOGETHER AND WITH THE ADDRESS STROBES. THERE WAS SOME DELAY ISSUES
 	--WHEN THEY WERE "IN" THE STATE MACHINE CODE.
 	
-	nAAS <= '0' WHEN cycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	ARnW <= arwout WHEN cycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';	
+	--nAAS <= '0' WHEN cycle = '1' AND STATE7 = '0' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z'; --THIS FAILS TO ASSERT SOMETIMES!
+	--nAAS <= '0' WHEN cycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	nAAS <= aasout WHEN cycle = '1' AND ( STATE7 = '0' OR nVMA = '0' ) ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	--ARnW <= arwout WHEN cycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';	
+	ARnW <= arwout WHEN sm_enabled = '1' ELSE 'Z';	
 
 	--THE STATE MACHINE
+	
+	--THIS IS A SIMPLE SHIFT REGISTER TO TRACK THE EDGES OF THE 7MHz CLOCK
+--	PROCESS (CPUCLK) BEGIN
+--	
+--		IF RISING_EDGE (CPUCLK) THEN
+--		
+--			edge(0) <= edge(1);
+--			edge(1) <= basis7m;
+--			
+--		END IF;	
+--		
+--		IF edge = "10" THEN
+--			--THIS IS THE FALLING EDGE
+--			lastedge <= '0';
+--		ELSIF edge = "01" THEN
+--			--THIS IS THE RISING EDGE
+--			lastedge <= '1';
+--		END IF;
+--		
+--	END PROCESS;
 
 	PROCESS (basis7m, sm_enabled) BEGIN
 
@@ -625,8 +703,7 @@ begin
 		
 			--RESET THE STATE MACHINE SIGNALS
 			
-			nVMA <= 'Z';
-			
+			nVMA <= 'Z';			
 			cycle <= '0';
 			DSACKEN <= '0';
 			dsenable <= '0';
@@ -680,6 +757,8 @@ begin
 						
 						--ACTIVATE nAAS AND ARnW
 						cycle <= '1';
+						
+						aasout <= '0';
 						
 						--DURING A READ CYCLE, ASSERT DATA STROBES WITH THE ADDRESS STROBE.
 						--IF RnW = '1' THEN						
@@ -776,6 +855,7 @@ begin
 					
 					nVMA <= '1';
 					arwout <= '1';
+					aasout <= '1';
 					dsenable <= '0';					
 					STATE7EN <= '0';
 					DSACKEN <= '0';					
@@ -832,7 +912,7 @@ begin
 
 		IF FALLING_EDGE (basis7m) THEN 
 		
-			STATE7 <= STATE7EN;
+			STATE7 <= STATE7EN;	
 
 		END IF;
 
