@@ -6,7 +6,7 @@ PROCESS (CPUCLK) BEGIN
   
   IF RISING_EDGE (CPUCLK) THEN
     
-    IF nAS = '0' AND (dsacken = '1' OR nDSACK1 = '0') THEN
+    IF sm_enabled = '1' AND nAS = '0' AND (dsacken = '1' OR nDSACK1 = '0') THEN
       
       dsackout <= '0';
     
