@@ -32,147 +32,149 @@ nDSACK1 <= dsackout WHEN sm_enabled = '1' ELSE 'Z';
 
 PROCESS (CLK14, sm_enabled) BEGIN
 
-	IF sm_enabled = '0' THEN
+	IF sm_enabled = '0' THEN		
     
-    --THE STATE MACHINE IS DISABLED
-    --TRISTATE APPROPRIATE SIGNALS AND SET OTHERS TO DISABLED
-    
-    CURRENT_STATE <= S0;
-    
-    aasout <= '1';
-    arwout <= '1';
+		--THE STATE MACHINE IS DISABLED
+		--TRISTATE APPROPRIATE SIGNALS AND SET OTHERS TO DISABLED
+
+		CURRENT_STATE <= S0;
+
+		aasout <= '1';
+		arwout <= '1';
 		vmaout <= '1';
-    ldsout <= '1';
-    udsout <= '1';
-    readcycle <= '0';
-    writecycle <= '0';
+		ldsout <= '1';
+		udsout <= '1';
+		readcycle <= '0';
+		writecycle <= '0';
 		dsacken <= '0';
 
 	ELSIF RISING_EDGE (CLK14) THEN
 	
 		--BEGIN 68000 STATE MACHINE--
     
-    CASE (CURRENT_STATE) IS
-      
-      WHEN S0 =>
+		CASE (CURRENT_STATE) IS
 
-        --STATE 0 IS THE START OF A CYCLE. 
-        --WE WATCH FOR ASSERTION OF 68030 _AS TO SIGNAL THE CYCLE START
+			WHEN S0 =>
 
-        IF nAS = '0' THEN
+				--STATE 0 IS THE START OF A CYCLE. 
+				--WE WATCH FOR ASSERTION OF 68030 _AS TO SIGNAL THE CYCLE START
 
-          CURRENT_STATE <= S1;
+				IF nAS = '0' THEN
 
-          --PREP THE DATA STROBES--
-          IF A(0) = '0' THEN
-            udsout <= '0';
-          ELSE
-            udsout <= '1';
-          END IF;
+				  CURRENT_STATE <= S1;
 
-          IF SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' THEN
-            ldsout <= '0';
-          ELSE
-            ldsout <= '1';
-          END IF;	
+				  --PREP THE DATA STROBES--
+				  IF A(0) = '0' THEN
+				    udsout <= '0';
+				  ELSE
+				    udsout <= '1';
+				  END IF;
 
-        END IF;
+				  IF SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' THEN
+				    ldsout <= '0';
+				  ELSE
+				    ldsout <= '1';
+				  END IF;	
 
-      WHEN S1 =>            
-            
-      --PROCESSOR DRIVES A VALID ADDRESS ON THE BUS IN STATE 1. 
-      --NOTHING MUCH FOR US TO DO.
-      --SET UP FOR STATE 2.
+				END IF;
 
-      CURRENT_STATE <= S2;
+			WHEN S1 =>            
 
-      aasout <= '0';        
+				--PROCESSOR DRIVES A VALID ADDRESS ON THE BUS IN STATE 1. 
+				--NOTHING MUCH FOR US TO DO.
+				--SET UP FOR STATE 2.
 
-      IF RnW = '1' THEN readcycle <= '1';
-      IF RnW = '0' THEN arwout <= '0';
+				CURRENT_STATE <= S2;
 
-     WHEN S2 =>
-              
-      --ASSERT _AAS FOR ALL CYCLES
-      --ASSERT _LDS, AND _UDS FOR READ CYCLES
-      --GO TO STATE 3
+				aasout <= '0';        
 
-      CURRENT_STATE <= S3;
-      
-      WHEN S3 =>
-      
-        --PROCEED TO STATE 4.
-        --DURING WRITE CYCLES, _LDS AND _UDS ARE ASSERTED ON THE RISING EDGE OF STATE 4.
-      
-        CURRENT_STATE <= S4;
-        IF RnW = '0' THEN writecycle <= '1';
-    
-      WHEN S4 =>
+				IF RnW = '1' THEN readcycle <= '1';
+				IF RnW = '0' THEN arwout <= '0';
 
-        --SOME IMPORTANT STUFF HAPPENS AT S4.
-        --IF THIS IS A 6800 CYCLE, ASSERT _VMA IF WE ARE IN SYNC WITH E
-        --IF THIS IS A 68000 CYCLE, LOOK FOR ASSERTION OF _DTACK.
-        --IF THIS IS A 68000 WRITE CYCLE, ASSERT THE DATA STROBES HERE (SET PREVIOUSLY).
+			WHEN S2 =>
 
-        IF nVPA = '0' AND nVMA = '1' AND vmacount = 2 THEN
-          --THIS IS A 6800 CYCLE, WE WAIT HERE UNTIL THE
-          --APPROPRIATE TIME IS REACHED ON E TO ASSERT _VMA, WHICH IS 
-          --BETWEEN 3 AND 4 CLOCK CYCLES AFTER E GOES TO LOGIC LOW.		
+				--ASSERT _AAS FOR ALL CYCLES
+				--ASSERT _LDS, AND _UDS FOR READ CYCLES
+				--GO TO STATE 3
 
-          vmaout <= '0';	
+				CURRENT_STATE <= S3;
 
-        END IF;
+			WHEN S3 =>
 
-        IF (nDTACK = '0' OR nBERR = '0' OR (nVMA = '0' AND vmacount = 8)) THEN
+				--PROCEED TO STATE 4.
+				--DURING WRITE CYCLES, _LDS AND _UDS ARE ASSERTED ON THE RISING EDGE OF STATE 4.
 
-          --WHEN THE TARGET DEVICE HAS ASSERTED _DTACK OR _BERR, WE CONTINUE ON.
-          --IF THIS IS A 6800/6502 (CIA) CYCLE, WE WAIT UNTIL E IS HIGH TO PROCEED.
-          --OTHERWISE, INSERT WAIT STATES UNTIL ONE OF THESE CONDITIONS IS SATISFIED.
+				CURRENT_STATE <= S4;
+				IF RnW = '0' THEN writecycle <= '1';
 
-          CURRENT_STATE <= S5;
+			WHEN S4 =>
 
-        END IF;
+				--SOME IMPORTANT STUFF HAPPENS AT S4.
+				--IF THIS IS A 6800 CYCLE, ASSERT _VMA IF WE ARE IN SYNC WITH E
+				--IF THIS IS A 68000 CYCLE, LOOK FOR ASSERTION OF _DTACK.
+				--IF THIS IS A 68000 WRITE CYCLE, ASSERT THE DATA STROBES HERE (SET PREVIOUSLY).
 
-     WHEN S5 =>
+				IF nVPA = '0' AND nVMA = '1' AND vmacount = 2 THEN
+				  --THIS IS A 6800 CYCLE, WE WAIT HERE UNTIL THE
+				  --APPROPRIATE TIME IS REACHED ON E TO ASSERT _VMA, WHICH IS 
+				  --BETWEEN 3 AND 4 CLOCK CYCLES AFTER E GOES TO LOGIC LOW.		
 
-        --NOTHING HAPPENS HERE. GO TO STATE 6.
+				  vmaout <= '0';	
 
-        CURRENT_STATE <= S6;
+				END IF;
 
-     WHEN S6 =>
+				IF (nDTACK = '0' OR nBERR = '0' OR (nVMA = '0' AND vmacount = 8)) THEN
 
-        --DURING READ CYCLES, THE DATA IS DRIVEN ON TO THE BUS DURING STATE 6.
-        --THE 68000 NORMALLY LATCHES DATA ON THE FALLING EDGE OF STATE 7.
-        --FOR 6800 CYCLES, E FALLS WITH THE FALLING EDGE OF STATE 7.
+				  --WHEN THE TARGET DEVICE HAS ASSERTED _DTACK OR _BERR, WE CONTINUE ON.
+				  --IF THIS IS A 6800/6502 (CIA) CYCLE, WE WAIT UNTIL E IS HIGH TO PROCEED.
+				  --OTHERWISE, INSERT WAIT STATES UNTIL ONE OF THESE CONDITIONS IS SATISFIED.
 
-        CURRENT_STATE <= S7;
-        dsacken <= '1';
+				  CURRENT_STATE <= S5;
 
-        --FOR ALL CYCLES, WE NEGATE _AAS, _LDS, AND _UDS IN STATE 7.
-        aasout <= '1';
-        writecycle <= '1';
-        readcycle <= '1';
+				END IF;
 
-    WHEN S7 =>
-      --HOLD AT STATE 7 UNTIL 68030 _AS NEGATES.
-      --THAT PREVENTS US FROM STARTING A NEW CYCLE UNTIL THE CURRENT CYCLE IS COMPLETE.
+			WHEN S5 =>
 
-      --ONCE WE ARE IN STATE 7, WE NEGATE dsacken AND ALLOW THE _DSACK1 PROCESSS
-      --TO DO IT'S THING.
-      dsacken <= '0';
+				--NOTHING HAPPENS HERE. GO TO STATE 6.
 
-      --ONCE THE 68030 _AS IS NEGATED, WE CAN CLOSE OUT THIS CYCLE AND GET READY FOR THE NEXT.
-      --READ/WRITE AND _VMA ARE HELD UNTIL THE CYCLE IS DONE. NEGATING THEM TOO SOON WILL MESS UP THE CYCLE.
-      IF nAS = '1' THEN
+				CURRENT_STATE <= S6;
 
-        CURRENT_STATE <= S0;
-        arwout <= '1';
-        vmaout <= '1';
+			WHEN S6 =>
 
-      END IF;
+				--DURING READ CYCLES, THE DATA IS DRIVEN ON TO THE BUS DURING STATE 6.
+				--THE 68000 NORMALLY LATCHES DATA ON THE FALLING EDGE OF STATE 7.
+				--FOR 6800 CYCLES, E FALLS WITH THE FALLING EDGE OF STATE 7.
 
-    END CASE;
-  END IF;
+				CURRENT_STATE <= S7;
+				dsacken <= '1';
+
+				--FOR ALL CYCLES, WE NEGATE _AAS, _LDS, AND _UDS IN STATE 7.
+				aasout <= '1';
+				writecycle <= '1';
+				readcycle <= '1';
+
+			WHEN S7 =>
+				--HOLD AT STATE 7 UNTIL 68030 _AS NEGATES.
+				--THAT PREVENTS US FROM STARTING A NEW CYCLE UNTIL THE CURRENT CYCLE IS COMPLETE.
+
+				--ONCE WE ARE IN STATE 7, WE NEGATE dsacken AND ALLOW THE _DSACK1 PROCESSS
+				--TO DO IT'S THING.
+				dsacken <= '0';
+
+				--ONCE THE 68030 _AS IS NEGATED, WE CAN CLOSE OUT THIS CYCLE AND GET READY FOR THE NEXT.
+				--READ/WRITE AND _VMA ARE HELD UNTIL THE CYCLE IS DONE. NEGATING THEM TOO SOON WILL MESS UP THE CYCLE.
+				IF nAS = '1' THEN
+
+				CURRENT_STATE <= S0;
+				arwout <= '1';
+				vmaout <= '1';
+
+				END IF;
+
+		END CASE;
+			
+	END IF;
+		
 END PROCESS;
          
           
