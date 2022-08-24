@@ -21,8 +21,8 @@ PROCESS (CPUCLK) BEGIN
 END PROCESS;
 
 --DATA TRANSFER SIGNALS
-nUDS <= udsout WHEN writecycle OR readcycle ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-nLDS <= ldsout WHEN writecycle OR readcycle ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+nUDS <= udsout WHEN writecycle = '1' OR readcycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+nLDS <= ldsout WHEN writecycle = '1' OR readcycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
 nAAS <= aasout WHEN sm_enabled = '1' ELSE 'Z';
 ARnW <= arwout WHEN sm_enabled = '1' ELSE 'Z';
 nVMA <= vmaout WHEN sm_enabled = '1' ELSE 'Z';
