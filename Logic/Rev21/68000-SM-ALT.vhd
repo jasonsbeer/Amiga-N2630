@@ -459,8 +459,8 @@ begin
 	nADOEH <= '0' 
 		WHEN 
 			--( nBOSS = '0' AND nBGACK = '1' AND MEMACCESS = '0' AND nAS = '0' AND nONBOARD = '1' AND nEXTERN = '1' ) 
-			--( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0' AND nAS = '0' ) OR
-			( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0') OR --NEW TRY. nAS IS ALREADY CONSIDERED IN THE SMDIS LOGIC.
+			( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0' AND nAS = '0' ) OR
+			--( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0') OR --NEW TRY. nAS IS ALREADY CONSIDERED IN THE SMDIS LOGIC.
 			--( nBOSS = '0' AND nBGACK = '1' AND sm_enabled = '1' AND nAS = '0' ) OR ==>NOOOOOOOOOOOOOOOOOOOOOOOOOO!!!!!!!<==
 			( nBOSS = '0' AND nBGACK = '0' AND nMEMZ2 = '0' AND nAAS = '0' AND A(1) = '1' )  
 			--OR ( nBOSS = '1' AND MODE68K = '1' AND nBGACK = '1' AND nMEMZ2 = '0' AND nAAS = '0' ) 
@@ -542,7 +542,8 @@ begin
 	--RESOURCES ON OUR CARD. WE ARE GOING AFTER SOMETHING ON THE AMIGA 2000.
 	
 	sm_enabled <= '1' 
-		WHEN 
+		WHEN
+			nAS = '0' AND
 			SMDIS = '0' AND 
 			nBGACK = '1' AND 
 			FC ( 2 downto 0 ) /= "111" AND
@@ -647,8 +648,7 @@ begin
 
 					CURRENT_STATE <= S2;
 
-					aasout <= '0';        
-
+					aasout <= '0'; 
 					IF RnW = '1' THEN readcycle <= '1'; END IF;
 					IF RnW = '0' THEN arwout <= '0'; END IF;
 
@@ -722,15 +722,10 @@ begin
 					--TO DO IT'S THING.
 					dsacken <= '0';
 
-					--ONCE _DSACK1 IS NEGATED, WE CAN CLOSE OUT THIS CYCLE AND GET READY FOR THE NEXT.
 					--READ/WRITE AND _VMA ARE HELD UNTIL THE CYCLE IS DONE. NEGATING THEM TOO SOON WILL MESS UP THE CYCLE.
-					--IF nDSACK1 = '1' THEN
-
 					CURRENT_STATE <= S0;
 					arwout <= '1';
 					vmaout <= '1';
-
-					--END IF;
 
 			END CASE;
 				
