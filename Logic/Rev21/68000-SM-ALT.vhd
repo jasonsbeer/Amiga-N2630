@@ -597,7 +597,6 @@ begin
 		IF sm_enabled = '0' THEN		
 		 
 			--THE STATE MACHINE IS DISABLED
-			--TRISTATE APPROPRIATE SIGNALS AND SET OTHERS TO DISABLED
 
 			CURRENT_STATE <= S0;
 
@@ -619,9 +618,11 @@ begin
 				WHEN S0 =>
 
 					--STATE 0 IS THE START OF A CYCLE. 
-					--WE WATCH FOR ASSERTION OF 68030 _AS TO SIGNAL THE CYCLE START
+					--DON'T START A CYCLE UNTIL _DSACK1 IS NEGATED.
+					--THIS PREVENTS US FROM STARTING A NEW CYCLE
+					--BEFORE THE PREVIOUS CYCLE IS COMPLETE.
 
-					--IF nAS = '0' THEN
+					IF dsackout = '1' THEN
 
 					  CURRENT_STATE <= S1;
 
@@ -638,7 +639,7 @@ begin
 						 ldsout <= '1';
 					  END IF;	
 
-					--END IF;
+					END IF;
 
 				WHEN S1 =>            
 
