@@ -624,20 +624,24 @@ begin
 
 					IF dsackout = '1' THEN
 
-					  CURRENT_STATE <= S1;
+						CURRENT_STATE <= S1;
 
-					  --PREP THE DATA STROBES--
-					  IF A(0) = '0' THEN
-						 udsout <= '0';
-					  ELSE
-						 udsout <= '1';
-					  END IF;
+						--PREP THE DATA STROBES--
+						IF A(0) = '0' THEN
+							udsout <= '0';
+						ELSE
+							udsout <= '1';
+						END IF;
 
-					  IF SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' THEN
-						 ldsout <= '0';
-					  ELSE
-						 ldsout <= '1';
-					  END IF;	
+						IF SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' THEN
+							ldsout <= '0';
+						ELSE
+							ldsout <= '1';
+						END IF;	
+						  
+					ELSE
+						
+						CURRENT_STATE <= S0;
 
 					END IF;
 
@@ -650,8 +654,14 @@ begin
 					CURRENT_STATE <= S2;
 
 					aasout <= '0'; 
-					IF RnW = '1' THEN readcycle <= '1'; END IF;
-					IF RnW = '0' THEN arwout <= '0'; END IF;
+						
+					IF RnW = '1' THEN
+						readcycle <= '1';
+						arwout <= '1';
+					ELSE
+						readcycle <= '0';
+						arwout <= '0';
+					END IF;
 
 				WHEN S2 =>
 
@@ -667,7 +677,7 @@ begin
 					--DURING WRITE CYCLES, _LDS AND _UDS ARE ASSERTED ON THE RISING EDGE OF STATE 4.
 
 					CURRENT_STATE <= S4;
-					IF RnW = '0' THEN writecycle <= '1'; END IF;
+					IF RnW = '0' THEN writecycle <= '1'; ELSE writecycle <= '0'; END IF;
 
 				WHEN S4 =>
 
@@ -682,6 +692,10 @@ begin
 					  --BETWEEN 3 AND 4 CLOCK CYCLES AFTER E GOES TO LOGIC LOW.		
 
 						vmaout <= '0';	
+					
+					ELSE
+						
+						vmaout <= '1';
 
 					END IF;
 
@@ -692,6 +706,10 @@ begin
 						--OTHERWISE, INSERT WAIT STATES UNTIL ONE OF THESE CONDITIONS IS SATISFIED.
 
 						CURRENT_STATE <= S5;
+						
+					ELSE
+						
+						CURRENT_STATE <= S4;
 
 					END IF;
 
@@ -723,7 +741,8 @@ begin
 					--TO DO IT'S THING.
 					dsacken <= '0';
 
-					--READ/WRITE AND _VMA ARE HELD UNTIL THE CYCLE IS DONE. NEGATING THEM TOO SOON WILL MESS UP THE CYCLE.
+					--READ/WRITE AND _VMA ARE HELD UNTIL THE RISING EDGE OF STATE 0.
+					--NEGATING THEM TOO SOON WILL MESS UP THE CYCLE.
 					CURRENT_STATE <= S0;
 					arwout <= '1';
 					vmaout <= '1';
