@@ -686,20 +686,20 @@ begin
 					--IF THIS IS A 68000 CYCLE, LOOK FOR ASSERTION OF _DTACK.
 					--IF THIS IS A 68000 WRITE CYCLE, ASSERT THE DATA STROBES HERE (SET PREVIOUSLY).
 
-					IF nVPA = '0' AND vmaout = '1' AND vmacount = 2 THEN
+					IF (nVPA = '0' AND vmacount = 2) OR vmaout = '0' THEN
 					  --THIS IS A 6800/6502 (CIA) CYCLE, WE WAIT HERE UNTIL THE
 					  --APPROPRIATE TIME IS REACHED ON E TO ASSERT _VMA, WHICH IS 
 					  --BETWEEN 3 AND 4 CLOCK CYCLES AFTER E GOES TO LOGIC LOW.		
 
-						vmaout <= '0';	
-					
+						vmaout <= '0';			
+
 					ELSE
-						
+					
 						vmaout <= '1';
 
 					END IF;
 
-					IF (nDTACK = '0' OR nBERR = '0' OR (vmaout = '0' AND vmacount = 8)) THEN
+					IF (nDTACK = '0' OR nBERR = '0') OR (vmaout = '0' AND vmacount = 8) THEN
 
 						--WHEN THE TARGET DEVICE HAS ASSERTED _DTACK OR _BERR, WE CONTINUE ON.
 						--IF THIS IS A 6800/6502 (CIA) CYCLE, WE WAIT UNTIL E IS HIGH TO PROCEED.
@@ -734,8 +734,6 @@ begin
 					readcycle <= '0';
 
 				WHEN S7 =>
-					--HOLD AT STATE 7 UNTIL 68030 _AS NEGATES.
-					--THAT PREVENTS US FROM STARTING A NEW CYCLE UNTIL THE CURRENT CYCLE IS COMPLETE.
 
 					--ONCE WE ARE IN STATE 7, WE NEGATE dsacken AND ALLOW THE _DSACK1 PROCESSS
 					--TO DO IT'S THING.
