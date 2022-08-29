@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    AUGUST 13, 2022 
+-- Create Date:    AUGUST 25, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -721,31 +721,33 @@ begin
 	onboard <= '1' WHEN hirom = '1' OR lorom = '1' OR autoconfigspace = '1' ELSE '0';
 	memaccess <= '1' WHEN nIDEACCESS = '0' OR nMEMZ2 = '0' OR nMEMZ3 = '0' ELSE '0';	
 	
-	PROCESS (CPUCLK) BEGIN
+	SMDIS <= '1' WHEN onboard = '1' OR memaccess = '1' ELSE '0';
 	
-		IF RISING_EDGE (CPUCLK) THEN	
-		
-			IF nAS = '0' THEN
-		
-				IF onboard = '1' OR memaccess = '1' THEN
-				
-					SMDIS <= '1';
-					
-				ELSE
-				
-					SMDIS <= '0';
-					
-				END IF;
-				
-			ELSE
-			
-				SMDIS <= '1';
-				
-			END IF;
-		
-		END IF;
-		
-	END PROCESS;
+--	PROCESS (CPUCLK) BEGIN
+--	
+--		IF RISING_EDGE (CPUCLK) THEN	
+--		
+--			IF nAS = '0' THEN
+--		
+--				IF onboard = '1' OR memaccess = '1' THEN
+--				
+--					SMDIS <= '1';
+--					
+--				ELSE
+--				
+--					SMDIS <= '0';
+--					
+--				END IF;
+--				
+--			ELSE
+--			
+--				SMDIS <= '1';
+--				
+--			END IF;
+--		
+--		END IF;
+--		
+--	END PROCESS;
 	
 	-------------------
 	-- JOHANN'S MODE --
