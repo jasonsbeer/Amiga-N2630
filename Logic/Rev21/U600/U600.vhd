@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    August 22, 2022 
+-- Create Date:    August 28, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -52,6 +52,7 @@ PORT
 (
 	--SDSPEED : IN STD_LOGIC_VECTOR(1 DOWNTO 0); --INPUT FROM J402 AND J403
 	A7M : IN STD_LOGIC; --AMIGA 7MHZ CLOCK	
+	CDAC : IN STD_LOGIC; --CDAC CLOCK
 	REFACKZ3 : IN STD_LOGIC; --ZORRO 3 RAM REFRESH ACK FROM U602
 	REFACKZ2 : IN STD_LOGIC; --ZORRO 2 RAM REFRESH ACK FROM U601
 	CPUCLK : IN STD_LOGIC; --68030 CLOCK
@@ -75,7 +76,7 @@ PORT
 	nAS : INOUT STD_LOGIC; --68030 ADDRESS STROBE
 	nABR : INOUT STD_LOGIC; -- AMIGA BUS REQUEST	
 	nBOSS : INOUT STD_LOGIC; --_BOSS SIGNAL
-	REF : INOUT STD_LOGIC; --SDRAM REFRESH SIGNAL
+	REF : INOUT STD_LOGIC := '0'; --SDRAM REFRESH SIGNAL
 	E : INOUT STD_LOGIC; --E CLOCK
 	nVMA : INOUT STD_LOGIC; --6800 VMA SIGNAL	
 	nAAS : INOUT STD_LOGIC; --AMIGA 68000 ADDRESS STROBE	
@@ -96,7 +97,7 @@ PORT
 	nLDS : OUT STD_LOGIC; --68000 _LDS
 	nUDS : OUT STD_LOGIC; --68000 _UDS
 	nBR : OUT STD_LOGIC; --68030 BUS REQUEST SIGNAL
-	n7M : OUT STD_LOGIC --INVERTED 7MHZ OUT FOR 74HCT646 DATA LATCH
+	nCLK7 : OUT STD_LOGIC --INVERTED 7MHZ OUT FOR 74HCT646 DATA LATCH
 	
 );
 
@@ -106,7 +107,7 @@ end U600;
 architecture Behavioral of U600 is
 
 	--DEFINE THE 68000 STATE MACHINE STATES
-	TYPE STATE68K IS ( S0, S2, S4, S6 );
+	TYPE STATE68K IS ( S0, S1, S2, S3, S4, S5, S6, S7 );
 	SIGNAL CURRENT_STATE : STATE68K;
 	
 	--THESE ARE THE CLOCK CYCLES DEFINED FOR THE SDRAM REFRESH COUNTER
@@ -122,25 +123,25 @@ architecture Behavioral of U600 is
 	SIGNAL REFRESH_COUNTER : INTEGER RANGE 0 TO 63 := 0; --6 BIT NUMBER. 63 = 111111
 	
 	--68000 STATE MACHINE SIGNALS
-	SIGNAL nLDSOUT : STD_LOGIC := '1'; --VALUE FOR _LDS
-	SIGNAL nUDSOUT : STD_LOGIC := '1'; --VALUE FOR _UDS
-	SIGNAL dsenable : STD_LOGIC := '0'; --ENABLE THE 68000 DATA STROBES
+	SIGNAL ldsout : STD_LOGIC := '1'; --VALUE FOR _LDS
+	SIGNAL udsout : STD_LOGIC := '1'; --VALUE FOR _UDS
 	SIGNAL sm_enabled : STD_LOGIC := '0'; --ARE WE ACCESSING THE AMIGA 2000 BOARD?
 	SIGNAL eclk_counter : INTEGER RANGE 0 TO 15 := 0; --4 BIT NUMBER E COUNTER
 	SIGNAL vmacount : INTEGER RANGE 0 TO 15 := 0; --COUNTER FOR E VMA
 	SIGNAL eclk : STD_LOGIC := '0'; --E SIGNAL FOR "A2000"
 	SIGNAL esync : STD_LOGIC := '0'; --ONE CLOCK DELAY OF E
 	SIGNAL DSACKEN : STD_LOGIC := '0'; --ENABLE _DSACK1
-	SIGNAL STATE7 : STD_LOGIC := '0'; --ARE WE IN 68000 STATE 7?
-	SIGNAL STATE7EN : STD_LOGIC := '0';
-	SIGNAL cycle : STD_LOGIC := '0'; --DELAY THE START OF THE STATE MACHINE
-	SIGNAL arwout : STD_LOGIC := '1'; --READ/WRITE SIGNAL FOR THE AMIGA
-	--SIGNAL edge : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --TRACK THE EDGE OF THE 7MHz CLOCK
-	--SIGNAL lastedge : STD_LOGIC; --LAST 7MHz EDGE
-	SIGNAL aasout : STD_LOGIC := '1'; --ENABLE AMIGA ADDRESS STROBE
+	SIGNAL ascycle : STD_LOGIC := '0'; --ENABLE AMIGA ADDRESS STROBE SIGNAL
+	SIGNAL rwcycle : STD_LOGIC := '0'; --ENABLE AMIGA READ/WRITE SIGNAL
+	SIGNAL writecycle : STD_LOGIC := '0';
+	SIGNAL readcycle : STD_LOGIC := '0';
+	SIGNAL dsackcycle : STD_LOGIC := '0'; --ENABLE THE 68030 _DSACK1 SIGNAL
+	SIGNAL vmacycle :STD_LOGIC := '0'; --ENABLE THE AMIGA _VMA SIGNAL
+	SIGNAL edsack : STD_LOGIC := '0';
 	
 	--CLOCK SIGNALS
-	SIGNAL basis7m : STD_LOGIC := '0';
+	SIGNAL CLK7 : STD_LOGIC := '0';
+	SIGNAL CLK14 : STD_LOGIC := '0';
 
 begin
 
@@ -151,19 +152,22 @@ begin
 	--THE 7MHz CLOCK CAN BE PULLED FROM THE CPU SLOT OF THE B2000, BUT MUST BE RECREATED
 	--FROM C1 AND C2 ON THE A2000.
 		
-	basis7m <= '1' WHEN ( B2000 = '1' AND A7M = '1' ) OR ( B2000 = '0' AND (nC1 = '1' XOR nC3 = '0' )) ELSE '0';	
+	CLK7 <= '1' WHEN ( B2000 = '1' AND A7M = '1' ) OR ( B2000 = '0' AND (nC1 = '1' XOR nC3 = '0' )) ELSE '0';	
 	
 	--This clock is used to latch the interrupt lines between the motherboard
 	--and the 68030.  If this isn't done, you'll get phantom interrupts
 	--that you probably won't even notice in AmigaOS, but can be fatal to
 	--time critical interrupt code in UNIX and possibly even AmigaOS. U708
 
-	IPLCLK <= basis7m;
+	IPLCLK <= CLK7;
 	
 	--THIS CLOCK DRIVES THE 74HCT646 DATA BUS LATCHES.
 	--IT IS AN INVERTED VERSION OF THE AMIGA 7MHz CLOCK.
 	
-	n7M <= NOT basis7m;
+	nCLK7 <= NOT CLK7;
+	
+	--THIS IS A 14MHz CLOCK FOR THE 68000 STATE MACHINE
+	CLK14 <= CLK7 XOR CDAC;
 
 	----------------------------------
 	-- AUTOREFRESH COUNTER SETTINGS --
@@ -197,6 +201,8 @@ begin
 	--HELD UNTIL BOTH REFACKZ2 AND REFACKZ3 ARE ASSERTED. REF IS THEN NEGATED.
 	--SIMLATED OK
 	
+	REF<= '0';
+	
 --	PROCESS (CPUCLK) BEGIN
 --		IF RISING_EDGE(CPUCLK) THEN
 --			IF (REFRESH_COUNTER > REFRESH_COUNTER_DEFAULT) THEN			
@@ -214,22 +220,22 @@ begin
 --		END IF;
 --	END PROCESS;			
 
-	PROCESS (basis7m) BEGIN
-		IF RISING_EDGE(basis7m) THEN
-			IF (REFRESH_COUNTER > REFRESH_COUNTER_DEFAULT) THEN			
-				REF <= '1';
-				REFRESH_COUNTER <= 0;				
-			ELSE			
-				REFRESH_COUNTER <= REFRESH_COUNTER + 1;				
-				IF REF = '0' OR (REF = '1' AND REFACKZ2 = '1' AND REFACKZ3 = '1') THEN
-					REF <= '0';
-				ELSE
-					REF <= '1';
-				END IF;
-				
-			END IF;
-		END IF;
-	END PROCESS;		
+--	PROCESS (CLK7) BEGIN
+--		IF RISING_EDGE(CLK7) THEN
+--			IF (REFRESH_COUNTER > REFRESH_COUNTER_DEFAULT) THEN			
+--				REF <= '1';
+--				REFRESH_COUNTER <= 0;				
+--			ELSE			
+--				REFRESH_COUNTER <= REFRESH_COUNTER + 1;				
+--				IF REF = '0' OR (REF = '1' AND REFACKZ2 = '1' AND REFACKZ3 = '1') THEN
+--					REF <= '0';
+--				ELSE
+--					REF <= '1';
+--				END IF;
+--				
+--			END IF;
+--		END IF;
+--	END PROCESS;		
 
 	---------------------
 	-- REQUEST THE BUS --
@@ -239,8 +245,8 @@ begin
 	--Bus mastering is supposed to be clocked on the 7MHz rising edge (A2000 technical reference).
 	--BUS REQUEST (_BR) HAS A PULLUP ON THE A2000.
 	
-	PROCESS (basis7m) BEGIN
-		IF (RISING_EDGE (basis7m)) THEN
+	PROCESS (CLK7) BEGIN
+		IF RISING_EDGE (CLK7) THEN
 		
 			IF (nRESET = '0' OR nBOSS = '0' OR MODE68K = '1' ) THEN		
 				--We do not need to request the bus at this time.
@@ -298,8 +304,8 @@ begin
 	--Doing it like this avoids combitorial loops and it should work fine
 	--BOSS HAS A PULLUP ON THE A2000
 
-	PROCESS (basis7m) BEGIN
-		IF (RISING_EDGE (basis7m)) THEN
+	PROCESS (CLK7) BEGIN
+		IF RISING_EDGE (CLK7) THEN
 			IF (nBOSS = '0') THEN
 				--HOLD BOSS UNTIL ONE OF THE CONDITION BELOW IS FALSE
 				IF ( nHALT = '1' AND MODE68K = '0') OR ( nRESET = '1' AND MODE68K = '0' ) THEN
@@ -354,7 +360,7 @@ begin
 	--PROCESSOR IS REMOVED FROM THE MOTHERBOARD. WHEN IN "B2000" MODE, WE CAN
 	--USE THE EXISTING E SIGNAL BUT WE MUST REPLY TO _VPA EITHER WAY.
 	
-	E <= 'Z' WHEN B2000 = '1' ELSE eclk;
+--	E <= 'Z' WHEN B2000 = '1' ELSE eclk;
 	
 	--E IS A TIMING SIGNAL FOR 6800 BASED PERIPHERLS. THE CIAs USE THE E SIGNAL.
 	--IT IS 6 CLOCK CYCLES LOW AND 4 HIGH AND ASYNCHRONOUS WITH ANY OTHER CLOCK.  
@@ -362,31 +368,36 @@ begin
 	--7MHz CLOCK. WE ONLY CREATE OUR OWN E WHEN WE ARE IN AN "A2000" MACHINE. 
 	--TRIVIA: E MEANS "ENABLE"
 
-	PROCESS (basis7m) BEGIN
-		IF FALLING_EDGE (basis7m) AND B2000 = '0' THEN
-			
-			IF (eclk_counter < 6) THEN
-				eclk <= '0';
-			ELSE
-				eclk <= '1';
-			END IF;
-			
-			IF (eclk_counter = 9) THEN
-				eclk_counter <= 0;
-			ELSE			
-				eclk_counter <= eclk_counter +1;
-			END IF;
-			
-		END IF;
-			
-	END PROCESS;
+--	PROCESS (CLK7, nRESET) BEGIN
+--	
+--		IF nRESET = '0' THEN
+--		
+--			eclk_counter <= 0;			
+--	
+--		ELSIF FALLING_EDGE (CLK7) AND B2000 = '0' THEN
+--			
+--			IF (eclk_counter < 6) THEN
+--				eclk <= '0';
+--			ELSE
+--				eclk <= '1';
+--			END IF;
+--			
+--			IF (eclk_counter = 9) THEN
+--				eclk_counter <= 0;
+--			ELSE			
+--				eclk_counter <= eclk_counter +1;
+--			END IF;
+--			
+--		END IF;
+--			
+--	END PROCESS;
 	
 	--THIS IS OUR E SYNC SIGNAL AND IS ONE 7MHz CLOCK BEHIND E. THIS GIVES US
 	--A WAY TO DETECT THE E FALLING EDGE, WHICH TELLS US WHEN A NEW E CYCLE STARTS.	
 	
-	PROCESS (basis7m) BEGIN
+	PROCESS (CLK7) BEGIN
 		
-		IF FALLING_EDGE (basis7m) THEN
+		IF FALLING_EDGE (CLK7) THEN
 			esync <= E;
 		END IF;
 		
@@ -398,15 +409,45 @@ begin
 	--WE USE THIS COUNTER SO WE KNOW WHEN TO ASSERT _VMA AS IT TRACKS WHERE WE ARE IN THE E CYCLE.
 	--THE COUNTER GOES FROM 0 TO 9 TO ACCOUNT FOR THE 10 TOTAL CLOCKS IN AN E CYCLE, BUT IS ONE CLOCK BEHIND.
 	
-	PROCESS (basis7m) BEGIN	
+	PROCESS (CLK7, nRESET) BEGIN	
+		
+		IF nRESET = '0' THEN
+		
+			vmacycle <= '0';
+			edsack <= '0';
 
-		IF FALLING_EDGE (basis7m) THEN
+		ELSIF FALLING_EDGE (CLK7) THEN
+		
+			--VMA COUNTER
 			IF E = '0' AND esync = '1' THEN
 				--RESET THE COUNTER
 				vmacount <= 0;		
 			ELSE
 				vmacount <= vmacount + 1;
 			END IF;
+			
+			--REPSPOND TO _VPA IN 6800 CYCLES
+			--THIS FEEDS INTO THE 68000 STATE MACHINE TO 
+			--SIGNAL THE END OF THE CYCLE.
+			IF nVPA = '0' THEN
+			
+				IF vmacount = 1 THEN
+				
+					vmacycle <= '1';
+					
+				ELSIF nVMA = '0' AND vmacount = 7 THEN
+				
+					edsack <= '1';
+					
+				END IF;
+				
+			ELSE
+			
+				vmacycle <= '0';
+				edsack <= '0';
+				
+			END IF;
+			
 		END IF;
 		
 	END PROCESS;
@@ -450,8 +491,8 @@ begin
 	nADOEH <= '0' 
 		WHEN 
 			--( nBOSS = '0' AND nBGACK = '1' AND MEMACCESS = '0' AND nAS = '0' AND nONBOARD = '1' AND nEXTERN = '1' ) 
-			--( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0' AND nAS = '0' ) OR
-			( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0') OR --NEW TRY. nAS IS ALREADY CONSIDERED IN THE SMDIS LOGIC.
+			( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0' AND nAS = '0' ) OR
+			--( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0') OR --NEW TRY. nAS IS ALREADY CONSIDERED IN THE SMDIS LOGIC.
 			--( nBOSS = '0' AND nBGACK = '1' AND sm_enabled = '1' AND nAS = '0' ) OR ==>NOOOOOOOOOOOOOOOOOOOOOOOOOO!!!!!!!<==
 			( nBOSS = '0' AND nBGACK = '0' AND nMEMZ2 = '0' AND nAAS = '0' AND A(1) = '1' )  
 			--OR ( nBOSS = '1' AND MODE68K = '1' AND nBGACK = '1' AND nMEMZ2 = '0' AND nAAS = '0' ) 
@@ -533,7 +574,8 @@ begin
 	--RESOURCES ON OUR CARD. WE ARE GOING AFTER SOMETHING ON THE AMIGA 2000.
 	
 	sm_enabled <= '1' 
-		WHEN 
+		WHEN
+			nAS = '0' AND
 			SMDIS = '0' AND 
 			nBGACK = '1' AND 
 			FC ( 2 downto 0 ) /= "111" AND
@@ -545,236 +587,134 @@ begin
 	-- 68000 STATE MACHINE --
 	-------------------------
 
---	PROCESS (nAS) BEGIN
---	
---		IF FALLING_EDGE(nAS) THEN
---		
---			--PREP THE DATA STROBES
---			IF A(0) = '0' THEN
---				nUDSOUT <= '0';
---			ELSE
---				nUDSOUT <= '1';
---			END IF;
---
---			IF SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' THEN
---				nLDSOUT <= '0';
---			ELSE
---				nLDSOUT <= '1';
---			END IF;	
---			
---		END IF;
---		
---	END PROCESS;
+	--DSACK1 PROCESS
+	PROCESS (CPUCLK, nRESET) BEGIN
 	
-	
-	--THIS IS HOW THE 68030 COMMUNICATES WITH THE AMIGA 2000 BOARD, WHICH ONLY 
-	--UNDERSTANDS MC68000. WITH THIS STATE MACHINE, WE SLOW THINGS DOWN
-	--BY USING THE 7MHz CLOCK TO HELP SUPPLY 68000 COMPATABLE SIGNALS AND TIMINGS.
-	
-	--LOTS OF STUFF GOING ON HERE. WE MUST CONSIDER BOTH 6800 AND 68000 DATA TRANSFERS AND
-	--WE MUST SUPPLY THE APPROPRIATE SUPPORTING SIGNALS AT THE CORRECT TIME. 
-	
-	--DO NOT START A 68000/6800 CYCLE ON DMA, FPU, IDE, OR ON BOARD MEMORY ACCESS.
-
-	--THE CHALLENGE HERE IS TO GET THE TIMINGS OF THE 68000 BASED A2000 TO MATCH UP
-	--WITH THE TIMINGS OF THE 68030 ON OUR CARD, WHICH CAN RUN ANYWHERE UP TO 50MHz.
-	--ANOTHER VARIABLE IS THE STATES OF THE TWO ARCHITECTURES ARE NOT ALIGNED.
-	--IF THE TIMINGS ARE NOT RIGHT OR WE GET OFF A STATE, THE SYSTEM WILL STOP RESPONDING
-	--DUE TO MISSED SIGNALS OR CORRUPTED DATA FROM POORLY TIMED LATCHING.
+		IF nRESET = '0' THEN
 		
-	--68000 DATA STROBE OUTPUTS
-	--FOR 68000 DATA STROBES, SEE TABLE 7-7 (pp7-23) IN 68030 MANUAL
-	--nUDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D31:24 (UPPER BYTE)
-	--nLDS IS ASSERTED ANYWHERE WE SEE W (WORD) IN COLUMN D23:16 (LOWER BYTE)	
-	
---	PROCESS (CPUCLK) BEGIN
---	
---		IF RISING_EDGE (CPUCLK) THEN
---		
---			--SET AMIGA DATA STROBES
---			IF STATE7 = '0' AND ((cycle = '1' AND RnW = '1') OR dsenable = '1') THEN
---			
---				nUDS <= nUDSOUT;
---				nLDS <= nLDSOUT;
---					
---			ELSIF sm_enabled = '1' THEN
---			
---				nUDS <= '1';
---				nLDS <= '1';
---				
---			ELSE 
---			
---				nUDS <= 'Z';
---				nLDS <= 'Z';
---				
---			END IF;
---			
---			--SET AMIGA ADDRESS STROBE
---			IF cycle = '1' AND STATE7 = '0' THEN 
---			
---				nAAS <= '0';
---			
---			ELSIF sm_enabled = '1' THEN
---			
---				nAAS <= '1'; 
---			
---			ELSE 
---			
---				nAAS <= 'Z';
---				
---			END IF;
---		
---		END IF;
---		
---		--SET R/W
---		IF sm_enabled = '1' THEN
---			
---			ARnW <= arwout;
---			
---		ELSE
---		
---			ARnW <= 'Z';
---			
---		END IF;
---		
---	END PROCESS;
-	
-	--nUDS <= nUDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	--nLDS <= nLDSOUT WHEN dsenable = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	
-	nUDS <= nUDSOUT 
-		WHEN ( STATE7 = '0' OR nVMA = '0' ) AND ((cycle = '1' AND RnW = '1') OR dsenable = '1')
-		ELSE '1' WHEN sm_enabled = '1' 
-		ELSE 'Z';
+			dsackcycle <= '0';
+	  
+		ELSIF RISING_EDGE (CPUCLK) THEN
+		 
+			IF sm_enabled = '1' THEN
+				 
+				IF nAS = '0' AND (dsacken = '1' OR nDSACK1 = '0') THEN
+					 
+					dsackcycle <= '1';
 
---	nUDS <= nUDSOUT 
---		WHEN dsenable = '1' AND RnW = '0' --FOR WRITES
---		ELSE '0' WHEN cycle = '1' AND RnW = '1' --ALWAYS RETURN 16 BIT READS FOR CACHING (pp7-26 68030 Manual)
---		ELSE '1' WHEN sm_enabled = '1' 
---		ELSE 'Z';
-		
-	nLDS <= nLDSOUT 
-		WHEN ( STATE7 = '0' OR nVMA = '0' ) AND ((cycle = '1' AND RnW = '1') OR dsenable = '1')
-		ELSE '1' WHEN sm_enabled = '1' 
-		ELSE 'Z';
-
---	nLDS <= nLDSOUT 
---		WHEN dsenable = '1' AND RnW = '0' --FOR WRITES
---		ELSE '0' WHEN cycle = '1' AND RnW = '1' --ALWAYS RETURN 16 BIT READS FOR CACHING (pp7-26 68030 Manual)
---		ELSE '1' WHEN sm_enabled = '1' 
---		ELSE 'Z';
-	
-	--AMIGA ADDRESS STROBE AND AMIGA READ/WRITE SIGNALS ARE HERE.
-	--THERE ARE HERE AND NOT "INSIDE" THE STATE MACHINE SO THEY ASSERT
-	--TOGETHER AND WITH THE ADDRESS STROBES. THERE WAS SOME DELAY ISSUES
-	--WHEN THEY WERE "IN" THE STATE MACHINE CODE.
-	
-	--nAAS <= '0' WHEN cycle = '1' AND STATE7 = '0' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z'; --THIS FAILS TO ASSERT SOMETIMES!
-	--nAAS <= '0' WHEN cycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	nAAS <= aasout WHEN cycle = '1' AND ( STATE7 = '0' OR nVMA = '0' ) ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	--ARnW <= arwout WHEN cycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';	
-	ARnW <= arwout WHEN sm_enabled = '1' ELSE 'Z';	
-
-	--THE STATE MACHINE
-	
-	--THIS IS A SIMPLE SHIFT REGISTER TO TRACK THE EDGES OF THE 7MHz CLOCK
---	PROCESS (CPUCLK) BEGIN
---	
---		IF RISING_EDGE (CPUCLK) THEN
---		
---			edge(0) <= edge(1);
---			edge(1) <= basis7m;
---			
---		END IF;	
---		
---		IF edge = "10" THEN
---			--THIS IS THE FALLING EDGE
---			lastedge <= '0';
---		ELSIF edge = "01" THEN
---			--THIS IS THE RISING EDGE
---			lastedge <= '1';
---		END IF;
---		
---	END PROCESS;
-
-	PROCESS (basis7m, sm_enabled) BEGIN
-
-		IF sm_enabled = '0' THEN
-		
-			--RESET THE STATE MACHINE SIGNALS
+				ELSE
+				 
+					dsackcycle <= '0';
+				 
+				END IF;
+				 
+			ELSE
+				 
+				 dsackcycle <= '0';
+			 
+			END IF;
 			
-			nVMA <= 'Z';			
-			cycle <= '0';
-			DSACKEN <= '0';
-			dsenable <= '0';
-			STATE7EN <= '0';
+		END IF;
+		
+	END PROCESS;
 
-			--SET CURRENT STATE TO S0
+	--DATA TRANSFER SIGNALS
+	nUDS <= udsout WHEN writecycle = '1' OR readcycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	nLDS <= ldsout WHEN writecycle = '1' OR readcycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	nAAS <= nAS WHEN ascycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	ARnW <= RnW WHEN rwcycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	nVMA <= '0' WHEN vmacycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	nDSACK1 <= '0' WHEN dsackcycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+		 
+	--68000 STATE MACHINE PROCESS
+
+	PROCESS (CLK14, sm_enabled, nRESET) BEGIN
+
+		IF sm_enabled = '0' OR nRESET = '0' THEN		
+		 
+			--THE STATE MACHINE IS DISABLED
+
 			CURRENT_STATE <= S0;
+			
+			ldsout <= '1';
+			udsout <= '1';
+			
+			ascycle <= '0';
+			rwcycle <= '0';
+			readcycle <= '0';
+			writecycle <= '0';
+			dsacken <= '0';
 
-		ELSIF RISING_EDGE (basis7m) THEN
+		ELSIF RISING_EDGE (CLK14) THEN
+		
+			--BEGIN 68000 STATE MACHINE--
 			
-			--MOST OF THE INTERESTING STATES ARE FIRED ON THE RISING EDGE.
-			--THE ONLY EXCEPTION IS S7, WHICH IS ON THE FALLING EDGE.
-			
-			--NOW, THE STATE MACHINE
-			
+			--PREP THE DATA STROBES--
+			IF A(0) = '0' THEN
+				udsout <= '0';
+			ELSE
+				udsout <= '1';
+			END IF;
+
+			IF SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' THEN
+				ldsout <= '0';
+			ELSE
+				ldsout <= '1';
+			END IF;	
+		 
 			CASE (CURRENT_STATE) IS
 
 				WHEN S0 =>
 
-					--STATE 0 IS THE START OF A CYCLE.
-					--WATCH FOR ASSERTION OF _AS TO TRIGGER THE START OF A CYCLE.
-					--WE WANT TO WAIT UNTIL THE 7MHz CLOCK IS HIGH SO WE START IN STATE 0, NOT STATE 1.					
-					--WE CONSIDER _DSACK1 TO ENSURE WE DON'T START IF THE PREVIOUS
-					--CYCLE IS NOT YET COMPLETE IN A BACK-TO-BACK SITUATION.
+					--STATE 0 IS THE START OF A CYCLE. 
+					--WE MAKE SURE TO START ON THE CORRECT EDGE BY SAMPLING CDAC.					
+
+					IF CDAC = '1' THEN
+
+						CURRENT_STATE <= S1;
+						  
+					ELSE
+						
+						CURRENT_STATE <= S0;
+
+					END IF;
+
+				WHEN S1 =>            
+
+					--PROCESSOR DRIVES A VALID ADDRESS ON THE BUS IN STATE 1. 
+					--NOTHING MUCH FOR US TO DO.
+					--SET UP FOR STATE 2.
+
+					CURRENT_STATE <= S2;
 					
-					--DSACKEN <= '0';		
-
-					--HOLD THE _VMA SIGNAL.
-					nVMA <= '1';	
-
-					--SET THE READ/WRITE SIGNAL
-					arwout <= RnW;					
-
-					IF nAS = '0' AND nDSACK1 = '1' THEN
-					
-						CURRENT_STATE <= S2;	
+					ascycle <= '1';
+					rwcycle <= '1';
 						
-						--PREP THE DATA STROBES
-						
-						IF A(0) = '0' THEN
-							nUDSOUT <= '0';
-						ELSE
-							nUDSOUT <= '1';
-						END IF;
-
-						IF SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' THEN
-							nLDSOUT <= '0';
-						ELSE
-							nLDSOUT <= '1';
-						END IF;	
-						
-						--ACTIVATE nAAS AND ARnW
-						cycle <= '1';
-						
-						aasout <= '0';
-						
-						--DURING A READ CYCLE, ASSERT DATA STROBES WITH THE ADDRESS STROBE.
-						--IF RnW = '1' THEN						
-							
-						--	dsenable <= '1';
-
-						--END IF;
-
+					IF RnW = '1' THEN
+						readcycle <= '1';
+					ELSE
+						readcycle <= '0';
 					END IF;
 
 				WHEN S2 =>
 
-					CURRENT_STATE <= S4;
+					--ASSERT _AAS FOR ALL CYCLES
+					--ASSERT _LDS, AND _UDS FOR READ CYCLES
+					--GO TO STATE 3
 
-					--DURING A WRITE CYCLE, ASSERT DATA STROBES AT S4.	
-					dsenable <= '1';
+					CURRENT_STATE <= S3;
+
+				WHEN S3 =>
+
+					--PROCEED TO STATE 4.
+					--DURING WRITE CYCLES, _LDS AND _UDS ARE ASSERTED ON THE RISING EDGE OF STATE 4.
+
+					CURRENT_STATE <= S4;
+					IF RnW = '0' THEN 
+						writecycle <= '1'; 
+					ELSE 
+						writecycle <= '0'; 
+					END IF;
 
 				WHEN S4 =>
 
@@ -783,139 +723,55 @@ begin
 					--IF THIS IS A 68000 CYCLE, LOOK FOR ASSERTION OF _DTACK.
 					--IF THIS IS A 68000 WRITE CYCLE, ASSERT THE DATA STROBES HERE (SET PREVIOUSLY).
 
-					IF nVPA = '0' THEN
-						--THIS IS A 6800 CYCLE, WE WAIT HERE UNTIL THE
-						--APPROPRIATE TIME IS REACHED ON E TO ASSERT _VMA, WHICH IS 
-						--BETWEEN 3 AND 4 CLOCK CYCLES AFTER E GOES TO LOGIC LOW.
-							
---						IF nVMA = '1' AND (vmacount = 1 OR vmacount = 2) THEN
---								
---							nVMA <= '0';
---							DSACKEN <= '1';
---							
---						ELSIF nVMA = '0' AND vmacount = 7 THEN
---							
---							STATE7EN <= '1';
---						
---						ELSIF nVMA = '0' AND vmacount = 8 THEN						
---							
---							--NOW WAIT UNTIL WE ARE ON THE RIGHT SPOT IN E TO LATCH THE DATA.
---							--ACCORING TO THE MC6800 MANUAL, THE TIME FROM ASSERTION OF _VMA
---							--TO THE TIME DATA BECOMES VALID FOR A READ IS 605ns. THIS IS 
---							--APPROX 4.3 7.16MHz CLOCK CYCLES.
---							
---							CURRENT_STATE <= S6;
---							DSACKEN <= '0';
---							STATE7EN <= '0';
---						
---						END IF;			
+					IF nDTACK = '0' OR nBERR = '0' OR edsack = '1' THEN
 
-						IF nVMA = '1' AND (vmacount = 1 OR vmacount = 2) THEN
-								
-							nVMA <= '0';	
+						--WHEN THE TARGET DEVICE HAS ASSERTED _DTACK OR _BERR, WE CONTINUE ON.
+						--IF THIS IS A 6800/6502 (CIA) CYCLE, WE WAIT UNTIL E IS HIGH TO PROCEED.
+						--OTHERWISE, INSERT WAIT STATES UNTIL ONE OF THESE CONDITIONS IS SATISFIED.
+
+						CURRENT_STATE <= S5;
 						
-						ELSIF nVMA = '0' AND vmacount = 8 THEN						
-							
-							--NOW WAIT UNTIL WE ARE ON THE RIGHT SPOT IN E TO LATCH THE DATA.
-							--ACCORING TO THE MC6800 MANUAL, THE TIME FROM ASSERTION OF _VMA
-							--TO THE TIME DATA BECOMES VALID FOR A READ IS 605ns. THIS IS 
-							--APPROX 4.3 7.16MHz CLOCK CYCLES.
-							
-							CURRENT_STATE <= S6;
-							DSACKEN <= '1';
-							STATE7EN <= '1';
-						
-						END IF;	
-							
 					ELSE
-								
-						IF (nDTACK = '0' OR nBERR = '0') THEN
-
-							--WHEN THE TARGET DEVICE HAS ASSERTED _DTACK OR _BERR, WE CONTINUE ON.
-							--OTHERWISE, INSERT WAIT STATES UNTIL _DTACK OR _BERR IS ASSERTED.
-									
-							CURRENT_STATE <= S6;
-							DSACKEN <= '1';
-							STATE7EN <= '1';
-							
-						END IF;
+						
+						CURRENT_STATE <= S4;
 
 					END IF;
 
+				WHEN S5 =>
+
+					--NOTHING HAPPENS HERE. GO TO STATE 6.
+
+					CURRENT_STATE <= S6;
+
 				WHEN S6 =>
 
-					--AT S6, DATA IS PLACED ON THE BUS WHEN READING.
-					--WE ASSERT _DSACK1 ON THE RISING EDGE OF THE 25MHZ
-					--CLOCK WHEN STATE7 AND DSACKEN ARE BOTH HIGH. WE ARE LATCHING
-					--THE DATA ON READ SO WE HAVE AN ENTIRE CLOCK CYCLE TO GET IT.
+					--DURING READ CYCLES, THE DATA IS DRIVEN ON TO THE BUS DURING STATE 6.
+					--THE 68000 NORMALLY LATCHES DATA ON THE FALLING EDGE OF STATE 7.
+					--FOR 6800 CYCLES, E FALLS WITH THE FALLING EDGE OF STATE 7.
 
+					CURRENT_STATE <= S7;
+					dsacken <= '1';
+
+					--FOR ALL CYCLES, WE NEGATE _AAS, _LDS, AND _UDS IN STATE 7.
+					ascycle <= '0';
+					writecycle <= '0';
+					readcycle <= '0';
+
+				WHEN S7 =>
+
+					--ONCE WE ARE IN STATE 7, WE NEGATE dsacken AND ALLOW THE _DSACK1 PROCESSS
+					--TO DO IT'S THING.
+					dsacken <= '0';
+
+					--READ/WRITE AND _VMA ARE HELD UNTIL THE RISING EDGE OF STATE 0.
+					--NEGATING THEM TOO SOON WILL MESS UP THE CYCLE.
 					CURRENT_STATE <= S0;
-					
-					cycle <= '0';
-					
-					nVMA <= '1';
-					arwout <= '1';
-					aasout <= '1';
-					dsenable <= '0';					
-					STATE7EN <= '0';
-					DSACKEN <= '0';					
+					rwcycle <= '0';
 
 			END CASE;
-
-		END IF;
-
-	END PROCESS;
-	
-	--THIS PROCESS ASSERTS _DSACK1 WHEN DSACKEN AND STATE7 ARE ASSERTED.
-	--IT CONTINUES TO ASSERT _DSACK1 UNTIL _AS IS NEGATED.
-
-	PROCESS (CPUCLK) BEGIN
-
-		--ASSERT _DSACK1 DURING STATE 7 AND HOLD UNTIL _AS IS NEGATED.
-
-		IF RISING_EDGE (CPUCLK) THEN
-
-			IF sm_enabled = '1' THEN			
-
-				IF STATE7 = '1' AND DSACKEN = '1' AND nAS = '0' THEN 
-
-					--ASSERT _DSACK1.
-					nDSACK1 <= '0';
-
-				ELSIF nDSACK1 = '0' AND nAS = '0' THEN
-
-					--HOLD _DSACK1 WHILE _AS IS ASSERTED.
-					nDSACK1 <= '0';
 				
-				ELSE
-
-					--WE ARE IN A STATE MACHINE CYCLE, BUT NOT READY TO ASSERT.
-					nDSACK1 <= '1';
-					
-				END IF;
-
-			ELSE
-
-				--WE ARE NOT IN A CYCLE.
-				nDSACK1 <= 'Z';
-
-			END IF;
-
 		END IF;
-
-	END PROCESS;
-	
-	
-	--THIS PROCESS DETERMINES WHEN WE ARE IN STATE 7.
-	
-	PROCESS (basis7m) BEGIN
-
-		IF FALLING_EDGE (basis7m) THEN 
-		
-			STATE7 <= STATE7EN;	
-
-		END IF;
-
+			
 	END PROCESS;
 
-end Behavioral;
+END Behavioral;
