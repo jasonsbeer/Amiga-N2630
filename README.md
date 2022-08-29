@@ -19,6 +19,7 @@ Before installing, it is necessary to determine if you have an early, non-cost r
 By default, the N2630 starts in 68030 mode. When in 68030 mode, all installed RAM and the IDE/ATA device port are active.
 
 ## 68000 Mode
+When desired, the 68030 may be disabled during a cold or warm start. This results in the Amiga falling back to using the 68000 processor. This may be desired when software does not run correctly on the 68030 processor. To start up in 68000 mode, hold down both mouse buttons during startup. A window will appear allowing the user to select either the 68030 or 68000. Select "68000" and the Amiga will reset with the 68000 as the active processor. When in 68000 mode, the IDE/ATA port and Zorro 3 RAM are inactive. The Zorro 2 RAM continues to be available.
 
 ## FAST RAM
 The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM is the successor to Fast Page Memory found in devices such as the Amiga 3000, A2630 processor card, and other computers of the time. SDRAMs are a very cost effictive way to supply memory to older systems and are readily available either new or from unused memory modules. 
@@ -58,6 +59,9 @@ The N2630 includes an AUTOBOOT<sup>[A]</sup> ATA/IDE port compatable with hard d
 
 ## 68882 Math Coprocessor (FPU)
 The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the 68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 4, J202). The PLCC-68 footprint is supported, which is available up to 40MHz.
+
+## Unix (Amix)
+The N2630 card should fully support Amiga Unix (Amix). In order to boot into a Unix environment, you must place a jumper at J304. (Table 2.) Although this feature is fully supported by the A2630 ROMs, it has not been tested with the N2630 at this time.
 
 ## Other Jumper Settings
 In the following tables, OPEN indicates no jumper. Shorted indicates the presence of a jumper on the pins indicated. All jumpers must be set correctly or you may encounter unexpected bahaviors or failure to boot.
