@@ -16,8 +16,8 @@ NET "nBOSS"			LOC = "P21" ;
 NET "nBGACK"		LOC = "P22" ;
 NET "SMDIS"			LOC = "P23" ;
 NET "nBERR"			LOC = "P24" ;
-NET "REF"			LOC = "P25" ;
-NET "REFACKZ2"		LOC = "P26" ;
+//NET "REF"			LOC = "P25" ;
+//NET "REFACKZ2"		LOC = "P26" ;
 NET "J404"			LOC = "P27" ;
 
 NET "CPUCLK"		LOC = "P30" ;

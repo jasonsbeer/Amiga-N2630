@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    AUGUST 25, 2022 
+-- Create Date:    AUGUST 29, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -32,7 +32,7 @@
 -- Revision 1.0 - Original Release
 -- Additional Comments: SPECIAL THANKS TO DAVE HAYNIE FOR RELEASING THE A2630 PAL LOGIC EQUATIONS.
 --                      ORIGINAL PAL EQUATIONS BY C= COMMODORE.
---                      TRANSLATIONS AND ORIGINAL EQUATIONS FOR THE A30 PROJECT BY JASON NEUS.
+--                      TRANSLATIONS AND ORIGINAL EQUATIONS FOR THE N2630 PROJECT BY JASON NEUS.
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -52,7 +52,7 @@ PORT
 (
 
 	RnW : IN STD_LOGIC; --680x0 READ/WRITE
-	REF : IN STD_LOGIC; --SDRAM REFRESH SIGNAL
+	--REF : IN STD_LOGIC; --SDRAM REFRESH SIGNAL
 	CPUCLK : IN STD_LOGIC; --68030 CLOCK
 	A : IN STD_LOGIC_VECTOR (23 DOWNTO 0); --680x0 ADDRESS LINES, ZORRO 2 ADDRESS SPACE
 	nAS : IN STD_LOGIC; --68030 ADDRESS STROBE
@@ -77,7 +77,7 @@ PORT
 	nBOSS : IN STD_LOGIC; --BOSS SIGNAL
 	
 	nMEMZ2 : INOUT STD_LOGIC; --ARE WE ACCESSING ZORRO 2 RAM ADDRESS SPACE
-	REFACKZ2 : INOUT STD_LOGIC; --REFRESH ACK
+	--REFACKZ2 : INOUT STD_LOGIC; --REFRESH ACK
 	CONFIGED : INOUT STD_LOGIC; --ARE WE AUTOCONFIGED?
 	D : INOUT STD_LOGIC_VECTOR (31 DOWNTO 28); --68030 DATA BUS
 	nCSROM : INOUT STD_LOGIC; --ROM CHIP SELECT
@@ -145,6 +145,10 @@ architecture Behavioral of U601 is
 	SIGNAL CURRENT_STATE : SDRAM_STATE; --CURRENT SDRAM STATE
 	SIGNAL SDRAM_START_REFRESH_COUNT : STD_LOGIC; --WE NEED TO REFRESH TWICE UPON STARTUP
 	SIGNAL COUNT : INTEGER RANGE 0 TO 2 := 0; --COUNTER FOR SDRAM STARTUP ACTIVITIES
+	signal refresh : STD_LOGIC := '0'; --SIGNALS TIME TO REFRESH
+	
+	SIGNAL REFRESH_COUNTER : INTEGER RANGE 0 TO 255 := 0;
+	CONSTANT REFRESH_DEFAULT : INTEGER := 185; --25MHz REFRESH COUNTER
 
 	--AUTOCONFIG SIGNALS
 	SIGNAL autoconfigspace : STD_LOGIC := '0'; --AUTOCONFIG ADDRESS SPACE
@@ -212,6 +216,36 @@ begin
 	--THIS MEANS WE COULD TIE IT TO GROUND?
 	--nAAENA <= '0' WHEN nBOSS = '0' OR MODE68K = '1' ELSE '1'; 
 	nAAENA <= nBOSS;
+	
+	---------------------
+	-- REFRESH COUNTER --
+	---------------------
+	
+	PROCESS (CPUCLK, nRESET) BEGIN
+	
+		IF nRESET = '0' THEN
+		
+			REFRESH_COUNTER <= 0;
+			
+		ELSIF RISING_EDGE (CPUCLK) THEN
+		
+			REFRESH_COUNTER <= REFRESH_COUNTER + 1;
+				
+			IF CURRENT_STATE = AUTO_REFRESH THEN
+			
+				refresh <= '0';
+				
+			ELSIF refresh = '1' OR (REFRESH_COUNTER = REFRESH_DEFAULT) THEN
+			
+				refresh <= '1';
+				REFRESH_COUNTER <= 0;
+				
+			END IF;
+			
+		END IF;
+		
+	END PROCESS;
+	
 	
 	---------------
 	-- RAM STUFF --
@@ -363,7 +397,6 @@ begin
 				CLKE <= '0';
 				COUNT <= 0;
 				nDTACK <= 'Z';
-				REFACKZ2 <= '0';
 				dsack <= '1';
 		
 		ELSIF ( FALLING_EDGE (CPUCLK) ) THEN
@@ -379,31 +412,16 @@ begin
 			--ACKNOWLEDGE THE REFRESH BY ASSERTING REFACK2. WE ASSERT REFACK2 UNTIL
 			--REF IS NEGATED.
 			
-			IF (REF = '1') THEN
-			
-				IF (REFACKZ2 = '0') THEN
+			IF (refresh = '1') THEN
 				
-					--TIME TO REFRESH THE SDRAM, BUT ONLY IF WE ARE NOT IN THE MIDDLE OF A MEMORY ACCESS CYCLE
-					IF nMEMZ2 = '1' THEN
-					
-						CURRENT_STATE <= AUTO_REFRESH;
-						nZWE <= '1';
-						nZRAS <= '0';
-						nZCAS <= '0';
-						nZCS <= '0';
-						
-						REFACKZ2 <= '1';
-						
-					END IF;
-					
-				END IF;
-					
-			ELSE
+				--TIME TO REFRESH THE SDRAM, BUT ONLY IF WE ARE NOT IN THE MIDDLE OF A MEMORY ACCESS CYCLE
+				IF nMEMZ2 = '1' THEN
 				
-				IF (REFACKZ2 = '1') THEN
-				
-					--NEGATE REFACKZ2
-					REFACKZ2 <= '0';
+					CURRENT_STATE <= AUTO_REFRESH;
+					nZWE <= '1';
+					nZRAS <= '0';
+					nZCAS <= '0';
+					nZCS <= '0';					
 					
 				END IF;
 				
@@ -595,7 +613,7 @@ begin
 						--IN THE EVENT WE HAVE A REFRESH ASSERTED AND WAITING,
 						--WE GO THERE INSTANTLY. OTHERWISE, RETURN TO RUN STATE.
 						
-						IF REF = '0' THEN 
+						IF refresh = '0' THEN 
 						
 							CURRENT_STATE <= RUN_STATE;	
 						
@@ -608,8 +626,6 @@ begin
 							nZRAS <= '0';
 							nZCAS <= '0';
 							nZCS <= '0';	
-						
-							REFACKZ2 <= '1';
 							
 						END IF;
 						
