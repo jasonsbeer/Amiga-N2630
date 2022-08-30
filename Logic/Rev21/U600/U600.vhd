@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    August 28, 2022 
+-- Create Date:    August 29, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC9572 64 PIN
@@ -116,11 +116,13 @@ architecture Behavioral of U600 is
 --	CONSTANT REFRESH_COUNTER_33 : INTEGER := 244;
 --	CONSTANT REFRESH_COUNTER_40 : INTEGER := 296;
 --	CONSTANT REFRESH_COUNTER_50 : INTEGER := 370;
-	CONSTANT REFRESH_COUNTER_DEFAULT : INTEGER := 50; --FOR 7MHZ REFRESH COUNTER
+	--CONSTANT REFRESH_COUNTER_DEFAULT : INTEGER := 350; --50 FOR 7MHZ REFRESH COUNTER
 	
 	--THIS IS THE SDRAM REFRESH COUNTER
 	--SIGNAL REFRESH_COUNTER : INTEGER RANGE 0 TO 511 := 0; --9 BIT NUMBER
-	SIGNAL REFRESH_COUNTER : INTEGER RANGE 0 TO 63 := 0; --6 BIT NUMBER. 63 = 111111
+	--SIGNAL REFRESH_COUNTER : INTEGER RANGE 0 TO 63 := 0; --6 BIT NUMBER. 63 = 111111
+	--SIGNAL refcycle : STD_LOGIC  := '0'; --SIGNIFIES A NEEDED SDRAM REFRESH 
+	--SIGNAL refcomplete : STD_LOGIC := '0'; --SIGNIFIES WHEN REFRESH IS ACKED BY RAM CONTROLLERS
 	
 	--68000 STATE MACHINE SIGNALS
 	SIGNAL ldsout : STD_LOGIC := '1'; --VALUE FOR _LDS
@@ -142,6 +144,7 @@ architecture Behavioral of U600 is
 	--CLOCK SIGNALS
 	SIGNAL CLK7 : STD_LOGIC := '0';
 	SIGNAL CLK14 : STD_LOGIC := '0';
+	--SIGNAL REFCLK : STD_LOGIC := '0';
 
 begin
 
@@ -153,6 +156,8 @@ begin
 	--FROM C1 AND C2 ON THE A2000.
 		
 	CLK7 <= '1' WHEN ( B2000 = '1' AND A7M = '1' ) OR ( B2000 = '0' AND (nC1 = '1' XOR nC3 = '0' )) ELSE '0';	
+	
+	--REFCLK <= CLK7;
 	
 	--This clock is used to latch the interrupt lines between the motherboard
 	--and the 68030.  If this isn't done, you'll get phantom interrupts
@@ -220,22 +225,67 @@ begin
 --		END IF;
 --	END PROCESS;			
 
---	PROCESS (CLK7) BEGIN
---		IF RISING_EDGE(CLK7) THEN
---			IF (REFRESH_COUNTER > REFRESH_COUNTER_DEFAULT) THEN			
+--	PROCESS (CLK7, nRESET) BEGIN
+--	
+--		IF nRESET = '0' THEN
+--		
+--			REFRESH_COUNTER <= 0;
+--			--refcycle <= '0';
+--	
+--		ELSIF RISING_EDGE(CLK7) THEN
+--		
+--			IF (REFRESH_COUNTER > REFRESH_COUNTER_DEFAULT) THEN	
+--			
+--				--refcycle <= '1';
+--				REFRESH_COUNTER <= 0;	
 --				REF <= '1';
---				REFRESH_COUNTER <= 0;				
---			ELSE			
---				REFRESH_COUNTER <= REFRESH_COUNTER + 1;				
---				IF REF = '0' OR (REF = '1' AND REFACKZ2 = '1' AND REFACKZ3 = '1') THEN
---					REF <= '0';
---				ELSE
---					REF <= '1';
---				END IF;
 --				
+--			ELSE			
+--			
+--				REFRESH_COUNTER <= REFRESH_COUNTER + 1;
+--				REF<= '0';
+--				
+----				IF refcomplete = '1' THEN
+----				
+----					refcycle <= '0';
+----					
+----				ELSE
+----				
+----					refcycle <= '1';
+----					
+----				END IF;
+----				
 --			END IF;
 --		END IF;
 --	END PROCESS;		
+
+	--refcomplete <= '1' WHEN REF = '0' OR (REF = '1' AND REFACKZ2 = '1' AND REFACKZ3 = '1') ELSE '0';
+--	REF <= '1' WHEN refcycle = '1' ELSE '0';
+--	
+--	PROCESS (REFCLK, nRESET) BEGIN
+--	
+--		IF nRESET = '0' THEN
+--		
+--			REFRESH_COUNTER <= 0;
+--			
+--		ELSIF RISING_EDGE (REFCLK) THEN
+--		
+--			REFRESH_COUNTER <= REFRESH_COUNTER + 1;
+--			
+--			IF REFRESH_COUNTER > REFRESH_COUNTER_DEFAULT THEN
+--			
+--				refcycle <= '1';
+--				REFRESH_COUNTER <= 0;
+--				
+--			ELSE
+--			
+--				refcycle <= '0';
+--				
+--			END IF;
+--			
+--		END IF;
+--		
+--	END PROCESS;
 
 	---------------------
 	-- REQUEST THE BUS --
@@ -360,7 +410,7 @@ begin
 	--PROCESSOR IS REMOVED FROM THE MOTHERBOARD. WHEN IN "B2000" MODE, WE CAN
 	--USE THE EXISTING E SIGNAL BUT WE MUST REPLY TO _VPA EITHER WAY.
 	
---	E <= 'Z' WHEN B2000 = '1' ELSE eclk;
+	E <= 'Z' WHEN B2000 = '1' ELSE eclk;
 	
 	--E IS A TIMING SIGNAL FOR 6800 BASED PERIPHERLS. THE CIAs USE THE E SIGNAL.
 	--IT IS 6 CLOCK CYCLES LOW AND 4 HIGH AND ASYNCHRONOUS WITH ANY OTHER CLOCK.  
@@ -368,29 +418,29 @@ begin
 	--7MHz CLOCK. WE ONLY CREATE OUR OWN E WHEN WE ARE IN AN "A2000" MACHINE. 
 	--TRIVIA: E MEANS "ENABLE"
 
---	PROCESS (CLK7, nRESET) BEGIN
---	
---		IF nRESET = '0' THEN
---		
---			eclk_counter <= 0;			
---	
---		ELSIF FALLING_EDGE (CLK7) AND B2000 = '0' THEN
---			
---			IF (eclk_counter < 6) THEN
---				eclk <= '0';
---			ELSE
---				eclk <= '1';
---			END IF;
---			
---			IF (eclk_counter = 9) THEN
---				eclk_counter <= 0;
---			ELSE			
---				eclk_counter <= eclk_counter +1;
---			END IF;
---			
---		END IF;
---			
---	END PROCESS;
+	PROCESS (CLK7, nRESET) BEGIN
+	
+		IF nRESET = '0' THEN
+		
+			eclk_counter <= 0;			
+	
+		ELSIF FALLING_EDGE (CLK7) THEN
+			
+			IF (eclk_counter < 6) THEN
+				eclk <= '0';
+			ELSE
+				eclk <= '1';
+			END IF;
+			
+			IF (eclk_counter = 9) THEN
+				eclk_counter <= 0;
+			ELSE			
+				eclk_counter <= eclk_counter +1;
+			END IF;
+			
+		END IF;
+			
+	END PROCESS;
 	
 	--THIS IS OUR E SYNC SIGNAL AND IS ONE 7MHz CLOCK BEHIND E. THIS GIVES US
 	--A WAY TO DETECT THE E FALLING EDGE, WHICH TELLS US WHEN A NEW E CYCLE STARTS.	
