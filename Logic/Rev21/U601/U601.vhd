@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    AUGUST 29, 2022 
+-- Create Date:    AUGUST 31, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -30,9 +30,7 @@
 --
 -- Revision: 
 -- Revision 1.0 - Original Release
--- Additional Comments: SPECIAL THANKS TO DAVE HAYNIE FOR RELEASING THE A2630 PAL LOGIC EQUATIONS.
---                      ORIGINAL PAL EQUATIONS BY C= COMMODORE.
---                      TRANSLATIONS AND ORIGINAL EQUATIONS FOR THE N2630 PROJECT BY JASON NEUS.
+-- Additional Comments: SPECIAL THANKS TO DAVE HAYNIE FOR RELEASING THE A2630 ENGINEERING INFO.
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -101,7 +99,7 @@ PORT
 	nLMBE : OUT STD_LOGIC; --LOWER MIDDLE BYTE ENABLE
 	nLLBE : OUT STD_LOGIC; --LOWER LOWER BYTE ENABLE
 	nDTACK : OUT STD_LOGIC; --68000 DTACK FOR DMA
-	nDSACK0 : OUT STD_LOGIC; --68030 DSACK
+	nDSACK0 : INOUT STD_LOGIC; --68030 DSACK
 	nDSACK1 : OUT STD_LOGIC;
 	nOVR : OUT STD_LOGIC; --DTACK OVERRIDE
 	EMDDIR : OUT STD_LOGIC; --DIRECTION OF MEMORY DATA BUS BUFFERS
@@ -118,7 +116,8 @@ architecture Behavioral of U601 is
 	--MEMORY ACCESS SIGNALS
 	SIGNAL dmaaccess : STD_LOGIC := '0'; --ARE WE IN A DMA MEMORY CYCLE?
 	SIGNAL cpuaccess : STD_LOGIC := '0'; --ARE WE IN A CPU MEMORY CYCLE?
-	SIGNAL dsack : STD_LOGIC := '1'; --FEEDS THE 68030 DSACK SIGNALS
+	SIGNAL dsacken : STD_LOGIC := '0'; --FEEDS THE 68030 DSACK SIGNALS
+	--SIGNAL memcycle : STD_LOGIC := '0'; --ARE WE IN A MEMORY SM CYCLE?
 	
 	--ADDRESS SPACES
 	--SIGNAL chipram : STD_LOGIC:='0';
@@ -163,8 +162,8 @@ architecture Behavioral of U601 is
 	SIGNAL phantomhi : STD_LOGIC := '0'; --PHANTOM HIGH SIGNAL
 	SIGNAL hirom : STD_LOGIC := '0'; --IS THE ROM IN THE HIGH ADDRESS SPACE?
 	SIGNAL lorom : STD_LOGIC := '0'; --IS THE ROM IN THE LOW ADDRESS SPACE?
-	SIGNAL rambaseaddress0 : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --RAM BASE ADDRESS	
-	SIGNAL rambaseaddress1 : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00"; --RAM BASE ADDRESS	
+	CONSTANT rambaseaddress0 : STD_LOGIC_VECTOR (2 DOWNTO 0) := "001"; --RAM BASE ADDRESS	
+	CONSTANT rambaseaddress1 : STD_LOGIC_VECTOR (2 DOWNTO 0) := "010"; --RAM BASE ADDRESS	
 	--SIGNAL acsack : STD_LOGIC := '0'; --DSACK FOR THE AUTOCONFIG
 	
 	--ROM RELATED SIGNALS
@@ -263,9 +262,8 @@ begin
 	--THIS DETECTS A 68030 MEMORY ACCESS
 	cpuaccess <= '1' 
 		WHEN
-			( A(23 DOWNTO 22) = rambaseaddress0 OR A(23 DOWNTO 22) = rambaseaddress1 ) AND
-			ramconfiged = '1' AND 
-			nAS = '0' AND 
+			( A(23 DOWNTO 21) = rambaseaddress0 OR A(23 DOWNTO 21) = rambaseaddress1 ) AND
+			ramconfiged = '1' AND
 			nBGACK = '1' AND 
 			FC(2 downto 0) /= "111"
 		ELSE
@@ -274,7 +272,7 @@ begin
 	--THIS DETECTS A DMA MEMORY ACCESS
 	dmaaccess <= '1'
 		WHEN
-			( A(23 DOWNTO 22) = rambaseaddress0 OR A(23 DOWNTO 22) = rambaseaddress1 ) AND
+			( A(23 DOWNTO 21) = rambaseaddress0 OR A(23 DOWNTO 21) = rambaseaddress1 ) AND
 			ramconfiged = '1' AND 
 			nAAS = '0' AND 
 			nBGACK = '0'
@@ -283,7 +281,7 @@ begin
 			
 	nMEMZ2 <= '0' 
 		WHEN
-			cpuaccess = '1' OR dmaaccess = '1'
+			(cpuaccess = '1' AND nAS = '0') OR dmaaccess = '1'
 		ELSE
 			'1';
 			
@@ -397,7 +395,7 @@ begin
 				CLKE <= '0';
 				COUNT <= 0;
 				nDTACK <= 'Z';
-				dsack <= '1';
+				dsacken <= '0';
 		
 		ELSIF ( FALLING_EDGE (CPUCLK) ) THEN
 			
@@ -405,7 +403,7 @@ begin
 			--ZORRO 2 RAM ACCESSES ARE ALL ASYNCHROUNOUS.
 			
 			--SDRAM is pretty fast. Most operations will complete in less than one 50MHz clock cycle. 
-			--Only AUTOREFRESH takeS more than one clock cycle at 60ns. 			
+			--Only AUTOREFRESH takes more than one clock cycle at 60ns. 			
 			
 			--WE WATCH FOR THE REF(RESH) SIGNAL FROM U600 TO TELL US WHEN TO REFRESH THE SDRAM.
 			--WHEN REF IS ASSERTED, WE WAIT UNTIL WE ARE NOT IN MEMORY CYCLE AND THEN
@@ -565,7 +563,7 @@ begin
 						--IF THIS IS A WRITE ACTION, WE CAN IMMEDIATELY ASSERT _DSACKx.
 						IF (RnW = '0') THEN
 						
-							dsack <= '0';
+							dsacken <= '1';
 							
 						END IF;
 						
@@ -576,6 +574,7 @@ begin
 					--BANK ACTIVATE
 					--SET CAS STATE VALUES SO THEY LATCH ON THE NEXT CLOCK EDGE
 					CURRENT_STATE <= CAS_STATE;
+					
 					ZMA(6 downto 0) <= A(21 downto 15);
 					ZMA(7) <= '0';
 					ZMA(8) <= '0';
@@ -587,6 +586,10 @@ begin
 					nZCAS <= '0';	
 					nZWE <= RnW;	
 					
+					dsacken <= '0';
+					
+					COUNT <= 0;
+					
 				WHEN CAS_STATE =>
 					
 					--IF THIS IS A READ ACTION, THE CAS LATENCY IS 2 CLOCK CYCLES.
@@ -597,18 +600,33 @@ begin
 					nZCAS <= '1';							
 					nZWE <= '1';
 					
-					IF (RnW = '1') THEN
-						
-						--68030 CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
-						--ASSERTING BOTH DSACKs TELLS THE 68030 THAT THIS IS A 32 BIT PORT.
-						dsack <= '0'; 
-						
-					END IF;						
+					IF nMEMZ2 = '0' THEN
 					
-					IF (nMEMZ2 = '1') THEN 
-						--THE ADDRESS STROBE HAS NEGATED INDICATING THE END OF THE MEMORY ACCESS.
+						IF RnW = '1' AND COUNT = 1 THEN
 						
-						dsack <= '1';
+							--68030 CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
+							--ASSERTING BOTH DSACKs TELLS THE 68030 THAT THIS IS A 32 BIT PORT.
+							
+							IF	nDSACK0 = '1' THEN
+							
+								--SIGNAL _DSACKn BE ASSERTED THE FIRST TIME.
+								dsacken <= '1';
+								
+							ELSE
+							
+								--AFTERWARDS, ALLOW THE _DSACKn PROCEDURE TO DO IT'S THING.
+								dsacken <= '0';
+								
+							END IF;
+							
+						ELSE
+						
+							COUNT <= 1;
+							
+						END IF;						
+					
+					ELSE
+						--THE ADDRESS STROBE HAS NEGATED INDICATING THE END OF THE MEMORY ACCESS.
 						
 						--IN THE EVENT WE HAVE A REFRESH ASSERTED AND WAITING,
 						--WE GO THERE INSTANTLY. OTHERWISE, RETURN TO RUN STATE.
@@ -678,12 +696,12 @@ begin
 			
 				IF dsackdelay(DELAYVALUE) = '1' THEN				
 					
-					nDSACK0 <= '1';
+					--nDSACK0 <= '1';
 					nDSACK1 <= '0';
 				
 				ELSIF dsackdelay(DELAYVALUE) = '0' THEN				
 					
-					nDSACK0 <= '1';
+					--nDSACK0 <= '1';
 					nDSACK1 <= '1';
 					
 					dsackdelay(0) <= '1';
@@ -696,22 +714,32 @@ begin
 				--WE ARE IN THE AUTOCONFIG ADDRESS SPACE
 				IF nAS = '0' THEN
 				
-					nDSACK0 <= '1';
+					--nDSACK0 <= '1';
 					nDSACK1 <= '0';
 					
 				ELSE
 				
-					nDSACK0 <= '1';
+					--nDSACK0 <= '1';
 					nDSACK1 <= '1';
 					
 				END IF;
 				
-			ELSIF nMEMZ2 = '0' THEN
+			ELSIF cpuaccess = '1' THEN
 			
-				--WE ARE IN THE SDRAM ADDRESS SPACE
+				--WE ARE IN THE SDRAM ADDRESS SPACE	
+				IF nAS = '0' AND (dsacken = '1' OR nDSACK0 = '0') THEN
+			
+					--ASSERT!
+					nDSACK0 <= '0';
+					nDSACK1 <= '0';
+					
+				ELSE
 				
-				nDSACK0 <= dsack;
-				nDSACK1 <= dsack;
+					--DON'T ASSERT AT THIS TIME.
+					nDSACK0 <= '1';
+					nDSACK1 <= '1';
+					
+				END IF;
 				
 			ELSE
 			
@@ -873,8 +901,8 @@ begin
 	
 		IF nRESET = '0' THEN
 			
-			rambaseaddress0 <= "00";
-			rambaseaddress1 <= "00";
+			--rambaseaddress0 <= "000";
+			--rambaseaddress1 <= "000";
 			ramconfiged <= '0';	
 			
 		ELSIF ( RISING_EDGE (CPUCLK)) THEN
@@ -952,17 +980,12 @@ begin
 							--THIS IS THE ZORRO 2 RAM BASE ADDRESS FOR OUR 8 MEGABYTES.
 							--THERE ARE TWO POSSIBLE SLOTS FOR THIS SPACE...01 AND 10.
 							
-							IF D(31 downto 30) = "01" THEN
+							
 								
-								rambaseaddress0 <= "01";
-								rambaseaddress1 <= "10";
+								--rambaseaddress0 <= "001";
+								--rambaseaddress1 <= "010";
 						
-							ELSE
-								--ADDRESS "10"
-								rambaseaddress0 <= "10";
-								rambaseaddress1 <= "11";
 					
-							END IF;
 								
 							ramconfiged <= '1'; 
 							
