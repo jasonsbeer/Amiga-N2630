@@ -18,7 +18,7 @@ NET "SMDIS"			LOC = "P23" ;
 NET "nBERR"			LOC = "P24" ;
 //NET "REF"			LOC = "P25" ;
 //NET "REFACKZ2"		LOC = "P26" ;
-NET "J404"			LOC = "P27" ;
+//NET "J404"			LOC = "P27" ;
 
 NET "CPUCLK"		LOC = "P30" ;
 NET "CPUCLK"		BUFG = CLK;

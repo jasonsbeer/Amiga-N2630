@@ -62,7 +62,7 @@ PORT
 	nLDS : IN STD_LOGIC; --68000 LOWER DATA STROBE
 	SIZ : IN STD_LOGIC_VECTOR (1 downto 0); --SIZE BUS FROM 68030
 	FC : IN STD_LOGIC_VECTOR (2 downto 0); --68030 FUNCTION CODES
-	J404 : IN STD_LOGIC; --CPU CLOCK SPEED
+	--J404 : IN STD_LOGIC; --CPU CLOCK SPEED
 	OSMODE : IN STD_LOGIC; --J304 UNIX/AMIGA OS
 	nCPURESET : IN STD_LOGIC; --68030 RESET SIGNAL
 	nHALT : IN STD_LOGIC; --68030 HALT
@@ -117,13 +117,19 @@ architecture Behavioral of U601 is
 	SIGNAL dmaaccess : STD_LOGIC := '0'; --ARE WE IN A DMA MEMORY CYCLE?
 	SIGNAL cpuaccess : STD_LOGIC := '0'; --ARE WE IN A CPU MEMORY CYCLE?
 	SIGNAL dsacken : STD_LOGIC := '0'; --FEEDS THE 68030 DSACK SIGNALS
-	--SIGNAL memcycle : STD_LOGIC := '0'; --ARE WE IN A MEMORY SM CYCLE?
+	SIGNAL datamask : STD_LOGIC_VECTOR (3 DOWNTO 0) := "0000"; --DATA MASK
+	SIGNAL sdramcom : STD_LOGIC_VECTOR (3 DOWNTO 0) := "1111"; --SDRAM COMMAND
+	
+	--THE SDRAM COMMAND CONSTANTS ARE: _CS, _RAS, _CAS, _WE
+	CONSTANT ramstate_NOP : STD_LOGIC_VECTOR (3 DOWNTO 0) := "1111"; --SDRAM NOP
+	CONSTANT ramstate_PRECHARGE : STD_LOGIC_VECTOR (3 DOWNTO 0) := "0010"; --SDRAM PRECHARGE ALL;
+	CONSTANT ramstate_BANKACTIVATE : STD_LOGIC_VECTOR (3 DOWNTO 0) := "0011";
+	CONSTANT ramstate_READ : STD_LOGIC_VECTOR (3 DOWNTO 0) := "0101";
+	CONSTANT ramstate_WRITE : STD_LOGIC_VECTOR (3 DOWNTO 0) := "0100";
+	CONSTANT ramstate_AUTOREFRESH : STD_LOGIC_VECTOR (3 DOWNTO 0) := "0001";
+	CONSTANT ramstate_MODEREGISTER : STD_LOGIC_VECTOR (3 DOWNTO 0) := "0000";
 	
 	--ADDRESS SPACES
-	--SIGNAL chipram : STD_LOGIC:='0';
-	--SIGNAL ciaspace : STD_LOGIC:='0';
-	--SIGNAL chipregs : STD_LOGIC:='0';
-	--SIGNAL iospace	 : STD_LOGIC:='0';
 	SIGNAL memaccess : STD_LOGIC := '0';
 	SIGNAL onboard : STD_LOGIC := '0';
 	
@@ -140,9 +146,9 @@ architecture Behavioral of U601 is
 	SIGNAL mc68881 : STD_LOGIC:='0';
 	
 	--DEFINE THE SDRAM STATE MACHINE 
-	TYPE SDRAM_STATE IS ( PRESTART, POWERUP, POWERUP_PRECHARGE, MODE_REGISTER, AUTO_REFRESH, AUTO_REFRESH_CYCLE, RUN_STATE, RAS_STATE, CAS_STATE );
+	TYPE SDRAM_STATE IS ( PRESTART, POWERUP, POWERUP_PRECHARGE, MODE_REGISTER, AUTO_REFRESH_PRECHARGE, AUTO_REFRESH, AUTO_REFRESH_CYCLE, RUN_STATE, RAS_STATE, CAS_STATE );
 	SIGNAL CURRENT_STATE : SDRAM_STATE; --CURRENT SDRAM STATE
-	SIGNAL SDRAM_START_REFRESH_COUNT : STD_LOGIC; --WE NEED TO REFRESH TWICE UPON STARTUP
+	SIGNAL SDRAM_START_REFRESH_COUNT : STD_LOGIC := '0'; --WE NEED TO REFRESH TWICE UPON STARTUP
 	SIGNAL COUNT : INTEGER RANGE 0 TO 2 := 0; --COUNTER FOR SDRAM STARTUP ACTIVITIES
 	signal refresh : STD_LOGIC := '0'; --SIGNALS TIME TO REFRESH
 	
@@ -163,28 +169,13 @@ architecture Behavioral of U601 is
 	SIGNAL hirom : STD_LOGIC := '0'; --IS THE ROM IN THE HIGH ADDRESS SPACE?
 	SIGNAL lorom : STD_LOGIC := '0'; --IS THE ROM IN THE LOW ADDRESS SPACE?
 	CONSTANT rambaseaddress0 : STD_LOGIC_VECTOR (2 DOWNTO 0) := "001"; --RAM BASE ADDRESS	
-	CONSTANT rambaseaddress1 : STD_LOGIC_VECTOR (2 DOWNTO 0) := "010"; --RAM BASE ADDRESS	
-	--SIGNAL acsack : STD_LOGIC := '0'; --DSACK FOR THE AUTOCONFIG
+	CONSTANT rambaseaddress1 : STD_LOGIC_VECTOR (2 DOWNTO 0) := "010"; --RAM BASE ADDRESS
 	
 	--ROM RELATED SIGNALS
 	CONSTANT DELAYVALUE : INTEGER := 1;
 	SIGNAL dsackdelay : STD_LOGIC_VECTOR ( DELAYVALUE DOWNTO 0 ) := (OTHERS => '0') ; --DELAY DSACK CYCLE
 	
 begin
-
-	--chipram <= '1' WHEN A(23 downto 12) >= x"000" AND A(23 downto 12) <= x"1FF"  ELSE '0'; 
-	--chipram		= (cpuaddr:[000000..1fffff]) ;    /* All Chip RAM */ 0-000111111111111111111111
-	--busspace	= (cpuaddr:[200000..9fffff]) ;    /* Main expansion bus */ 001000000000000000000000-100111111111111111111111
-	--ciaspace <= '1' WHEN A(23 downto 12) >= x"A00" AND A(23 downto 12) <= x"BFF" ELSE '0';
-	--ciaspace	= (cpuaddr:[a00000..bfffff]) ;    /* VPA decode */ 101000000000000000000000-101111111111111111111111
-	--extraram	= (cpuaddr:[c00000..cfffff]) ;    /* Motherboard RAM */ 110000000000000000000000-110011111111111111111111
-	--chipregs <= '1' WHEN A(23 downto 12) >= x"D00" AND A(23 downto 12) <= x"DFF" ELSE '0';
-	--chipregs	= (cpuaddr:[d00000..dfffff]) ;    /* Custom chip registers */ 110100000000000000000000-110111111111111111111111
-	--iospace <= '1' WHEN A(23 downto 12) >= x"E80" AND A(23 downto 12) <= x"EFF" ELSE '0';
-	--iospace		= (cpuaddr:[e80000..efffff]) ;    /* I/O expansion bus */ 111010000000000000000000-111011111111111111111111
-	--romspace	= (cpuaddr:[f80000..ffffff]) ;    /* All ROM */ 111110000000000000000000-111111111111111111111111
-
-	--cpuspace <= '1' WHEN FC(2 downto 0) = "111" ELSE '0'; --(cpustate:7)
 
 	---------------------------
 	-- MEMORY DATA DIRECTION --
@@ -216,9 +207,9 @@ begin
 	--nAAENA <= '0' WHEN nBOSS = '0' OR MODE68K = '1' ELSE '1'; 
 	nAAENA <= nBOSS;
 	
-	---------------------
-	-- REFRESH COUNTER --
-	---------------------
+	---------------------------
+	-- SDRAM REFRESH COUNTER --
+	---------------------------
 	
 	PROCESS (CPUCLK, nRESET) BEGIN
 	
@@ -299,78 +290,123 @@ begin
 	-- SDRAM DATA MASK ACTIONS --
 	-----------------------------
 	
-	PROCESS ( CPUCLK ) BEGIN
+	PROCESS (CPUCLK) BEGIN
+	
+		--TRYING TO DEAL WITH METASTABILITY?
+		--ALSO TRIED RISING_EDGE, BOTH HAVE SAME PROBLEMS.
+		--IN GENERAL, ALL THE DATAMASK SIGNALS ARE PROBLEMATIC.
+		--THEY ALL OFTEN FAIL TO RETURN TO LOGIC HIGH (1) 
+		--AND _UUBE AND _LMBE OFTEN OSCILATE, LIKE METASTABILITY.
 		
-		IF ( FALLING_EDGE (CPUCLK) ) THEN
+		--THIS OSCILLATION IS THE SAME AS THE CLOCK FREQUENCY! (25MHz)
+		
+		IF FALLING_EDGE (CPUCLK) THEN
+		
+			IF nMEMZ2 = '0' THEN
+			
+				nUUBE <= datamask(3);
+				nUMBE <= datamask(2);
+				nLMBE <= datamask(1);
+				nLLBE <= datamask(0);
+				
+			END IF;
+			
+		END IF;
+		
+	END PROCESS;
+				
+	--THIS IS HOW THE SIGNALS WERE ORIGINALY ASSERTED. 
+	--CHANGEING TO THE PROCESS ABOVE MADE NO IMPROVEMENT.
+	
+	--nUUBE <= datamask(3) WHEN nMEMZ2 = '0' ELSE '1';
+	--nUMBE <= datamask(2) WHEN nMEMZ2 = '0' ELSE '1';
+	--nLMBE <= datamask(1) WHEN nMEMZ2 = '0' ELSE '1';
+	--nLLBE <= datamask(0) WHEN nMEMZ2 = '0' ELSE '1';	
+	
+	--THIS FOLLOWING PROCESS IS HOW THE DATA MASK BITS ARE SET.
+	--THESE EQUATIONS HAVE BEEN CONFIRMED CORRECT.
+	--I STRIPPED OUT AS MUCH AS POSSIBLE TO STILL HAVE A FUNCTIONING PROCESS.
+	
+	PROCESS ( CPUCLK, nRESET ) BEGIN
+	
+		IF nRESET = '0' THEN 
+		
+			datamask <= "1111";
+		
+		ELSIF ( FALLING_EDGE (CPUCLK) ) THEN
 
 			IF (nMEMZ2 = '0') THEN		
 
-				--ENABLE THE VARIOUS BYTES ON THE SDRAM DEPENDING ON WHAT THE ACCESSING DEVICE IS ASKING FOR. U603
-				--DISCUSSION OF PORT SIZE AND BYTE SIZING IS ALL IN SECTION 12 OF THE 68030 USER MANUAL
-				--WE ALSO INCLUDE BYTE SELECTION FOR DMA.
+				IF RnW = '0' THEN
 				
-				--UPPER UPPER BYTE ENABLE (D31..24)
-				IF 
-				   (( RnW = '1' ) OR
-					(nBGACK = '1' AND A(1 downto 0) = "00" AND nDS = '0') OR
-					(nBGACK = '0' AND nUDS = '0' AND A(1) = '1'))
-				THEN			
-					nUUBE <= '0'; 
-				ELSE 
-					nUUBE <= '1';
-				END IF;
+					--FOR WRITES,
+					--ENABLE THE VARIOUS BYTES ON THE SDRAM DEPENDING ON WHAT THE ACCESSING DEVICE IS ASKING FOR.
+					--DISCUSSION OF PORT SIZE AND BYTE SIZING IS ALL IN SECTION 12 OF THE 68030 USER MANUAL
+					--WE ALSO INCLUDE BYTE SELECTION FOR DMA.
+					
+					--UPPER UPPER BYTE ENABLE (D31..24)
+					IF 
+						(A(1 downto 0) = "00") --OR
+						--(nBGACK = '0' AND nUDS = '0' AND A(1) = '1')
+					THEN			
+						datamask(3) <= '0'; 
+					ELSE 
+						datamask(3) <= '1';
+					END IF;
 
-				--UPPER MIDDLE BYTE (D23..16)
-				IF 
-					(( RnW = '1' ) OR
-					(nBGACK = '1' AND A(1 downto 0) = "01" AND nDS = '0') OR
-					(nBGACK = '1' AND A(1) = '0' AND SIZ(0) = '0' AND nDS = '0') OR
-					(nBGACK = '1' AND A(1) = '0' AND SIZ(1) = '1' AND nDS = '0') OR
-					(nBGACK = '0' AND nLDS = '0' AND A(1) = '1')) 
-				THEN
-					nUMBE <= '0';
+					--UPPER MIDDLE BYTE (D23..16)
+					IF 
+						(A(1 downto 0) = "01") OR
+						(A(1) = '0' AND SIZ(0) = '0') OR
+						(A(1) = '0' AND SIZ(1) = '1') --OR
+						--(nBGACK = '0' AND nLDS = '0' AND A(1) = '1') 
+					THEN
+						datamask(2) <= '0';
+					ELSE
+						datamask(2) <= '1';
+					END IF;
+
+					--LOWER MIDDLE BYTE (D15..8)
+					IF 
+						(A(1 downto 0) = "10") OR
+						(A(1) = '0' AND SIZ(0) = '0' AND SIZ(1) = '0') OR
+						(A(1) = '0' AND SIZ(0) = '1' AND SIZ(1) = '1') OR
+						(A(0) = '1' AND A(1) = '0' AND SIZ(0) = '0') --OR
+						--(nBGACK = '0' AND nUDS = '0' AND A(1) = '0')
+					THEN
+						datamask(1) <= '0';
+					ELSE
+						datamask(1) <= '1';
+					END IF;
+
+					--LOWER LOWER BYTE (D7..0)
+					IF 
+						(A(1 downto 0) = "11") OR
+						(A(0) = '1' AND SIZ(0) = '1' AND SIZ(1) = '1') OR
+						(SIZ(0) = '0' AND SIZ(1) = '0') OR
+						(A(1) = '1' AND SIZ(1) ='1') --OR
+						--(nBGACK = '0' AND nLDS = '0' AND A(1) = '0')
+					THEN
+						datamask(0) <= '0';
+					ELSE
+						datamask(0) <= '1';
+					END IF;	
+				
 				ELSE
-					nUMBE <= '1';
+				
+					--FOR READS, WE RETURN ALL 32 BITS
+					datamask <= "0000";
+					
 				END IF;
-
-				--LOWER MIDDLE BYTE (D15..8)
-				IF 
-				   (( RnW = '1' ) OR
-					(nBGACK = '1' AND A(1 downto 0) = "10" AND nDS = '0') OR
-					(nBGACK = '1' AND A(1) = '0' AND SIZ(0) = '0' AND SIZ(1) = '0' AND nDS = '0') OR
-					(nBGACK = '1' AND A(1) = '0' AND SIZ(0) = '1' AND SIZ(1) = '1' AND nDS = '0') OR
-					(nBGACK = '1' AND A(0) = '1' AND A(1) = '0' AND SIZ(0) = '0' AND nDS = '0') OR
-					(nBGACK = '0' AND nUDS = '0' AND A(1) = '0'))
-				THEN
-					nLMBE <= '0';
-				ELSE
-					nLMBE <= '1';
-				END IF;
-
-				--LOWER LOWER BYTE (D7..0)
-				IF 
-				   (( RnW = '1' ) OR
-					(nBGACK = '1' AND A(1 downto 0) = "11" AND nDS = '0' ) OR
-					(nBGACK = '1' AND A(0) = '1' AND SIZ(0) = '1' AND SIZ(1) = '1' AND nDS = '0') OR
-					(nBGACK = '1' AND SIZ(0) = '0' AND SIZ(1) = '0' AND nDS = '0') OR
-					(nBGACK = '1' AND A(1) = '1' AND SIZ(1) ='1' AND nDS = '0') OR
-					(nBGACK = '0' AND nLDS = '0' AND A(1) = '0'))
-				THEN
-					nLLBE <= '0';
-				ELSE
-					nLLBE <= '1';
-				END IF;	
-
-			ELSE 
-				--DEACTIVATE ALL THE RAM BYTE MASKS
-
-				nUUBE <= '1';
-				nUMBE <= '1';
-				nLMBE <= '1';
-				nLLBE <= '1';
+				
+			ELSE
+			
+				datamask <= "1111";
 
 			END IF;	
+			
 		END IF;
+		
 	END PROCESS;
 	
 	---------------------------
@@ -381,17 +417,19 @@ begin
 	--FALLING EDGE SO THE COMMANDS ARE STABLE AT THE MOMENT THE SDRAM LATCHES THE COMMAND.
 	--SDRAM COMMANDS ALL SIMULATE OK
 	
+	nZCS <= sdramcom(3);
+	nZRAS <= sdramcom(2);
+	nZCAS <= sdramcom(1);	
+	nZWE <= sdramcom(0);	
+	
 	PROCESS ( CPUCLK, nRESET ) BEGIN
 	
 		IF (nRESET = '0') THEN 
+		
 				--THE AMIGA HAS BEEN RESET OR JUST POWERED UP
-				CURRENT_STATE <= PRESTART;
-				SDRAM_START_REFRESH_COUNT <= '0';
-				
-				nZCAS <= '1';
-				nZRAS <= '1';
-				nZWE <= '1';
-				nZCS <= '1';
+				CURRENT_STATE <= PRESTART;				
+				sdramcom <= ramstate_NOP;				
+				SDRAM_START_REFRESH_COUNT <= '0';					
 				CLKE <= '0';
 				COUNT <= 0;
 				nDTACK <= 'Z';
@@ -399,27 +437,23 @@ begin
 		
 		ELSIF ( FALLING_EDGE (CPUCLK) ) THEN
 			
-			--WE CANNOT USE BURST MODE IN Z2 RAM, WHICH ONLY WORKS WITH STERM TERMINATED ACTIONS.
-			--ZORRO 2 RAM ACCESSES ARE ALL ASYNCHROUNOUS.
+			--WE CANNOT USE BURST MODE WITH Z2 RAM, WHICH ONLY WORKS WITH STERM TERMINATED ACTIONS.
+			--ZORRO 2 RAM ACCESSES ARE ALL ASYNCHRONOUS.
 			
 			--SDRAM is pretty fast. Most operations will complete in less than one 50MHz clock cycle. 
 			--Only AUTOREFRESH takes more than one clock cycle at 60ns. 			
 			
-			--WE WATCH FOR THE REF(RESH) SIGNAL FROM U600 TO TELL US WHEN TO REFRESH THE SDRAM.
-			--WHEN REF IS ASSERTED, WE WAIT UNTIL WE ARE NOT IN MEMORY CYCLE AND THEN
-			--ACKNOWLEDGE THE REFRESH BY ASSERTING REFACK2. WE ASSERT REFACK2 UNTIL
-			--REF IS NEGATED.
+			--WHEN REFRESH IS ASSERTED, WE WAIT UNTIL WE ARE NOT IN MEMORY CYCLE.
 			
 			IF (refresh = '1') THEN
 				
-				--TIME TO REFRESH THE SDRAM, BUT ONLY IF WE ARE NOT IN THE MIDDLE OF A MEMORY ACCESS CYCLE
+				--TIME TO REFRESH THE SDRAM, BUT ONLY IF WE ARE NOT IN A MEMORY ACCESS CYCLE
 				IF nMEMZ2 = '1' THEN
-				
-					CURRENT_STATE <= AUTO_REFRESH;
-					nZWE <= '1';
-					nZRAS <= '0';
-					nZCAS <= '0';
-					nZCS <= '0';					
+					
+					--FIRST, PRECHARGE ALL BANKS SO EVERYTHING IS IDLE.
+					CURRENT_STATE <= AUTO_REFRESH_PRECHARGE;					
+					ZMA <= ("10000000000"); --PRECHARGE ALL
+					sdramcom <= ramstate_PRECHARGE;
 					
 				END IF;
 				
@@ -436,10 +470,7 @@ begin
 				
 					CURRENT_STATE <= POWERUP;
 					CLKE <= '0'; --DISABLE CLOCK
-					nZWE <= '1';
-					nZRAS <= '1';
-					nZCAS <= '1';
-					nZCS <= '1'; --NOP STATE					
+					sdramcom <= ramstate_NOP;				
 			
 				WHEN POWERUP =>
 					--First power up or warm reset
@@ -448,20 +479,14 @@ begin
 
 					CURRENT_STATE <= POWERUP_PRECHARGE;
 					ZMA <= ("10000000000"); --PRECHARGE ALL			
-					nZWE <= '0';
-					nZRAS <= '0';
-					nZCAS <= '1';
-					nZCS <= '0';
+					sdramcom <= ramstate_PRECHARGE;
 					CLKE <= '1';
 					
 				WHEN POWERUP_PRECHARGE =>
 				
 					CURRENT_STATE <= MODE_REGISTER;
 					ZMA <= "01000100000"; --PROGRAM THE SDRAM...NO READ OR WRITE BURST, CAS LATENCY=2,
-					nZWE <= '0';
-					nZRAS <= '0';
-					nZCAS <= '0';
-					nZCS <= '0';	
+					sdramcom <= ramstate_MODEREGISTER;
 				
 				WHEN MODE_REGISTER =>
 				
@@ -469,48 +494,36 @@ begin
 					
 					IF (COUNT = 0) THEN
 						--NOP ON THE SECOND CLOCK DURING MODE REGISTER
-						nZWE <= '1';
-						nZRAS <= '1';
-						nZCAS <= '1';
-						nZCS <= '1';
+						sdramcom <= ramstate_NOP;
 					ELSE
 						--NOW NEED TO REFRESH TWICE
 						CURRENT_STATE <= AUTO_REFRESH;
-						nZWE <= '1';
-						nZRAS <= '0';
-						nZCAS <= '0';
-						nZCS <= '0';
+						sdramcom <= ramstate_AUTOREFRESH;
 					END IF;
 					
 					COUNT <= COUNT + 1;
+					
+				WHEN AUTO_REFRESH_PRECHARGE =>
+				
+					--THE TIME BETWEEN PRECHARGE AND AUTOREFRESH WILL BE TIGHT AT 50MHz.
+					--IT NEEDS 21ns BETWEEN THE TWO COMMANDS.
+					CURRENT_STATE <= AUTO_REFRESH;
+					sdramcom <= ramstate_AUTOREFRESH;
 					
 				WHEN AUTO_REFRESH =>
 					--REFRESH the SDRAM
 					--MUST BE FOLLOWED BY NOPs UNTIL REFRESH COMPLETE
 					--Refresh minimum time is 60ns. We must NOP enough clock cycles to meet this requirement.
 					--50MHz IS 20ns PER CYCLE, 40MHz IS 24ns, 33 IS 30ns, 25MHz IS 40ns.
-					--SO, 3 CLOCK CYCLES FOR 50 AND 40 MHz AND 2 CLOCK CYCLES FOR 33 AND 25 MHz.
+					--SO, 3 CLOCK CYCLES FOR 50 AND 40 MHz AND 2 CLOCK CYCLES FOR 33 AND 25 MHz.					
 					
-					--THE WAY THIS REFRESH LOGIC IS WRITTEN, YOU ALWAYS HAVE AN EXTRA CLOCK
-					--AFTER THE REFRESH (NOT DURING STARTUP, THOUGH) AS IT GOES INTO RUN STATE WHEN 
-					--THE 68030 HAS ASSERTED _AS DURING THE REFRESH., RUN_STATE BEING THE "EXTRA" CLOCK.
-					--SO...AUTO_REFRESH -> AUTO_REFRESH_CYCLE -> RUN_STATE -> RAS_STATE.
-					--IDEALLY IT WOULD GO AUTO_REFRESH -> AUTO_REFRESH_CYCLE -> RAS_STATE.
-					--THIS COULD BE A TARGET FOR FUTURE OPTIMIZATION.
-					
-					IF (J404 = '0') THEN
-						--WE NEED TO ADD A CLOCK CYCLE TO ACHEIVE THE MINIMIM REFRESH TIME OF 60ns
-						COUNT <= 0;
-					ELSE
-						--OUR CLOCK IS SLOW ENOUGH TO ACCOMODATE THE 60ns TIME.
-						COUNT <= 1;
-					END IF;
+					--ADD A CLOCK CYCLE TO ACHEIVE THE MINIMIM REFRESH TIME OF 60ns
+					--THIS IS REALLY ONLY NEEDED AT 40MHz AND GREATER, BUT WE COMPROMISE HERE
+					--AND APPLY TO EVERYTHING.
+					COUNT <= 0;
 					
 					CURRENT_STATE <= AUTO_REFRESH_CYCLE;
-					nZWE <= '1';
-					nZRAS <= '1';
-					nZCAS <= '1';
-					nZCS <= '1';
+					sdramcom <= ramstate_NOP;
 					
 				WHEN AUTO_REFRESH_CYCLE =>
 					
@@ -521,21 +534,15 @@ begin
 							--DO WE NEED TO REFRESH AGAIN (STARTUP)?
 						
 							CURRENT_STATE <= AUTO_REFRESH;
-							nZWE <= '1';
-							nZRAS <= '0';
-							nZCAS <= '0';
-							nZCS <= '0';
+							sdramcom <= ramstate_AUTOREFRESH;
 							
 							SDRAM_START_REFRESH_COUNT <= '1';
 							
 						ELSE
 						
+							--GO TO OUR IDLE STATE AND WAIT.
 							CURRENT_STATE <= RUN_STATE;
-							
-							nZCS <= '1';
-							nZRAS <= '1';	
-							nZCAS <= '1';							
-							nZWE <= '1';
+							sdramcom <= ramstate_NOP;
 							
 						END IF;
 						
@@ -555,10 +562,7 @@ begin
 						ZBANK0 <= A(13);
 						ZBANK1 <= A(14);
 						
-						nZCS <= '0';
-						nZRAS <= '0';	
-						nZCAS <= '1';							
-						nZWE <= '1';
+						sdramcom <= ramstate_BANKACTIVATE;
 						
 						--IF THIS IS A WRITE ACTION, WE CAN IMMEDIATELY ASSERT _DSACKx.
 						IF (RnW = '0') THEN
@@ -581,10 +585,13 @@ begin
 					ZMA(9) <= '0';
 					ZMA(10) <= '1'; --PRECHARGE
 					
-					nZCS <= '0';
-					nZRAS <= '1';	
-					nZCAS <= '0';	
-					nZWE <= RnW;	
+					IF RnW = '0' THEN
+						--WRITE STATE
+						sdramcom <= ramstate_WRITE;
+					ELSE
+						--READ STATE
+						sdramcom <= ramstate_READ;
+					END IF;	
 					
 					dsacken <= '0';
 					
@@ -595,10 +602,7 @@ begin
 					--IF THIS IS A READ ACTION, THE CAS LATENCY IS 2 CLOCK CYCLES.
 					
 					--WE NOP FOR THE REMAINING CYCLES.
-					nZCS <= '1';
-					nZRAS <= '1';	
-					nZCAS <= '1';							
-					nZWE <= '1';
+					sdramcom <= ramstate_NOP;
 					
 					IF nMEMZ2 = '0' THEN
 					
@@ -638,12 +642,9 @@ begin
 						ELSE
 						
 							--THERE IS A REFRESH ASSERTED, GO TO THE REFRESH STATE
-							CURRENT_STATE <= AUTO_REFRESH;
-							
-							nZWE <= '1';
-							nZRAS <= '0';
-							nZCAS <= '0';
-							nZCS <= '0';	
+							CURRENT_STATE <= AUTO_REFRESH_PRECHARGE;
+							ZMA <= ("10000000000"); --PRECHARGE ALL			
+							sdramcom <= ramstate_PRECHARGE;
 							
 						END IF;
 						
@@ -766,32 +767,6 @@ begin
 	memaccess <= '1' WHEN nIDEACCESS = '0' OR nMEMZ2 = '0' OR nMEMZ3 = '0' ELSE '0';	
 	
 	SMDIS <= '1' WHEN onboard = '1' OR memaccess = '1' ELSE '0';
-	
---	PROCESS (CPUCLK) BEGIN
---	
---		IF RISING_EDGE (CPUCLK) THEN	
---		
---			IF nAS = '0' THEN
---		
---				IF onboard = '1' OR memaccess = '1' THEN
---				
---					SMDIS <= '1';
---					
---				ELSE
---				
---					SMDIS <= '0';
---					
---				END IF;
---				
---			ELSE
---			
---				SMDIS <= '1';
---				
---			END IF;
---		
---		END IF;
---		
---	END PROCESS;
 	
 	-------------------
 	-- JOHANN'S MODE --
