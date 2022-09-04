@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    SEPTEMBER 2, 2022 
+-- Create Date:    SEPTEMBER 3, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -117,7 +117,7 @@ architecture Behavioral of U601 is
 	SIGNAL dmaaccess : STD_LOGIC := '0'; --ARE WE IN A DMA MEMORY CYCLE?
 	SIGNAL cpuaccess : STD_LOGIC := '0'; --ARE WE IN A CPU MEMORY CYCLE?
 	SIGNAL dsacken : STD_LOGIC := '0'; --FEEDS THE 68030 DSACK SIGNALS
-	SIGNAL datamask : STD_LOGIC_VECTOR (3 DOWNTO 0) := "0000"; --DATA MASK
+	SIGNAL datamask : STD_LOGIC_VECTOR (3 DOWNTO 0) := "1111"; --DATA MASK
 	SIGNAL sdramcom : STD_LOGIC_VECTOR (3 DOWNTO 0) := "1111"; --SDRAM COMMAND
 	
 	--THE SDRAM COMMAND CONSTANTS ARE: _CS, _RAS, _CAS, _WE
@@ -150,8 +150,7 @@ architecture Behavioral of U601 is
 	SIGNAL CURRENT_STATE : SDRAM_STATE; --CURRENT SDRAM STATE
 	SIGNAL SDRAM_START_REFRESH_COUNT : STD_LOGIC := '0'; --WE NEED TO REFRESH TWICE UPON STARTUP
 	SIGNAL COUNT : INTEGER RANGE 0 TO 2 := 0; --COUNTER FOR SDRAM STARTUP ACTIVITIES
-	signal refresh : STD_LOGIC := '0'; --SIGNALS TIME TO REFRESH
-	
+	SIGNAL refresh : STD_LOGIC := '0'; --SIGNALS TIME TO REFRESH
 	SIGNAL REFRESH_COUNTER : INTEGER RANGE 0 TO 255 := 0;
 	CONSTANT REFRESH_DEFAULT : INTEGER := 185; --25MHz REFRESH COUNTER
 
@@ -278,7 +277,7 @@ begin
 			
 	--The OVR signal must be asserted whenever on-board memory is selected
 	--during a DMA cycle.  It tri-states GARY's DTACK output, allowing
-	--one to be created by our memory logic. u501
+	--one to be created by our memory logic.
 
 	nOVR <= '0' 
 		WHEN 
@@ -288,43 +287,12 @@ begin
 	
 	-----------------------------
 	-- SDRAM DATA MASK ACTIONS --
-	-----------------------------
-	
-	--TRYING TO DEAL WITH METASTABILITY? THIS PROCESS DIDN'T HELP.
-	--ALSO TRIED RISING_EDGE, BOTH HAVE SAME PROBLEMS.
-	
-	--ALSO, THIS RESULTS IN THE ASSERTION BEING TOO LATE, SO THIS ISN'T AN ACCEPTABLE
-	--ANSWER WITHOUT SOME OTHER MODIFICATIONS.
-	
---	PROCESS (CPUCLK) BEGIN
---	
---		IF FALLING_EDGE (CPUCLK) THEN
---			
---				nUUBE <= datamask(3);
---				nUMBE <= datamask(2);
---				nLMBE <= datamask(1);
---				nLLBE <= datamask(0);
---			
---		END IF;
---		
---	END PROCESS;				
-	
-	--THIS RESULTS IN IDEAL TIMING FOR THE DATA MASK SIGNALS.	
+	-----------------------------		
+		
 	nUUBE <= datamask(3);
 	nUMBE <= datamask(2);
 	nLMBE <= datamask(1);
 	nLLBE <= datamask(0);	
-	
-	--nUUBE <= datamask(3) WHEN nMEMZ2 = '0' ELSE '1';
-	--nUMBE <= datamask(2) WHEN nMEMZ2 = '0' ELSE '1';
-	--nLMBE <= datamask(1) WHEN nMEMZ2 = '0' ELSE '1';
-	--nLLBE <= datamask(0) WHEN nMEMZ2 = '0' ELSE '1';
-	
-	--THIS FOLLOWING PROCESS IS HOW THE DATA MASK BITS ARE SET.
-	--THESE EQUATIONS HAVE BEEN CONFIRMED CORRECT.
-	--I STRIPPED OUT AS MUCH AS POSSIBLE TO STILL HAVE A FUNCTIONING PROCESS.
-	--STRIPPING OUT MORE WILL RESULT IN A NON-FUNCTIONING SET OF SIGNALS,
-	--BUT MAY BE NECESSARY TO CONTINUE TROUBLESHOOTING.
 	
 	PROCESS ( CPUCLK, nRESET ) BEGIN
 	
@@ -441,22 +409,6 @@ begin
 			
 			--SDRAM is pretty fast. Most operations will complete in less than one 50MHz clock cycle. 
 			--Only AUTOREFRESH takes more than one clock cycle at 60ns. 			
-			
-			--WHEN REFRESH IS ASSERTED, WE WAIT UNTIL WE ARE NOT IN MEMORY CYCLE.
-			
-			IF (refresh = '1') THEN
-				
-				--TIME TO REFRESH THE SDRAM, BUT ONLY IF WE ARE NOT IN A MEMORY ACCESS CYCLE
-				IF nMEMZ2 = '1' THEN
-					
-					--FIRST, PRECHARGE ALL BANKS SO EVERYTHING IS IDLE.
-					CURRENT_STATE <= AUTO_REFRESH_PRECHARGE;					
-					ZMA <= ("10000000000"); --PRECHARGE ALL
-					sdramcom <= ramstate_PRECHARGE;
-					
-				END IF;
-				
-			END IF;
 		
 			--PROCEED WITH SDRAM STATE MACHINE
 			--THE FIRST STATES ARE TO INITIALIZE THE SDRAM, WHICH WE ALWAYS DO.
@@ -550,8 +502,15 @@ begin
 					COUNT <= COUNT + 1;						
 				
 				WHEN RUN_STATE =>
+				
+					IF (refresh = '1') THEN
+				
+						--TIME TO REFRESH THE SDRAM, WHICH TAKES PRIORITY.	
+						CURRENT_STATE <= AUTO_REFRESH_PRECHARGE;					
+						ZMA <= ("10000000000"); --PRECHARGE ALL
+						sdramcom <= ramstate_PRECHARGE;							
 					
-					IF nMEMZ2 = '0' THEN 
+					ELSIF nMEMZ2 = '0' THEN 
 					
 						--WE ARE IN THE Z2 MEMORY SPACE WITH THE ADDRESS STROBE ASSERTED.
 						--SEND THE BANK ACTIVATE COMMAND W/RAS
@@ -634,18 +593,18 @@ begin
 						--IN THE EVENT WE HAVE A REFRESH ASSERTED AND WAITING,
 						--WE GO THERE INSTANTLY. OTHERWISE, RETURN TO RUN STATE.
 						
-						IF refresh = '0' THEN 
+						--IF refresh = '0' THEN 
 						
-							CURRENT_STATE <= RUN_STATE;	
+						CURRENT_STATE <= RUN_STATE;	
 						
-						ELSE
+						--ELSE
 						
 							--THERE IS A REFRESH ASSERTED, GO TO THE REFRESH STATE
-							CURRENT_STATE <= AUTO_REFRESH_PRECHARGE;
-							ZMA <= ("10000000000"); --PRECHARGE ALL			
-							sdramcom <= ramstate_PRECHARGE;
+							--CURRENT_STATE <= AUTO_REFRESH_PRECHARGE;
+							--ZMA <= ("10000000000"); --PRECHARGE ALL			
+							--sdramcom <= ramstate_PRECHARGE;
 							
-						END IF;
+						--END IF;
 						
 					END IF;	
 				

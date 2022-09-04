@@ -484,3 +484,4 @@ Finished circuit initialization process.
 # run .01us
 # run .01us
 # run .01us
+# exit 0
