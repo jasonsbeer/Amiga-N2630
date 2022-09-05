@@ -167,8 +167,8 @@ architecture Behavioral of U601 is
 	SIGNAL phantomhi : STD_LOGIC := '0'; --PHANTOM HIGH SIGNAL
 	SIGNAL hirom : STD_LOGIC := '0'; --IS THE ROM IN THE HIGH ADDRESS SPACE?
 	SIGNAL lorom : STD_LOGIC := '0'; --IS THE ROM IN THE LOW ADDRESS SPACE?
-	CONSTANT rambaseaddress0 : STD_LOGIC_VECTOR (2 DOWNTO 0) := "001"; --RAM BASE ADDRESS	
-	CONSTANT rambaseaddress1 : STD_LOGIC_VECTOR (2 DOWNTO 0) := "010"; --RAM BASE ADDRESS
+	CONSTANT rambaseaddress0 : STD_LOGIC_VECTOR (2 DOWNTO 0) := "100"; --RAM BASE ADDRESS	
+	CONSTANT rambaseaddress1 : STD_LOGIC_VECTOR (2 DOWNTO 0) := "001"; --RAM BASE ADDRESS
 	
 	--ROM RELATED SIGNALS
 	CONSTANT DELAYVALUE : INTEGER := 1;
@@ -252,7 +252,7 @@ begin
 	--THIS DETECTS A 68030 MEMORY ACCESS
 	cpuaccess <= '1' 
 		WHEN
-			( A(23 DOWNTO 21) = rambaseaddress0 OR A(23 DOWNTO 21) = rambaseaddress1 ) AND
+			( A(23 DOWNTO 21) = "100" OR A(23 DOWNTO 21) = "011" OR A(23 DOWNTO 21) = "010" OR A(23 DOWNTO 21) = "001" ) AND
 			ramconfiged = '1' AND
 			nBGACK = '1' AND 
 			FC(2 downto 0) /= "111"
@@ -401,6 +401,10 @@ begin
 				COUNT <= 0;
 				nDTACK <= 'Z';
 				dsacken <= '0';
+				
+				ZMA(10 DOWNTO 0) <= (OTHERS => '0');
+				ZBANK0 <= '0';
+				ZBANK1 <= '0';
 		
 		ELSIF ( FALLING_EDGE (CPUCLK) ) THEN
 			
@@ -420,7 +424,6 @@ begin
 					--SET THE POWERUP SETTINGS SO THEY ARE LATCHED ON THE NEXT CLOCK EDGE
 				
 					CURRENT_STATE <= POWERUP;
-					CLKE <= '0'; --DISABLE CLOCK
 					sdramcom <= ramstate_NOP;				
 			
 				WHEN POWERUP =>
@@ -510,9 +513,9 @@ begin
 						ZMA <= ("10000000000"); --PRECHARGE ALL
 						sdramcom <= ramstate_PRECHARGE;							
 					
-					ELSIF nMEMZ2 = '0' THEN 
+					ELSIF nMEMZ2 = '0' AND nDS = '0' THEN 
 					
-						--WE ARE IN THE Z2 MEMORY SPACE WITH THE ADDRESS STROBE ASSERTED.
+						--WE ARE IN THE Z2 MEMORY SPACE WITH THE ADDRESS AND DATA STROBES ASSERTED.
 						--SEND THE BANK ACTIVATE COMMAND W/RAS
 						
 						CURRENT_STATE <= RAS_STATE;
@@ -523,11 +526,11 @@ begin
 						sdramcom <= ramstate_BANKACTIVATE;
 						
 						--IF THIS IS A WRITE ACTION, WE CAN IMMEDIATELY ASSERT _DSACKx.
-						IF (RnW = '0') THEN
+						--IF (RnW = '0') THEN
 						
-							dsacken <= '1';
+							--dsacken <= '1';
 							
-						END IF;
+						--END IF;
 						
 					END IF;
 					
@@ -538,22 +541,23 @@ begin
 					CURRENT_STATE <= CAS_STATE;
 					
 					ZMA(6 downto 0) <= A(21 downto 15);
+					--ZMA(6) <= '0';
 					ZMA(7) <= '0';
 					ZMA(8) <= '0';
 					ZMA(9) <= '0';
-					ZMA(10) <= '1'; --PRECHARGE
+					ZMA(10) <= '1'; --AUTO PRECHARGE
 					
 					IF RnW = '0' THEN
 						--WRITE STATE
 						sdramcom <= ramstate_WRITE;
+						--dsacken <= '1';
 					ELSE
 						--READ STATE
 						sdramcom <= ramstate_READ;
 					END IF;	
 					
-					dsacken <= '0';
-					
-					COUNT <= 0;
+					dsacken <= '1';
+					--dsacken <= '0';
 					
 				WHEN CAS_STATE =>
 					
@@ -562,51 +566,46 @@ begin
 					--WE NOP FOR THE REMAINING CYCLES.
 					sdramcom <= ramstate_NOP;
 					
+					dsacken <= '0';
+					
 					IF nMEMZ2 = '0' THEN
 					
-						IF RnW = '1' AND COUNT = 1 THEN
+						CURRENT_STATE <= RUN_STATE;
 						
-							--68030 CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
-							--ASSERTING BOTH DSACKs TELLS THE 68030 THAT THIS IS A 32 BIT PORT.
-							
-							IF	nDSACK0 = '1' THEN
-							
-								--SIGNAL _DSACKn BE ASSERTED THE FIRST TIME.
-								dsacken <= '1';
-								
-							ELSE
-							
-								--AFTERWARDS, ALLOW THE _DSACKn PROCEDURE TO DO IT'S THING.
-								dsacken <= '0';
-								
-							END IF;
-							
-						ELSE
-						
-							COUNT <= 1;
-							
-						END IF;						
+					END IF;
 					
-					ELSE
-						--THE ADDRESS STROBE HAS NEGATED INDICATING THE END OF THE MEMORY ACCESS.
-						
-						--IN THE EVENT WE HAVE A REFRESH ASSERTED AND WAITING,
-						--WE GO THERE INSTANTLY. OTHERWISE, RETURN TO RUN STATE.
-						
-						--IF refresh = '0' THEN 
-						
-						CURRENT_STATE <= RUN_STATE;	
-						
-						--ELSE
-						
-							--THERE IS A REFRESH ASSERTED, GO TO THE REFRESH STATE
-							--CURRENT_STATE <= AUTO_REFRESH_PRECHARGE;
-							--ZMA <= ("10000000000"); --PRECHARGE ALL			
-							--sdramcom <= ramstate_PRECHARGE;
-							
-						--END IF;
-						
-					END IF;	
+--					IF nMEMZ2 = '0' THEN
+--					
+--						IF RnW = '1' THEN
+--						
+--							--68030 CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
+--							--ASSERTING BOTH DSACKs TELLS THE 68030 THAT THIS IS A 32 BIT PORT.
+--							
+--							IF	nDSACK0 = '1' THEN
+--							
+--								--SIGNAL _DSACKn BE ASSERTED THE FIRST TIME.
+--								dsacken <= '1';
+--								
+--							ELSE
+--							
+--								--AFTERWARDS, ALLOW THE _DSACKn PROCEDURE TO DO IT'S THING.
+--								dsacken <= '0';
+--								
+--							END IF;							
+--							
+--						ELSE
+--						
+--							dsacken <= '0';
+--							
+--						END IF;
+--							
+--					
+--					ELSE
+--					
+--						--THE ADDRESS STROBE HAS NEGATED INDICATING THE END OF THE MEMORY ACCESS.						
+--						CURRENT_STATE <= RUN_STATE;
+--						
+--					END IF;	
 				
 			END CASE;
 				
