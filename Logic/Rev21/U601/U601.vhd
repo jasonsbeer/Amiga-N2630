@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    SEPTEMBER 3, 2022 
+-- Create Date:    SEPTEMBER 5, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -146,13 +146,13 @@ architecture Behavioral of U601 is
 	SIGNAL mc68881 : STD_LOGIC:='0';
 	
 	--DEFINE THE SDRAM STATE MACHINE 
-	TYPE SDRAM_STATE IS ( PRESTART, POWERUP, POWERUP_PRECHARGE, MODE_REGISTER, AUTO_REFRESH_PRECHARGE, AUTO_REFRESH, AUTO_REFRESH_CYCLE, RUN_STATE, RAS_STATE, CAS_STATE );
+	TYPE SDRAM_STATE IS ( PRESTART, POWERUP, POWERUP_PRECHARGE, MODE_REGISTER, AUTO_REFRESH, AUTO_REFRESH_CYCLE, RUN_STATE, RAS_STATE, CAS_STATE ); --AUTO_REFRESH_PRECHARGE, 
 	SIGNAL CURRENT_STATE : SDRAM_STATE; --CURRENT SDRAM STATE
 	SIGNAL SDRAM_START_REFRESH_COUNT : STD_LOGIC := '0'; --WE NEED TO REFRESH TWICE UPON STARTUP
 	SIGNAL COUNT : INTEGER RANGE 0 TO 2 := 0; --COUNTER FOR SDRAM STARTUP ACTIVITIES
 	SIGNAL refresh : STD_LOGIC := '0'; --SIGNALS TIME TO REFRESH
 	SIGNAL REFRESH_COUNTER : INTEGER RANGE 0 TO 255 := 0;
-	CONSTANT REFRESH_DEFAULT : INTEGER := 185; --25MHz REFRESH COUNTER
+	CONSTANT REFRESH_DEFAULT : INTEGER := 180; --25MHz REFRESH COUNTER 185
 
 	--AUTOCONFIG SIGNALS
 	SIGNAL autoconfigspace : STD_LOGIC := '0'; --AUTOCONFIG ADDRESS SPACE
@@ -384,6 +384,12 @@ begin
 	--FALLING EDGE SO THE COMMANDS ARE STABLE AT THE MOMENT THE SDRAM LATCHES THE COMMAND.
 	--SDRAM COMMANDS ALL SIMULATE OK
 	
+	--SOMETHING OF NOTE...THE 68000 AND 68030 LATCH READ DATA ON THE FALLING EDGE,
+	--WHILE THE DATA FROM THE SDRAM IS ONLY GUARANTEED TO BE VALID ON A SINGLE RISING EDGE.
+	--THIS MEANS WE NEED TO DO "TRICKS" TO GET THE DATA INTO THE 680x0. 
+	--INVERTING THE SDRAM CLOCK WOULD PROBABLY SIMPLIFY ALL OF THIS AND ALLOW US 
+	--TO NOT USE "TRICKS".
+	
 	nZCS <= sdramcom(3);
 	nZRAS <= sdramcom(2);
 	nZCAS <= sdramcom(1);	
@@ -439,7 +445,7 @@ begin
 				WHEN POWERUP_PRECHARGE =>
 				
 					CURRENT_STATE <= MODE_REGISTER;
-					ZMA <= "01000100000"; --PROGRAM THE SDRAM...NO READ OR WRITE BURST, CAS LATENCY=2,
+					ZMA <= "01000100000"; --PROGRAM THE SDRAM...NO READ OR WRITE BURST, CAS LATENCY=2
 					sdramcom <= ramstate_MODEREGISTER;
 				
 				WHEN MODE_REGISTER =>
@@ -457,12 +463,12 @@ begin
 					
 					COUNT <= COUNT + 1;
 					
-				WHEN AUTO_REFRESH_PRECHARGE =>
+				--WHEN AUTO_REFRESH_PRECHARGE =>
 				
 					--THE TIME BETWEEN PRECHARGE AND AUTOREFRESH WILL BE TIGHT AT 50MHz.
 					--IT NEEDS 21ns BETWEEN THE TWO COMMANDS.
-					CURRENT_STATE <= AUTO_REFRESH;
-					sdramcom <= ramstate_AUTOREFRESH;
+					--CURRENT_STATE <= AUTO_REFRESH;
+					--sdramcom <= ramstate_AUTOREFRESH;
 					
 				WHEN AUTO_REFRESH =>
 					--REFRESH the SDRAM
@@ -506,12 +512,27 @@ begin
 				
 				WHEN RUN_STATE =>
 				
+					--MEMORY MAP 
+					--3210987654321098765432 10 ADDRESS BITS
+					
+					--0010000000000000000000 00 $00200000-$003FFFFF
+					--0011111111111111111111 11
+
+					--0100000000000000000000 00 $00400000-$005FFFFF
+					--0101111111111111111111 11
+
+					--0110000000000000000000 00 $00600000-$007FFFFF
+					--0110111111111111111111 11
+
+					--1000000000000000000000 00 $00800000-$009FFFFF
+					--1001111111111111111111 11
+				
 					IF (refresh = '1') THEN
 				
 						--TIME TO REFRESH THE SDRAM, WHICH TAKES PRIORITY.	
-						CURRENT_STATE <= AUTO_REFRESH_PRECHARGE;					
-						ZMA <= ("10000000000"); --PRECHARGE ALL
-						sdramcom <= ramstate_PRECHARGE;							
+						CURRENT_STATE <= AUTO_REFRESH;					
+						--ZMA <= ("10000000000"); --PRECHARGE ALL
+						sdramcom <= ramstate_AUTOREFRESH;							
 					
 					ELSIF nMEMZ2 = '0' AND nDS = '0' THEN 
 					
@@ -519,9 +540,13 @@ begin
 						--SEND THE BANK ACTIVATE COMMAND W/RAS
 						
 						CURRENT_STATE <= RAS_STATE;
-						ZMA(10 downto 0) <= A(12 downto 2);
-						ZBANK0 <= A(13);
-						ZBANK1 <= A(14);
+						--ZMA(10 downto 0) <= A(12 downto 2);
+						--ZBANK0 <= A(13);
+						--ZBANK1 <= A(14);
+						
+						ZMA(10 downto 0) <= A(20 downto 10);
+						ZBANK0 <= A(21);
+						ZBANK1 <= A(22);
 						
 						sdramcom <= ramstate_BANKACTIVATE;
 						
@@ -540,9 +565,8 @@ begin
 					--SET CAS STATE VALUES SO THEY LATCH ON THE NEXT CLOCK EDGE
 					CURRENT_STATE <= CAS_STATE;
 					
-					ZMA(6 downto 0) <= A(21 downto 15);
-					--ZMA(6) <= '0';
-					ZMA(7) <= '0';
+					--A7 IS THE MAX ADDRESS BIT FOR THE COLUMN SELECTION.
+					ZMA(7 downto 0) <= A(9 downto 2);
 					ZMA(8) <= '0';
 					ZMA(9) <= '0';
 					ZMA(10) <= '1'; --AUTO PRECHARGE
@@ -550,14 +574,15 @@ begin
 					IF RnW = '0' THEN
 						--WRITE STATE
 						sdramcom <= ramstate_WRITE;
-						--dsacken <= '1';
+						dsacken <= '1';
 					ELSE
 						--READ STATE
 						sdramcom <= ramstate_READ;
 					END IF;	
 					
-					dsacken <= '1';
+					--dsacken <= '1';
 					--dsacken <= '0';
+					COUNT <= 0;
 					
 				WHEN CAS_STATE =>
 					
@@ -566,46 +591,42 @@ begin
 					--WE NOP FOR THE REMAINING CYCLES.
 					sdramcom <= ramstate_NOP;
 					
-					dsacken <= '0';
+					--dsacken <= '0';					
 					
 					IF nMEMZ2 = '0' THEN
 					
-						CURRENT_STATE <= RUN_STATE;
+						IF RnW = '1' THEN
 						
-					END IF;
+							--68030 CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
+							--ASSERTING BOTH DSACKs TELLS THE 68030 THAT THIS IS A 32 BIT PORT.
+							
+							IF	nDSACK0 = '1' THEN
+							
+								--SIGNAL _DSACKn BE ASSERTED THE FIRST TIME.
+								dsacken <= '1';
+								
+							ELSE
+							
+								--AFTERWARDS, ALLOW THE _DSACKn PROCEDURE TO DO IT'S THING.
+								dsacken <= '0';
+								--CLKE <= '0';
+								
+							END IF;							
+							
+						ELSE
+						
+							dsacken <= '0';
+							
+						END IF;
+							
 					
---					IF nMEMZ2 = '0' THEN
---					
---						IF RnW = '1' THEN
---						
---							--68030 CAN COMMIT ON THE NEXT FALLING CLOCK EDGE.
---							--ASSERTING BOTH DSACKs TELLS THE 68030 THAT THIS IS A 32 BIT PORT.
---							
---							IF	nDSACK0 = '1' THEN
---							
---								--SIGNAL _DSACKn BE ASSERTED THE FIRST TIME.
---								dsacken <= '1';
---								
---							ELSE
---							
---								--AFTERWARDS, ALLOW THE _DSACKn PROCEDURE TO DO IT'S THING.
---								dsacken <= '0';
---								
---							END IF;							
---							
---						ELSE
---						
---							dsacken <= '0';
---							
---						END IF;
---							
---					
---					ELSE
---					
---						--THE ADDRESS STROBE HAS NEGATED INDICATING THE END OF THE MEMORY ACCESS.						
---						CURRENT_STATE <= RUN_STATE;
---						
---					END IF;	
+					ELSE
+					
+						--THE ADDRESS STROBE HAS NEGATED INDICATING THE END OF THE MEMORY ACCESS.						
+						CURRENT_STATE <= RUN_STATE;
+						--CLKE <= '1';
+						
+					END IF;	
 				
 			END CASE;
 				
@@ -791,7 +812,7 @@ begin
 	--IS EVERYTHING WE WANT CONFIGURED?
 	--THIS IS PASSED TO THE _COPCFG SIGNAL 
 	--U602 WILL ASSERT Z3CONFIGED WHEN Z3 RAM HAS BEEN AUTOCONFIGed OR IF Z3 RAM IS DISABLED.
-	CONFIGED <= '1' WHEN Z3CONFIGED = '1' AND boardconfiged = '1' ELSE '0';	
+	CONFIGED <= '1' WHEN Z3CONFIGED = '1' AND boardconfiged = '1' ELSE '0';
 
 	--We have three boards we need to autoconfig, in this order
 	--1. The 68030 ROM (SEE ALSO SPECIAL REGISTER, ABOVE)
@@ -870,7 +891,7 @@ begin
 						--offset $08 INVERTED
 						WHEN "000100" =>
 							D_2630 <= "1111"; 
-							D_ZORRO2RAM <= "0011"; --PREFER 8 MEG SPACE, CAN'T BE SHUT UP
+							D_ZORRO2RAM <= "1011"; --PREFER 8 MEG SPACE, CAN'T BE SHUT UP
 
 						--offset $0C INVERTED						
 						WHEN "000110" => 
