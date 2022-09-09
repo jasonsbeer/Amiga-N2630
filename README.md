@@ -78,15 +78,7 @@ J600|IDE|Disable|Enable
 
 <sup>A</sup>The factory configuration for all jumpers is open (no jumper).  
 
-**Table 3.** SDRAM Refresh Jumper Settings
-Jumper|50MHz<sup>[A]</sup>|40MHz|33MHz|25MHz
--|-|-|-|-
-J403|Shorted|Open|Shorted|Open
-J404|Shorted|Shorted|Open|Open
-
-<sup>A</sup>Set jumpers to match CPU clock.
-
-**Table 4.** System Clock Jumper Settings
+**Table 3.** System Clock Jumper Settings
 Jumper|Description|1-2|2-3
 -|-|-|-
 J202|FPU Clock|X1<sup>[A]</sup>|X2<sup>[B]</sup>
