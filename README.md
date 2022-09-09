@@ -73,7 +73,7 @@ J302|Amiga Version|A2000|B2000
 J303|Zorro 2 RAM|Disable|Enable
 J304|OS Mode|Unix|Amiga OS
 J305|Zorro 3 RAM|Disable|Enable
-J405|Z2 4/8MB|4MB|8MB
+J404|Z2 4/8MB|4MB|8MB
 J600|IDE|Disable|Enable
 
 <sup>A</sup>The factory configuration for all jumpers is open (no jumper).  
