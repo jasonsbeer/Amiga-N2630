@@ -5,6 +5,7 @@
   (paper "B")
 
   (title_block
+    (title "Amiga N2630")
     (date "2022-09-09")
     (rev "2.3")
   )
