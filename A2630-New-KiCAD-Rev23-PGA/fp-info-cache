@@ -1,4 +1,4 @@
-20386315559995545
+20406183931529963
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -60220,6 +60220,90 @@ Mounting 4.5mm 9774100982
 0
 8
 1
+N2630 Libraries
+A2000_CPUSLOT_MALE
+Connecteur Bus AT ISA 16 bits
+CONN BUS AMIGA
+0
+86
+86
+N2630 Libraries
+ATA_Header_2x20_P2.54mm
+Through hole straight pin header, 2x20, 2.54mm pitch, double rows
+Through hole pin header THT 2x20 2.54mm double row
+0
+39
+39
+N2630 Libraries
+Jumper1
+
+
+0
+0
+0
+N2630 Libraries
+Jumper2
+
+
+0
+0
+0
+N2630 Libraries
+Jumper3
+
+
+0
+0
+0
+N2630 Libraries
+MC68030-PGA
+
+
+0
+128
+128
+N2630 Libraries
+MC68030FE-PQFP-132
+PQFP, 132 pins, 24mm sq body, 0.635mm pitch (https://www.intel.com/content/dam/www/public/us/en/documents/packaging-databooks/packaging-chapter-02-databook.pdf, http://www.nxp.com/docs/en/application-note/AN4388.pdf)
+PQFP 132
+0
+132
+132
+N2630 Libraries
+Mug
+
+
+0
+0
+0
+N2630 Libraries
+SDRAMRefresh
+
+
+0
+0
+0
+N2630 Libraries
+TSOP-II-86
+54-lead TSOP typ II package
+TSOPII TSOP2
+0
+86
+86
+N2630 Libraries
+Z3RAM
+
+
+0
+0
+0
+N2630 Libraries
+Z3RAM-JUMPER
+
+
+0
+0
+0
 NetTie
 NetTie-2_SMD_Pad0.5mm
 Net tie, 2 pin, 0.5mm square SMD pads

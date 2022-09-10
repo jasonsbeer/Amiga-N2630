@@ -6,8 +6,8 @@
 
   (title_block
     (title "Amiga N2630")
-    (date "2022-08-20")
-    (rev "2.2")
+    (date "2022-09-09")
+    (rev "2.3")
   )
 
   (lib_symbols
@@ -5050,10 +5050,10 @@
       (effects (font (size 1.27 1.27)) (justify right) hide)
     )
   )
-  (global_label "RAMCLK" (shape input) (at 33.02 106.68 180) (fields_autoplaced)
+  (global_label "CPUCLK_B" (shape input) (at 33.02 106.68 180) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify right))
     (uuid 8b129856-cc2d-4792-b90f-5af9599716ce)
-    (property "Intersheet References" "${INTERSHEET_REFS}" (id 0) (at 23.3177 106.6006 0)
+    (property "Intersheet References" "${INTERSHEET_REFS}" (id 0) (at 21.0196 106.6006 0)
       (effects (font (size 1.27 1.27)) (justify right) hide)
     )
   )

@@ -6,8 +6,8 @@
 
   (title_block
     (title "Amiga N2630")
-    (date "2022-08-20")
-    (rev "2.2")
+    (date "2022-09-09")
+    (rev "2.3")
   )
 
   (lib_symbols
@@ -901,9 +901,6 @@
     (path "/00000000-0000-0000-0000-0000634ecc15/301e4ba5-c8ed-4558-9460-8fe3166cb834"
       (reference "#PWR02") (unit 1) (value "+3.3V") (footprint "")
     )
-    (path "/00000000-0000-0000-0000-0000634ecc15/40f8622b-4e6e-4236-a5d6-fa988402837b"
-      (reference "#PWR03") (unit 1) (value "GND") (footprint "")
-    )
     (path "/00000000-0000-0000-0000-000061df74a0/7bf97497-1c26-4261-b180-0a72c617dfdc"
       (reference "#PWR04") (unit 1) (value "GND") (footprint "")
     )
@@ -1057,9 +1054,6 @@
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-0000626c9de3"
       (reference "#PWR0148") (unit 1) (value "GND") (footprint "")
     )
-    (path "/00000000-0000-0000-0000-000061fbe594/f8b81497-aa1c-4988-920a-ba8e1510d78b"
-      (reference "#PWR0149") (unit 1) (value "GND") (footprint "")
-    )
     (path "/00000000-0000-0000-0000-0000634ecc15/7a5ce3d5-cb25-428c-a9ca-16ea991a720b"
       (reference "#PWR0150") (unit 1) (value "+3.3V") (footprint "")
     )
@@ -1089,9 +1083,6 @@
     )
     (path "/00000000-0000-0000-0000-000061fbe594/5ceffb7d-3e27-41ee-810c-1ee3d5a4b3db"
       (reference "#PWR0159") (unit 1) (value "GND") (footprint "")
-    )
-    (path "/00000000-0000-0000-0000-000061fbe594/f29e62b0-80cd-4660-adb3-754d98a47f8c"
-      (reference "#PWR0160") (unit 1) (value "GND") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000062089831/5785f29d-e8a8-4b78-bef3-d39c69b2c19e"
       (reference "#PWR0161") (unit 1) (value "+3.3V") (footprint "")
@@ -1465,9 +1456,6 @@
     (path "/00000000-0000-0000-0000-000061d9c8dc/d413c753-f18d-4dca-a484-f0398ae092a1"
       (reference "J402") (unit 1) (value "Jumper_NO_Small") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
     )
-    (path "/00000000-0000-0000-0000-0000634ecc15/efe438c5-03ee-48a9-856f-082338f3a360"
-      (reference "J403") (unit 1) (value "RAM_CLK") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical")
-    )
     (path "/00000000-0000-0000-0000-000061d9c8dc/ec50c8ea-fe19-4a0c-bc01-f135725afb1f"
       (reference "J404") (unit 1) (value "Jumper_NO_Small") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
     )
@@ -1792,7 +1780,7 @@
     (path "/00000000-0000-0000-0000-000061d79ebc/a7ff92ad-4e9c-4c82-8e4f-57bdca1f58a5"
       (reference "U204") (unit 2) (value "74AHCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
-    (path "/00000000-0000-0000-0000-000061d79ebc/52b46a9f-57a9-4860-bfc6-9a420bfe1e8c"
+    (path "/00000000-0000-0000-0000-000061fbe594/f1752b90-4936-4daa-b80d-e4893702ebca"
       (reference "U204") (unit 3) (value "74AHCT04") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/61e1f990-e4bf-4c6d-9000-2762ea2f4563"
