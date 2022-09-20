@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U600/U600_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="std_logic_1164" />
+            <top_module name="u600" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="21" />
+   <wvobject fp_name="/u600/b2000" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">b2000</obj_property>
+      <obj_property name="ObjectShortName">b2000</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/clk7" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk7</obj_property>
+      <obj_property name="ObjectShortName">clk7</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/cdac" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">cdac</obj_property>
+      <obj_property name="ObjectShortName">cdac</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/cpuclk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">cpuclk</obj_property>
+      <obj_property name="ObjectShortName">cpuclk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/clk14" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk14</obj_property>
+      <obj_property name="ObjectShortName">clk14</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/e" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">e</obj_property>
+      <obj_property name="ObjectShortName">e</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/vmacount" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">vmacount</obj_property>
+      <obj_property name="ObjectShortName">vmacount</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/siz[0]" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">[0]</obj_property>
+      <obj_property name="ObjectShortName">siz[0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/a[0]" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">[0]</obj_property>
+      <obj_property name="ObjectShortName">a[0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/current_state" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">current_state</obj_property>
+      <obj_property name="ObjectShortName">current_state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/sm_enabled" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">sm_enabled</obj_property>
+      <obj_property name="ObjectShortName">sm_enabled</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/ndtack" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">ndtack</obj_property>
+      <obj_property name="ObjectShortName">ndtack</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/nvpa" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">nvpa</obj_property>
+      <obj_property name="ObjectShortName">nvpa</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/rnw" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">rnw</obj_property>
+      <obj_property name="ObjectShortName">rnw</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/nas" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">nas</obj_property>
+      <obj_property name="ObjectShortName">nas</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/arnw" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">arnw</obj_property>
+      <obj_property name="ObjectShortName">arnw</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/naas" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">naas</obj_property>
+      <obj_property name="ObjectShortName">naas</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/nlds" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">nlds</obj_property>
+      <obj_property name="ObjectShortName">nlds</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/nuds" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">nuds</obj_property>
+      <obj_property name="ObjectShortName">nuds</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/ndsack1" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">ndsack1</obj_property>
+      <obj_property name="ObjectShortName">ndsack1</obj_property>
+   </wvobject>
+   <wvobject fp_name="/u600/nvma" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">nvma</obj_property>
+      <obj_property name="ObjectShortName">nvma</obj_property>
+   </wvobject>
+</wave_config>
