@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    September 19, 2022 
+-- Create Date:    September 25, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC9572 64 PIN
@@ -339,7 +339,7 @@ begin
 				vmacount <= vmacount + 1;
 			END IF;
 			
-			--REPSPOND TO _VPA IN 6800 CYCLES
+			--RESPOND TO _VPA IN 6800 CYCLES
 			--THIS FEEDS INTO THE 68000 STATE MACHINE TO 
 			--SIGNAL THE END OF THE CYCLE.
 			IF nVPA = '0' THEN
@@ -475,6 +475,7 @@ begin
 	--IT'S CURRENT CYCLE, WE MUST DO THE ARBITRATION FOR THEM. WAIT UNTIL THE DATA 
 	--TRANSFER SIGNALS ARE ALL CLEAR BEFORE PASSING BUS GRANT TO THE REQUESTING DEVICE.
 	nABG <= '0' WHEN nBG = '0' AND nBOSS = '0' AND nAS = '1' AND nDSACK1 = '1' AND nSTERM = '1' ELSE 'Z' WHEN nBOSS = '1' ELSE '1'; 
+	--nABG <= '0' WHEN nBG = '0' AND nBOSS = '0' AND nAS = '1' AND nDSACK1 = '1' ELSE 'Z' WHEN nBOSS = '1' ELSE '1'; 
 	
 	----------------------------------------
 	-- 68000 STATE MACHINE ENABLE/DISABLE --
@@ -554,6 +555,7 @@ begin
 			
 			ascycle <= '0';
 			rwcycle <= '0';
+			--wcycle <= '0';
 			readcycle <= '0';
 			writecycle <= '0';
 			dsacken <= '0';
@@ -561,19 +563,6 @@ begin
 		ELSIF RISING_EDGE (CLK14) THEN
 		
 			--BEGIN 68000 STATE MACHINE--
-			
-			--PREP THE DATA STROBES--
-			IF A(0) = '0' THEN
-				udsout <= '0';
-			ELSE
-				udsout <= '1';
-			END IF;
-
-			IF SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' THEN
-				ldsout <= '0';
-			ELSE
-				ldsout <= '1';
-			END IF;	
 		 
 			CASE (CURRENT_STATE) IS
 
@@ -583,6 +572,19 @@ begin
 					--WE MAKE SURE TO START ON THE CORRECT EDGE BY SAMPLING CDAC.					
 
 					IF CDAC = '1' THEN
+					
+						--PREP THE DATA STROBES--
+						IF A(0) = '0' THEN
+							udsout <= '0';
+						ELSE
+							udsout <= '1';
+						END IF;
+
+						IF SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' THEN
+							ldsout <= '0';
+						ELSE
+							ldsout <= '1';
+						END IF;	
 
 						CURRENT_STATE <= S1;
 						  

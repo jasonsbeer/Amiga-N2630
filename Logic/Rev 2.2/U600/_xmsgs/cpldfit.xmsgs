@@ -20,7 +20,7 @@
 <msg type="warning" file="Cpld" num="1239" delta="old" >The global <arg fmt="%s" index="1">clock</arg> designation (BUFG) on signal &apos;<arg fmt="%s" index="2">nAS_IOBUFE</arg>&apos; is ignored. Most likely the signal is gated and therefore cannot be used as a global control signal.
 </msg>
 
-<msg type="warning" file="Cpld" num="1239" delta="old" >The global <arg fmt="%s" index="1">clock</arg> designation (BUFG) on signal &apos;<arg fmt="%s" index="2">A7M_IBUF</arg>&apos; is ignored. Most likely the signal is gated and therefore cannot be used as a global control signal.
+<msg type="info" file="Cpld" num="994" delta="new" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">50</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">10</arg>
 </msg>
 
 </messages>
