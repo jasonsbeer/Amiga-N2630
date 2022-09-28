@@ -535,7 +535,8 @@ begin
 	--DATA TRANSFER SIGNALS
 	nUDS <= udsout WHEN writecycle = '1' OR readcycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
 	nLDS <= ldsout WHEN writecycle = '1' OR readcycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	nAAS <= nAS WHEN ascycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	nAAS <= '0' WHEN ascycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	--nAAS <= nAS WHEN ascycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
 	ARnW <= RnW WHEN rwcycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
 	nVMA <= '0' WHEN vmacycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
 	nDSACK1 <= '0' WHEN dsackcycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
@@ -555,7 +556,6 @@ begin
 			
 			ascycle <= '0';
 			rwcycle <= '0';
-			--wcycle <= '0';
 			readcycle <= '0';
 			writecycle <= '0';
 			dsacken <= '0';
@@ -563,6 +563,19 @@ begin
 		ELSIF RISING_EDGE (CLK14) THEN
 		
 			--BEGIN 68000 STATE MACHINE--
+			
+			--PREP THE DATA STROBES--
+			IF A(0) = '0' THEN
+				udsout <= '0';
+			ELSE
+				udsout <= '1';
+			END IF;
+
+			IF SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' THEN
+				ldsout <= '0';
+			ELSE
+				ldsout <= '1';
+			END IF;	
 		 
 			CASE (CURRENT_STATE) IS
 
@@ -571,20 +584,7 @@ begin
 					--STATE 0 IS THE START OF A CYCLE. 
 					--WE MAKE SURE TO START ON THE CORRECT EDGE BY SAMPLING CDAC.					
 
-					IF CDAC = '1' THEN
-					
-						--PREP THE DATA STROBES--
-						IF A(0) = '0' THEN
-							udsout <= '0';
-						ELSE
-							udsout <= '1';
-						END IF;
-
-						IF SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' THEN
-							ldsout <= '0';
-						ELSE
-							ldsout <= '1';
-						END IF;	
+					IF CDAC = '1' THEN	
 
 						CURRENT_STATE <= S1;
 						  
