@@ -25,16 +25,16 @@ NET "CONFIGED"		LOC = "P35" ;
 
 //NET "A7M"			LOC = "P38" ;
 //NET "A7M"			BUFG = CLK  ;
-
 NET "AADIR"			LOC = "P39" ;
 NET "nAAENA"		LOC = "P40" ;
 //NET "nUDS"			LOC = "P41" ;
 //NET "nLDS"			LOC = "P43" ; 
-NET "nAAS"			LOC = "P44" ; 
-NET "nDTACK"		LOC = "P45" ; 
+//NET "nAAS"			LOC = "P44" ; 
+//NET "nDTACK"		LOC = "P45" ; 
 NET "OSMODE"		LOC = "P46" ;
 NET "Z2AUTO"		LOC = "P48" ;
-NET "nOVR"			LOC = "P56" ;
+//NET "nRAM8"			LOC = "P50" ;
+//NET "nOVR"			LOC = "P56" ;
 NET "nMEMZ3"		LOC = "P58" ;
 //NET "nGRESET"		LOC = "P61" ;
 NET "nEMENA"		LOC = "P64" ;
@@ -45,13 +45,26 @@ NET "nUMBE"			LOC = "P70" ;
 NET "nLLBE"			LOC = "P71" ;
 NET "nUUBE"			LOC = "P74" ;
 NET "nLMBE"			LOC = "P75" ;
+
+//NET "nUMBE" MAXPT=90; 
+//NET "nLLBE" MAXPT=90; 
+//NET "nUUBE" MAXPT=90; 
+//NET "nLMBE" MAXPT=90; 
+
+
 NET "nZWE"			LOC = "P76" ;
+//NET "nZWE" MAXPT=1; 
 NET "nZCAS"			LOC = "P77" ;
+//NET "nZCAS" MAXPT=1; 
 NET "CLKE"			LOC = "P78" ;
 NET "nZRAS"			LOC = "P79" ;
+//NET "nZRAS" MAXPT=1; 
 NET "nZCS"			LOC = "P81" ;
+//NET "nZCS" MAXPT=1; 
 NET "ZBANK0"		LOC = "P83" ;
+//NET "ZBANK0" MAXPT=1; 
 NET "ZBANK1"		LOC = "P86" ;
+//NET "ZBANK1" MAXPT=1; 
 NET "EMDDIR"		LOC = "P100" ;
 NET "SIZ<1>"		LOC = "P101" ;
 NET "SIZ<0>"		LOC = "P102" ;
@@ -67,8 +80,11 @@ NET "ZMA<5>"		LOC = "P95" ;
 NET "ZMA<6>"		LOC = "P93" ;
 NET "ZMA<7>"		LOC = "P91" ;
 NET "ZMA<8>"		LOC = "P87" ;
+//NET "ZMA<8>" MAXPT=1; 
 NET "ZMA<9>"		LOC = "P85" ;
+//NET "ZMA<9>" MAXPT=1; 
 NET "ZMA<10>"		LOC = "P88" ;
+//NET "ZMA<10>" MAXPT=1; 
 NET "ZMA<11>"		LOC = "P82" ;
 NET "ZMA<12>"		LOC = "P80" ;
 
@@ -106,4 +122,11 @@ NET "A<19>"			LOC = "P107" ;
 NET "A<20>"			LOC = "P106" ; 
 NET "A<21>"			LOC = "P105" ; 
 NET "A<22>"			LOC = "P104" ;
-NET "A<23>"			LOC = "P103" ; 
+NET "A<23>"			LOC = "P103" ;
+
+#Created by Constraints Editor (xc95144xl-tq144-10) - 2022/09/27
+#NET "CPUCLK" TNM_NET = CPUCLK;
+#TIMESPEC TS_CPUCLK = PERIOD "CPUCLK" 25 MHz HIGH 50% INPUT_JITTER 100 ps;
+#Created by Constraints Editor (xc95144xl-tq144-10) - 2022/09/27
+#NET "nAS" OFFSET = IN 10 ns BEFORE "CPUCLK"; 
+
