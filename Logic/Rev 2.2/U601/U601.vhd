@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    SEPTEMBER 19, 2022 
+-- Create Date:    OCTOBER 17, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC95144 144 PIN
@@ -71,6 +71,7 @@ PORT
 	nIDEACCESS : IN STD_LOGIC; --IDE IS RESPONDING TO THE ADDRESS SPACE
 	nBOSS : IN STD_LOGIC; --BOSS SIGNAL
 	A7M : IN STD_LOGIC; --AMIGA 7MHZ CLOCK
+	nRAM8 : IN STD_LOGIC; --8/4MB RAM SELECTION JUMPER
 	
 	nMEMZ2 : INOUT STD_LOGIC; --ARE WE ACCESSING ZORRO 2 RAM ADDRESS SPACE
 	CONFIGED : INOUT STD_LOGIC; --ARE WE AUTOCONFIGED?
@@ -139,8 +140,8 @@ architecture Behavioral of U601 is
 	TYPE SDRAM_STATE IS ( PRESTART, POWERUP, POWERUP_PRECHARGE, MODE_REGISTER, AUTO_REFRESH, AUTO_REFRESH_CYCLE, RUN_STATE, RAS_STATE, CAS_STATE ); --AUTO_REFRESH_PRECHARGE, 
 	SIGNAL CURRENT_STATE : SDRAM_STATE; --CURRENT SDRAM STATE
 	SIGNAL SDRAM_START_REFRESH_COUNT : STD_LOGIC := '0'; --WE NEED TO REFRESH TWICE UPON STARTUP
-	SIGNAL COUNT : INTEGER RANGE 0 TO 2 := 0; --COUNTER FOR SDRAM STARTUP ACTIVITIES
-	SIGNAL refresh : STD_LOGIC := '0'; --SIGNALS TIME TO REFRESH
+	SIGNAL COUNT : INTEGER RANGE 0 TO 2; --COUNTER FOR SDRAM STARTUP ACTIVITIES
+	SIGNAL refresh : STD_LOGIC; --SIGNALS TIME TO REFRESH
 	SIGNAL REFRESH_COUNTER : INTEGER RANGE 0 TO 255 := 0;
 	CONSTANT REFRESH_DEFAULT : INTEGER := 54; --7MHz REFRESH COUNTER
 
@@ -157,8 +158,11 @@ architecture Behavioral of U601 is
 	SIGNAL phantomhi : STD_LOGIC; --PHANTOM HIGH SIGNAL
 	SIGNAL hirom : STD_LOGIC; --IS THE ROM IN THE HIGH ADDRESS SPACE?
 	SIGNAL lorom : STD_LOGIC; --IS THE ROM IN THE LOW ADDRESS SPACE?
-	CONSTANT rambaseaddress0 : STD_LOGIC_VECTOR (2 DOWNTO 0) := "000"; --RAM BASE ADDRESS	
-	CONSTANT rambaseaddress1 : STD_LOGIC_VECTOR (2 DOWNTO 0) := "001"; --RAM BASE ADDRESS
+	SIGNAL rambaseaddress0 : STD_LOGIC_VECTOR (2 DOWNTO 0); --RAM BASE ADDRESS	
+	SIGNAL rambaseaddress1 : STD_LOGIC_VECTOR (2 DOWNTO 0); --RAM BASE ADDRESS
+	SIGNAL rambaseaddress2 : STD_LOGIC_VECTOR (2 DOWNTO 0); --RAM BASE ADDRESS
+	SIGNAL rambaseaddress3 : STD_LOGIC_VECTOR (2 DOWNTO 0); --RAM BASE ADDRESS
+	SIGNAL ramsize : STD_LOGIC_VECTOR (2 DOWNTO 0); --RAM SIZE FROM J404
 	
 	--ROM RELATED SIGNALS
 	CONSTANT DELAYVALUE : INTEGER := 1;
@@ -213,6 +217,8 @@ begin
 	
 	--WE USE THE 7MHz CLOCK TO DRIVE THE REFRESH COUNTER BECAUSE THAT 
 	--WILL ALWAYS BE AVAILABLE NO MATTER OUR N2630 CONFIGURATION.
+	--SINCE WE ARE JUMPING BETWEEN CLOCK DOMAINS, WE NEED TO HAVE
+	--TWO PROCESSES TO ACCOMODATE THE JUMP.
 	
 	refreset <= '1' WHEN CURRENT_STATE = AUTO_REFRESH ELSE '0';
 	
@@ -273,7 +279,11 @@ begin
 	--THIS DETECTS A 68030 MEMORY ACCESS
 	cpuaccess <= '1' 
 		WHEN
-			( A(23 DOWNTO 21) = "100" OR A(23 DOWNTO 21) = "011" OR A(23 DOWNTO 21) = "010" OR A(23 DOWNTO 21) = "001" ) AND
+			( A(23 DOWNTO 21) = rambaseaddress0 OR 
+			  A(23 DOWNTO 21) = rambaseaddress1 OR 
+			  A(23 DOWNTO 21) = rambaseaddress2 OR 
+			  A(23 DOWNTO 21) = rambaseaddress3 ) AND
+			  
 			ramconfiged = '1' AND
 			nBGACK = '1' AND 
 			FC(2 downto 0) /= "111" AND
@@ -284,23 +294,26 @@ begin
 	--THIS DETECTS A DMA MEMORY ACCESS
 	dmaaccess <= '1'
 		WHEN
-			( A(23 DOWNTO 21) = "100" OR A(23 DOWNTO 21) = "011" OR A(23 DOWNTO 21) = "010" OR A(23 DOWNTO 21) = "001" ) AND
+			( A(23 DOWNTO 21) = rambaseaddress0 OR 
+			  A(23 DOWNTO 21) = rambaseaddress1 OR 
+			  A(23 DOWNTO 21) = rambaseaddress2 OR 
+			  A(23 DOWNTO 21) = rambaseaddress3 ) AND
+			  
 			ramconfiged = '1' AND 
 			nAAS = '0' AND 
 			nBGACK = '0'
 		ELSE
 			'0';
 			
-	--QUALIFY THE ZORRO 2 MEM SPACE ACCESS WITH _MEMZ3 TO PREVENT ERRONEOUS RESPONSES.
+	--QUALIFY THE ZORRO 2 MEM SPACE ACCESS WITH _MEMZ3 TO PREVENT ERRONEOUS ACCESS.
 	nMEMZ2 <= '0' 
 		WHEN
 			nMEMZ3 = '1' AND (cpuaccess = '1' OR dmaaccess = '1')
 		ELSE
 			'1';
 			
-	--The OVR signal must be asserted whenever on-board memory is selected
-	--during a DMA cycle.  It tri-states GARY's DTACK output, allowing
-	--one to be created by our memory logic.
+	--DURING A DMA CYCLE, WE NEED TO STOP GARY'S _DTACK SIGNAL SO 
+	--WE CAN CREATE OUR OWN.
 
 	nOVR <= '0' 
 		WHEN 
@@ -634,6 +647,7 @@ begin
 	--AFTERWARD, THE ROM IS THEN MOVED TO THE ADDRESS SPACE AT $F80000 - $F8FFFF.
 	--THIS IS THE "NORMAL" PLACE FOR SYSTEM ROMS.
 	--THE ROM WILL STOP RESPONDING ONCE phantomhi IS SET = 1 AFTER CONFIGURATION.
+	--AT THAT TIME, KICKSTART TAKES OVER.
 	
 	hirom <= '1' WHEN A(23 DOWNTO 16) = x"F8" AND phantomhi = '0' AND RnW = '1' ELSE '0';
 	
@@ -693,7 +707,7 @@ begin
 			ELSIF cpuaccess = '1' THEN
 			
 				--WE ARE IN THE SDRAM ADDRESS SPACE	
-				IF nAS = '0' AND (dsacken = '1' OR nDSACK0 = '0') THEN
+				IF dsacken = '1' OR nDSACK0 = '0' THEN
 			
 					--ASSERT!
 					nDSACK0 <= '0';
@@ -836,33 +850,42 @@ begin
 		ELSE
 			"ZZZZ";		
 			
-	--Here it is in all its glory...the AUTOCONFIG sequence
+	--THE ramsize VECTOR IS USED IN THE AUTOCONFIG SEQUENCE TO SET THE USER'S DESIRED RAM SIZE: 4 OR 8 MB.
+	--THE USER IS ALLOWED TO AUTOCONFIG LESS THAN 8MB IN THE EVENT THEY ARE USING A CARD THAT RELIES ON 
+	--IT'S OWN ONBOARD MEMORY FOR DMA. SUCH AS THE GVP IMPACT SERIES II CARDS. OUR MEMORY CANNOT BE 
+	--SHUT UP. SO, WE DON'T WANT TO BLOCK OUT OTHER PERIPHERALS IF THEY NEED THEIR OWN RAM TO FUNCTION.
+	
+	ramsize <= "000" WHEN nRAM8 = '1' ELSE "111";
+	
+	--AUTCONFIG SEQUENCE, IN ALL ITS GLORY!
 	PROCESS ( CPUCLK, nRESET ) BEGIN
 	
 		IF nRESET = '0' THEN
 			
-			--rambaseaddress0 <= "000";
-			--rambaseaddress1 <= "000";
-			ramconfiged <= '0';	
+			rambaseaddress0 <= "111";
+			rambaseaddress1 <= "111";
+			rambaseaddress2 <= "111";
+			rambaseaddress3 <= "111";
+			ramconfiged <= '0';			
 			
 		ELSIF ( RISING_EDGE (CPUCLK)) THEN
 		
 			IF autoconfigspace = '1' THEN
 			
 				IF RnW = '1' AND nAS = '0' THEN
-					--The 680x0 is reading from us
 				
 					CASE A(6 downto 1) IS
 
-						--offset $00
+						--offset $00 NOT INVERTED
 						WHEN "000000" => 
 							D_2630 <= "1110"; 
 							D_ZORRO2RAM <= "1110"; --er_type: Zorro 2 card without BOOT ROM, LINK TO MEM POOL
 
-						--offset $02
-						WHEN "000001" => 
-							D_2630 <= "0000"; --8MB
-							D_ZORRO2RAM <= "0000"; --er_type: NEXT BOARD NOT RELATED, 8MB
+						--offset $02 NOT INVERTED
+						WHEN "000001" => 						
+							
+							D_2630 <= "0" & ramsize; --RAM SIZE AS DETERMINED BY JUMPER J404.
+							D_ZORRO2RAM <= "0" & ramsize;
 
 						--offset $04 INVERTED
 						WHEN "000010" => 
@@ -900,34 +923,56 @@ begin
 
 					END CASE;					
 
-				ELSIF ( RnW = '0' AND nDS = '0' ) THEN	
+				ELSIF RnW = '0' AND nDS = '0' AND A(6 downto 1) = "100100" THEN
 				
-					--THE TIMING HERE ASSERTS DSACK1 IN 68030 STATE 2, AS REQUIRED FOR NO WAIT STATES.
-					--_DS IS ASSERTED IN S3, SO WE LATCH THE INCOMING DATA ON THE RISING EDGE OF S4.
-					--ALL SHOULD BE GOOD.
-				
-					IF ( A(6 downto 1) = "100100" ) THEN
 						--WRITE REGISTER AT OFFSET $48. THIS IS WHERE THE BASE ADDRESS IS ASSIGNED.
 						
-						--THERE MIGHT BE A CASE WHERE WE ARE HAVE JUST CONFIGED THE ROM WHERE
-						--WE GET TO THIS ADDRESS AND MISTAKENLY THINK IT'S THE RAM BEING CONFIGURED
-						--FOOD FOR THOUGHT. IN THAT CASE WE NEED TO WAIT UNTIL WE GET TO THE NEXT
-						--AUTOCONFIG CYCLE TO ENTER THE BELOW CODE.
+						IF nRAM8 = '1' THEN
 						
-						--IF ( romconfiged = '1' AND ramconfiged = '0' ) THEN
-						--IF ( romconfiged = '1' ) THEN
+							--WHEN WE ARE AUTOCONFIGing 8MB OF RAM, WE USE UP ALL 
+							--THE ADDRESSES OF THE 8MB SPACE, SO THESE ARE THE ONLY
+							--POSSIBLE VALUES. 
 							
-							--THIS IS THE ZORRO 2 RAM BASE ADDRESS FOR OUR 8 MEGABYTES.
-							--THERE ARE TWO POSSIBLE SLOTS FOR THIS SPACE...01 AND 10.
-								
-								--rambaseaddress0 <= "001";
-								--rambaseaddress1 <= "010";	
-								
-							ramconfiged <= '1'; 
+							rambaseaddress0 <= "001";
+							rambaseaddress1 <= "010";	
+							rambaseaddress2 <= "011";
+							rambaseaddress3 <= "100";	
 							
-						--END IF;								
-						
-					END IF;	
+						ELSE
+							
+							--THE USER HAS CHOSEN TO AUTOCONFIGure 4MB.
+							--BECAUSE WE HAVE FOUR ADDRESSES TO POPULATE IN OUR LOGIC,
+							--WE MAKE DUPLICATES OF THE POSSIBLE TWO 4MB ADDRESSES.
+							--SINCE WE ARE ALWAYS THE FIRST AUTOCONFIG DEVICE, WE
+							--SHOULD ONLY BE ASSIGNED 001 AS THE BASE ADDRESS,
+							--ALTHOUGH THE NEXT TWO SLOTS ARE INCLUDED.
+							
+							CASE D(31 downto 29) IS
+							
+								WHEN "001" =>
+									rambaseaddress0 <= "001";
+									rambaseaddress1 <= "010";	
+									rambaseaddress2 <= "001";
+									rambaseaddress3 <= "010";	
+									
+								WHEN "010" =>
+									rambaseaddress0 <= "010";
+									rambaseaddress1 <= "011";	
+									rambaseaddress2 <= "010";
+									rambaseaddress3 <= "011";	
+									
+								WHEN others =>
+									rambaseaddress0 <= "011";
+									rambaseaddress1 <= "100";	
+									rambaseaddress2 <= "011";
+									rambaseaddress3 <= "100";
+									
+							END CASE;
+			
+							
+						END IF;
+								
+						ramconfiged <= '1'; 		
 						
 				END IF;					
 				
@@ -990,7 +1035,7 @@ begin
 	-- AUTO VECTORING --
 	--------------------
 	
-	--C=: This forces all interrupts to be serviced by autovectoring.  None
+	--This forces all interrupts to be serviced by autovectoring.  None
 	--of the built-in devices supply their own vectors, and the system is
 	--generally incompatible with supplied vectors, so this shouldn't be
 	--a problem working all the time.  During DMA we don't want any AVEC
