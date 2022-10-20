@@ -20,17 +20,21 @@ NET "nBERR"			LOC = "P24" ;
 NET "CPUCLK"		LOC = "P30" ;
 NET "CPUCLK"		BUFG = CLK  ;
 
+//NET "CDAC"			LOC = "P32";
+//NET "CDAC"			BUFG = CLK;
+
 NET "nMEMZ2"		LOC = "P33" ;
 NET "CONFIGED"		LOC = "P35" ;
 
 NET "A7M"			LOC = "P38" ;
 NET "A7M"			BUFG = CLK  ;
+
 NET "AADIR"			LOC = "P39" ;
 NET "nAAENA"		LOC = "P40" ;
 NET "nUDS"			LOC = "P41" ;
 NET "nLDS"			LOC = "P43" ; 
-NET "nAAS"			LOC = "P44" ; 
-//NET "nDTACK"		LOC = "P45" ; 
+//NET "nAAS"			LOC = "P44" ; 
+NET "nDTACK"		LOC = "P45" ; 
 NET "OSMODE"		LOC = "P46" ;
 NET "Z2AUTO"		LOC = "P48" ;
 NET "nRAM8"			LOC = "P50" ;

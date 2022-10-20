@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    OCTOBER 17, 2022 
+-- Create Date:    OCTOBER 19, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC95144 144 PIN
@@ -52,7 +52,6 @@ PORT
 	CPUCLK : IN STD_LOGIC; --68030 CLOCK
 	A : IN STD_LOGIC_VECTOR (23 DOWNTO 0); --680x0 ADDRESS LINES, ZORRO 2 ADDRESS SPACE
 	nAS : IN STD_LOGIC; --68030 ADDRESS STROBE
-	nAAS : IN STD_LOGIC; --68000 ADDRESS STROBE
 	nDS : IN STD_LOGIC; --68030 DATA STROBE
 	nRESET : IN STD_LOGIC; --AMIGA RESET SIGNAL
 	nBGACK : IN STD_LOGIC; --AMIGA BUS GRANT ACK
@@ -96,7 +95,7 @@ PORT
 	nUMBE : OUT STD_LOGIC; --UPPER MIDDLE BYTE ENABLE
 	nLMBE : OUT STD_LOGIC; --LOWER MIDDLE BYTE ENABLE
 	nLLBE : OUT STD_LOGIC; --LOWER LOWER BYTE ENABLE
-	--nDTACK : OUT STD_LOGIC; --68000 DTACK FOR DMA
+	nDTACK : INOUT STD_LOGIC; --68000 DTACK FOR DMA
 	nDSACK0 : INOUT STD_LOGIC; --68030 DSACK
 	nDSACK1 : OUT STD_LOGIC;
 	nOVR : OUT STD_LOGIC; --DTACK OVERRIDE
@@ -112,12 +111,15 @@ end U601;
 architecture Behavioral of U601 is
 	
 	--MEMORY ACCESS SIGNALS
-	SIGNAL dmaaccess : STD_LOGIC := '0'; --ARE WE IN A DMA MEMORY CYCLE?
-	SIGNAL cpuaccess : STD_LOGIC := '0'; --ARE WE IN A CPU MEMORY CYCLE?
-	SIGNAL dsacken : STD_LOGIC := '0'; --FEEDS THE 68030 DSACK SIGNALS
-	SIGNAL datamask : STD_LOGIC_VECTOR (3 DOWNTO 0) := "1111"; --DATA MASK
-	SIGNAL sdramcom : STD_LOGIC_VECTOR (3 DOWNTO 0) := "1111"; --SDRAM COMMAND
+	SIGNAL dmaaccess : STD_LOGIC; --ARE WE IN A DMA MEMORY CYCLE?
+	SIGNAL cpuaccess : STD_LOGIC; --ARE WE IN A CPU MEMORY CYCLE?
+	SIGNAL dsacken : STD_LOGIC; --FEEDS THE 68030 DSACK SIGNALS
+	SIGNAL datamask : STD_LOGIC_VECTOR (3 DOWNTO 0); --DATA MASK
+	SIGNAL sdramcom : STD_LOGIC_VECTOR (3 DOWNTO 0); --SDRAM COMMAND
 	SIGNAL refreset : STD_LOGIC; --RESET THE REFRESH COUNTER
+	SIGNAL dmastatefour : STD_LOGIC; --DMA STATE COUNTER
+	SIGNAL dtacken : STD_LOGIC;
+	--SIGNAL CLK14 : STD_LOGIC; --THE 14MHz CLOCK FOR DMA STATE MACHINE EDGES
 	
 	--THE SDRAM COMMAND CONSTANTS ARE: _CS, _RAS, _CAS, _WE
 	CONSTANT ramstate_NOP : STD_LOGIC_VECTOR (3 DOWNTO 0) := "1111"; --SDRAM NOP
@@ -174,8 +176,7 @@ begin
 	-- MEMORY DATA DIRECTION --
 	---------------------------
 	
-	--This sets the direction of the LVC data buffers between the 680x0 and the RAM
-	--We simply go with the inverse of the RW signal.
+	--THIS SETS THE DIRECTION OF THE LVC DATA BUFFERS BETWEEN THE 680X0 AND THE SDRAM.
 	EMDDIR <= NOT RnW;
 	
 	--ENABLE/DISABLE THE SDRAM BUFFERS
@@ -276,7 +277,7 @@ begin
 	--WITH 2MBs INSTALLED, WE RESPOND WHEN A23..19 = BASEADDRESS.
 	--WITH 1MB INSTALLED, WE RESPOND WHEN A23..18 = BASEADDRESS.
 	
-	--THIS DETECTS A 68030 MEMORY ACCESS
+	--THIS DETECTS A 68030 MEMORY ACCESS.
 	cpuaccess <= '1' 
 		WHEN
 			( A(23 DOWNTO 21) = rambaseaddress0 OR 
@@ -291,7 +292,8 @@ begin
 		ELSE
 			'0';
 	
-	--THIS DETECTS A DMA MEMORY ACCESS
+	--THIS DETECTS A DMA MEMORY ACCESS. REMEMBER THE AMIGA 
+	--ADDRESS STROBE IS CONNECTED TO _AS WHEN IN DMA MODE.
 	dmaaccess <= '1'
 		WHEN
 			( A(23 DOWNTO 21) = rambaseaddress0 OR 
@@ -300,7 +302,7 @@ begin
 			  A(23 DOWNTO 21) = rambaseaddress3 ) AND
 			  
 			ramconfiged = '1' AND 
-			nAAS = '0' AND 
+			nAS = '0' AND 
 			nBGACK = '0'
 		ELSE
 			'0';
@@ -314,12 +316,37 @@ begin
 			
 	--DURING A DMA CYCLE, WE NEED TO STOP GARY'S _DTACK SIGNAL SO 
 	--WE CAN CREATE OUR OWN.
-
 	nOVR <= '0' 
 		WHEN 
 			dmaaccess = '1' 
 		ELSE 
 			'Z';	
+			
+	--dmasattefour IS TO TRACK WHERE WE ARE IN THE DMA (68000) STATES.
+	--SINCE THE AMIGA ADDRESS STROBE (_AAS) FALLS ON THE RISING EDGE OF 
+	--STATE 2, WE CAN'T DETECT IT UNTIL THE NEXT 7MHz RISING EDGE, WHICH IS STATE 4.
+	--THIS WORKS WELL AS STATE 4 IS THE ONE WE REALLY CARE ABOUT.
+	--THE SIGNAL ONLY ASSERTS WHEN _AS (_AAS) IS ASSERTED AND THE CURRENT
+	--SDRAM STATE IS RUN_STATE. THIS STOPS IT FROM ASSERRTING 
+	--DURING A REFRESH CYCLE.
+		
+	PROCESS (A7M, dmaaccess) BEGIN
+	
+		IF dmaaccess = '0' THEN
+		
+			dmastatefour <= '0';
+			
+		ELSIF RISING_EDGE (A7M) THEN
+		
+			IF nAS = '0' AND CURRENT_STATE = RUN_STATE THEN
+			
+				dmastatefour <= '1';
+				
+			END IF;
+			
+		END IF;
+		
+	END PROCESS;	
 	
 	-----------------------------
 	-- SDRAM DATA MASK ACTIONS --
@@ -342,9 +369,9 @@ begin
 
 				IF RnW = '0' THEN
 				
-					--FOR WRITES,
-					--ENABLE THE VARIOUS BYTES ON THE SDRAM DEPENDING ON WHAT THE ACCESSING DEVICE IS ASKING FOR.
-					--DISCUSSION OF PORT SIZE AND BYTE SIZING IS ALL IN SECTION 12 OF THE 68030 USER MANUAL
+					--FOR WRITES, WE ENABLE THE VARIOUS BYTES ON THE SDRAM DEPENDING 
+					--ON WHAT THE ACCESSING DEVICE IS ASKING FOR. DISCUSSION OF PORT 
+					--SIZE AND BYTE SIZING IS ALL IN SECTION 12 OF THE 68030 USER MANUAL
 					--WE ALSO INCLUDE BYTE SELECTION FOR DMA.
 					
 					--UPPER UPPER BYTE ENABLE (D31..24)
@@ -434,8 +461,8 @@ begin
 				SDRAM_START_REFRESH_COUNT <= '0';					
 				CLKE <= '0';
 				COUNT <= 0;
-				--nDTACK <= 'Z';
 				dsacken <= '0';
+				dtacken <= '0';
 				
 				ZMA(12 DOWNTO 0) <= (OTHERS => '0');
 				ZBANK0 <= '0';
@@ -558,25 +585,38 @@ begin
 					
 					ELSIF nMEMZ2 = '0' THEN 
 					
-						--WE ARE IN THE Z2 MEMORY SPACE WITH THE ADDRESS AND DATA STROBES ASSERTED.
-						--SEND THE BANK ACTIVATE COMMAND.
-						
 						--THE N2630 IS WIRED TO ACCEPT UP TO 13 SDRAM ADDRESS LINES, BUT WE ONLY
 						--USE 11 FOR THE ROW ADDRESS. THIS IS BECAUASE ZORRO 2 IS LIMITED TO 
 						--8MB OF RAM. WIRING IT LIKE THIS ALLOWS US TO USE A VARIETY OF SDRAMs.
+						--THE BOM CALLS OUT A PAIR 4Mx16 SDRAMS, BUT SDRAMS WITH GREATER CAPACITY
+						--COULD BE USED, IF DESIRED.
 						
-						CURRENT_STATE <= RAS_STATE;
+						--WE ARE IN THE Z2 MEMORY SPACE WITH THE ADDRESS AND DATA STROBES ASSERTED.
+						--SEND THE BANK ACTIVATE COMMAND. IN THE EVENT THIS IS A 68030 ACCESS, WE 
+						--PROCEED IMMEDIATELY. IF THIS IS A DMA ACCESS, WE NEED TO WAIT UNTIL
+						--WE ARE IN 68000 STATE 4 BEFORE PROCEEDING.
 						
-						ZMA(10 downto 0) <= A(20 downto 10);
-						ZBANK0 <= A(21);
-						ZBANK1 <= A(22);
+						IF (dmaaccess = '1' AND dmastatefour = '1') OR cpuaccess = '1' THEN
 						
-						sdramcom <= ramstate_BANKACTIVATE;
-						
-						--IF THIS IS A WRITE ACTION, WE CAN IMMEDIATELY ASSERT _DSACKx.
-						IF (RnW = '0') THEN
-						
-							dsacken <= '1';
+							CURRENT_STATE <= RAS_STATE;
+							
+							ZMA(10 downto 0) <= A(20 downto 10);
+							ZBANK0 <= A(21);
+							ZBANK1 <= A(22);
+							
+							sdramcom <= ramstate_BANKACTIVATE;							
+							
+							IF (RnW = '0' AND cpuaccess = '1') THEN
+							
+								--IF THIS IS A WRITE ACTION, WE CAN IMMEDIATELY ASSERT _DSACKx.
+								dsacken <= '1';
+								
+							ELSIF dmaaccess = '1' THEN
+							
+								--IF THIS IS A DMA ACTION, WE ALWAYS ASSERT nDTACK IN STATE 4.
+								dtacken <= '1';
+								
+							END IF;
 							
 						END IF;
 						
@@ -609,8 +649,8 @@ begin
 					--WE NOP FOR THE REMAINING CYCLES.
 					sdramcom <= ramstate_NOP;
 					
-					--IF _DSACKx IS NOT ENABLED FROM A WRITE CYCLE, ENABLE IT NOW.
-					IF dsacken = '0' AND COUNT = 0 THEN
+					--IF _DSACKx IS NOT ENABLED FROM A 68030 WRITE CYCLE, ENABLE IT NOW.
+					IF dsacken = '0' AND COUNT = 0 AND cpuaccess = '1' THEN
 					
 						dsacken <= '1';						
 						
@@ -620,14 +660,29 @@ begin
 						
 					END IF;
 					
-					COUNT <= 1;
+					--IF _DTACK IS ENABLED FOR A DMA CYCLE, WE CAN TURN OFF THE ENABLE SIGNAL.
+					dtacken <= '0';
+					
+					--FOR DMA READ CYCLES, WE NEGATE THE SDRAM CLOCK ENABLE SIGNAL.
+					--THIS HOLDS THE DATA OUTPUT ON THE BUS UNTIL THE DMA DEVICE
+					--HAS RETRIEVED IT (NEGATED _AS). WRITE EVENTS HAPPEN IMMEDIATELY, SO THERE IS 
+					--NO NEED TO STOP THE CLOCK FOR THAT CASE.
+					
+					IF RnW = '1' AND dmaaccess = '1' AND COUNT = 1 THEN
+					
+						CLKE <= '0';
+						
+					END IF;
 					
 					--IF WE ARE NO LONGER IN THE ZORRO 2 MEM SPACE, GO BACK TO START.
 					IF nMEMZ2 = '1' THEN					
 											
 						CURRENT_STATE <= RUN_STATE;
+						CLKE <= '1';						
 						
 					END IF;	
+					
+					COUNT <= 1;
 				
 			END CASE;
 				
@@ -654,11 +709,9 @@ begin
 	--THE FINAL ROM CHIP SELECT SIGNAL
 	nCSROM <= '0' WHEN (lorom = '1' OR hirom = '1') AND nAS = '0' ELSE '1';	
 	
-	---------------------------
-	-- ROM DATA TRANSFER ACK --
-	---------------------------
-	
-	--THIS IS FOR 16 BIT ROM ACCESS ASYNC CYCLES.
+	-----------------------------
+	-- 68030 DATA TRANSFER ACK --
+	-----------------------------
 	
 	PROCESS (CPUCLK) BEGIN
 	
@@ -676,12 +729,10 @@ begin
 			
 				IF dsackdelay(DELAYVALUE) = '1' THEN				
 					
-					--nDSACK0 <= '1';
 					nDSACK1 <= '0';
 				
 				ELSIF dsackdelay(DELAYVALUE) = '0' THEN				
 					
-					--nDSACK0 <= '1';
 					nDSACK1 <= '1';
 					
 					dsackdelay(0) <= '1';
@@ -694,19 +745,17 @@ begin
 				--WE ARE IN THE AUTOCONFIG ADDRESS SPACE
 				IF nAS = '0' THEN
 				
-					--nDSACK0 <= '1';
 					nDSACK1 <= '0';
 					
 				ELSE
 				
-					--nDSACK0 <= '1';
 					nDSACK1 <= '1';
 					
 				END IF;
 				
 			ELSIF cpuaccess = '1' THEN
 			
-				--WE ARE IN THE SDRAM ADDRESS SPACE	
+				--WE ARE IN THE SDRAM ADDRESS SPACE	AND THIS IS A 68030 ACCESS
 				IF dsacken = '1' OR nDSACK0 = '0' THEN
 			
 					--ASSERT!
@@ -730,6 +779,37 @@ begin
 				
 			END IF;
 		
+		END IF;
+		
+	END PROCESS;
+	
+	---------------------------
+	-- DMA DATA TRANSFER ACK --
+	---------------------------
+	
+	PROCESS (CPUCLK) BEGIN
+	
+		IF RISING_EDGE (CPUCLK) THEN
+		
+			IF dmaaccess = '1' THEN
+			
+				--WE ARE IN THE SDRAM ADDRESS SPACE	AND THIS IS A DMA ACCESS
+				IF dtacken = '1' or nDTACK = '0' THEN
+				
+					nDTACK <= '0';
+					
+				ELSE
+				
+					nDTACK <= '1';
+					
+				END IF;
+				
+			ELSE
+			
+				nDTACK <= 'Z';
+				
+			END IF;
+			
 		END IF;
 		
 	END PROCESS;
@@ -811,19 +891,19 @@ begin
 	----------------
 	
 	--IS EVERYTHING WE WANT CONFIGURED?
-	--THIS IS PASSED TO THE _COPCFG SIGNAL 
+	--THIS IS PASSED TO THE _COPCFG SIGNAL.
 	--U602 WILL ASSERT Z3CONFIGED WHEN Z3 RAM HAS BEEN AUTOCONFIGed OR IF Z3 RAM IS DISABLED.
 	CONFIGED <= '1' WHEN Z3CONFIGED = '1' AND boardconfiged = '1' ELSE '0';
 
 	--We have three boards we need to autoconfig, in this order
-	--1. The 68030 ROM (SEE ALSO SPECIAL REGISTER, ABOVE)
-	--2. The base memory (8MB) in the Zorro 2 space
+	--1. The 68030 ROM. SEE ALSO SPECIAL REGISTER, ABOVE.
+	--2. The base memory (4/8MB) in the Zorro 2 space.
 	--3. The expansion memory in the Zorro 3 space. This is done in U602.	
 
-	--A good explaination of the autoconfig process is given in the Amiga Hardware Reference Manual from Commodore
+	--A good explaination of the autoconfig process is given in the Amiga Hardware Reference Manual from Commodore.
 	--https://archive.org/details/amiga-hardware-reference-manual-3rd-edition
 			
-	--BOARDCONFIGED IS ASSERTED WHEN WE ARE DONE CONFIGING THE ROM AND ZORRO 2 MEMORY
+	--BOARDCONFIGED IS ASSERTED WHEN WE ARE DONE CONFIGING THE ROM AND ZORRO 2 MEMORY.
 	--WHEN THE ZORRO 2 RAM IS DISABLED BY J303, IT SETS Z2AUTO = 0.
 	--boardconfiged <= '1' WHEN (romconfiged = '1' AND Z2AUTO = '0') OR (romconfiged = '1' AND ramconfiged = '1') ELSE '0';
 	boardconfiged <= '1' WHEN romconfiged = '1' AND (Z2AUTO = '0' OR ramconfiged = '1' OR MODE68K = '1') ELSE '0';
@@ -945,7 +1025,7 @@ begin
 							--WE MAKE DUPLICATES OF THE POSSIBLE TWO 4MB ADDRESSES.
 							--SINCE WE ARE ALWAYS THE FIRST AUTOCONFIG DEVICE, WE
 							--SHOULD ONLY BE ASSIGNED 001 AS THE BASE ADDRESS,
-							--ALTHOUGH THE NEXT TWO SLOTS ARE INCLUDED.
+							--ALTHOUGH THE NEXT TWO SLOTS ARE INCLUDED HERE.
 							
 							CASE D(31 downto 29) IS
 							
@@ -967,8 +1047,7 @@ begin
 									rambaseaddress2 <= "011";
 									rambaseaddress3 <= "100";
 									
-							END CASE;
-			
+							END CASE;			
 							
 						END IF;
 								
@@ -991,7 +1070,7 @@ begin
 	--MEMORY AND ROM ARE GOOD CANDIDATES FOR CACHING, BUT NOT CHIP
 	--RAM BECAUSE AGNUS CAN ALSO USE THAT RAM.
 	
-	--DOES THIS REALLY CATCH EVERYTHING WE SHOULD CACHE?
+	--IS THIS REALLY EVERYTHING WE SHOULD CACHE?
 	--THE A2630 GOES ABOUT THIS FROM THE OTHER ANGLE, AND
 	--DEACTIVATES THE CACHE OF CERTAIN MEMORY SPACES, RATHER
 	--THAN ACTIVATE FOR CERTAIN MEMORY SPACES. THUS, THE C= LOGIC
@@ -1045,7 +1124,7 @@ begin
 	--SOME TRIVIA...JEFF BOYER HAD A HAND IN DESIGNING SOME OF THE FIRST ZORRO 2
 	--PERIPHERALS AT COMMODORE. SUCH CARDS INCLUDE THE A2052 RAM EXPANSION AND THE A2090 AND A2091
 	--HARD DRIVE CARDS. AT MIMINUM, HE HAD A HAND IN DEVELOPING THE ORIGINAL DMAC CHIP FOUND ON THE 
-	--A2090/A2091. THUS, IT SEEMS THE "BOYER HD" REFERENCED ABOVE IS, IN FACT, ANY HARD DRIVE
+	--A2090/A2091. THUS, IT SEEMS THE "BOYER HD" REFERENCED ABOVE IS ANY HARD DRIVE
 	--CONTROLLER WITH HIS ORIGINAL DMAC. THAT DESIGN WAS REPLACED BY THE SDMAC IN THE A3000.
 	--AGAIN, DESIGNED BY JEFF BOYER.
 	
