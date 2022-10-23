@@ -21,14 +21,14 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    September 25, 2022 
+-- Create Date:    October 23, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC9572 64 PIN
 -- Tool versions: 
 -- Description: BOSS, GLUE LOGIC, BUS INTERFACE, 6800/6502 STATE MACHINE, 68000 STATE MACHINE
 --
--- Revision: 2.2
+-- Hardware Revision: 2.2
 -- Additional Comments: 
 ----------------------------------------------------------------------------------
 library IEEE;
@@ -210,27 +210,24 @@ begin
 	--bus grant from the 68000, then we assert BOSS, if we're a B2000.  We
 	--always assert BOSS during a non-reset if we're an A2000.  Finally, we
 	--hold BOSS on the B2000 until either a full reset or the 68K mode is
-	--activated. U504
+	--activated.
 
-	--Check if the bus has been granted and lock in BOSS
-	--Bus mastering is supposed to be clocked on the 7MHz rising edge (A2000 technical reference)
-	--Doing it like this avoids combitorial loops and it should work fine
-	--BOSS HAS A PULLUP ON THE A2000
+	PROCESS (CLK7, nRESET) BEGIN
 
-	PROCESS (CLK7) BEGIN
 		IF RISING_EDGE (CLK7) THEN
+		
 			IF (nBOSS = '0') THEN
 				--HOLD BOSS UNTIL ONE OF THE CONDITION BELOW IS FALSE
 				IF ( nHALT = '1' AND MODE68K = '0') OR ( nRESET = '1' AND MODE68K = '0' ) THEN
 					nBOSS <= '0';
 				ELSE
-					nBOSS <= 'Z';
+					nBOSS <= '1';
 				END IF;
 			ELSE
 				--ASSERT _BGACK (_BOSS) WHEN THE 68000 HAS FINISHED ITS CURRENT CYCLE (_AS AND _DTACK ARE NEGATED).
 				IF 
-					( B2000 = '1' AND nABG = '0' AND nAAS ='1' AND nDTACK = '1' AND nHALT = '1' AND nRESET = '1' AND MODE68K = '0' ) OR 
-					( B2000 = '0' AND nHALT ='1' AND nRESET ='1') 
+					( B2000 = '1' AND nABG = '0' AND nAAS ='1' AND nDTACK = '1' AND nHALT = '1' AND MODE68K = '0' ) OR 
+					( B2000 = '0' AND nHALT ='1') 
 				THEN
 					nBOSS <= '0';
 				ELSE
@@ -258,16 +255,12 @@ begin
 	
 	--THERE IS A PULLUP ON THE A2000 FOR RESET (RST).
 	--FLOAT RESET UNTIL WE ARE ACTUALLY READY TO USE IT.
-	
-	--RESET		= BOSS & CPURESET & RESENB;
-	--RSTENB IS ACTIVE WHEN ROM IS CONFIGED...CHEAT HERE AND GO WITH OUR CONFIGED SIGNAL FROM U601
-	--RSTENB IN REV 9 2630 IS TIED TO +5V, SO WE SHOULD BE ABLE TO IGNORE IT HERE.
-	--THIS IS WORKING, AS DEMONSTRATED BY EARLY ISSUES IN THE PROJECT.
+
 	nRESET <= '0' WHEN nBOSS = '0' AND nCPURESET ='0' ELSE 'Z';
 	
-	---------------------------
-	-- E AND RELATED SIGNALS --
-	---------------------------
+	------------------------
+	-- 6800 STATE MACHINE --
+	------------------------
 	
 	--WHEN IN "A2000" MODE, WE MUST GENERATE OUR OWN E BECAUSE THE 68000 
 	--PROCESSOR IS REMOVED FROM THE MOTHERBOARD. WHEN IN "B2000" MODE, WE CAN
@@ -392,8 +385,8 @@ begin
 	--WE WANT _ADOEH ASSERTED (ENABLED) WHEN
 		--NOT DMA AND ACCESSING THE A2000 BOARD IN 68030 MODE (BOSS=0, STATE MACHINE ENABLED)
 		--DMA AND ACCESSING Z2 MEMORY IN 68030 MODE (BOSS=0)
-		--NOT DMA AND ACCESSING MEMORY IN 68000 MODE (BOSS=1, MODE68K =1)
-		--NOT DMA AND ACCESSING IDE IN 68000 MODE (BOSS=1, MODE68K =1)
+		--NOT DMA AND ACCESSING MEMORY IN 68000 MODE (BOSS=1, MODE68K =1) NOTE: NOT IMPLEMENTED
+		--NOT DMA AND ACCESSING IDE IN 68000 MODE (BOSS=1, MODE68K =1) NOTE: NOT IMPLEMENTED
 		
 	--SMDIS (STATE MACHINE DISABLED) IS ASSERTED (=1) WHEN USING RESOURCES ON THE 2630 CARD
 		--IDE MEMORY SPACE
@@ -403,12 +396,9 @@ begin
 		
 	nADOEH <= '0' 
 		WHEN 
-			--( nBOSS = '0' AND nBGACK = '1' AND MEMACCESS = '0' AND nAS = '0' AND nONBOARD = '1' AND nEXTERN = '1' ) 
 			( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0' AND nAS = '0' ) OR
-			--( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0') OR --NEW TRY. nAS IS ALREADY CONSIDERED IN THE SMDIS LOGIC.
-			--( nBOSS = '0' AND nBGACK = '1' AND sm_enabled = '1' AND nAS = '0' ) OR ==>NOOOOOOOOOOOOOOOOOOOOOOOOOO!!!!!!!<==
 			( nBOSS = '0' AND nBGACK = '0' AND nMEMZ2 = '0' AND nAAS = '0' AND A(1) = '1' )  
-			--OR ( nBOSS = '1' AND MODE68K = '1' AND nBGACK = '1' AND nMEMZ2 = '0' AND nAAS = '0' ) 
+			--OR ( nBOSS = '1' AND MODE68K = '1' AND nBGACK = '1' AND nMEMZ2 = '0' AND nAAS = '0' AND A(1) = '1' ) 
 			--OR ( nBOSS = '1' AND MODE68K = '1' AND nBGACK = '1' AND nIDEACCESS AND nAAS = '0' )
 			
 		ELSE
@@ -428,17 +418,11 @@ begin
 	--THE A2630 LATCHES DATA ON READS BECAUSE IT NEGATES _AAS AT THE MOMENT
 	--IT ASSERTS _DSACK1. BECAUSE OF THIS, THE DATA NEEDS TO BE STABLE
 	--WHILE THE 68030 COMPLETES THE CYCLE. OTHERWISE, THE 68000 DATA MAY
-	--BECOME INVALID BEFORE THE 6030 LATCHES. I AM HOPING TO MAKE IT WORK
-	--SO WE DON'T NEED TO USE THE 74xx646'S. THEY ARE COSTLY WHEN COMPARED
-	--TO A 74xx245, FOR EXAMPLE.
+	--BECOME INVALID BEFORE THE 6030 LATCHES. 
 
-	--DRSEL		= BOSS & !BGACK & RW;
 	DRSEL <= '1' WHEN nBOSS = '0' AND nBGACK = '1' AND RnW = '1' ELSE '0';
 	
-	--This is data direction control U500
-	--PIN 5		= !BGACK	;	/* '030 Bus grant acknowledge */
-	--PIN 16	= !ADDIR	;	/* Amiga data direction control */
-	--!ADDIR	=  BGACK & !RW		# !BGACK &  RW;
+	--CONTROLS DIRECTION OF THE DATA BUS
 	ADDIR <= '1'
 		WHEN 
 			( nBGACK = '0' AND RnW = '1' ) OR
@@ -446,12 +430,9 @@ begin
 		ELSE 
 			'0';
 	
-	--TRISTATE is an output used to tristate all signals that go to the 68000
-	--bus. This is done on powerup before BOSS is asserted and whenever a DMA
-	--device has control of the A2000 Bus.  We want tristate when we're not 
-	--BOSS, or when we are BOSS but we're being DMAed. U305
+	--THIS SIGNAL IS ONLY USED ON U606, WHICH BUFFERS THE 
+	--FUNCTION CODES AND INTERUPTS.
 
-	--TRISTATE	= !BOSS # (BOSS & BGACK);
 	TRISTATE <= '1' WHEN nBOSS = '1' OR ( nBOSS = '0' AND nBGACK = '0' ) ELSE '0';
 			
 	-----------------------------
@@ -471,7 +452,7 @@ begin
 	nBR <= '0' WHEN nABR = '0' AND nBOSS = '0' AND nBGACK = '1' ELSE 'Z'; --THERE IS A PULLUP ON BR.
 	
 	--ANY DEVICE REQUESTING THE BUS CANNOT "SEE" ALL THE 68030 DATA TRANSFER SIGNALS.
-	--SINCE THE REQUESTING DEVICE IS SUPPOSED TO WAIT UNTIL THE PROCESSOR HAS COMPLETED
+	--SINCE THE REQUESTING DEVICE MUST WAIT UNTIL THE PROCESSOR HAS COMPLETED
 	--IT'S CURRENT CYCLE, WE MUST DO THE ARBITRATION FOR THEM. WAIT UNTIL THE DATA 
 	--TRANSFER SIGNALS ARE ALL CLEAR BEFORE PASSING BUS GRANT TO THE REQUESTING DEVICE.
 	nABG <= '0' WHEN nBG = '0' AND nBOSS = '0' AND nAS = '1' AND nDSACK1 = '1' AND nSTERM = '1' ELSE 'Z' WHEN nBOSS = '1' ELSE '1'; 
@@ -634,7 +615,7 @@ begin
 				WHEN S4 =>
 
 					--SOME IMPORTANT STUFF HAPPENS AT S4.
-					--IF THIS IS A 6800 CYCLE, ASSERT _VMA IF WE ARE IN SYNC WITH E
+					--IF THIS IS A 6800 CYCLE, ASSERT _VMA IF WE ARE IN SYNC WITH E. SEE 6800 STATE MACHINE.
 					--IF THIS IS A 68000 CYCLE, LOOK FOR ASSERTION OF _DTACK.
 					--IF THIS IS A 68000 WRITE CYCLE, ASSERT THE DATA STROBES HERE (SET PREVIOUSLY).
 
