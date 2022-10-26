@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    October 24, 2022 
+-- Create Date:    October 25, 2022 
 -- Design Name:    N2630 U602 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -72,7 +72,7 @@ entity U602 is
 				nDIOR : INOUT STD_LOGIC; --IDE READ SIGNAL
 				nDIOW : INOUT STD_LOGIC; --IDE WRITE SIGNAL
 				
-				nZ3CONFIGED : OUT STD_LOGIC; --HAS ZORRO 3 RAM BEEN AUTOCONFIGed? ACTIVE HIGH				
+				Z3CONFIGED : INOUT STD_LOGIC; --HAS ZORRO 3 RAM BEEN AUTOCONFIGed? ACTIVE HIGH				
 				nCS0 : OUT STD_LOGIC; --IDE CHIP SELECT 0
 				nCS1 : OUT STD_LOGIC; --IDE CHIP SELECT 1
 				DA : OUT STD_LOGIC_VECTOR (2 DOWNTO 0); --IDE ADDRESS LINES
@@ -279,10 +279,10 @@ begin
 	
 	--SIGNAL U601 WHEN WE ARE DONE AUTOCONFIGing.
 	--THIS IS EITHER AFTER WE HAVE AUTOCONFIGED OR THE USER HAS DISABLED THE Z3 RAM VIA J305.
-	nZ3CONFIGED <= '1' WHEN Z3RAM_CONFIGED = '1' OR nZ3DIS = '0' ELSE '0';
+	Z3CONFIGED <= '1' WHEN Z3RAM_CONFIGED = '1' OR nZ3DIS = '0' ELSE '0';
 	
 	--ARE WE IN THE Z3 AUTOCONFIG MEMORY SPACE?
-	AUTOCONFIG_SPACE <= '1' WHEN A(31 DOWNTO 24) = x"FF" AND nZ3DIS = '1' AND Z3RAM_CONFIGED = '0' ELSE '0';
+	AUTOCONFIG_SPACE <= '1' WHEN A(31 DOWNTO 24) = x"FF" AND Z3CONFIGED = '0' ELSE '0';
 	
 	--MAP THE ADDRESS BITS FOR Z3 AUTOCONFIG.
 	--MAPPING A8 AS A1 RESULTS IN THE BITS LINING UP THE SAME AS THEY WOULD IN Z2 AUTOCONFIG.
@@ -312,7 +312,7 @@ begin
 						WHEN "000000" => DATAOUTAC <= "1010"; --ZORRO 3 CARD
 						
 						--$02
-						WHEN "000001" => DATAOUTAC <= "0100"; --256MB MAX
+						WHEN "000001" => DATAOUTAC <= "0011"; --256MB MAX
 						
 						--$04
 						--WHEN "000010" => D(31 DOWNTO 28) <= "1111"; --PRODUCT NUMBER	
@@ -333,12 +333,14 @@ begin
 						
 						--$0A
 						--INVERTED
-						WHEN "000101" => DATAOUTAC <= "1110"; --AUTOSIZED BY THE OPERATING SYSTEM					
+						WHEN "000101" => DATAOUTAC <= "1100"; --AUTOSIZED BY THE OPERATING SYSTEM					
 					
 						--EVERYTHING ELSE
 						WHEN OTHERS => DATAOUTAC <= "1111";
 					
 					END CASE;
+					
+					
 					
 				ELSIF addr = "100010" AND nDS = '0' THEN	
 					--WRITE REGISTER
@@ -515,8 +517,12 @@ begin
 	
 	--GAYLE SPECS TELL US WHEN THE IDE CHIP SELECT LINES ARE ACTIVE
 	
-	nCS0 <= '0' WHEN A(12) = '0' AND IDE_SPACE = '1' ELSE '1';			
-	nCS1 <= '0' WHEN A(12) = '1' AND IDE_SPACE = '1' ELSE '1';
+	nCS0 <= '0' WHEN A(12) = '0' AND ide_space = '1' ELSE '1';			
+	nCS1 <= '0' WHEN A(12) = '1' AND ide_space = '1' ELSE '1';
+	
+	--READ/WRITE SIGNALS
+	nDIOR <= '0' WHEN ide_space = '1' AND RnW = '1' ELSE '1';
+	nDIOW <= '0' WHEN ide_space = '1' AND RnW = '0' AND nDS = '0' ELSE '1';
 			
 	--GAYLE EXPECTS IDE DA2..0 TO BE CONNECTED TO A4..2
 	
@@ -530,29 +536,34 @@ begin
 		IF (nGRESET = '0') THEN
 		
 			--AMIGA HAS RESET, START OVER
-			nDIOR <= '1';
-			nDIOW <= '1';
+			--nDIOR <= '1';
+			--nDIOW <= '1';
 			idesacken <= '0';
 			idesackenabled <= '0';
 		
 		ELSIF RISING_EDGE(CPUCLK) THEN			
 		
-			IF ide_space = '1' THEN			
+			IF ide_space = '1' AND IORDY = '1' THEN			
 				--WE ARE IN THE IDE ADDRESS SPACE 
 				
-				IF RnW = '1' THEN
-				
-					--THIS IS A READ, WHICH CAN BE ASSERTED IMMEDIATELY
-					nDIOR <= '0';
-					
-				ELSIF RnW = '0' AND nDS = '0' THEN
-				
-					--THIS IS A WRITE, WHICH IS ASSERTED ONE CLOCK AFTER DATA STROBE
-					nDIOW <= '0';
-					
-				END IF;
+--				IF RnW = '1' THEN
+--				
+--					--THIS IS A READ, WHICH CAN BE ASSERTED IMMEDIATELY
+--					nDIOR <= '0';
+--					
+--				ELSE
+--				
+--					IF nDS = '0' THEN
+--				
+--						--THIS IS A WRITE, WHICH IS ASSERTED ONE CLOCK AFTER DATA STROBE
+--						nDIOW <= '0';
+--						
+--					END IF;
+--					
+--				END IF;
 
-				IF IORDY = '1' THEN
+--				IF IORDY = '1' THEN
+				
 					--IORDY IS ACTIVE HIGH BUT IS CALLED "_WAIT" IN THE GAYLE SPECS. 
 					--WHEN HIGH, THE IDE DEVICE IS READY TO TRANSMIT OR RECEIVE DATA. 						
 					--SIGNAL 16 BIT PORT TO 68030.
@@ -571,13 +582,13 @@ begin
 					
 					idesackenabled <= '1';
 					
-				END IF;
+				--END IF;
 					
 			ELSE
 			
 				--SET IN A "NOP" STATE
-				nDIOR <= '1';
-				nDIOW <= '1';						
+				--nDIOR <= '1';
+				--nDIOW <= '1';						
 				idesackenabled <= '0';
 					
 			END IF;
@@ -662,6 +673,7 @@ begin
 	MEMSEL <= '1' 
 		WHEN 
 			Z3RAM_CONFIGED = '1' AND FC(2 DOWNTO 0) /= "111" AND A(31 DOWNTO 28) = Z3RAM_BASE_ADDR			 
+			--FC(2 DOWNTO 0) /= "111" AND A(31 DOWNTO 28) = "0001"
 		ELSE 			 
 			'0';	
 	
