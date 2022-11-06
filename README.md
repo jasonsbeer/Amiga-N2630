@@ -25,12 +25,16 @@ When desired, the 68030 may be disabled during a cold or warm start. This result
 The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM is the successor to Fast Page Memory found in devices such as the Amiga 3000, A2630 processor card, and other computers of the time. SDRAMs are a very cost effictive way to supply memory to older systems and are readily available either new or from unused memory modules. 
 
 ### Zorro 2
-Zorro 2 RAM is the Amiga RAM found in the 24 bit address space of the Motorola 68000 processor. The Zorro 2 RAM on the N2630 is accessed by the 68030 as a 32-bit data bus and supports DMA activities of the Zorro 2 bus. Using the N2630 Zorro 2 RAM will result in greater performance in 68030 mode when compared to other RAM on the Zorro 2 bus. When 68000 mode is selected, the Zorro 2 memory expansion remains available to the system. The Zorro 2 RAM may be disabled by adding a jumper to J303. Disabling the Zorro 2 RAM is not recommended for regular use as this will degrade performance of the system.
+Zorro 2 RAM is the Amiga RAM found in the 24 bit address space of the Motorola 68000 processor. The Zorro 2 RAM on the N2630 is accessed by the 68030 as a 32-bit data bus and supports 16-bit DMA activities of the Zorro 2 bus. Installing 2Mx16 or greater capacity SDRAMs will allow the N2630 to configure the maximum of 8MB in the Zorro 2 space. Placing a jumper at position J404 will limit the amount of RAM configured to 4MB in the Zorro 2 space, freeing up 4MB to be supplied by other Zorro 2 devices. This may be useful in the event you have a device that requires it's own RAM for proper function. One example being the GVP Impact Series II card, which can only use its own RAM for DMA activities. 
+
+The N2630 will always configure the onboard RAM and cannot be "shut up" in the AUTOCONFIG process. You must use the onboard RAM to maximize the performance of the MC68030. The N2630 Zorro 2 RAM may be disabled by placing a jumper at J303. This is discouraged and should only be done for testing purposes.
 
 NOTE: Any SDRAM at least 2Mx16 in capacity in the 54-TSOP II footprint may be placed. However, it is not possible to achieve more than 8 megabytes of Zorro 2 RAM capacity. 
 
 ### Zorro 3
-Zorro 3 RAM is the Amiga RAM found in the 32 bit address space of the Motorola 68030 processor. Both Zorro 2 and Zorro 3 RAM are used together on the N2630 card. Thus, total memory available to the system will be the sum of the Zorro 2 and Zorro 3 RAM. Zorro 3 SDRAMs may be installed in different configurations to acheive a specific amount of final RAM (Table 1). The SDRAM footprint is 54-TSOP II. The indicated jumpers must be set as shown or your system may not function correctly.
+Zorro 3 RAM is the Amiga RAM found in the 32-bit address space of the Motorola 68030 processor. Both Zorro 2 and Zorro 3 RAM are used together on the N2630 card. Thus, the total memory available to the system will be the sum of the Zorro 2 and Zorro 3 RAM. Zorro 3 SDRAMs may be installed in different configurations to acheive a specific amount of final RAM (Table 1). The SDRAM footprint is 54-TSOP II. The indicated jumpers must be set as shown or your system may not function correctly.
+
+The Zorro 3 memory supports AUTOCONFIG with Kickstart 2.04 and newer. When using Kickstart version 1.x, ADDMEM may be used to add the Zorro 3 memory to the Amiga's memory pool. See Table 2 for the N2630 Zorro 3 memory map.
 
 The Zorro 3 RAM may be disabled by adding a jumper to J305. Disabling the Zorro 3 RAM is not recommended for regular use as this will degrade performance of the 68030.
 
@@ -50,6 +54,15 @@ Desired Zorro</br>3 RAM (MB)|SDRAM</br>Capacity|U406|U407|U408|U409|J400|J401|J4
 <sup>B</sup> This position not populated.  
 <sup>C</sup> No jumper.  
 <sup>D</sup> Jumper placed.  
+
+**Table 2.** N2630 Zorro 3 Memory Map
+Desired Zorro</br>3 RAM (MB)|Starting Address|Ending Address
+-|-|-
+16|$40000000|$40FFFFFF
+32|$40000000|$41FFFFFF
+64|$40000000|$43FFFFFF
+128|$40000000|$47FFFFFF
+256|$40000000|$4FFFFFFF
 
 ## ATA/IDE Port
 The N2630 includes an AUTOBOOT<sup>[A]</sup> ATA/IDE port compatable with hard drives and ATAPI<sup>[B]</sup> devices. The port supports two devices (master and slave) and operates in PIO mode. The port may be disabled by placing a jumper on J600 (Table 2). For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
