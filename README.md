@@ -65,7 +65,7 @@ Desired Zorro</br>3 RAM (MB)|Starting Address|Ending Address
 256|$40000000|$4FFFFFFF
 
 ## ATA/IDE Port
-The N2630 includes an AUTOBOOT<sup>[A]</sup> ATA/IDE port compatable with hard drives and ATAPI<sup>[B]</sup> devices. The port supports two devices (master and slave) and operates in PIO mode. The port may be disabled by placing a jumper on J600 (Table 2). For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
+The N2630 includes an AUTOBOOT<sup>[A]</sup> ATA/IDE port compatable with hard drives and ATAPI<sup>[B]</sup> devices. The port supports two devices (master and slave) and operates in PIO mode. The port may be disabled by placing a jumper on J600. (Table 3) For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
 
 <sup>A</sup>AUTOBOOT requires Kickstart v37.300 or greater or compatable SCSI.device in Kickstart.  
 <sup>B</sup>ATAPI support included in Kickstart 3.1.4+. Older versions of Kickstart may require installation of third party ATAPI drivers.  
@@ -74,12 +74,12 @@ The N2630 includes an AUTOBOOT<sup>[A]</sup> ATA/IDE port compatable with hard d
 The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the 68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 4, J202). The PLCC-68 footprint is supported, which is available up to 40MHz.
 
 ## Unix (Amix)
-The N2630 card should fully support Amiga Unix (Amix). In order to boot into a Unix environment, you must place a jumper at J304. (Table 2.) Although this feature is fully supported by the A2630 ROMs, it has not been tested with the N2630 at this time.
+The N2630 card should fully support Amiga Unix (Amix). In order to boot into a Unix environment, you must place a jumper at J304. (Table 3) Although this feature is fully supported by the A2630 ROMs, it has not been tested with the N2630 at this time.
 
 ## Other Jumper Settings
 In the following tables, OPEN indicates no jumper. Shorted indicates the presence of a jumper on the pins indicated. All jumpers must be set correctly or you may encounter unexpected bahaviors or failure to boot.
 
-**Table 2.** Configuration Jumper Settings
+**Table 3.** Configuration Jumper Settings
 Jumper|Description|Shorted|Open<sup>[A]</sup>
 -|-|-|-
 J302|Amiga Version|A2000|B2000
@@ -91,7 +91,7 @@ J600|IDE|Disable|Enable
 
 <sup>A</sup>The factory configuration for all jumpers is open (no jumper).  
 
-**Table 3.** System Clock Jumper Settings
+**Table 4.** System Clock Jumper Settings
 Jumper|Description|1-2|2-3
 -|-|-|-
 J202|FPU Clock|X1<sup>[A]</sup>|X2<sup>[B]</sup>
