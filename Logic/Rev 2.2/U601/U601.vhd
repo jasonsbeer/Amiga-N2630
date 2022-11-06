@@ -21,12 +21,12 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    OCTOBER 19, 2022 
+-- Create Date:    NOVEMBER 5, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC95144 144 PIN
 -- Tool versions: 
--- Description: INCLUDES LOGIC FOR ZORRO 2 AUTOCONFIG, ZORRO2 SDRAM CONTROLLER, AND GENERAL GLUE LOGIC
+-- Description: INCLUDES LOGIC FOR AUTOCONFIG, ZORRO2 SDRAM CONTROLLER, AND GENERAL GLUE LOGIC
 --
 -- Revision: 2.2
 -- Additional Comments: 
@@ -66,7 +66,7 @@ PORT
 	DROM : IN STD_LOGIC_VECTOR (20 DOWNTO 16); --THIS IS FOR THE ROM SPECIAL REGISTER
 	nMEMZ3 : IN STD_LOGIC; --ZORRO 3 RAM IS RESPONDING TO THE ADDRESS (WAS EXTSEL)
 	nSENSE : IN STD_LOGIC; --68882 SENSE
-	Z3CONFIGED : IN STD_LOGIC; --IS ZORRO 3 RAM CONFIGURED?	
+	Z3CONFIGED : INOUT STD_LOGIC; --IS ZORRO 3 RAM CONFIGURED?	
 	nIDEACCESS : IN STD_LOGIC; --IDE IS RESPONDING TO THE ADDRESS SPACE
 	nBOSS : IN STD_LOGIC; --BOSS SIGNAL
 	A7M : IN STD_LOGIC; --AMIGA 7MHZ CLOCK
@@ -150,9 +150,11 @@ architecture Behavioral of U601 is
 	--AUTOCONFIG SIGNALS
 	SIGNAL autoconfigspace : STD_LOGIC; --AUTOCONFIG ADDRESS SPACE
 	SIGNAL romconfiged : STD_LOGIC; --HAS THE ROM BEEN AUTOCONFIGED?
-	SIGNAL ramconfiged : STD_LOGIC; --HAS THE Z2 RAM BEEN AUTOCONFIGED?
+	SIGNAL ram2configed : STD_LOGIC; --HAS THE Z2 RAM BEEN AUTOCONFIGED?
+	SIGNAL ram3configed : STD_LOGIC; --HAS THE Z3 RAM BEEN AUTOCONFIGED?
 	SIGNAL boardconfiged : STD_LOGIC; --HAS THE ROM AND Z2 RAM FINISHED CONFIGURING?
 	SIGNAL D_ZORRO2RAM : STD_LOGIC_VECTOR (3 DOWNTO 0); --Z2 AUTOCONFIG DATA
+	SIGNAL D_ZORRO3RAM : STD_LOGIC_VECTOR (3 DOWNTO 0); --Z3 AUTOCONFIG DATA
 	SIGNAL D_2630 : STD_LOGIC_VECTOR (3 DOWNTO 0); --ROM AUTOCONFIG DATA
 	SIGNAL regreset : STD_LOGIC; --REGISTER RESET 
 	SIGNAL jmode : STD_LOGIC; --JMODE
@@ -285,7 +287,7 @@ begin
 			  A(23 DOWNTO 21) = rambaseaddress2 OR 
 			  A(23 DOWNTO 21) = rambaseaddress3 ) AND
 			  
-			ramconfiged = '1' AND
+			ram2configed = '1' AND
 			nBGACK = '1' AND 
 			FC(2 downto 0) /= "111" AND
 			nAS = '0'
@@ -301,7 +303,7 @@ begin
 			  A(23 DOWNTO 21) = rambaseaddress2 OR 
 			  A(23 DOWNTO 21) = rambaseaddress3 ) AND
 			  
-			ramconfiged = '1' AND 
+			ram2configed = '1' AND 
 			nAS = '0' AND 
 			nBGACK = '0'
 		ELSE
@@ -837,6 +839,8 @@ begin
    --with the CPU.  Otherwise, the registers can only be reset with a cold
    --reset asserted.
 	
+	--THE A2630, THIS IS LATCHED ON THE INVERSE (falling edge) 7MHZ CLOCK.
+	
 	PROCESS (CPUCLK) BEGIN
 	
 		IF RISING_EDGE(CPUCLK) THEN
@@ -893,7 +897,8 @@ begin
 	--IS EVERYTHING WE WANT CONFIGURED?
 	--THIS IS PASSED TO THE _COPCFG SIGNAL.
 	--U602 WILL ASSERT Z3CONFIGED WHEN Z3 RAM HAS BEEN AUTOCONFIGed OR IF Z3 RAM IS DISABLED.
-	CONFIGED <= '1' WHEN Z3CONFIGED = '1' AND boardconfiged = '1' ELSE '0';
+	--CONFIGED <= '1' WHEN Z3CONFIGED = '1' AND boardconfiged = '1' ELSE '0';
+	CONFIGED <= boardconfiged;
 
 	--We have three boards we need to autoconfig, in this order
 	--1. The 68030 ROM. SEE ALSO SPECIAL REGISTER, ABOVE.
@@ -905,8 +910,9 @@ begin
 			
 	--BOARDCONFIGED IS ASSERTED WHEN WE ARE DONE CONFIGING THE ROM AND ZORRO 2 MEMORY.
 	--WHEN THE ZORRO 2 RAM IS DISABLED BY J303, IT SETS Z2AUTO = 0.
-	--boardconfiged <= '1' WHEN (romconfiged = '1' AND Z2AUTO = '0') OR (romconfiged = '1' AND ramconfiged = '1') ELSE '0';
-	boardconfiged <= '1' WHEN romconfiged = '1' AND (Z2AUTO = '0' OR ramconfiged = '1' OR MODE68K = '1') ELSE '0';
+	--boardconfiged <= '1' WHEN (romconfiged = '1' AND Z2AUTO = '0') OR (romconfiged = '1' AND ram2configed = '1') ELSE '0';
+	--boardconfiged <= '1' WHEN romconfiged = '1' AND (Z2AUTO = '0' OR ram2configed = '1' OR MODE68K = '1') ELSE '0';
+	boardconfiged <= '1' WHEN romconfiged = '1' AND ram2configed = '1' AND ram3configed = '1' ELSE '0';
 	
 	--WE ARE IN THE Z2 AUTOCONFIG ADDRESS SPACE ($E80000).
 	--THIS IS QUALIFIED BY BOARDCONFIGED SO WE STOP RESPONDING TO THE AUTOCONFIG 
@@ -926,6 +932,9 @@ begin
 				WHEN romconfiged = '0' AND autoconfigspace = '1' AND RnW = '1' AND nAS = '0'
 		ELSE
 			D_ZORRO2RAM 
+				WHEN Z2AUTO = '1' AND ram2configed = '0' AND autoconfigspace = '1' AND RnW = '1' AND nAS = '0'
+		ELSE
+			D_ZORRO3RAM 
 				WHEN autoconfigspace ='1' AND RnW = '1' AND nAS = '0'
 		ELSE
 			"ZZZZ";		
@@ -937,6 +946,9 @@ begin
 	
 	ramsize <= "000" WHEN nRAM8 = '1' ELSE "111";
 	
+	--SIGNAL FOR U602 TO KNOW WHEN Z3 RAM IS CONFIGURED
+	Z3CONFIGED <= ram3configed;
+	
 	--AUTCONFIG SEQUENCE, IN ALL ITS GLORY!
 	PROCESS ( CPUCLK, nRESET ) BEGIN
 	
@@ -946,7 +958,13 @@ begin
 			rambaseaddress1 <= "111";
 			rambaseaddress2 <= "111";
 			rambaseaddress3 <= "111";
-			ramconfiged <= '0';			
+			
+			ram2configed <= '0';			
+			ram3configed <= '0';
+			
+			D_2630 <= "0000";
+			D_ZORRO2RAM <= "0000";
+			D_ZORRO3RAM <= "0000";
 			
 		ELSIF ( RISING_EDGE (CPUCLK)) THEN
 		
@@ -960,102 +978,137 @@ begin
 						WHEN "000000" => 
 							D_2630 <= "1110"; 
 							D_ZORRO2RAM <= "1110"; --er_type: Zorro 2 card without BOOT ROM, LINK TO MEM POOL
+							D_ZORRO3RAM <= "1010"; --Z3 Board, LINK TO MEM POOL, NO ROM
 
 						--offset $02 NOT INVERTED
 						WHEN "000001" => 						
 							
-							D_2630 <= "0" & ramsize; --RAM SIZE AS DETERMINED BY JUMPER J404.
-							D_ZORRO2RAM <= "0" & ramsize;
+							D_2630 <= "0" & ramsize; 
+							D_ZORRO2RAM <= "1" & ramsize; --RAM SIZE AS DETERMINED BY JUMPER J404. NEXT DEVICE IS RELATED.
+							D_ZORRO3RAM <= "0011"; --128MB
 
 						--offset $04 INVERTED
 						WHEN "000010" => 
 							D_2630 <= "1010";
 							D_ZORRO2RAM <= "1010"; --Product Number Hi Nibble, we are stealing the A2630 product number
+							D_ZORRO3RAM <= "1111";
 
 						--offset $06 INVERTED
 						WHEN "000011" => 
 							D_2630 <= "1110";
 							D_ZORRO2RAM <= "1110"; --Product Number Lo Nibble
+							D_ZORRO3RAM <= "1110";
 							
 						--offset $08 INVERTED
 						WHEN "000100" =>
 							D_2630 <= "1111"; 
 							D_ZORRO2RAM <= "1011"; --PREFER 8 MEG SPACE, CAN'T BE SHUT UP
+							D_ZORRO3RAM <= "0100"; --MEMORY DEVICE, CAN BE SHUT UP, EXTENDED RAM SIZE, ZORRO 3 CARD
+						
+						--offset $0A INVERTED
+						WHEN "000101" =>
+							D_2630 <= "1111";
+							D_ZORRO2RAM <= "1111";
+							D_ZORRO3RAM <= "1110"; --AUTOSIZED BY OS
 
 						--offset $0C INVERTED						
 						WHEN "000110" => 
 							D_2630 <= OSMODE & "111"; --THE A2630 CONFIGURES THIS NIBBLE AS "0111" WHEN UNIX, "1111" WHEN AMIGA OS
 							D_ZORRO2RAM <= "1111"; --Reserved: must be zeroes
+							D_ZORRO3RAM <= "1111";
 
 						--offset $12 INVERTED
 						WHEN "001001" => 
 							D_2630 <= "1111";
 							D_ZORRO2RAM <= "1101"; --MANUFACTURER Number, high byte, low nibble hi byte. Just for fun, lets put C= in here!
+							D_ZORRO3RAM <= "1111";
 
 						--offset $16 INVERTED
 						WHEN "001011" => 
 							D_2630 <= "1111";
 							D_ZORRO2RAM <= "1101"; --MANUFACTURER Number, low nibble low byte. Just for fun, lets put C= in here!
+							D_ZORRO3RAM <= "1111";
 
 						WHEN OTHERS => 
 							D_2630 <= "1111";
 							D_ZORRO2RAM <= "1111"; --INVERTED...Reserved offsets and unused offset values are all zeroes
+							D_ZORRO3RAM <= "1111";
 
 					END CASE;					
 
-				ELSIF RnW = '0' AND nDS = '0' AND A(6 downto 1) = "100100" THEN
+				ELSIF RnW = '0' AND nDS = '0' THEN
 				
-						--WRITE REGISTER AT OFFSET $48. THIS IS WHERE THE BASE ADDRESS IS ASSIGNED.
-						
-						IF nRAM8 = '1' THEN
-						
-							--WHEN WE ARE AUTOCONFIGing 8MB OF RAM, WE USE UP ALL 
-							--THE ADDRESSES OF THE 8MB SPACE, SO THESE ARE THE ONLY
-							--POSSIBLE VALUES. 
+					CASE A(6 downto 1) IS
+					
+						WHEN "100100" =>
+							--WRITE REGISTER AT OFFSET $48. THIS IS WHERE THE BASE ADDRESS IS ASSIGNED.
+								
+							IF ram2configed = '0' THEN
 							
-							rambaseaddress0 <= "001";
-							rambaseaddress1 <= "010";	
-							rambaseaddress2 <= "011";
-							rambaseaddress3 <= "100";	
-							
-						ELSE
-							
-							--THE USER HAS CHOSEN TO AUTOCONFIGure 4MB.
-							--BECAUSE WE HAVE FOUR ADDRESSES TO POPULATE IN OUR LOGIC,
-							--WE MAKE DUPLICATES OF THE POSSIBLE TWO 4MB ADDRESSES.
-							--SINCE WE ARE ALWAYS THE FIRST AUTOCONFIG DEVICE, WE
-							--SHOULD ONLY BE ASSIGNED 001 AS THE BASE ADDRESS,
-							--ALTHOUGH THE NEXT TWO SLOTS ARE INCLUDED HERE.
-							
-							CASE D(31 downto 29) IS
-							
-								WHEN "001" =>
+								--THIS IS THE ZORRO 2 RAM BASE ADDRESS.
+								
+								IF nRAM8 = '1' THEN
+								
+									--WHEN WE ARE AUTOCONFIGing 8MB OF RAM, WE USE UP ALL 
+									--THE ADDRESSES OF THE 8MB SPACE, SO THESE ARE THE ONLY
+									--POSSIBLE VALUES. 
+									
 									rambaseaddress0 <= "001";
 									rambaseaddress1 <= "010";	
-									rambaseaddress2 <= "001";
-									rambaseaddress3 <= "010";	
-									
-								WHEN "010" =>
-									rambaseaddress0 <= "010";
-									rambaseaddress1 <= "011";	
-									rambaseaddress2 <= "010";
-									rambaseaddress3 <= "011";	
-									
-								WHEN others =>
-									rambaseaddress0 <= "011";
-									rambaseaddress1 <= "100";	
 									rambaseaddress2 <= "011";
-									rambaseaddress3 <= "100";
+									rambaseaddress3 <= "100";	
 									
-							END CASE;			
-							
-						END IF;
+								ELSE
+									
+									--THE USER HAS CHOSEN TO AUTOCONFIGure 4MB.
+									--BECAUSE WE HAVE FOUR ADDRESSES TO POPULATE IN OUR LOGIC,
+									--WE MAKE DUPLICATES OF THE POSSIBLE TWO 4MB ADDRESSES.
+									
+									CASE D(31 downto 29) IS
+									
+										WHEN "001" =>
+											rambaseaddress0 <= "001";
+											rambaseaddress1 <= "010";	
+											rambaseaddress2 <= "001";
+											rambaseaddress3 <= "010";	
+											
+										WHEN "010" =>
+											rambaseaddress0 <= "010";
+											rambaseaddress1 <= "011";	
+											rambaseaddress2 <= "010";
+											rambaseaddress3 <= "011";	
+											
+										WHEN others =>
+											rambaseaddress0 <= "011";
+											rambaseaddress1 <= "100";	
+											rambaseaddress2 <= "011";
+											rambaseaddress3 <= "100";
+											
+									END CASE;			
+									
+								END IF;
+										
+								ram2configed <= '1'; 	
 								
-						ramconfiged <= '1'; 		
+							END IF;
 						
+						WHEN "100010" =>
+						
+							--THIS IS THE ZORRO 3 BASE ADDRESS.
+							--ZORRO 3 BASE ADDRESS APPEARS AT $44. 01000100
+							--A(6 downto 1) = "100010" 
+							
+							ram3configed <= '1';		
+								
+						WHEN OTHERS => 
+						
+							--YO. NOTHING TO DO HERE.
+							
+					END CASE;
+
 				END IF;					
-				
-			END IF;
+					
+			END IF;					
 			
 		END IF;
 		
