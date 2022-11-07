@@ -21,12 +21,12 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    October 25, 2022 
+-- Create Date:    November 7, 2022 
 -- Design Name:    N2630 U602 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
 -- Tool versions: 
--- Description: INCLUDES LOGIC FOR ZORRO 3 AUTOCONFIG, ZORRO 3 SDRAM CONTROLLER, AND GAYLE IDE CONTROLLER
+-- Description: INCLUDES LOGIC FOR ZORRO 3 SDRAM CONTROLLER AND GAYLE IDE CONTROLLER
 --
 -- Hardware Revision: 2.2
 -- Additional Comments: 
@@ -48,16 +48,16 @@ entity U602 is
 				A : IN  STD_LOGIC_VECTOR (31 DOWNTO 0);
 				RnW : IN STD_LOGIC; --READ/WRITE SIGNAL FROM 680x0
 				nAS : IN STD_LOGIC; --ADDRESS STROBE
-				--IORDY : IN STD_LOGIC; --IDE I/O READY
-				--INTRQ : IN STD_LOGIC; --IDE INTERUPT REQUEST
+				IORDY : IN STD_LOGIC; --IDE I/O READY
+				INTRQ : IN STD_LOGIC; --IDE INTERUPT REQUEST
 				--MODE68K : IN STD_LOGIC; --ARE WE IN 68000 MODE?
 				CPUCLK : IN STD_LOGIC; --25MHz CPU CLOCK
 				A7M : IN STD_LOGIC; --7MHz AMIGA CLOCK
 				nRESET : IN STD_LOGIC; --SYSTEM RESET SIGNAL VALID IN 68000 AND 68030 MODE
 				--nGRESET : IN STD_LOGIC; --68030 ONLY RESET SIGNAL
-				--nIDEDIS : IN STD_LOGIC; --IDE DISABLE
+				nIDEDIS : IN STD_LOGIC; --IDE DISABLE
 				--nZ3DIS : IN STD_LOGIC; --ZORRO 3 RAM DISABLE
-				--nDS : IN STD_LOGIC; --68030 DATA STROBE
+				nDS : IN STD_LOGIC; --68030 DATA STROBE
 				FC : IN STD_LOGIC_VECTOR (2 DOWNTO 0); --68030 FUNCTION CODES
 				SIZ : IN STD_LOGIC_VECTOR (1 DOWNTO 0); --68030 TRANSFER SIZE SIGNALS
 				--nBGACK : IN STD_LOGIC; --680x0 BUS GRANT ACK
@@ -66,20 +66,21 @@ entity U602 is
 				--nIO16 : IN STD_LOGIC; --IDE IO16 SIGNAL, NOT USED.
 				
 				--D : INOUT  STD_LOGIC_VECTOR (31 DOWNTO 28);
+				D : INOUT STD_LOGIC; --THIS IS D31 OF THE 68030
 				nMEMZ3 : INOUT STD_LOGIC; --SIGNALS THE OTHER LOGIC THAT WE ARE RESPONDING TO THE RAM ADDRESS SPACE		
-				--nIDEACCESS : INOUT STD_LOGIC; --SIGNALS THE OTHER LOGIC THAT WE ARE RESPONDING TO THE IDE ADDRESS SPACE
-				--nINT2 : INOUT STD_LOGIC; --INT2 DRIVEN BY IDE INTRQ
-				--nDIOR : INOUT STD_LOGIC; --IDE READ SIGNAL
-				--nDIOW : INOUT STD_LOGIC; --IDE WRITE SIGNAL
+				nIDEACCESS : INOUT STD_LOGIC; --SIGNALS THE OTHER LOGIC THAT WE ARE RESPONDING TO THE IDE ADDRESS SPACE
+				nINT2 : INOUT STD_LOGIC; --INT2 DRIVEN BY IDE INTRQ
+				nDIOR : INOUT STD_LOGIC; --IDE READ SIGNAL
+				nDIOW : INOUT STD_LOGIC; --IDE WRITE SIGNAL
 				
 				--AUTOCONFIG_SPACE : INOUT STD_LOGIC;
 				--Z3CONFIGED : IN STD_LOGIC; --HAS ZORRO 3 RAM BEEN AUTOCONFIGed? ACTIVE HIGH				
-				--nCS0 : OUT STD_LOGIC; --IDE CHIP SELECT 0
-				--nCS1 : OUT STD_LOGIC; --IDE CHIP SELECT 1
-				--DA : OUT STD_LOGIC_VECTOR (2 DOWNTO 0); --IDE ADDRESS LINES
-				--IDEDIR : OUT STD_LOGIC; --IDE BUFFER DIRECTION
-				--nIDEEN : OUT STD_LOGIC; --IDE BUFFER ENABLE
-				--nIDERST : OUT STD_LOGIC; --IDE RESET
+				nCS0 : OUT STD_LOGIC; --IDE CHIP SELECT 0
+				nCS1 : OUT STD_LOGIC; --IDE CHIP SELECT 1
+				DA : OUT STD_LOGIC_VECTOR (2 DOWNTO 0); --IDE ADDRESS LINES
+				IDEDIR : OUT STD_LOGIC; --IDE BUFFER DIRECTION
+				nIDEEN : OUT STD_LOGIC; --IDE BUFFER ENABLE
+				nIDERST : OUT STD_LOGIC; --IDE RESET
 				
 				nDSACK0 : INOUT STD_LOGIC; --68030 ASYNC DATA ACK SIGNAL
 				nDSACK1 : INOUT STD_LOGIC; --68030 ASYNC DATA ACK SIGNAL
@@ -123,7 +124,7 @@ architecture Behavioral of U602 is
 	SIGNAL sdramcom : STD_LOGIC_VECTOR (3 DOWNTO 0); --SDRAM COMMAND
 	--SIGNAL stermen : STD_LOGIC; --ENABLE _STERM
 	SIGNAL dsacken : STD_LOGIC;
-	SIGNAL ndsack : STD_LOGIC;
+	--SIGNAL ndsack : STD_LOGIC;
 	SIGNAL chipselected : STD_LOGIC;
 	
 	--THE SDRAM COMMAND CONSTANTS ARE: _CS, _RAS, _CAS, _WE
@@ -140,6 +141,22 @@ architecture Behavioral of U602 is
 	SIGNAL CURRENT_STATE : SDRAM_STATE;
 	SIGNAL SDRAM_START_REFRESH_COUNT : STD_LOGIC; --WE NEED TO REFRESH TWICE UPON STARTUP
 	SIGNAL sdramstartup : STD_LOGIC;
+	
+	--GAYLE SIGNALS
+	SIGNAL gayleid : STD_LOGIC_VECTOR (3 DOWNTO 0); --THIS IS THE GAYLE ID VALUE
+	--SIGNAL gayleregistered : STD_LOGIC; --HAS OUR GAYLE EMULATOR BEEN REGISTERED?
+	SIGNAL gayle_space : STD_LOGIC; --ARE WE IN ANY OF THE GAYLE REGISTER SPACES?
+	SIGNAL gayleid_space : STD_LOGIC;
+	SIGNAL gaylereg_space : STD_LOGIC;
+	SIGNAL dataoutgayle : STD_LOGIC;
+	SIGNAL ideintenable : STD_LOGIC;
+	SIGNAL intreq : STD_LOGIC;
+	SIGNAL intchg : STD_LOGIC;
+	SIGNAL clrint : STD_LOGIC;
+	SIGNAL intlast : STD_LOGIC;
+	SIGNAL ide_space : STD_LOGIC;
+	SIGNAL idesacken : STD_LOGIC;
+	SIGNAL idesackdisable : STD_LOGIC;
 	
 begin
 
@@ -620,31 +637,321 @@ begin
 	-- 68030 DATA TRANSFER ACK --
 	-----------------------------
 	
-	nDSACK0 <= ndsack WHEN nMEMZ3 = '0' ELSE 'Z';
-	nDSACK1 <= ndsack WHEN nMEMZ3 = '0' ELSE 'Z';
+	--nDSACK0 <= ndsack WHEN nMEMZ3 = '0' ELSE 'Z';
+	--nDSACK1 <= ndsack WHEN nMEMZ3 = '0' ELSE 'Z';
 	
-	PROCESS (CPUCLK, nRESET) BEGIN
+	PROCESS (CPUCLK) BEGIN
 	
-		IF nRESET = '0' THEN
+		--IF nRESET = '0' THEN
 		
-			ndsack <= '1';
+			--ndsack <= '1';
 	
-		ELSIF RISING_EDGE (CPUCLK) THEN
+		IF RISING_EDGE (CPUCLK) THEN
 			
-			--MEMSEL = nMEMZ3 = '0' AND nAS = '0'
-			IF memsel = '1' AND (dsacken = '1' OR nDSACK0 = '0') THEN
+			IF memsel = '1' THEN
 			
-				--WE ARE IN THE SDRAM ADDRESS SPACE	AND ADDRESS STROBE IS ASSERTED.
-				ndsack <= '0';
+				--WE ARE IN THE ZORRO 3 ADDRESS SPACE WITH _AS ASSERTED.
+				IF dsacken = '1' OR nDSACK0 = '0' THEN
+			
+					nDSACK0 <= '0';
+					nDSACK1 <= '0';
+				
+				ELSE
+				
+					nDSACK0 <= '1';
+					nDSACK1 <= '1';
+				
+				END IF;
+				
+			ELSIF ide_space = '1' THEN
+			
+				--WE ARE IN THE IDE I/0 ADDRESS SPACE WITH _AS ASSERTED.
+				IF idesacken = '1' OR nDSACK1 = '0' THEN
+				
+					nDSACK1 <= '0';
+					
+				ELSE
+				
+					nDSACK1 <= '1';
+			
+				END IF;
+				
+			ELSIF gayle_space = '1' THEN
+			
+				--WE ARE IN THE GAYLE REGISTER ADDRESS SPACE
+				IF nAS = '0' THEN
+				
+					nDSACK1 <= '0';
+					
+				ELSE
+				
+					nDSACK1 <= '1';
+					
+				END IF;
 				
 			ELSE
 			
-				ndsack <= '1';
+				nDSACK0 <= 'Z';
+				nDSACK1 <= 'Z';
 				
 			END IF;
 		
 		END IF;
 		
 	END PROCESS;
+	
+	---------------------
+	-- DATA BUS OUTPUT --
+	---------------------
+	
+	--WE NEED TO COMMUNICATE DATA RELATED TO GAYLE/IDE.
+	
+	D <= 
+			dataoutgayle WHEN gayle_space = '1' AND RnW = '1'
+		ELSE
+			'Z'; 	
+	
+	---------------------
+	-- GAYLE REGISTERS --
+	---------------------   
+	---------------------------
+	--WE ARE USING THE AMIGA OS GAYLE IDE INTERFACE SUPPORTING PIO WITH UP TO 2 DRIVES.
+	--IT IS SIMPLE TO IMPLEMENT AND READY OUT OF THE BOX WITH KS => 37.300.
+	--COMPATABILITY CAN BE ADDED TO EARLIER KICKSTARTS BY ADDING THE APPROPRIATE SCSI.DEVICE TO ROM.
+
+	--TO TRICK AMIGA OS INTO THINKING WE HAVE A GAYLE ADDRESS DECODER, WE NEED TO RESPOND TO GAYLE SPECIFIC REGISTERS.
+	--SEE THE GAYLE SPECIFICATIONS FOR MORE DETAILS.
+	--WE DISABLE THE IDE PORT BY SIMPLY IGNORING THE GAYLE CONFIGURATION REGISTERS, WHICH TELLS AMIGA OS THERE IS NO GAYLE HERE.
+	---------------------------
+	
+	--gayleid_space <= '1' WHEN A(23 DOWNTO 12) = x"DE1" AND nIDEDIS = '1' ELSE '0'; --110111100001000000000000
+	gayleid_space <= '1' WHEN A(23 DOWNTO 15) = "110111100" AND nIDEDIS = '1' ELSE '0';
+	
+	--CHECKS IF THE CURRENT ADDRESS IS IN THE GAYLE REGISTER SPACE.
+	--gaylereg_space <= '1' WHEN A(23 DOWNTO 16) = x"DA" AND nIDEDIS = '1' ELSE '0'; --110110101000000000000000
+	gaylereg_space <= '1' WHEN A(23 DOWNTO 15) = "110110101" ELSE '0'; --AND nIDEDIS = '1' 
+	
+	gayle_space <= '1' WHEN gaylereg_space = '1' OR gayleid_space = '1' ELSE '0';		
+	
+	--GAYLE IDENTIFICATION AND REGISTER PROCESS
+	PROCESS (nDS, nRESET) BEGIN
+	
+		IF nRESET = '0' THEN
+		
+			ideintenable <= '0';
+			gayleid <= "1101"; --1101 BINARY
+	
+		ELSIF FALLING_EDGE (nDS) THEN
+					
+			IF gayleid_space = '1' THEN
+			
+				--11010000 = $D0 = ECS Gayle, 11010001 = $D1 = AGA Gayle
+				--GAYLE_ID CONFIGURATION REGISTER IS AT $DE1000. WHEN ADDRESS IS $DE1000 AND R_W IS READ, BIT 7 IS READ.
+				--BELOW IS A SIMPLE SHIFT REGISTER TO LOAD THE GAYLE ID VALUE, OF WHICH ONLY THE HIGH NIBBLE IS CONSIDERED.
+				--IF ANYTHING IS WRITTEN TO $DE1000, THAT MEANS THE REGISTER HAS BEEN RESET AND WE NEED TO RE-ESTABLISH GAYLE.
+				
+				IF (RnW = '1') THEN
+					
+					dataoutgayle <= gayleid(3);
+					gayleid <= gayleid (2 DOWNTO 0) & "0";
+					
+				ELSE
+				
+					gayleid <= "1101";
+				
+				END IF;	
+				
+			ELSIF gaylereg_space = '1' THEN
+					
+				CASE A(15 DOWNTO 12) IS
+				
+					--THE REGISTER AT $DAA000 ENABLES IDE INTERRUPTS AND IS SET BY AMIGA OS.					
+					WHEN x"A" => 
+					
+						IF RnW = '0' THEN
+							ideintenable <= D; --1 = ENABLE, 0 = DISABLE --YUP
+						ELSE
+							dataoutgayle <= ideintenable; --YUP
+						END IF;		
+					
+					--THE REGISTER AT $DA8000 IDENTIFIES THE IDE DEVICE AS THE SOURCE OF THE IRQ.						
+					WHEN x"8" =>
+						
+						IF RnW = '1' THEN -- AND ideintenable = '1'
+							dataoutgayle <= intreq; --YUP
+						END IF;											
+					
+					--WHEN THERE IS A NEW IDE IRQ, WE SET THIS TO '1'. AMIGA OS SETS TO '0' WHEN IT IS DONE HANDLING THE IRQ.
+					WHEN x"9" =>
+
+						IF RnW = '1' THEN
+							dataoutgayle <= intchg; --YUP
+						--ELSE
+							--clrint <= NOT D;
+						END IF;	
+						
+					WHEN OTHERS =>
+					
+						dataoutgayle <= 'Z';
+					
+				END CASE;
+				
+			END IF;
+			
+		END IF;
+		
+	END PROCESS;
+	
+	------------------------------------------------------
+	-- GAYLE COMPATABLE HARD DRIVE CONTROLLER INTERFACE --
+	------------------------------------------------------
+	
+	--THE FOLLOWING LOGIC HANDLES THE IDE INTERRUPT REQEUSTS.
+	--WHEN INTRQ = '1', WE SIGNAL THE INTERRUPT REQUEST ON REGISTER $DA8000 AND $DA9000 AND ASSERT _INT2.
+	--WHEN AMIGA OS IS DONE HANDLING THE REQUEST, IT NEGATES THE IDE INT ON $DA9000 AND WE THEN NEGATE _INT2.
+	
+	--PASS THE IDE DEVICE INTRQ SIGNAL TO _INT2 WHEN INTERRUPTS ARE ENABLED.
+	nINT2 <= '0' WHEN intchg = '1' AND ideintenable = '1' ELSE 'Z'; --AND nIDEDIS = '1' 
+	
+	--CLEAR THE INTERRUPT WHEN THE AMIGA SIGNALS TO DO SO.
+	clrint <= '1' WHEN gaylereg_space = '1' AND A(15 DOWNTO 12) = x"9" AND RnW = '0' AND nDS = '0' AND D = '0' ELSE '0';
+	
+	--GET THE CURRENT IDE INTERUPT STATE
+	PROCESS (CPUCLK) BEGIN --, nRESET
+	
+		--IF nRESET = '0' THEN
+		
+			--intreq <= '0';
+			--intlast <= '0';
+			
+		IF RISING_EDGE (CPUCLK) THEN
+		
+			intreq <= INTRQ;
+			intlast <= intreq;
+			
+		END IF;
+		
+	END PROCESS;
+	
+	--CHECK FOR A CHANGE IN THE IDE INTERRUPT SIGNAL
+	PROCESS (CPUCLK, CLRINT) BEGIN
+	
+		IF clrint = '1' THEN
+		
+			intchg <= '0';
+			
+		ELSIF RISING_EDGE (CPUCLK) THEN
+		
+			IF intreq = '1' AND intlast = '0' THEN
+			
+				intchg <= '1';
+				
+			END IF;
+			
+		END IF;
+		
+	END PROCESS;
+	
+	
+	--ARE WE IN THE ASSIGNED ADDRESS SPACE FOR THE IDE CONTROLLER?
+	--GAYLE IDE CHIP SELECT ADDRESS SPACE IS $DA0000 - $DA3FFF. THE ADDRESS SPACE IS HARD CODED IN GAYLE.
+	--SPACE $0DA4000 - $0DA4FFF IS IDE RESERVED. I FIND NO EVIDENCE IT WAS EVER IMPLEMENTED.
+	
+	
+	ide_space <= '1' WHEN A(23 DOWNTO 15) = "110110100" ELSE '0';
+	
+	--IDE_SPACE <= '1' WHEN (A(23 DOWNTO 12) >= x"DA0" AND A(23 DOWNTO 12) <= x"DA3") AND nAS = '0' AND nBGACK = '1' ELSE '0';	
+	--nIDEACCESS <= '0' WHEN gaylereg_space = '1' AND A(15 DOWNTO 12) < x"4" AND nBGACK = '1' ELSE '1';	--gayleregistered = '1' AND 
+	nIDEACCESS <= '0' WHEN gayle_space = '1' OR ide_space = '1' ELSE '1'; --110110100000000000000000
+	
+	--ENABLE THE IDE BUFFERS
+	nIDEEN <= '0' WHEN ide_space = '1' ELSE '1'; --ide_space = '1'
+	
+	--SETS THE DIRECTION OF THE IDE BUFFERS
+	IDEDIR <= NOT RnW;
+	
+	--WE PASS THE COMPUTER RESET SIGNAL TO THE IDE DRIVE
+	nIDERST <= nRESET;
+	
+	--GAYLE SPECS TELL US WHEN THE IDE CHIP SELECT LINES ARE ACTIVE
+	--AND IS DRIVEN PURELY BY ADDRESS.
+	
+	nCS0 <= '0' WHEN A(12) = '0' AND ide_space = '1' AND nAS = '0' ELSE '1';			
+	nCS1 <= '0' WHEN A(12) = '1' AND ide_space = '1' AND nAS = '0' ELSE '1';
+	
+	--READ/WRITE SIGNALS
+	--nDIOR <= '0' WHEN ide_space = '1' AND RnW = '1' ELSE '1';
+	--nDIOW <= '0' WHEN ide_space = '1' AND RnW = '0' AND nDS = '0' ELSE '1';
+			
+	--GAYLE EXPECTS IDE DA2..0 TO BE CONNECTED TO A4..2	
+	DA(0) <= A(2);
+	DA(1) <= A(3);
+	DA(2) <= A(4);	
+	
+	--SET THE READ/WRITE SIGNALS ON THE IDE PORT
+	PROCESS (CPUCLK, nRESET) BEGIN
+	
+		IF nRESET = '0' THEN
+		
+			idesacken <= '0';
+			idesackdisable <= '0';
+	
+		ELSIF RISING_EDGE (CPUCLK) THEN
+		
+			IF ide_space = '1' AND nAS = '0' THEN
+			
+--				IF RnW = '1' THEN
+--				
+--					nDIOR <= '0';
+--					nDIOW <= '1';
+--					
+--				ELSIF RnW = '0' AND nDS = '0' THEN
+--				
+--					nDIOR <= '1';
+--					nDIOW <= '0';
+--					
+--				ELSE
+--				
+--					nDIOR <= '1';
+--					nDIOW <= '1';
+--					
+--				END IF;
+
+				IF nDS = '0' THEN
+				
+					nDIOR <= NOT RnW; --(0 WHEN R, 1 WHEN W)
+					nDIOW <= RnW;     --(1 WHEN R, 0 WHEN W)
+					idesackdisable <= '0';
+					
+				ELSE
+				
+					nDIOR <= '1';
+					nDIOW <= '1';
+					
+				END IF;
+				
+				--IORDY IS ACTIVE HIGH BUT IS CALLED "_WAIT" IN THE GAYLE SPECS. 
+				--WHEN HIGH, THE IDE DEVICE IS READY TO TRANSMIT OR RECEIVE DATA.
+				--IF NOT READY, INSERT WAIT STATES. WHEN READY, SIGNAL 16 BIT PORT TO 68030.
+				--ENABLE _DSACK1 ON THE FIRST TIME THROUGH, THEN LET THE DSACK PROCESS DO ITS THING.
+				
+				IF IORDY = '1' AND nDS = '0' AND idesackdisable = '0' THEN
+				
+					idesacken <= '1';
+					idesackdisable <= '1';
+					
+				ELSE
+				
+					idesacken <= '0';	
+				
+				END IF;
+				
+			END IF;
+			
+		END IF;
+		
+	END PROCESS;
+			
+			
 	
 end Behavioral;
