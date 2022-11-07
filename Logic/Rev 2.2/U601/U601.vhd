@@ -898,8 +898,8 @@ begin
 	--THIS IS PASSED TO THE _COPCFG SIGNAL.
 	--U602 WILL ASSERT Z3CONFIGED WHEN Z3 RAM HAS BEEN AUTOCONFIGed OR IF Z3 RAM IS DISABLED.
 	--CONFIGED <= '1' WHEN Z3CONFIGED = '1' AND boardconfiged = '1' ELSE '0';
-	CONFIGED <= boardconfiged;
-
+	CONFIGED <= '1' WHEN boardconfiged = '1' OR MODE68K = '1' ELSE '0';
+	
 	--We have three boards we need to autoconfig, in this order
 	--1. The 68030 ROM. SEE ALSO SPECIAL REGISTER, ABOVE.
 	--2. The base memory (4/8MB) in the Zorro 2 space.
