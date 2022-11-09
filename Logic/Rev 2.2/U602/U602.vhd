@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    November 7, 2022 
+-- Create Date:    November 8, 2022 
 -- Design Name:    N2630 U602 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -156,7 +156,8 @@ architecture Behavioral of U602 is
 	SIGNAL intlast : STD_LOGIC;
 	SIGNAL ide_space : STD_LOGIC;
 	SIGNAL idesacken : STD_LOGIC;
-	SIGNAL idesackdisable : STD_LOGIC;
+	--SIGNAL idesackdisable : STD_LOGIC;
+	SIGNAL delaycount : INTEGER RANGE 0 TO 15;
 	
 begin
 
@@ -637,16 +638,14 @@ begin
 	-- 68030 DATA TRANSFER ACK --
 	-----------------------------
 	
-	--nDSACK0 <= ndsack WHEN nMEMZ3 = '0' ELSE 'Z';
-	--nDSACK1 <= ndsack WHEN nMEMZ3 = '0' ELSE 'Z';
+	PROCESS (CPUCLK, nRESET) BEGIN
 	
-	PROCESS (CPUCLK) BEGIN
-	
-		--IF nRESET = '0' THEN
+		IF nRESET = '0' THEN
 		
-			--ndsack <= '1';
+			nDSACK0 <= 'Z';
+			nDSACK1 <= 'Z';
 	
-		IF RISING_EDGE (CPUCLK) THEN
+		ELSIF RISING_EDGE (CPUCLK) THEN
 			
 			IF memsel = '1' THEN
 			
@@ -663,7 +662,7 @@ begin
 				
 				END IF;
 				
-			ELSIF ide_space = '1' THEN
+			ELSIF ide_space = '1' AND nAS = '0' THEN
 			
 				--WE ARE IN THE IDE I/0 ADDRESS SPACE WITH _AS ASSERTED.
 				IF idesacken = '1' OR nDSACK1 = '0' THEN
@@ -724,12 +723,14 @@ begin
 	--WE DISABLE THE IDE PORT BY SIMPLY IGNORING THE GAYLE CONFIGURATION REGISTERS, WHICH TELLS AMIGA OS THERE IS NO GAYLE HERE.
 	---------------------------
 	
-	--gayleid_space <= '1' WHEN A(23 DOWNTO 12) = x"DE1" AND nIDEDIS = '1' ELSE '0'; --110111100001000000000000
-	gayleid_space <= '1' WHEN A(23 DOWNTO 15) = "110111100" AND nIDEDIS = '1' ELSE '0';
+	--THE GAYLE ID REGISTER IS AT $DE1000. THIS SEEMS TO BE THE ONLY ADDRESS USED
+	--IN THE $DE1XXX SPACE, SO WE CAN JUST LOOK FOR THE MOST SIGNIFICANT BITS.
+	gayleid_space <= '1' WHEN A(23 DOWNTO 15) = "110111100" AND nIDEDIS = '1' ELSE '0'; --110111100001000000000000
 	
 	--CHECKS IF THE CURRENT ADDRESS IS IN THE GAYLE REGISTER SPACE.
-	--gaylereg_space <= '1' WHEN A(23 DOWNTO 16) = x"DA" AND nIDEDIS = '1' ELSE '0'; --110110101000000000000000
-	gaylereg_space <= '1' WHEN A(23 DOWNTO 15) = "110110101" ELSE '0'; --AND nIDEDIS = '1' 
+	--THE GAYLE REGISTERS ARE FOUND IN $DA8XXX SPACE. WE ARE SPECIFICALLY 
+	--INTERESTED IN ANY REGISTER HAVING TO DO WITH INTERRUPT REQUESTS.
+	gaylereg_space <= '1' WHEN A(23 DOWNTO 15) = "110110101" ELSE '0'; --110110101000000000000000
 	
 	gayle_space <= '1' WHEN gaylereg_space = '1' OR gayleid_space = '1' ELSE '0';		
 	
@@ -739,7 +740,7 @@ begin
 		IF nRESET = '0' THEN
 		
 			ideintenable <= '0';
-			gayleid <= "1101"; --1101 BINARY
+			gayleid <= "1101"; 
 	
 		ELSIF FALLING_EDGE (nDS) THEN
 					
@@ -750,7 +751,7 @@ begin
 				--BELOW IS A SIMPLE SHIFT REGISTER TO LOAD THE GAYLE ID VALUE, OF WHICH ONLY THE HIGH NIBBLE IS CONSIDERED.
 				--IF ANYTHING IS WRITTEN TO $DE1000, THAT MEANS THE REGISTER HAS BEEN RESET AND WE NEED TO RE-ESTABLISH GAYLE.
 				
-				IF (RnW = '1') THEN
+				IF RnW = '1' THEN
 					
 					dataoutgayle <= gayleid(3);
 					gayleid <= gayleid (2 DOWNTO 0) & "0";
@@ -762,39 +763,55 @@ begin
 				END IF;	
 				
 			ELSIF gaylereg_space = '1' THEN
-					
-				CASE A(15 DOWNTO 12) IS
+			
+				IF RnW = '1' THEN
 				
-					--THE REGISTER AT $DAA000 ENABLES IDE INTERRUPTS AND IS SET BY AMIGA OS.					
-					WHEN x"A" => 
+					--READ MODE
 					
-						IF RnW = '0' THEN
-							ideintenable <= D; --1 = ENABLE, 0 = DISABLE --YUP
-						ELSE
-							dataoutgayle <= ideintenable; --YUP
-						END IF;		
-					
-					--THE REGISTER AT $DA8000 IDENTIFIES THE IDE DEVICE AS THE SOURCE OF THE IRQ.						
-					WHEN x"8" =>
+					CASE A(14 DOWNTO 12) IS
 						
-						IF RnW = '1' THEN -- AND ideintenable = '1'
-							dataoutgayle <= intreq; --YUP
-						END IF;											
-					
-					--WHEN THERE IS A NEW IDE IRQ, WE SET THIS TO '1'. AMIGA OS SETS TO '0' WHEN IT IS DONE HANDLING THE IRQ.
-					WHEN x"9" =>
+						--THE REGISTER AT $DA8000 IDENTIFIES THE IDE DEVICE AS THE SOURCE OF THE IRQ.						
+						WHEN "000" => --$8
+							
+							dataoutgayle <= intreq;										
+						
+						--WHEN THERE IS A NEW IDE IRQ, WE SET THIS TO '1'. 
+						--AMIGA OS SETS TO '0' WHEN IT IS DONE HANDLING THE IRQ.
+						WHEN "001" => --$9
 
-						IF RnW = '1' THEN
-							dataoutgayle <= intchg; --YUP
-						--ELSE
-							--clrint <= NOT D;
-						END IF;	
+							dataoutgayle <= intchg;
+							
+						--WHEN THE IDE DEVICE IS ASSERTING INTERRUPT REQUEST, WE 
+						--SET THE BIT AT $DAA000. THIS TELLS AMIGA OS THE IDE DEVICE
+						--IS REQUESTING THE INTERUPT.					
+						WHEN "010" => --$A
 						
-					WHEN OTHERS =>
+							dataoutgayle <= ideintenable;	
+							
+						WHEN OTHERS =>
+						
+							dataoutgayle <= 'Z';
+						
+					END CASE;
 					
-						dataoutgayle <= 'Z';
+				ELSE
+				
+					--WRITE MODE
+					CASE A(14 DOWNTO 12) IS
 					
-				END CASE;
+						--AFTER AMIGA OS HAS COMPLETED ITS HANDLING OF THE IDE
+						--INTERUPT, IT SIGNALS US HERE BY CLEARING THE BIT.
+						WHEN "010" => --$A
+						
+							ideintenable <= D;
+							
+						WHEN OTHERS =>
+						
+							dataoutgayle <= 'Z';
+							
+					END CASE;				
+				
+				END IF;
 				
 			END IF;
 			
@@ -811,18 +828,13 @@ begin
 	--WHEN AMIGA OS IS DONE HANDLING THE REQUEST, IT NEGATES THE IDE INT ON $DA9000 AND WE THEN NEGATE _INT2.
 	
 	--PASS THE IDE DEVICE INTRQ SIGNAL TO _INT2 WHEN INTERRUPTS ARE ENABLED.
-	nINT2 <= '0' WHEN intchg = '1' AND ideintenable = '1' ELSE 'Z'; --AND nIDEDIS = '1' 
+	nINT2 <= '0' WHEN intchg = '1' AND ideintenable = '1' ELSE 'Z'; 
 	
-	--CLEAR THE INTERRUPT WHEN THE AMIGA SIGNALS TO DO SO.
-	clrint <= '1' WHEN gaylereg_space = '1' AND A(15 DOWNTO 12) = x"9" AND RnW = '0' AND nDS = '0' AND D = '0' ELSE '0';
+	--CLEAR THE INTERUPT WHEN AMIGA OS SIGNALS TO DO SO.
+	clrint <= '1' WHEN A(23 DOWNTO 12) = "110110101001" AND RnW = '0' AND nDS = '0' AND D = '0' ELSE '0'; --$DA9
 	
 	--GET THE CURRENT IDE INTERUPT STATE
-	PROCESS (CPUCLK) BEGIN --, nRESET
-	
-		--IF nRESET = '0' THEN
-		
-			--intreq <= '0';
-			--intlast <= '0';
+	PROCESS (CPUCLK) BEGIN
 			
 		IF RISING_EDGE (CPUCLK) THEN
 		
@@ -834,7 +846,7 @@ begin
 	END PROCESS;
 	
 	--CHECK FOR A CHANGE IN THE IDE INTERRUPT SIGNAL
-	PROCESS (CPUCLK, CLRINT) BEGIN
+	PROCESS (CPUCLK, clrint) BEGIN
 	
 		IF clrint = '1' THEN
 		
@@ -854,14 +866,10 @@ begin
 	
 	
 	--ARE WE IN THE ASSIGNED ADDRESS SPACE FOR THE IDE CONTROLLER?
-	--GAYLE IDE CHIP SELECT ADDRESS SPACE IS $DA0000 - $DA3FFF. THE ADDRESS SPACE IS HARD CODED IN GAYLE.
-	--SPACE $0DA4000 - $0DA4FFF IS IDE RESERVED. I FIND NO EVIDENCE IT WAS EVER IMPLEMENTED.
-	
-	
+	--GAYLE IDE CHIP SELECT ADDRESS SPACE IS $DA0000 - $DA3FFF. 
 	ide_space <= '1' WHEN A(23 DOWNTO 15) = "110110100" ELSE '0';
 	
-	--IDE_SPACE <= '1' WHEN (A(23 DOWNTO 12) >= x"DA0" AND A(23 DOWNTO 12) <= x"DA3") AND nAS = '0' AND nBGACK = '1' ELSE '0';	
-	--nIDEACCESS <= '0' WHEN gaylereg_space = '1' AND A(15 DOWNTO 12) < x"4" AND nBGACK = '1' ELSE '1';	--gayleregistered = '1' AND 
+	--SIGNAL U601 TO DISABLE THE 6800/68000 STATE MACHINES.
 	nIDEACCESS <= '0' WHEN gayle_space = '1' OR ide_space = '1' ELSE '1'; --110110100000000000000000
 	
 	--ENABLE THE IDE BUFFERS
@@ -874,14 +882,9 @@ begin
 	nIDERST <= nRESET;
 	
 	--GAYLE SPECS TELL US WHEN THE IDE CHIP SELECT LINES ARE ACTIVE
-	--AND IS DRIVEN PURELY BY ADDRESS.
-	
-	nCS0 <= '0' WHEN A(12) = '0' AND ide_space = '1' AND nAS = '0' ELSE '1';			
+	--AND IS DRIVEN PURELY BY ADDRESS.	
+	nCS0 <= '0' WHEN A(12) = '0' AND ide_space = '1' AND nAS = '0' ELSE '1';
 	nCS1 <= '0' WHEN A(12) = '1' AND ide_space = '1' AND nAS = '0' ELSE '1';
-	
-	--READ/WRITE SIGNALS
-	--nDIOR <= '0' WHEN ide_space = '1' AND RnW = '1' ELSE '1';
-	--nDIOW <= '0' WHEN ide_space = '1' AND RnW = '0' AND nDS = '0' ELSE '1';
 			
 	--GAYLE EXPECTS IDE DA2..0 TO BE CONNECTED TO A4..2	
 	DA(0) <= A(2);
@@ -894,64 +897,53 @@ begin
 		IF nRESET = '0' THEN
 		
 			idesacken <= '0';
-			idesackdisable <= '0';
+			delaycount <= 0;
+			
+			nDIOR <= '1';
+			nDIOW <= '1';
 	
 		ELSIF RISING_EDGE (CPUCLK) THEN
 		
 			IF ide_space = '1' AND nAS = '0' THEN
 			
---				IF RnW = '1' THEN
---				
---					nDIOR <= '0';
---					nDIOW <= '1';
---					
---				ELSIF RnW = '0' AND nDS = '0' THEN
---				
---					nDIOR <= '1';
---					nDIOW <= '0';
---					
---				ELSE
---				
---					nDIOR <= '1';
---					nDIOW <= '1';
---					
---				END IF;
-
-				IF nDS = '0' THEN
+				CASE (delaycount) IS
 				
-					nDIOR <= NOT RnW; --(0 WHEN R, 1 WHEN W)
-					nDIOW <= RnW;     --(1 WHEN R, 0 WHEN W)
-					idesackdisable <= '0';
+					WHEN 2 =>
+				
+						nDIOR <= NOT RnW; --(0 WHEN R, 1 WHEN W)
+						nDIOW <= RnW;     --(1 WHEN R, 0 WHEN W)
+						delaycount <= delaycount + 1;
+						
+					WHEN 4 =>
+				
+						--IORDY IS ACTIVE HIGH BUT IS CALLED "_WAIT" IN THE GAYLE SPECS. 
+						--WHEN HIGH, THE IDE DEVICE IS READY TO TRANSMIT OR RECEIVE DATA.
+						--IF NOT READY, INSERT WAIT STATES. WHEN READY, SIGNAL 16 BIT PORT TO 68030.
+						--ENABLE _DSACK1 ON THE FIRST TIME THROUGH, THEN LET THE DSACK PROCESS DO ITS THING.				
+						IF IORDY = '1' THEN
+						
+							idesacken <= '1';	
+							delaycount <= delaycount + 1;
+						
+						END IF;
+						
+					WHEN OTHERS =>
 					
-				ELSE
+						idesacken <= '0';	
+						delaycount <= delaycount + 1;
+						
+				END CASE;
 				
-					nDIOR <= '1';
-					nDIOW <= '1';
-					
-				END IF;
-				
-				--IORDY IS ACTIVE HIGH BUT IS CALLED "_WAIT" IN THE GAYLE SPECS. 
-				--WHEN HIGH, THE IDE DEVICE IS READY TO TRANSMIT OR RECEIVE DATA.
-				--IF NOT READY, INSERT WAIT STATES. WHEN READY, SIGNAL 16 BIT PORT TO 68030.
-				--ENABLE _DSACK1 ON THE FIRST TIME THROUGH, THEN LET THE DSACK PROCESS DO ITS THING.
-				
-				IF IORDY = '1' AND nDS = '0' AND idesackdisable = '0' THEN
-				
-					idesacken <= '1';
-					idesackdisable <= '1';
-					
-				ELSE
-				
-					idesacken <= '0';	
-				
-				END IF;
+			ELSE
+			
+				nDIOR <= '1';
+				nDIOW <= '1';
+				delaycount <= 0;
 				
 			END IF;
 			
 		END IF;
 		
-	END PROCESS;
-			
-			
+	END PROCESS;			
 	
 end Behavioral;
