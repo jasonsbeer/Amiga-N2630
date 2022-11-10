@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    November 8, 2022 
+-- Create Date:    November 9, 2022 
 -- Design Name:    N2630 U602 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -158,6 +158,18 @@ architecture Behavioral of U602 is
 	SIGNAL idesacken : STD_LOGIC;
 	--SIGNAL idesackdisable : STD_LOGIC;
 	SIGNAL delaycount : INTEGER RANGE 0 TO 15;
+	SIGNAL counthalt : STD_LOGIC; --PAUSE THE DELAY COUNTER
+	SIGNAL countreset : STD_LOGIC; --RESET THE DELAY COUNTER
+	
+	CONSTANT T1 : INTEGER := 2; --T1 = 70ns. DELAY TWO CLOCK CYCLES AT 25MHz (80ns). 
+	CONSTANT Tack : INTEGER := 4; --ASSERT _DSACK1 AFTER 4 CLOCK CYCLES.
+	CONSTANT T2 : INTEGER := 6; --T2 = 165ns. This is satisfied by Tack + T2 = 160ns
+	CONSTANT Teoc : INTEGER := 15; --Teoc = T0 - T1 - T2. T0 = 600ns
+	
+	--SIGNAL T1GO : STD_LOGIC;
+	--SIGNAL T2GO : STD_LOGIC;
+	SIGNAL ATAGO : STD_LOGIC;
+	
 	
 begin
 
@@ -889,61 +901,95 @@ begin
 	--GAYLE EXPECTS IDE DA2..0 TO BE CONNECTED TO A4..2	
 	DA(0) <= A(2);
 	DA(1) <= A(3);
-	DA(2) <= A(4);	
+	DA(2) <= A(4);
 	
-	--SET THE READ/WRITE SIGNALS ON THE IDE PORT
+	--READ/WRITE SIGNALS
+	--nDIOR <= '0' WHEN RnW = '1' AND T2GO = '1' ELSE '1';
+	--nDIOW <= '0' WHEN RnW = '0' AND T2GO = '1' ELSE '1';
+
+
+	--ATA PIO COMMUNICATION PROCESS
 	PROCESS (CPUCLK, nRESET) BEGIN
 	
 		IF nRESET = '0' THEN
 		
+			ATAGO <= '0';	
+			counthalt <= '0';
+			countreset <= '0';
 			idesacken <= '0';
-			delaycount <= 0;
-			
 			nDIOR <= '1';
-			nDIOW <= '1';
+			nDIOW <= '1';			
 	
-		ELSIF RISING_EDGE (CPUCLK) THEN
+		ELSIF RISING_EDGE (CPUCLK) THEN		
 		
-			IF ide_space = '1' AND nAS = '0' THEN
+			CASE (delaycount) IS
 			
-				CASE (delaycount) IS
+				WHEN T1 =>
 				
-					WHEN 2 =>
-				
-						nDIOR <= NOT RnW; --(0 WHEN R, 1 WHEN W)
-						nDIOW <= RnW;     --(1 WHEN R, 0 WHEN W)
-						delaycount <= delaycount + 1;
-						
-					WHEN 4 =>
-				
-						--IORDY IS ACTIVE HIGH BUT IS CALLED "_WAIT" IN THE GAYLE SPECS. 
-						--WHEN HIGH, THE IDE DEVICE IS READY TO TRANSMIT OR RECEIVE DATA.
-						--IF NOT READY, INSERT WAIT STATES. WHEN READY, SIGNAL 16 BIT PORT TO 68030.
-						--ENABLE _DSACK1 ON THE FIRST TIME THROUGH, THEN LET THE DSACK PROCESS DO ITS THING.				
-						IF IORDY = '1' THEN
-						
-							idesacken <= '1';	
-							delaycount <= delaycount + 1;
-						
-						END IF;
-						
-					WHEN OTHERS =>
+					--T1 HAS ELAPSED. ASSERT READ/WRITE AND GO TO T2.
+					ATAGO <= '1';
+					nDIOR <= NOT RnW; --(0 WHEN R, 1 WHEN W)
+					nDIOW <= RnW;     --(1 WHEN R, 0 WHEN W)						
 					
-						idesacken <= '0';	
-						delaycount <= delaycount + 1;
-						
-				END CASE;
+				WHEN Tack =>
 				
+					IF IORDY = '1' THEN
+					
+						idesacken <= '1';	
+						counthalt <= '0';							
+						
+					ELSE
+					
+						counthalt <= '1';
+						
+					END IF;
+					
+				WHEN T2 =>						
+					
+					nDIOR <= '1';
+					nDIOW <= '1';
+					
+				WHEN Teoc =>
+				
+					ATAGO <= '0';
+					countreset <= '1';
+					
+				WHEN OTHERS =>
+				
+					idesacken <= '0';	
+					countreset <= '0';
+				
+			END CASE;				
+
+		END IF;
+		
+	END PROCESS;
+						
+					
+	PROCESS (CPUCLK, nRESET, countreset) BEGIN
+	
+		IF nRESET = '0' OR countreset = '1' THEN
+		
+			delaycount <= 0;
+	
+		ELSIF FALLING_EDGE (CPUCLK) THEN
+		
+			IF (ide_space = '1' AND nAS = '0') OR ATAGO = '1' THEN 
+			
+				IF counthalt = '0' THEN
+			
+					delaycount <= delaycount + 1;
+					
+				END IF;
+					
 			ELSE
 			
-				nDIOR <= '1';
-				nDIOW <= '1';
 				delaycount <= 0;
-				
+					
 			END IF;
 			
 		END IF;
 		
-	END PROCESS;			
+	END PROCESS;	
 	
 end Behavioral;
