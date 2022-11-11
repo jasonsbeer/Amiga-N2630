@@ -19,7 +19,7 @@ Before installing, it is necessary to determine if you have an early, non-cost r
 By default, the N2630 starts in 68030 mode. When in 68030 mode, all installed RAM and the IDE/ATA device port are active.
 
 ## 68000 Mode
-When desired, the 68030 may be disabled during a cold or warm start. This results in the Amiga falling back to using the 68000 processor. This may be desired when software does not run correctly on the 68030 processor. To start up in 68000 mode, hold down both mouse buttons during startup. A window will appear allowing the user to select either the 68030 or 68000. Select "68000" and the Amiga will reset with the 68000 as the active processor. When in 68000 mode, the IDE/ATA port and Zorro 3 RAM are inactive. The Zorro 2 RAM continues to be available.
+When desired, the 68030 may be disabled during a cold or warm start. This results in the Amiga falling back to using the 68000 processor. This may be desired when software does not run correctly on the 68030 processor. To start up in 68000 mode, hold down the right mouse button during startup. Select either the 68030 or 68000 from the screen options. Select "68000" and the Amiga will reset with the 68000 as the active processor. When in 68000 mode, the IDE/ATA port and Zorro 3 RAM are inactive. The Zorro 2 RAM continues to be available.
 
 ## FAST RAM
 The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM is the successor to Fast Page Memory found in devices such as the Amiga 3000, A2630 processor card, and other computers of the time. SDRAMs are a very cost effictive way to supply memory to older systems and are readily available either new or from unused memory modules. 
@@ -27,16 +27,16 @@ The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM
 ### Zorro 2
 Zorro 2 RAM is the Amiga RAM found in the 24 bit address space of the Motorola 68000 processor. The Zorro 2 RAM on the N2630 is accessed by the 68030 as a 32-bit data bus and supports 16-bit DMA activities of the Zorro 2 bus. Installing 2Mx16 or greater capacity SDRAMs will allow the N2630 to configure the maximum of 8MB in the Zorro 2 space. Placing a jumper at position J404 will limit the amount of RAM configured to 4MB in the Zorro 2 space, freeing up 4MB to be supplied by other Zorro 2 devices. This may be useful in the event you have a device that requires it's own RAM for proper function. One example being the GVP Impact Series II card, which can only use its own RAM for DMA activities. 
 
-The N2630 will always configure the onboard RAM and cannot be "shut up" in the AUTOCONFIG process. You must use the onboard RAM to maximize the performance of the MC68030. The N2630 Zorro 2 RAM may be disabled by placing a jumper at J303. This is discouraged and should only be done for testing purposes.
+The N2630 will always configure the onboard RAM and cannot be "shut up" in the AUTOCONFIG process. You must use the onboard RAM to maximize the performance of the MC68030. The N2630 Zorro 2 RAM may be disabled by placing a jumper at J303. This should only be done for testing purposes.
 
 NOTE: Any SDRAM at least 2Mx16 in capacity in the 54-TSOP II footprint may be placed. However, it is not possible to achieve more than 8 megabytes of Zorro 2 RAM capacity. 
 
 ### Zorro 3
 Zorro 3 RAM is the Amiga RAM found in the 32-bit address space of the Motorola 68030 processor. Both Zorro 2 and Zorro 3 RAM are used together on the N2630 card. Thus, the total memory available to the system will be the sum of the Zorro 2 and Zorro 3 RAM. Zorro 3 SDRAMs may be installed in different configurations to acheive a specific amount of final RAM (Table 1). The SDRAM footprint is 54-TSOP II. The indicated jumpers must be set as shown or your system may not function correctly.
 
-The Zorro 3 memory supports AUTOCONFIG with Kickstart 2.04 and newer. When using Kickstart version 1.x, ADDMEM may be used to add the Zorro 3 memory to the Amiga's memory pool. See Table 2 for the N2630 Zorro 3 memory map.
+The Zorro 3 memory supports AUTOCONFIG with Kickstart 2.04 and newer. When using Kickstart version 1.x, an addmem style program may be used to add the Zorro 3 memory to the Amiga's memory pool. See Table 2 for the N2630 Zorro 3 memory map.
 
-The Zorro 3 RAM may be disabled by adding a jumper to J305. Disabling the Zorro 3 RAM is not recommended for regular use as this will degrade performance of the 68030.
+Placing a jumper at J305 will disable the AUTOCONFIG of Zorro 3 RAM. Disabling the Zorro 3 RAM is not recommended for regular use as this will degrade performance of the 68030.
 
 **Table 1.** Supported Zorro 3 RAM configurations.
 Desired Zorro</br>3 RAM (MB)|SDRAM</br>Capacity|U406|U407|U408|U409|J400|J401|J402
