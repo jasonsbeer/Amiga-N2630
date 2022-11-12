@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    November 11, 2022 
+-- Create Date:    November 12, 2022 
 -- Design Name:    N2630 U602 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -102,9 +102,9 @@ architecture Behavioral of U602 is
 	SIGNAL memsel : STD_LOGIC; --ARE WE IN THE ZORRO 3 MEMORY SPACE?
 	SIGNAL cs_mem : STD_LOGIC; --ARE WE IN THE UPPER SDRAM PAIR?
 	SIGNAL COUNT : INTEGER RANGE 0 TO 2 := 0; --COUNTER FOR SDRAM STARTUP ACTIVITIES
-	SIGNAL rowad : STD_LOGIC_VECTOR (12 DOWNTO 0) := "0000000000000";
-	SIGNAL bankad : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00";
-	SIGNAL colad : STD_LOGIC_VECTOR (9 DOWNTO 0) := "0000000000";
+	--SIGNAL rowad : STD_LOGIC_VECTOR (12 DOWNTO 0) := "0000000000000";
+	--SIGNAL bankad : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00";
+	--SIGNAL colad : STD_LOGIC_VECTOR (9 DOWNTO 0) := "0000000000";
 	SIGNAL datamask : STD_LOGIC_VECTOR (3 DOWNTO 0); --DATA MASK
 	SIGNAL refresh : STD_LOGIC; --SIGNALS TIME TO REFRESH
 	SIGNAL refreset : STD_LOGIC; --RESET THE REFRESH COUNTER
@@ -283,57 +283,59 @@ begin
 				--16Mx16 - A8-A0 (64MB PER PAIR)
 				--32Mx16 - A9-A0 (128MB PER PAIR)
 				
-				WHEN "111" => --16MB LOW BANK POPULATED 4Mx16
-					cs_mem <= '0';
-					bankad <= A(23 DOWNTO 22);
-					rowad <= "0" & A(21 downto 10);					
-					colad <= "00" & A(9 DOWNTO 2);
-						
+--				WHEN "111" => --16MB LOW BANK POPULATED 4Mx16
+--					cs_mem <= '0';
+--					bankad <= A(23 DOWNTO 22);
+--					rowad <= "0" & A(21 downto 10);					
+--					colad <= "00" & A(9 DOWNTO 2);
+--						
 				WHEN "010" => --32MB BOTH MEMORY BANKS POPULATED 4Mx16
 					cs_mem <= A(24);
-					bankad <= A(23 DOWNTO 22);
-					rowad <= "0" & A(21 downto 10);					
-					colad <= "00" & A(9 DOWNTO 2);
-			
-				WHEN "011" => --32MB LOW BANK POPULATED 8Mx16
-					cs_mem <= '0';
-					bankad <= A(24 DOWNTO 23);
-					rowad <= "0" & A(22 downto 11);
-					colad <= "0" & A(10 DOWNTO 2);
-						
+--					bankad <= A(23 DOWNTO 22);
+--					rowad <= "0" & A(21 downto 10);					
+--					colad <= "00" & A(9 DOWNTO 2);
+--			
+--				WHEN "011" => --32MB LOW BANK POPULATED 8Mx16
+--					cs_mem <= '0';
+--					bankad <= A(24 DOWNTO 23);
+--					rowad <= "0" & A(22 downto 11);
+--					colad <= "0" & A(10 DOWNTO 2);
+--						
 				WHEN "100" => --64MB BOTH MEMORY BANKS POPULATED 8Mx16
 					cs_mem <= A(25);
-					bankad <= A(24 DOWNTO 23);
-					rowad <= "0" & A(22 downto 11);					
-					colad <= "0" & A(10 DOWNTO 2);
-		
-				WHEN "101" => --64MB LOW BANK POPULATED 16Mx16
-					cs_mem <= '0';
-					bankad <= A(25 DOWNTO 24);
-					rowad <= A(23 downto 11);					
-					colad <= "0" & A(10 DOWNTO 2);
-						
+--					bankad <= A(24 DOWNTO 23);
+--					rowad <= "0" & A(22 downto 11);					
+--					colad <= "0" & A(10 DOWNTO 2);
+--		
+--				WHEN "101" => --64MB LOW BANK POPULATED 16Mx16
+--					cs_mem <= '0';
+--					bankad <= A(25 DOWNTO 24);
+--					rowad <= A(23 downto 11);					
+--					colad <= "0" & A(10 DOWNTO 2);
+--						
 				WHEN "000" => --128MB BOTH MEMORY BANKS POPULATED 16Mx16
 					cs_mem <= A(26);
-					bankad <= A(25 DOWNTO 24);
-					rowad <= A(23 downto 11);					
-					colad <= "0" & A(10 DOWNTO 2);
-					
-				WHEN "001" => --128MB LOW BANK POPULATED 32Mx16
-					cs_mem <= '0';
-					bankad <= A(26 DOWNTO 25);
-					rowad <= A(24 downto 12);					
-					colad <= A(11 DOWNTO 2);
-						
+--					bankad <= A(25 DOWNTO 24);
+--					rowad <= A(23 downto 11);					
+--					colad <= "0" & A(10 DOWNTO 2);
+--					
+--				WHEN "001" => --128MB LOW BANK POPULATED 32Mx16
+--					cs_mem <= '0';
+--					bankad <= A(26 DOWNTO 25);
+--					rowad <= A(24 downto 12);					
+--					colad <= A(11 DOWNTO 2);
+--						
 				WHEN "110" => --256MB BOTH MEMORY BANKS POPULATED 32Mx16
 					cs_mem <= A(27);
-					bankad <= A(26 DOWNTO 25);
-					rowad <= A(24 downto 12);					
-					colad <= A(11 DOWNTO 2);
+--					bankad <= A(26 DOWNTO 25);
+--					rowad <= A(24 downto 12);					
+--					colad <= A(11 DOWNTO 2);
 
 				WHEN OTHERS =>
 				
-					--NOTHING TO DO HERE. HOW ABOUT SOME NICE ASCII ART?
+					cs_mem <= '0';
+					
+					--HOW ABOUT SOME NICE ASCII ART?
 					
 					--	.-----------------------------------------------------------------------------.
 					--	||Es| |F1 |F2 |F3 |F4 |F5 | |F6 |F7 |F8 |F9 |F10|                  C= AMIGA   |
@@ -587,9 +589,12 @@ begin
 						
 						CURRENT_STATE <= RAS_STATE;
 												
-						EMA(12 downto 0) <= rowad(12 DOWNTO 0);
-						BANK0 <= bankad(0);
-						BANK1 <= bankad(1);
+						--EMA(12 downto 0) <= rowad(12 DOWNTO 0);
+						--BANK0 <= bankad(0);
+						--BANK1 <= bankad(1);
+						EMA(12 downto 0) <= A(25) & A(21 DOWNTO 10);
+						BANK0 <= A(22);
+						BANK1 <= A(23);
 						
 						sdramcom <= ramstate_BANKACTIVATE;							
 						
@@ -608,7 +613,8 @@ begin
 					--SET CAS STATE VALUES SO THEY LATCH ON THE NEXT CLOCK EDGE
 					CURRENT_STATE <= CAS_STATE;					
 					
-					EMA(12 downto 0) <= "001" & colad (9 DOWNTO 0);	
+					--EMA(12 downto 0) <= "001" & colad (9 DOWNTO 0);	
+					EMA(12 downto 0) <= "001" & A(26) & A(24) & A(9 downto 2);
 					
 					IF RnW = '0' THEN
 						--WRITE STATE
@@ -789,10 +795,11 @@ begin
 					
 					CASE A(14 DOWNTO 12) IS
 						
-						--THE REGISTER AT $DA8000 IDENTIFIES THE IDE DEVICE AS THE SOURCE OF THE IRQ.						
+						--THE REGISTER AT $DA8000 IDENTIFIES THE ATA DEVICE 
+						--AS THE SOURCE OF THE IRQ.						
 						WHEN "000" => --$8
 							
-							dataoutgayle <= intreq;										
+							dataoutgayle <= INTRQ;										
 						
 						--WHEN THERE IS A NEW IDE IRQ, WE SET THIS TO '1'. 
 						--AMIGA OS SETS TO '0' WHEN IT IS DONE HANDLING THE IRQ.
@@ -824,9 +831,7 @@ begin
 						
 							ideintenable <= D;
 							
-						WHEN OTHERS =>
-						
-							dataoutgayle <= 'Z';
+						WHEN OTHERS =>						
 							
 					END CASE;				
 				
@@ -850,7 +855,8 @@ begin
 	nINT2 <= '0' WHEN intchg = '1' AND ideintenable = '1' ELSE 'Z'; 
 	
 	--CLEAR THE INTERUPT WHEN AMIGA OS SIGNALS TO DO SO.
-	clrint <= '1' WHEN A(23 DOWNTO 12) = "110110101001" AND RnW = '0' AND nDS = '0' AND D = '0' ELSE '0'; --$DA9
+	clrint <= '1' WHEN A(23 DOWNTO 12) = "110110101001" AND RnW = '0' AND nDS = '0' AND D = '0' ELSE '0'; --$DA9 110110101001000000000000
+	--CLRINT = (ADDR[23:12] == 'hDA9 & !RWn & ds & !DIN); // Clear INT Change flag
 	
 	--GET THE CURRENT IDE INTERUPT STATE
 	PROCESS (CPUCLK) BEGIN
@@ -906,9 +912,30 @@ begin
 	nCS1 <= '0' WHEN csaddress = '1' AND csenable = '1' ELSE '1';
 			
 	--GAYLE EXPECTS ATA DA2..0 TO BE CONNECTED TO A4..2	
-	DA(0) <= '0' WHEN A(2) = '0' AND ide_space = '1' ELSE '1' WHEN A(2) = '1' AND ide_space = '1' ELSE '1';
-	DA(1) <= '0' WHEN A(3) = '0' AND ide_space = '1' ELSE '1' WHEN A(3) = '1' AND ide_space = '1' ELSE '1';
-	DA(2) <= '0' WHEN A(4) = '0' AND ide_space = '1' ELSE '1' WHEN A(4) = '1' AND ide_space = '1' ELSE '1';
+	--LATCH THE DATA ON ASSERTION OF _AS WHEN WE ARE IN
+	--THE ATA ADDRESS SPACE. THIS HOLDS THE ADDRESS
+	--VALID THROUGHOUT THE ENTIRE CYCLE.
+	PROCESS (nAS, nRESET) BEGIN
+	
+		IF nRESET = '0' THEN
+		
+			DA(0) <= '0';
+			DA(1) <= '0';
+			DA(2) <= '0';
+	
+		ELSIF FALLING_EDGE (nAS) THEN
+		
+			IF (ide_space = '1') THEN
+				
+				DA(0) <= A(2);
+				DA(1) <= A(3);
+				DA(2) <= A(4);
+
+			END IF;
+			
+		END IF;
+		
+	END PROCESS;
 	
 	--READ/WRITE SIGNALS
 	nDIOR <= '0' WHEN RnW = '1' AND rwenable = '1' ELSE '1';
@@ -925,8 +952,7 @@ begin
 			idesacken <= '0';	
 			csaddress <= '1';
 			T2final <= 1;
-			TEOCfinal <= 1;
-			
+			TEOCfinal <= 1;			
 			
 		ELSIF RISING_EDGE(CPUCLK) THEN
 		
@@ -946,10 +972,12 @@ begin
 						TEOCfinal <= TEOCbit8;
 					END IF;
 					
+					--SET THE ATA CHIP SELECT ADDRESS.
+					csaddress <= A(12);
+					
 					IF ide_space = '1' AND nAS = '0' THEN
 					
-						--ENABLE THE ATA CHIP SELECT LINES.
-						csaddress <= A(12);
+						--ENABLE THE ATA CHIP SELECT LINES.						
 						csenable <= '1';
 						
 						--THE NEXT STATE
