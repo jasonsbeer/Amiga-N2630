@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    November 9, 2022 
+-- Create Date:    November 11, 2022 
 -- Design Name:    N2630 U602 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -50,31 +50,24 @@ entity U602 is
 				nAS : IN STD_LOGIC; --ADDRESS STROBE
 				IORDY : IN STD_LOGIC; --IDE I/O READY
 				INTRQ : IN STD_LOGIC; --IDE INTERUPT REQUEST
-				--MODE68K : IN STD_LOGIC; --ARE WE IN 68000 MODE?
 				CPUCLK : IN STD_LOGIC; --25MHz CPU CLOCK
 				A7M : IN STD_LOGIC; --7MHz AMIGA CLOCK
 				nRESET : IN STD_LOGIC; --SYSTEM RESET SIGNAL VALID IN 68000 AND 68030 MODE
 				--nGRESET : IN STD_LOGIC; --68030 ONLY RESET SIGNAL
 				nIDEDIS : IN STD_LOGIC; --IDE DISABLE
-				--nZ3DIS : IN STD_LOGIC; --ZORRO 3 RAM DISABLE
 				nDS : IN STD_LOGIC; --68030 DATA STROBE
 				FC : IN STD_LOGIC_VECTOR (2 DOWNTO 0); --68030 FUNCTION CODES
 				SIZ : IN STD_LOGIC_VECTOR (1 DOWNTO 0); --68030 TRANSFER SIZE SIGNALS
-				--nBGACK : IN STD_LOGIC; --680x0 BUS GRANT ACK
 				RAMSIZE : IN STD_LOGIC_VECTOR (2 DOWNTO 0); --RAM SIZE JUMPERS
 	    		--nCBREQ : IN STD_LOGIC; --68030 CACHE BURST REQUEST
-				--nIO16 : IN STD_LOGIC; --IDE IO16 SIGNAL, NOT USED.
 				
-				--D : INOUT  STD_LOGIC_VECTOR (31 DOWNTO 28);
 				D : INOUT STD_LOGIC; --THIS IS D31 OF THE 68030
 				nMEMZ3 : INOUT STD_LOGIC; --SIGNALS THE OTHER LOGIC THAT WE ARE RESPONDING TO THE RAM ADDRESS SPACE		
 				nIDEACCESS : INOUT STD_LOGIC; --SIGNALS THE OTHER LOGIC THAT WE ARE RESPONDING TO THE IDE ADDRESS SPACE
 				nINT2 : INOUT STD_LOGIC; --INT2 DRIVEN BY IDE INTRQ
 				nDIOR : INOUT STD_LOGIC; --IDE READ SIGNAL
 				nDIOW : INOUT STD_LOGIC; --IDE WRITE SIGNAL
-				
-				--AUTOCONFIG_SPACE : INOUT STD_LOGIC;
-				--Z3CONFIGED : IN STD_LOGIC; --HAS ZORRO 3 RAM BEEN AUTOCONFIGed? ACTIVE HIGH				
+							
 				nCS0 : OUT STD_LOGIC; --IDE CHIP SELECT 0
 				nCS1 : OUT STD_LOGIC; --IDE CHIP SELECT 1
 				DA : OUT STD_LOGIC_VECTOR (2 DOWNTO 0); --IDE ADDRESS LINES
@@ -84,7 +77,6 @@ entity U602 is
 				
 				nDSACK0 : INOUT STD_LOGIC; --68030 ASYNC DATA ACK SIGNAL
 				nDSACK1 : INOUT STD_LOGIC; --68030 ASYNC DATA ACK SIGNAL
-				--nDTACK : OUT STD_LOGIC; --68000 DATA SIGNAL
 				nUUBE : OUT STD_LOGIC; --68030 DYNAMIC BUS SIZING OUTPUT
 				nUMBE : OUT STD_LOGIC; --68030 DYNAMIC BUS SIZING OUTPUT
 				nLMBE : OUT STD_LOGIC; --68030 DYNAMIC BUS SIZING OUTPUT
@@ -107,11 +99,9 @@ end U602;
 architecture Behavioral of U602 is
 	
 	--MEMORY SIGNALS
-	--SIGNAL MEMORY_SPACE : STD_LOGIC := '0'; --READY TO START RAM CYCLE?
 	SIGNAL memsel : STD_LOGIC; --ARE WE IN THE ZORRO 3 MEMORY SPACE?
 	SIGNAL cs_mem : STD_LOGIC; --ARE WE IN THE UPPER SDRAM PAIR?
 	SIGNAL COUNT : INTEGER RANGE 0 TO 2 := 0; --COUNTER FOR SDRAM STARTUP ACTIVITIES
-	--SIGNAL Z3RAM_CONFIGED : STD_LOGIC := '0'; --HAS ZORRO 3 RAM BEEN AUTOCONFIGed? ACTIVE HIGH
 	SIGNAL rowad : STD_LOGIC_VECTOR (12 DOWNTO 0) := "0000000000000";
 	SIGNAL bankad : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00";
 	SIGNAL colad : STD_LOGIC_VECTOR (9 DOWNTO 0) := "0000000000";
@@ -120,11 +110,8 @@ architecture Behavioral of U602 is
 	SIGNAL refreset : STD_LOGIC; --RESET THE REFRESH COUNTER
 	SIGNAL REFRESH_COUNTER : INTEGER RANGE 0 TO 127 := 0;
 	CONSTANT REFRESH_DEFAULT : INTEGER := 54; --7MHz REFRESH COUNTER
-	--SIGNAL memcycle : STD_LOGIC;
 	SIGNAL sdramcom : STD_LOGIC_VECTOR (3 DOWNTO 0); --SDRAM COMMAND
-	--SIGNAL stermen : STD_LOGIC; --ENABLE _STERM
 	SIGNAL dsacken : STD_LOGIC;
-	--SIGNAL ndsack : STD_LOGIC;
 	SIGNAL chipselected : STD_LOGIC;
 	
 	--THE SDRAM COMMAND CONSTANTS ARE: _CS, _RAS, _CAS, _WE
@@ -144,7 +131,6 @@ architecture Behavioral of U602 is
 	
 	--GAYLE SIGNALS
 	SIGNAL gayleid : STD_LOGIC_VECTOR (3 DOWNTO 0); --THIS IS THE GAYLE ID VALUE
-	--SIGNAL gayleregistered : STD_LOGIC; --HAS OUR GAYLE EMULATOR BEEN REGISTERED?
 	SIGNAL gayle_space : STD_LOGIC; --ARE WE IN ANY OF THE GAYLE REGISTER SPACES?
 	SIGNAL gayleid_space : STD_LOGIC;
 	SIGNAL gaylereg_space : STD_LOGIC;
@@ -156,19 +142,40 @@ architecture Behavioral of U602 is
 	SIGNAL intlast : STD_LOGIC;
 	SIGNAL ide_space : STD_LOGIC;
 	SIGNAL idesacken : STD_LOGIC;
-	--SIGNAL idesackdisable : STD_LOGIC;
-	SIGNAL delaycount : INTEGER RANGE 0 TO 15;
-	SIGNAL counthalt : STD_LOGIC; --PAUSE THE DELAY COUNTER
-	SIGNAL countreset : STD_LOGIC; --RESET THE DELAY COUNTER
+	SIGNAL atacounter : INTEGER RANGE 0 TO 15;
+	SIGNAL csenable : STD_LOGIC;
+	SIGNAL csaddress : STD_LOGIC;
+	SIGNAL rwenable : STD_LOGIC;
 	
-	CONSTANT T1 : INTEGER := 2; --T1 = 70ns. DELAY TWO CLOCK CYCLES AT 25MHz (80ns). 
-	CONSTANT Tack : INTEGER := 4; --ASSERT _DSACK1 AFTER 4 CLOCK CYCLES.
-	CONSTANT T2 : INTEGER := 6; --T2 = 165ns. This is satisfied by Tack + T2 = 160ns
-	CONSTANT Teoc : INTEGER := 15; --Teoc = T0 - T1 - T2. T0 = 600ns
+	--ATA STATE MACHINE SIGNALS
 	
-	--SIGNAL T1GO : STD_LOGIC;
-	--SIGNAL T2GO : STD_LOGIC;
-	SIGNAL ATAGO : STD_LOGIC;
+	--25MHz CLOCK CYCLES NEEDED TO FULFILL MODE TIMING REQUIREMENTS FOR 16 BIT CYCLES.
+	--TIME|MODE0|MODE1|MODE2|MODE3
+	------------------------------
+	-- t1 |  2  |  2  |  1  |  1
+	-- t2 |  5  |  4  |  3  |  2
+	-- eoc|  8  |  4  |  2  |  2
+
+	--25MHz CLOCK CYCLES NEEDED TO FULFILL MODE TIMING REQUIREMENTS FOR 8 BIT CYCLES.
+	--TIME|MODE0|MODE1|MODE2|MODE3
+	------------------------------
+	-- t1 |  2  |  2  |  1  |  1
+	-- t2 |  8  |  8  |  8  |  2
+	-- eoc|  5  |  1  |  1  |  2
+
+	-- eoc (end of cycle) is T2i, T9, or T0-T1-T2. Whichever is greatest.
+	
+	SIGNAL T2final : INTEGER RANGE 1 TO 7;	
+	SIGNAL TEOCfinal : INTEGER RANGE 1 TO 7;
+	
+	CONSTANT T1 : INTEGER := 1; --T1 = 70ns. DELAY TWO CLOCK CYCLES AT 25MHz (80ns). 
+	CONSTANT T2bit8: INTEGER := 7; --Value = (T2/40) - 1
+	CONSTANT T2bit16 : INTEGER := 4; --Value = (T2/40) - 1	
+	CONSTANT TEOCbit8 : INTEGER := 4;
+	CONSTANT TEOCbit16 : INTEGER := 7; 
+	
+	TYPE ATA_STATE IS ( IDLE, RWEN, DATALATCH, CSNEGATE );
+	SIGNAL CURRENT_ATA_STATE : ATA_STATE;
 	
 	
 begin
@@ -674,10 +681,10 @@ begin
 				
 				END IF;
 				
-			ELSIF ide_space = '1' AND nAS = '0' THEN
+			ELSIF ide_space = '1' THEN
 			
 				--WE ARE IN THE IDE I/0 ADDRESS SPACE WITH _AS ASSERTED.
-				IF idesacken = '1' OR nDSACK1 = '0' THEN
+				IF nAS = '0' AND (idesacken = '1' OR nDSACK1 = '0') THEN
 				
 					nDSACK1 <= '0';
 					
@@ -857,7 +864,7 @@ begin
 		
 	END PROCESS;
 	
-	--CHECK FOR A CHANGE IN THE IDE INTERRUPT SIGNAL
+	--CHECK FOR A CHANGE IN THE ATA INTERRUPT SIGNAL
 	PROCESS (CPUCLK, clrint) BEGIN
 	
 		IF clrint = '1' THEN
@@ -878,7 +885,8 @@ begin
 	
 	
 	--ARE WE IN THE ASSIGNED ADDRESS SPACE FOR THE IDE CONTROLLER?
-	--GAYLE IDE CHIP SELECT ADDRESS SPACE IS $DA0000 - $DA3FFF. 
+	--GAYLE ATA CHIP SELECT ADDRESS SPACE IS $DA0000 - $DA3FFF. 
+	--THIS CAN BE BROKEN INTO 8 BIT AND 16 BIT COMMANDS, WHICH CHANGES THE TIME TO EXECUTE.
 	ide_space <= '1' WHEN A(23 DOWNTO 15) = "110110100" ELSE '0';
 	
 	--SIGNAL U601 TO DISABLE THE 6800/68000 STATE MACHINES.
@@ -893,103 +901,133 @@ begin
 	--WE PASS THE COMPUTER RESET SIGNAL TO THE IDE DRIVE
 	nIDERST <= nRESET;
 	
-	--GAYLE SPECS TELL US WHEN THE IDE CHIP SELECT LINES ARE ACTIVE
-	--AND IS DRIVEN PURELY BY ADDRESS.	
-	nCS0 <= '0' WHEN A(12) = '0' AND ide_space = '1' AND nAS = '0' ELSE '1';
-	nCS1 <= '0' WHEN A(12) = '1' AND ide_space = '1' AND nAS = '0' ELSE '1';
+	--GAYLE SPECS TELL US WHEN THE ATA CHIP SELECT LINES ARE ACTIVE.
+	nCS0 <= '0' WHEN csaddress = '0' AND csenable = '1' ELSE '1';
+	nCS1 <= '0' WHEN csaddress = '1' AND csenable = '1' ELSE '1';
 			
-	--GAYLE EXPECTS IDE DA2..0 TO BE CONNECTED TO A4..2	
-	DA(0) <= A(2);
-	DA(1) <= A(3);
-	DA(2) <= A(4);
+	--GAYLE EXPECTS ATA DA2..0 TO BE CONNECTED TO A4..2	
+	DA(0) <= '0' WHEN A(2) = '0' AND ide_space = '1' ELSE '1' WHEN A(2) = '1' AND ide_space = '1' ELSE '1';
+	DA(1) <= '0' WHEN A(3) = '0' AND ide_space = '1' ELSE '1' WHEN A(3) = '1' AND ide_space = '1' ELSE '1';
+	DA(2) <= '0' WHEN A(4) = '0' AND ide_space = '1' ELSE '1' WHEN A(4) = '1' AND ide_space = '1' ELSE '1';
 	
 	--READ/WRITE SIGNALS
-	--nDIOR <= '0' WHEN RnW = '1' AND T2GO = '1' ELSE '1';
-	--nDIOW <= '0' WHEN RnW = '0' AND T2GO = '1' ELSE '1';
-
-
-	--ATA PIO COMMUNICATION PROCESS
+	nDIOR <= '0' WHEN RnW = '1' AND rwenable = '1' ELSE '1';
+	nDIOW <= '0' WHEN RnW = '0' AND rwenable = '1' ELSE '1';
+	
 	PROCESS (CPUCLK, nRESET) BEGIN
 	
 		IF nRESET = '0' THEN
 		
-			ATAGO <= '0';	
-			counthalt <= '0';
-			countreset <= '0';
-			idesacken <= '0';
-			nDIOR <= '1';
-			nDIOW <= '1';			
-	
-		ELSIF RISING_EDGE (CPUCLK) THEN		
-		
-			CASE (delaycount) IS
+			CURRENT_ATA_STATE <= IDLE;
+			atacounter <= 0;
+			csenable <= '0';
+			rwenable <= '0';
+			idesacken <= '0';	
+			csaddress <= '1';
+			T2final <= 1;
+			TEOCfinal <= 1;
 			
-				WHEN T1 =>
+			
+		ELSIF RISING_EDGE(CPUCLK) THEN
+		
+			CASE CURRENT_ATA_STATE IS
+			
+				WHEN IDLE =>
 				
-					--T1 HAS ELAPSED. ASSERT READ/WRITE AND GO TO T2.
-					ATAGO <= '1';
-					nDIOR <= NOT RnW; --(0 WHEN R, 1 WHEN W)
-					nDIOW <= RnW;     --(1 WHEN R, 0 WHEN W)						
+					--THIS IS WHERE WE WAIT FOR THE ADDRESS STROBE TO ASSERT
+					--WHILE IN THE ATA ADDRESS SPACE.
 					
-				WHEN Tack =>
-				
-					IF IORDY = '1' THEN
-					
-						idesacken <= '1';	
-						counthalt <= '0';							
-						
+					--SET THE DELAY COUNTS BASED ON WHETHER THIS IS AN 8 BIT OR 16 BIT ACCESS.
+					IF A(13) = '1' THEN
+						T2final <= T2bit16;
+						TEOCfinal <= TEOCbit16;
 					ELSE
+						T2final <= T2bit8;
+						TEOCfinal <= TEOCbit8;
+					END IF;
 					
-						counthalt <= '1';
+					IF ide_space = '1' AND nAS = '0' THEN
+					
+						--ENABLE THE ATA CHIP SELECT LINES.
+						csaddress <= A(12);
+						csenable <= '1';
+						
+						--THE NEXT STATE
+						CURRENT_ATA_STATE <= RWEN;	
 						
 					END IF;
 					
-				WHEN T2 =>						
-					
-					nDIOR <= '1';
-					nDIOW <= '1';
-					
-				WHEN Teoc =>
+				WHEN RWEN =>
 				
-					ATAGO <= '0';
-					countreset <= '1';
+					--WAIT FOR T1 TO ELAPSE BEFORE ASSERTING READ/WRITE TO THE DEVICE.
+					if atacounter = T1 THEN
 					
-				WHEN OTHERS =>
+						rwenable <= '1';
+						CURRENT_ATA_STATE <= DATALATCH;
+						atacounter <= 0;
+						
+					ELSE
+					
+						atacounter <= atacounter + 1;
+						
+					END IF;
+						
+				WHEN DATALATCH =>
 				
-					idesacken <= '0';	
-					countreset <= '0';
+					--WAIT HERE FOR T2 TO ELAPSE. THIS IS THE TIME THE DATA WILL BE LATCHED.
+					--AT THIS TIME, WE CAN NEGATE THE READ/WRITE SIGNALS. _AS SHOULD NEGATE
+					--ABOUT THIS TIME, AS WELL.
+					
+					IF IORDY = '1' THEN
+					
+						IF atacounter = T2final - 3 THEN
+					
+							idesacken <= '1';							
+							atacounter <= atacounter + 1;
+						
+						ELSIF atacounter = T2final - 2 THEN
+						
+							idesacken <= '0';	
+							atacounter <= atacounter + 1;
+					
+						ELSIF atacounter = T2final THEN						
+							
+							rwenable <= '0';
+							--csenable <= '0';
+							CURRENT_ATA_STATE <= CSNEGATE;
+							atacounter <= 0;
+							
+						ELSE
+						
+							atacounter <= atacounter + 1;
+								
+						END IF;		
+						
+					END IF;
+					
+				WHEN CSNEGATE =>
 				
-			END CASE;				
-
+					--WE NEGATE THE ATA CHIP SELECT AFTER WE HAVE NEGATED THE READ/WRITE SIGNALS.
+					csenable <= '0';
+					
+					--WE ALSO COUNT OUT THE DELAY TIME NEEDED FOR THE ATA DEVICE TO 
+					--COMPLETE THE CYCLE TIME REQUIREMENT.
+					
+					IF atacounter = TEOCfinal THEN
+					
+						CURRENT_ATA_STATE <= IDLE;
+						atacounter <= 0;
+							
+					ELSE
+					
+						atacounter <= atacounter + 1;
+							
+					END IF;
+					
+			END CASE;
+			
 		END IF;
 		
 	END PROCESS;
-						
-					
-	PROCESS (CPUCLK, nRESET, countreset) BEGIN
-	
-		IF nRESET = '0' OR countreset = '1' THEN
-		
-			delaycount <= 0;
-	
-		ELSIF FALLING_EDGE (CPUCLK) THEN
-		
-			IF (ide_space = '1' AND nAS = '0') OR ATAGO = '1' THEN 
-			
-				IF counthalt = '0' THEN
-			
-					delaycount <= delaycount + 1;
-					
-				END IF;
-					
-			ELSE
-			
-				delaycount <= 0;
-					
-			END IF;
-			
-		END IF;
-		
-	END PROCESS;	
 	
 end Behavioral;
