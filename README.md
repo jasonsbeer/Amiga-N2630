@@ -67,7 +67,7 @@ Both Banks|Shorted<sup>B</sup>
 **Table 1c.** Jumper Configurations When Both Low and High Memory Banks Are Populated
 Desired Zorro</br>3 RAM (MB)|SDRAM</br>Capacity|J401|J402
 -|-|-|-
-32|4MX16|Open<sup>[A]</sup>|Shorted<sup>[A]</sup>
+32|4MX16|Open<sup>[A]</sup>|Shorted<sup>[B]</sup>
 64|8MX16|Shorted|Open
 128|16Mx16|Shorted|Shorted
 256|32MX16|Open|Open
@@ -125,7 +125,7 @@ J202|FPU Clock|X1<sup>[A]</sup>|X2<sup>[B]</sup>
 
 ## Acknowledgements
 Dave Haynie for sharing the A2630 technical details with the Amiga community.  
-Matt Harlum for sharing his Gayle IDE code and listening to all my problems.  
+Matt Harlum for sharing his Gayle IDE code and listening my struggles.  
 Everyone who made the Amiga possible.  
 
 ## License
