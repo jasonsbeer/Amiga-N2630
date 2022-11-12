@@ -55,7 +55,7 @@ Desired Zorro</br>3 RAM (MB)|SDRAM|Low Bank</br>(U406 and U407)|High Bank</br>(U
 <sup>A</sup> These SDRAM positions are populated by the SDRAM indicated.  
 <sup>B</sup> This SDARM positions are not populated.
 
-**Table 1b.** Supported Zorro 3 RAM configurations.
+**Table 1b.** SDRAM Bank Jumper Setting.
 Zorro 3 RAM</br>Banks Populated|J400
 -|-
 Low Bank Only|Open<sup>A</sup>
