@@ -32,30 +32,50 @@ The N2630 will always configure the onboard RAM and cannot be "shut up" in the A
 NOTE: Any SDRAM at least 2Mx16 in capacity in the 54-TSOP II footprint may be placed. However, it is not possible to achieve more than 8 megabytes of Zorro 2 RAM capacity. 
 
 ### Zorro 3
-Zorro 3 RAM is the Amiga RAM found in the 32-bit address space of the Motorola 68030 processor. Both Zorro 2 and Zorro 3 RAM are used together on the N2630 card. Thus, the total memory available to the system will be the sum of the Zorro 2 and Zorro 3 RAM. Zorro 3 SDRAMs may be installed in different configurations to acheive a specific amount of final RAM (Table 1). The SDRAM footprint is 54-TSOP II. The indicated jumpers must be set as shown or your system may not function correctly.
+Zorro 3 RAM is the Amiga RAM found in the 32-bit address space of the Motorola 68030 processor. Both Zorro 2 and Zorro 3 RAM are used together on the N2630 card. Thus, the total memory available to the system will be the sum of the Zorro 2 and Zorro 3 RAM. 
 
-The Zorro 3 memory supports AUTOCONFIG with Kickstart 2.04 and newer. When using Kickstart version 1.x, an addmem style program may be used to add the Zorro 3 memory to the Amiga's memory pool. See Table 2 for the N2630 Zorro 3 memory map.
+Zorro 3 SDRAMs may be installed in different configurations to acheive a specific amount of final RAM (Table 1a). SDRAM must be installed in pairs, or banks, to acheive the needed 32 bit data path. Positions U406 and U407 represent the "low" bank and positions U408 and U409 represent the "high" bank. The banks must be populated as the low bank only or both low and high banks. The high bank will not function without the low bank popualated. The SDRAM footprint is 54-TSOP II. The indicated jumpers must be set as shown or your system may not function correctly. When installing both banks, jumpers J400, J401, and J401 must be set as shown in tables 1b and 1c. If only the low bank is populated, these jumpers should be left empty.
 
-Placing a jumper at J305 will disable the AUTOCONFIG of Zorro 3 RAM. Disabling the Zorro 3 RAM is not recommended for regular use as this will degrade performance of the 68030.
+The Zorro 3 memory supports AUTOCONFIG with Kickstart 2.04 and newer and will be autosized by Amiga OS. When using Kickstart version 1.x, place a jumper at J305 to disable the Zorro 3 AUTOCONFIG. An addmem style program may be used to add the Zorro 3 memory to the Amiga's memory pool. See Table 1d for the N2630 Zorro 3 memory map.
 
-**Table 1.** Supported Zorro 3 RAM configurations.
-Desired Zorro</br>3 RAM (MB)|SDRAM</br>Capacity|U406|U407|U408|U409|J400|J401|J402
--|-|-|-|-|-|-|-|-
-16|4MX16|YES<sup>[A]</sup>|YES|NO<sup>[B]</sup>|NO|Open<sup>[C]</sup>|Open|Open
-32|4MX16|YES|YES|YES|YES|Shorted<sup>[D]</sup>|Open|Shorted
-32|8MX16|YES|YES|NO|NO|Open|Open|Shorted
-64|8MX16|YES|YES|YES|YES|Shorted|Shorted|Open
-64|16MX16|YES|YES|NO|NO|Open|Shorted|Open
-128|16Mx16|YES|YES|YES|YES|Shorted|Shorted|Shorted
-128|32MX16|YES|YES|NO|NO|Open|Shorted|Shorted
-256|32MX16|YES|YES|YES|YES|Shorted|Open|Open
+Except as discussed above, disabling the Zorro 3 RAM is not recommended for regular use as this will degrade performance of the 68030.
 
-<sup>A</sup> This position to be populated by the SDRAM indicated.  
-<sup>B</sup> This position not populated.  
-<sup>C</sup> No jumper.  
-<sup>D</sup> Jumper placed.  
+**Table 1a.** Possible Zorro 3 RAM Combinations for the N2630.
+Desired Zorro</br>3 RAM (MB)|SDRAM|Low Bank</br>(U406 and U407)|High Bank</br>(U408 and U409)
+-|-|-|-
+16|4MX16|Populated<sup>A</sup>|Unpopulated<sup>B</sup>
+32|4MX16|Populated|Populated
+32|8MX16|Populated|Unpopulated
+64|8MX16|Populated|Populated
+64|16MX16|Populated|Unpopulated
+128|16Mx16|Populated|Populated
+128|32MX16|Populated|Unpopulated
+256|32MX16|Populated|Populated
 
-**Table 2.** N2630 Zorro 3 Memory Map
+<sup>A</sup> These SDRAM positions are populated by the SDRAM indicated.  
+<sup>B</sup> This SDARM positions are not populated.
+
+**Table 1b.** Supported Zorro 3 RAM configurations.
+Zorro 3 RAM</br>Banks Populated|J400
+-|-
+Low Bank Only|Open<sup>A</sup>
+Both Banks|Shorted<sup>B</sup>
+
+<sup>A</sup> No jumper.  
+<sup>B</sup> Jumper placed. 
+  
+**Table 1c.** Jumper Configurations When Both Low and High Memory Banks Are Populated
+Desired Zorro</br>3 RAM (MB)|SDRAM</br>Capacity|J401|J402
+-|-|-|-
+32|4MX16|Open<sup>[A]</sup>|Shorted<sup>[A]</sup>
+64|8MX16|Shorted|Open
+128|16Mx16|Shorted|Shorted
+256|32MX16|Open|Open
+
+<sup>A</sup> No jumper.  
+<sup>B</sup> Jumper placed.  
+
+**Table 1d.** N2630 Zorro 3 Memory Map
 Desired Zorro</br>3 RAM (MB)|Starting Address|Ending Address
 -|-|-
 16|$40000000|$40FFFFFF
@@ -65,21 +85,25 @@ Desired Zorro</br>3 RAM (MB)|Starting Address|Ending Address
 256|$40000000|$4FFFFFFF
 
 ## ATA/IDE Port
-The N2630 includes an AUTOBOOT<sup>[A]</sup> ATA/IDE port compatable with hard drives and ATAPI<sup>[B]</sup> devices. The port supports two devices (master and slave) and operates in PIO mode. The port may be disabled by placing a jumper on J600. (Table 3) For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
+The N2630 includes an AUTOBOOT<sup>[A]</sup> ATA/IDE port compatable with hard drives and ATAPI<sup>[B]</sup> devices. The port supports two devices (master and slave) and operates in PIO 0 mode. The port may be disabled by placing a jumper on J600. (Table 2) For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
 
 <sup>A</sup>AUTOBOOT requires Kickstart v37.300 or greater or compatable SCSI.device in Kickstart.  
 <sup>B</sup>ATAPI support included in Kickstart 3.1.4+. Older versions of Kickstart may require installation of third party ATAPI drivers.  
 
+**Table x.** PIO Mode Jumpers
+MAYBE THIS WORKS, MAYBE NOT.
+MAYBE WE HAVE JUMPERS, MAYBE WE DON'T.
+
 ## 68882 Math Coprocessor (FPU)
-The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the 68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 4, J202). The PLCC-68 footprint is supported, which is available up to 40MHz.
+The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the 68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 3, J202). The PLCC-68 footprint is supported, which is available up to 40MHz.
 
 ## Unix (Amix)
-The N2630 card should fully support Amiga Unix (Amix). In order to boot into a Unix environment, you must place a jumper at J304. (Table 3) Although this feature is fully supported by the A2630 ROMs, it has not been tested with the N2630 at this time.
+The N2630 card should fully support Amiga Unix (Amix). In order to boot into a Unix environment, you must place a jumper at J304. (Table 2) Although this feature is fully supported by the A2630 ROMs, it has not been tested with the N2630 at this time.
 
 ## Other Jumper Settings
 In the following tables, OPEN indicates no jumper. Shorted indicates the presence of a jumper on the pins indicated. All jumpers must be set correctly or you may encounter unexpected bahaviors or failure to boot.
 
-**Table 3.** Configuration Jumper Settings
+**Table 2.** Configuration Jumper Settings
 Jumper|Description|Shorted|Open<sup>[A]</sup>
 -|-|-|-
 J302|Amiga Version|A2000|B2000
@@ -91,7 +115,7 @@ J600|IDE|Disable|Enable
 
 <sup>A</sup>The factory configuration for all jumpers is open (no jumper).  
 
-**Table 4.** System Clock Jumper Settings
+**Table 3.** System Clock Jumper Settings
 Jumper|Description|1-2|2-3
 -|-|-|-
 J202|FPU Clock|X1<sup>[A]</sup>|X2<sup>[B]</sup>
@@ -100,8 +124,8 @@ J202|FPU Clock|X1<sup>[A]</sup>|X2<sup>[B]</sup>
 <sup>B</sup>FPU clock from X2.
 
 ## Acknowledgements
-Dave Haynie for providing the A2630 PAL logic.  
-Matt Harlum for sharing his Gayle IDE code.  
+Dave Haynie for sharing the A2630 technical details with the Amiga community.  
+Matt Harlum for sharing his Gayle IDE code and listening to all my problems.  
 Everyone who made the Amiga possible.  
 
 ## License
