@@ -283,54 +283,18 @@ begin
 				--16Mx16 - A8-A0 (64MB PER PAIR)
 				--32Mx16 - A9-A0 (128MB PER PAIR)
 				
---				WHEN "111" => --16MB LOW BANK POPULATED 4Mx16
---					cs_mem <= '0';
---					bankad <= A(23 DOWNTO 22);
---					rowad <= "0" & A(21 downto 10);					
---					colad <= "00" & A(9 DOWNTO 2);
---						
 				WHEN "010" => --32MB BOTH MEMORY BANKS POPULATED 4Mx16
 					cs_mem <= A(24);
---					bankad <= A(23 DOWNTO 22);
---					rowad <= "0" & A(21 downto 10);					
---					colad <= "00" & A(9 DOWNTO 2);
---			
---				WHEN "011" => --32MB LOW BANK POPULATED 8Mx16
---					cs_mem <= '0';
---					bankad <= A(24 DOWNTO 23);
---					rowad <= "0" & A(22 downto 11);
---					colad <= "0" & A(10 DOWNTO 2);
---						
+					
 				WHEN "100" => --64MB BOTH MEMORY BANKS POPULATED 8Mx16
 					cs_mem <= A(25);
---					bankad <= A(24 DOWNTO 23);
---					rowad <= "0" & A(22 downto 11);					
---					colad <= "0" & A(10 DOWNTO 2);
---		
---				WHEN "101" => --64MB LOW BANK POPULATED 16Mx16
---					cs_mem <= '0';
---					bankad <= A(25 DOWNTO 24);
---					rowad <= A(23 downto 11);					
---					colad <= "0" & A(10 DOWNTO 2);
---						
+					
 				WHEN "000" => --128MB BOTH MEMORY BANKS POPULATED 16Mx16
 					cs_mem <= A(26);
---					bankad <= A(25 DOWNTO 24);
---					rowad <= A(23 downto 11);					
---					colad <= "0" & A(10 DOWNTO 2);
---					
---				WHEN "001" => --128MB LOW BANK POPULATED 32Mx16
---					cs_mem <= '0';
---					bankad <= A(26 DOWNTO 25);
---					rowad <= A(24 downto 12);					
---					colad <= A(11 DOWNTO 2);
---						
+					
 				WHEN "110" => --256MB BOTH MEMORY BANKS POPULATED 32Mx16
 					cs_mem <= A(27);
---					bankad <= A(26 DOWNTO 25);
---					rowad <= A(24 downto 12);					
---					colad <= A(11 DOWNTO 2);
-
+					
 				WHEN OTHERS =>
 				
 					cs_mem <= '0';
@@ -502,9 +466,8 @@ begin
 					sdramcom <= ramstate_NOP;				
 			
 				WHEN POWERUP =>
-					--First power up or warm reset
-					--200 microsecond is needed to stabilize. We are going to rely on the 
-					--the system reset to give us the needed time, although it might be inadequate.
+					--COLD OR WARM STARTUP. WE RELY ON THE SYSTEM RESET SIGNAL
+					--TO PROVIDE THE 200 microsecond NEEDED TO STABALIZE THE SDRAM.
 
 					CURRENT_STATE <= POWERUP_PRECHARGE;
 					EMA(12 downto 0) <= ("0010000000000"); --PRECHARGE ALL			
@@ -588,10 +551,7 @@ begin
 						--SEND THE BANK ACTIVATE COMMAND. 
 						
 						CURRENT_STATE <= RAS_STATE;
-												
-						--EMA(12 downto 0) <= rowad(12 DOWNTO 0);
-						--BANK0 <= bankad(0);
-						--BANK1 <= bankad(1);
+						
 						EMA(12 downto 0) <= A(25) & A(21 DOWNTO 10);
 						BANK0 <= A(22);
 						BANK1 <= A(23);
@@ -613,7 +573,6 @@ begin
 					--SET CAS STATE VALUES SO THEY LATCH ON THE NEXT CLOCK EDGE
 					CURRENT_STATE <= CAS_STATE;					
 					
-					--EMA(12 downto 0) <= "001" & colad (9 DOWNTO 0);	
 					EMA(12 downto 0) <= "001" & A(26) & A(24) & A(9 downto 2);
 					
 					IF RnW = '0' THEN
@@ -745,17 +704,17 @@ begin
 
 	--TO TRICK AMIGA OS INTO THINKING WE HAVE A GAYLE ADDRESS DECODER, WE NEED TO RESPOND TO GAYLE SPECIFIC REGISTERS.
 	--SEE THE GAYLE SPECIFICATIONS FOR MORE DETAILS.
-	--WE DISABLE THE IDE PORT BY SIMPLY IGNORING THE GAYLE CONFIGURATION REGISTERS, WHICH TELLS AMIGA OS THERE IS NO GAYLE HERE.
+	--WE DISABLE THE ATA PORT BY IGNORING THE GAYLE CONFIGURATION REGISTERS, WHICH TELLS AMIGA OS THERE IS NO GAYLE HERE.
 	---------------------------
 	
 	--THE GAYLE ID REGISTER IS AT $DE1000. THIS SEEMS TO BE THE ONLY ADDRESS USED
 	--IN THE $DE1XXX SPACE, SO WE CAN JUST LOOK FOR THE MOST SIGNIFICANT BITS.
-	gayleid_space <= '1' WHEN A(23 DOWNTO 15) = "110111100" AND nIDEDIS = '1' ELSE '0'; --110111100001000000000000
+	gayleid_space <= '1' WHEN A(23 DOWNTO 15) = "110111100" AND nIDEDIS = '1' AND nMEMZ3 <= '1' ELSE '0'; --110111100001000000000000
 	
 	--CHECKS IF THE CURRENT ADDRESS IS IN THE GAYLE REGISTER SPACE.
 	--THE GAYLE REGISTERS ARE FOUND IN $DA8XXX SPACE. WE ARE SPECIFICALLY 
 	--INTERESTED IN ANY REGISTER HAVING TO DO WITH INTERRUPT REQUESTS.
-	gaylereg_space <= '1' WHEN A(23 DOWNTO 15) = "110110101" ELSE '0'; --110110101000000000000000
+	gaylereg_space <= '1' WHEN A(23 DOWNTO 15) = "110110101" AND nMEMZ3 <= '1' ELSE '0'; --110110101000000000000000
 	
 	gayle_space <= '1' WHEN gaylereg_space = '1' OR gayleid_space = '1' ELSE '0';		
 	
@@ -773,7 +732,7 @@ begin
 			
 				--11010000 = $D0 = ECS Gayle, 11010001 = $D1 = AGA Gayle
 				--GAYLE_ID CONFIGURATION REGISTER IS AT $DE1000. WHEN ADDRESS IS $DE1000 AND R_W IS READ, BIT 7 IS READ.
-				--BELOW IS A SIMPLE SHIFT REGISTER TO LOAD THE GAYLE ID VALUE, OF WHICH ONLY THE HIGH NIBBLE IS CONSIDERED.
+				--BELOW IS A SIMPLE SHIFT REGISTER TO LOAD THE GAYLE ID VALUE.
 				--IF ANYTHING IS WRITTEN TO $DE1000, THAT MEANS THE REGISTER HAS BEEN RESET AND WE NEED TO RE-ESTABLISH GAYLE.
 				
 				IF RnW = '1' THEN
@@ -852,11 +811,23 @@ begin
 	--WHEN AMIGA OS IS DONE HANDLING THE REQUEST, IT NEGATES THE IDE INT ON $DA9000 AND WE THEN NEGATE _INT2.
 	
 	--PASS THE IDE DEVICE INTRQ SIGNAL TO _INT2 WHEN INTERRUPTS ARE ENABLED.
-	nINT2 <= '0' WHEN intchg = '1' AND ideintenable = '1' ELSE 'Z'; 
+	nINT2 <= '0' 
+		WHEN 
+			intchg = '1' AND 
+			ideintenable = '1' 
+		ELSE
+			'Z'; 
 	
 	--CLEAR THE INTERUPT WHEN AMIGA OS SIGNALS TO DO SO.
-	clrint <= '1' WHEN A(23 DOWNTO 12) = "110110101001" AND RnW = '0' AND nDS = '0' AND D = '0' ELSE '0'; --$DA9 110110101001000000000000
-	--CLRINT = (ADDR[23:12] == 'hDA9 & !RWn & ds & !DIN); // Clear INT Change flag
+	clrint <= '1' 
+		WHEN 
+			A(23 DOWNTO 12) = "110110101001" AND --$DA9 110110101001000000000000
+			RnW = '0' AND 
+			nDS = '0' AND 
+			D = '0' AND 
+			nMEMZ3 <= '1' 
+		ELSE 
+			'0'; 
 	
 	--GET THE CURRENT IDE INTERUPT STATE
 	PROCESS (CPUCLK) BEGIN
@@ -893,13 +864,27 @@ begin
 	--ARE WE IN THE ASSIGNED ADDRESS SPACE FOR THE IDE CONTROLLER?
 	--GAYLE ATA CHIP SELECT ADDRESS SPACE IS $DA0000 - $DA3FFF. 
 	--THIS CAN BE BROKEN INTO 8 BIT AND 16 BIT COMMANDS, WHICH CHANGES THE TIME TO EXECUTE.
-	ide_space <= '1' WHEN A(23 DOWNTO 15) = "110110100" ELSE '0';
+	ide_space <= '1' 
+		WHEN 
+			A(23 DOWNTO 15) = "110110100" AND 
+			nMEMZ3 <= '1' 
+		ELSE
+			'0';
 	
 	--SIGNAL U601 TO DISABLE THE 6800/68000 STATE MACHINES.
-	nIDEACCESS <= '0' WHEN gayle_space = '1' OR ide_space = '1' ELSE '1'; --110110100000000000000000
+	nIDEACCESS <= '0' 
+		WHEN 
+			gayle_space = '1' OR 
+			ide_space = '1' 
+		ELSE
+			'1'; --110110100000000000000000
 	
 	--ENABLE THE IDE BUFFERS
-	nIDEEN <= '0' WHEN ide_space = '1' ELSE '1'; --ide_space = '1'
+	nIDEEN <= '0' 
+		WHEN 
+			ide_space = '1' 
+		ELSE
+			'1';
 	
 	--SETS THE DIRECTION OF THE IDE BUFFERS
 	IDEDIR <= NOT RnW;
