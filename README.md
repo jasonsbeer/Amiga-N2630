@@ -85,7 +85,7 @@ Desired Zorro</br>3 RAM (MB)|Starting Address|Ending Address
 256|$40000000|$4FFFFFFF
 
 ## ATA/IDE Port
-The N2630 includes an AUTOBOOT<sup>[A]</sup> ATA/IDE port compatable with hard drives and ATAPI<sup>[B]</sup> devices. The port supports two devices (master and slave) and operates in PIO 0 mode. The port may be disabled by placing a jumper on J600. (Table 2) For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
+The N2630 includes an AUTOBOOT<sup>[A]</sup> ATA/IDE port compatable with hard drives and ATAPI<sup>[B]</sup> devices. The port supports two devices (master and slave) and operates in PIO 0 mode. The port may be disabled by placing a jumper on J900. (Table 2) For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
 
 <sup>A</sup>AUTOBOOT requires Kickstart v37.300 or greater or compatable SCSI.device in Kickstart.  
 <sup>B</sup>ATAPI support included in Kickstart 3.1.4+. Older versions of Kickstart may require installation of third party ATAPI drivers.  
@@ -111,7 +111,7 @@ J303|Zorro 2 RAM|Disable|Enable
 J304|OS Mode|Unix|Amiga OS
 J305|Zorro 3 RAM|Disable|Enable
 J404|Z2 4/8MB|4MB|8MB
-J600|IDE|Disable|Enable
+J900|IDE|Disable|Enable
 
 <sup>A</sup>The factory configuration for all jumpers is open (no jumper).  
 
