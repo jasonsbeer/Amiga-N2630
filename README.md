@@ -91,7 +91,7 @@ The N2630 includes an AUTOBOOT<sup>[A]</sup> ATA/IDE port compatable with hard d
 <sup>B</sup>ATAPI support included in Kickstart 3.1.4+. Older versions of Kickstart may require installation of third party ATAPI drivers.  
 
 **Table X.** ATA Configuration Jumper Settings
-Jumper|Description|Open<sup>[A]</sup>|Shorted|<sup>[B]</sup>
+Jumper|Description|Open<sup>[A]</sup>|Shorted<sup>[B]</sup>
 -|-|-|-
 J900|IDE|Enable|Disable
 J901|CF Select|Slave|Master
