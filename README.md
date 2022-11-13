@@ -90,7 +90,17 @@ The N2630 includes an AUTOBOOT<sup>[A]</sup> ATA/IDE port compatable with hard d
 <sup>A</sup>AUTOBOOT requires Kickstart v37.300 or greater or compatable SCSI.device in Kickstart.  
 <sup>B</sup>ATAPI support included in Kickstart 3.1.4+. Older versions of Kickstart may require installation of third party ATAPI drivers.  
 
-**Table x.** PIO Mode Jumpers
+**Table X.** ATA Configuration Jumper Settings
+Jumper|Description|Open<sup>[A]</sup>|Shorted|<sup>[B]</sup>
+-|-|-|-
+J900|IDE|Enable|Disable
+J901|CF Select|Slave|Master
+J902|PIO Mode|0|2
+
+<sup>A</sup> No jumper.  
+<sup>B</sup> Jumper placed.  
+
+PIO Mode Jumpers
 MAYBE THIS WORKS, MAYBE NOT.
 MAYBE WE HAVE JUMPERS, MAYBE WE DON'T.
 
@@ -111,7 +121,6 @@ J303|Zorro 2 RAM|Disable|Enable
 J304|OS Mode|Unix|Amiga OS
 J305|Zorro 3 RAM|Disable|Enable
 J404|Z2 4/8MB|4MB|8MB
-J900|IDE|Disable|Enable
 
 <sup>A</sup>The factory configuration for all jumpers is open (no jumper).  
 
