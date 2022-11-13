@@ -3467,6 +3467,11 @@
     )
   )
 
+  (text "MOVE NOISE RES _AS, _DS, R_W CLOSER \nTO CONSUMING LOGIC."
+    (at 117.602 174.244 0)
+    (effects (font (size 5 5)) (justify left bottom))
+    (uuid 629a18d3-1208-4ee5-8714-39540017c7b5)
+  )
   (text "JUMPER SETTINGS" (at 313.69 243.586 0)
     (effects (font (size 5 5)) (justify left bottom))
     (uuid a572f4fe-5f64-493e-9ab5-1ead6bb4a62c)
