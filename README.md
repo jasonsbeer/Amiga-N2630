@@ -64,18 +64,19 @@ Both Banks|Shorted<sup>B</sup>
 <sup>A</sup> No jumper.  
 <sup>B</sup> Jumper placed. 
   
-**Table 1c.** Jumper Configurations When Both Low and High Memory Banks Are Populated
-Desired Zorro</br>3 RAM (MB)|SDRAM</br>Capacity|J401|J402
+**Table 1c.** Jumper Configurations When Both Low and High Memory Banks Are Populated.
+Desired Zorro</br>3 RAM (MB)|SDRAM</br>Capacity|J401<sup>[A]</sup>|J402<sup>[A]</sup>
 -|-|-|-
-32|4MX16|Open<sup>[A]</sup>|Shorted<sup>[B]</sup>
+32|4MX16|Open<sup>[B]</sup>|Shorted<sup>[C]</sup>
 64|8MX16|Shorted|Open
 128|16Mx16|Shorted|Shorted
 256|32MX16|Open|Open
 
-<sup>A</sup> No jumper.  
-<sup>B</sup> Jumper placed.  
+<sup>[A]</sup>Ignored when J400 is open.
+<sup>B</sup>No jumper.  
+<sup>C</sup>Jumper placed.  
 
-**Table 1d.** N2630 Zorro 3 Memory Map
+**Table 1d.** N2630 Zorro 3 Memory Map.
 Desired Zorro</br>3 RAM (MB)|Starting Address|Ending Address
 -|-|-
 16|$40000000|$40FFFFFF
