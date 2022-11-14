@@ -52,8 +52,8 @@ Desired Zorro</br>3 RAM (MB)|SDRAM|Low Bank</br>(U406 and U407)|High Bank</br>(U
 128|32MX16|Populated|Unpopulated
 256|32MX16|Populated|Populated
 
-<sup>A</sup> These SDRAM positions are populated by the SDRAM indicated.  
-<sup>B</sup> This SDARM positions are not populated.
+<sup>A</sup>These SDRAM positions are populated by the SDRAM indicated.  
+<sup>B</sup>This SDARM positions are not populated.
 
 **Table 1b.** SDRAM Bank Jumper Setting.
 Zorro 3 RAM</br>Banks Populated|J400
@@ -61,8 +61,8 @@ Zorro 3 RAM</br>Banks Populated|J400
 Low Bank Only|Open<sup>A</sup>
 Both Banks|Shorted<sup>B</sup>
 
-<sup>A</sup> No jumper.  
-<sup>B</sup> Jumper placed. 
+<sup>A</sup>No jumper.  
+<sup>B</sup>Jumper placed. 
   
 **Table 1c.** Jumper Configurations When Both Low and High Memory Banks Are Populated.
 Desired Zorro</br>3 RAM (MB)|SDRAM</br>Capacity|J401<sup>[A]</sup>|J402<sup>[A]</sup>
@@ -72,7 +72,7 @@ Desired Zorro</br>3 RAM (MB)|SDRAM</br>Capacity|J401<sup>[A]</sup>|J402<sup>[A]<
 128|16Mx16|Shorted|Shorted
 256|32MX16|Open|Open
 
-<sup>[A]</sup>Ignored when J400 is open.
+<sup>A</sup>Ignored when J400 is open.  
 <sup>B</sup>No jumper.  
 <sup>C</sup>Jumper placed.  
 
@@ -98,8 +98,8 @@ J900|IDE|Enable|Disable
 J901|CF Select|Slave|Master
 J902|PIO Mode|0|2
 
-<sup>A</sup> No jumper.  
-<sup>B</sup> Jumper placed.  
+<sup>A</sup>No jumper.  
+<sup>B</sup>Jumper placed.  
 
 PIO Mode Jumpers
 MAYBE THIS WORKS, MAYBE NOT.
