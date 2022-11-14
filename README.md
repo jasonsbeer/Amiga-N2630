@@ -1,25 +1,25 @@
 <img src="/Images/n2630exp-small.png">  
-The N2630 is a Motorolla 68030 CPU card with additional RAM and IDE device port for the Amiga 2000 family of computers. It is installed in the CPU slot where it immediately upgrades the system to a 68030 processor with FPU, up to 264 megabytes of Fast RAM, and an ATA/IDE port. When desired, the 68030 processor may be temporarily disabled to run in 68000 mode. When running in 68000 mode, eight megabytes of Zorro 2 RAM remain enabled, unless otherwise disabled by the user.
+The N2630 is a Motorolla 68030 CPU card with additional RAM and IDE device port for the Amiga 2000 family of computers. It is installed in the CPU slot where it immediately upgrades the system to a 68030 processor with FPU, up to 264 megabytes of Fast RAM, and an ATA/IDE port. The N2630 is intended to be an evolution of the A2630 card.
 
 <p align="center"><img src="/Images/N2630MED.png" width="750"></p>
 
 ## Features
 1. Motorola 68030 microprocessor running at 25MHz or greater.
 2. Motorola 68882 math coprocessor running at 25MHZ or greater.
-3. 8 megabytes of Zorro 2 Fast RAM.
+3. Up to 8 megabytes of Zorro 2 Fast RAM.
 4. 16 to 256 megabytes of Zorro 3 Fast RAM.
 5. PATA/IDE hard drive port.
 
 ## Installation Notes
 This card may be installed in any Amiga 2000 computer. Installation is simply inserting the card into the 86 pin CPU/Coprocessor slot of the Amiga computer. There are no software drivers to install.  
 
-Before installing, it is necessary to determine if you have an early, non-cost reduced motherboard. If your motherboard is marked "Made In Germany" and "(C) 1986 Commodore" on the left side of the board, you have a non-cost reduced Amiga 2000 board, designated "A2000" in this documentation. An example of a non-cost reduced Amiga 2000 motherboard can be see [here](http://amiga.resource.cx/photos/a2000,1). In the event you have an non-cost reduced "A2000" motherboard, you must remove the Motorola 68000 processor from the Amiga 2000 motherboard and place a jumper at J302 of the N2630. Unfortunately, it is not possible to run in Motorola 68000 mode on these early revision motherboards. All other Amiga 2000 motherboards are designated "B2000" and should leave the Motorola 68000 in place.
+**IMPORTANT:** Before installing, it is necessary to determine if you have an early, non-cost reduced motherboard. If your motherboard is marked "Made In Germany" and "(C) 1986 Commodore" on the left side of the board, you have a non-cost reduced Amiga 2000 board, designated "A2000" in this documentation. An example of a non-cost reduced Amiga 2000 motherboard can be see [here](http://amiga.resource.cx/photos/a2000,1). In the event you have an non-cost reduced "A2000" motherboard, you must remove the Motorola 68000 processor from the Amiga 2000 motherboard and place a jumper at J302 of the N2630.  All other Amiga 2000 motherboards are designated "B2000" and should leave the Motorola 68000 in place.
 
 ## 68030 Mode
-By default, the N2630 starts in 68030 mode. When in 68030 mode, all installed RAM and the IDE/ATA device port are active.
+By default, the N2630 starts in 68030 mode. When in 68030 mode, all installed RAM and the ATA device port are active.
 
 ## 68000 Mode
-When desired, the 68030 may be disabled during a cold or warm start. This results in the Amiga falling back to using the 68000 processor. This may be desired when software does not run correctly on the 68030 processor. To start up in 68000 mode, hold down the right mouse button during startup. Select either the 68030 or 68000 from the screen options. Select "68000" and the Amiga will reset with the 68000 as the active processor. When in 68000 mode, the IDE/ATA port and Zorro 3 RAM are inactive. The Zorro 2 RAM continues to be available.
+When desired, the 68030 may be disabled during a cold or warm start. This results in the Amiga using the 68000 processor. This may be desired when software does not run correctly on the 68030 processor. To start up in 68000 mode, hold down the right mouse button during startup. Select "68000" and the Amiga will reset with the 68000 as the active processor. When in 68000 mode, the IDE/ATA port and Zorro 3 RAM are inactive. The Zorro 2 RAM continues to be available. Motorola 68000 mode is not available with A2000 motherboards.
 
 ## FAST RAM
 The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM is the successor to Fast Page Memory found in devices such as the Amiga 3000, A2630 processor card, and other computers of the time. SDRAMs are a very cost effictive way to supply memory to older systems and are readily available either new or from unused memory modules. 
