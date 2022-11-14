@@ -36,7 +36,7 @@ Zorro 3 RAM is the Amiga RAM found in the 32-bit address space of the Motorola 6
 
 Zorro 3 SDRAMs may be installed in different configurations to acheive a specific amount of final RAM (Table 1a). SDRAM must be installed in pairs, or banks, to acheive the needed 32 bit data path. Positions U406 and U407 represent the "low" bank and positions U408 and U409 represent the "high" bank. The banks must be populated as the low bank only or both low and high banks. The high bank will not function without the low bank popualated. The SDRAM footprint is 54-TSOP II. The indicated jumpers must be set as shown or your system may not function correctly. When installing both banks, jumpers J400, J401, and J401 must be set as shown in tables 1b and 1c. If only the low bank is populated, these jumpers should be left empty.
 
-The Zorro 3 memory supports AUTOCONFIG with Kickstart 2.04 and newer and will be autosized by Amiga OS. When using Kickstart version 1.x, place a jumper at J305 to disable the Zorro 3 AUTOCONFIG. An addmem style program may be used to add the Zorro 3 memory to the Amiga's memory pool. See Table 1d for the N2630 Zorro 3 memory map.
+The Zorro 3 memory supports AUTOCONFIG with Kickstart 2.04 and newer and will be autosized by Amiga OS. When using Kickstart version 1.x, place a jumper at J405 to disable the Zorro 3 AUTOCONFIG. An addmem style program may be used to add the Zorro 3 memory to the Amiga's memory pool. See Table 1d for the N2630 Zorro 3 memory map.
 
 Except as discussed above, disabling the Zorro 3 RAM is not recommended for regular use as this will degrade performance of the 68030.
 
@@ -117,10 +117,10 @@ In the following tables, OPEN indicates no jumper. Shorted indicates the presenc
 Jumper|Description|Shorted|Open<sup>[A]</sup>
 -|-|-|-
 J302|Amiga Version|A2000|B2000
-J303|Zorro 2 RAM|Disable|Enable
 J304|OS Mode|Unix|Amiga OS
-J305|Zorro 3 RAM|Disable|Enable
+J403|Zorro 2 RAM|Disable|Enable
 J404|Z2 4/8MB|4MB|8MB
+J405|Zorro 3 RAM|Disable|Enable
 
 <sup>A</sup>The factory configuration for all jumpers is open (no jumper).  
 
