@@ -8,7 +8,7 @@ The N2630 is a Motorolla 68030 CPU card with additional RAM and IDE device port 
 2. Motorola 68882 math coprocessor running at 25MHZ or greater.
 3. Up to 8 megabytes of Zorro 2 Fast RAM.
 4. 16 to 256 megabytes of Zorro 3 Fast RAM.
-5. PATA/IDE hard drive port.
+5. ATA/IDE hard drive port with 40-pin and CF card options.
 
 ## Installation Notes
 This card may be installed in any Amiga 2000 computer. Installation is simply inserting the card into the 86 pin CPU/Coprocessor slot of the Amiga computer. There are no software drivers to install.  
@@ -30,7 +30,7 @@ The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM
 ### Zorro 2
 Zorro 2 RAM is the Amiga RAM found in the 24 bit address space of the Motorola 68000 processor. The Zorro 2 RAM on the N2630 is accessed by the 68030 as a 32-bit data bus and supports 16-bit DMA activities of the Zorro 2 bus. Installing 2Mx16 or greater capacity SDRAMs will allow the N2630 to configure the maximum of 8MB in the Zorro 2 space. Placing a jumper at position J404 will limit the amount of RAM configured to 4MB in the Zorro 2 space, freeing up 4MB to be supplied by other Zorro 2 devices. This may be useful in the event you have a device that requires it's own RAM for proper function. One example being the GVP Impact Series II card, which can only use its own RAM for DMA activities. 
 
-The N2630 will always configure the onboard RAM and cannot be "shut up" in the AUTOCONFIG process. You must use the onboard RAM to maximize the performance of the MC68030. The N2630 Zorro 2 RAM may be disabled by placing a jumper at J303. This should only be done for testing purposes.
+The N2630 will always configure the onboard RAM and cannot be "shut up" in the AUTOCONFIG process. You must use the onboard RAM to maximize the performance of the 68030 processor. The N2630 Zorro 2 RAM may be disabled by placing a jumper at J303. This should only be done for testing purposes.
 
 NOTE: Any SDRAM at least 2Mx16 in capacity in the 54-TSOP II footprint may be placed. However, it is not possible to achieve more than 8 megabytes of Zorro 2 RAM capacity. 
 
