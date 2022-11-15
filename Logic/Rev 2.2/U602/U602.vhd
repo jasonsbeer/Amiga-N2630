@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    November 12, 2022 
+-- Create Date:    November 15, 2022 
 -- Design Name:    N2630 U602 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -102,9 +102,6 @@ architecture Behavioral of U602 is
 	SIGNAL memsel : STD_LOGIC; --ARE WE IN THE ZORRO 3 MEMORY SPACE?
 	SIGNAL cs_mem : STD_LOGIC; --ARE WE IN THE UPPER SDRAM PAIR?
 	SIGNAL COUNT : INTEGER RANGE 0 TO 2 := 0; --COUNTER FOR SDRAM STARTUP ACTIVITIES
-	--SIGNAL rowad : STD_LOGIC_VECTOR (12 DOWNTO 0) := "0000000000000";
-	--SIGNAL bankad : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00";
-	--SIGNAL colad : STD_LOGIC_VECTOR (9 DOWNTO 0) := "0000000000";
 	SIGNAL datamask : STD_LOGIC_VECTOR (3 DOWNTO 0); --DATA MASK
 	SIGNAL refresh : STD_LOGIC; --SIGNALS TIME TO REFRESH
 	SIGNAL refreset : STD_LOGIC; --RESET THE REFRESH COUNTER
@@ -709,12 +706,12 @@ begin
 	
 	--THE GAYLE ID REGISTER IS AT $DE1000. THIS SEEMS TO BE THE ONLY ADDRESS USED
 	--IN THE $DE1XXX SPACE, SO WE CAN JUST LOOK FOR THE MOST SIGNIFICANT BITS.
-	gayleid_space <= '1' WHEN A(23 DOWNTO 15) = "110111100" AND nIDEDIS = '1' AND nMEMZ3 <= '1' ELSE '0'; --110111100001000000000000
+	gayleid_space <= '1' WHEN A(23 DOWNTO 15) = "110111100" AND nIDEDIS = '1' AND nMEMZ3 = '1' ELSE '0'; --110111100001000000000000
 	
 	--CHECKS IF THE CURRENT ADDRESS IS IN THE GAYLE REGISTER SPACE.
 	--THE GAYLE REGISTERS ARE FOUND IN $DA8XXX SPACE. WE ARE SPECIFICALLY 
 	--INTERESTED IN ANY REGISTER HAVING TO DO WITH INTERRUPT REQUESTS.
-	gaylereg_space <= '1' WHEN A(23 DOWNTO 15) = "110110101" AND nMEMZ3 <= '1' ELSE '0'; --110110101000000000000000
+	gaylereg_space <= '1' WHEN A(23 DOWNTO 15) = "110110101" AND nMEMZ3 = '1' ELSE '0'; --110110101000000000000000
 	
 	gayle_space <= '1' WHEN gaylereg_space = '1' OR gayleid_space = '1' ELSE '0';		
 	
@@ -825,7 +822,7 @@ begin
 			RnW = '0' AND 
 			nDS = '0' AND 
 			D = '0' AND 
-			nMEMZ3 <= '1' 
+			nMEMZ3 = '1' 
 		ELSE 
 			'0'; 
 	
@@ -867,7 +864,7 @@ begin
 	ide_space <= '1' 
 		WHEN 
 			A(23 DOWNTO 15) = "110110100" AND 
-			nMEMZ3 <= '1' 
+			nMEMZ3 = '1' 
 		ELSE
 			'0';
 	
