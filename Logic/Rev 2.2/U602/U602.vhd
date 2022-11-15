@@ -147,18 +147,18 @@ architecture Behavioral of U602 is
 	--ATA STATE MACHINE SIGNALS
 	
 	--25MHz CLOCK CYCLES NEEDED TO FULFILL MODE TIMING REQUIREMENTS FOR 16 BIT CYCLES.
-	--TIME|MODE0|MODE1|MODE2|MODE3
-	------------------------------
-	-- t1 |  2  |  2  |  1  |  1
-	-- t2 |  5  |  4  |  3  |  2
-	-- eoc|  8  |  4  |  2  |  2
+	--TIME|MODE0|MODE1|MODE2|MODE3|MODE4(50MHz)
+	-------------------------------------------
+	-- t1 |  2  |  2  |  1  |  1  |  2
+	-- t2 |  5  |  4  |  3  |  2  |  4
+	-- eoc|  8  |  4  |  2  |  2  |  2
 
 	--25MHz CLOCK CYCLES NEEDED TO FULFILL MODE TIMING REQUIREMENTS FOR 8 BIT CYCLES.
-	--TIME|MODE0|MODE1|MODE2|MODE3
-	------------------------------
-	-- t1 |  2  |  2  |  1  |  1
-	-- t2 |  8  |  8  |  8  |  2
-	-- eoc|  5  |  1  |  1  |  2
+	--TIME|MODE0|MODE1|MODE2|MODE3|MODE4(50MHz)
+	-------------------------------------------
+	-- t1 |  2  |  2  |  1  |  1  |  2
+	-- t2 |  8  |  8  |  8  |  2  |  4
+	-- eoc|  5  |  1  |  1  |  2  |  2
 
 	-- eoc (end of cycle) is T2i, T9, or T0-T1-T2. Whichever is greatest.
 	
