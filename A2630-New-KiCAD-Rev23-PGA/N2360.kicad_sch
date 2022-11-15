@@ -1075,6 +1075,9 @@
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-0000626c9de3"
       (reference "#PWR0148") (unit 1) (value "GND") (footprint "")
     )
+    (path "/00000000-0000-0000-0000-000061fbe594/a9ad56a7-e304-44f2-8937-9f3ea2846dae"
+      (reference "#PWR0149") (unit 1) (value "GND") (footprint "")
+    )
     (path "/00000000-0000-0000-0000-0000634ecc15/7a5ce3d5-cb25-428c-a9ca-16ea991a720b"
       (reference "#PWR0150") (unit 1) (value "+3.3V") (footprint "")
     )
@@ -1149,6 +1152,9 @@
     )
     (path "/00000000-0000-0000-0000-000062089831/00000000-0000-0000-0000-000062219292"
       (reference "#PWR0174") (unit 1) (value "+3.3V") (footprint "")
+    )
+    (path "/00000000-0000-0000-0000-000061fbe594/3aadd172-cf05-48d7-bcca-62b7f9b28982"
+      (reference "#PWR0175") (unit 1) (value "+3.3V") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-0000626c9dea"
       (reference "#PWR0177") (unit 1) (value "+5V") (footprint "")
@@ -1660,6 +1666,12 @@
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-000061f93d08"
       (reference "R501") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
+    (path "/00000000-0000-0000-0000-000061fbe594/eca625e1-ae69-4eab-96b7-87c1d8b222d8"
+      (reference "R600") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
+    )
+    (path "/00000000-0000-0000-0000-000061fbe594/64be4f9a-0d3b-4e55-bca4-feee592b3dc8"
+      (reference "R601") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
+    )
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-000062551812"
       (reference "R706") (unit 1) (value "1K") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
@@ -1713,6 +1725,9 @@
     )
     (path "/00000000-0000-0000-0000-000061fbe594/21722d95-5a74-40df-a6f1-299ba3abfe62"
       (reference "RN403") (unit 1) (value "3.3K") (footprint "Resistor_THT:R_Array_SIP9")
+    )
+    (path "/00000000-0000-0000-0000-000061fbe594/bb005ae7-d652-43da-a50e-9284b169f881"
+      (reference "SW1") (unit 1) (value "MODE") (footprint "N2630 Libraries:100SP1T1B1M7QE")
     )
     (path "/00000000-0000-0000-0000-000061d9c8dc/00000000-0000-0000-0000-0000630008ce"
       (reference "U102") (unit 1) (value "27C256") (footprint "Package_DIP:DIP-28_W15.24mm")

@@ -1,4 +1,4 @@
-20610407593572359
+20610413381404960
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -60564,6 +60564,13 @@ Mounting 4.5mm 9774100982
 8
 1
 N2630 Libraries
+100SP1T1B1M7QE
+
+
+0
+5
+5
+N2630 Libraries
 A2000_CPUSLOT_MALE
 Connecteur Bus AT ISA 16 bits
 CONN BUS AMIGA
@@ -60600,13 +60607,6 @@ Jumper1
 0
 N2630 Libraries
 Jumper2
-
-
-0
-0
-0
-N2630 Libraries
-Jumper3
 
 
 0
