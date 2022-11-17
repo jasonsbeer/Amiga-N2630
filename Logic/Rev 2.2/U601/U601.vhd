@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    NOVEMBER 6, 2022 
+-- Create Date:    NOVEMBER 16, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC95144 144 PIN
@@ -170,7 +170,7 @@ architecture Behavioral of U601 is
 	
 	--ROM RELATED SIGNALS
 	CONSTANT DELAYVALUE : INTEGER := 1;
-	SIGNAL dsackdelay : STD_LOGIC_VECTOR ( DELAYVALUE DOWNTO 0 ) := (OTHERS => '0') ; --DELAY DSACK CYCLE
+	SIGNAL dsackdelay : INTEGER RANGE 0 TO DELAYVALUE;
 	
 begin
 
@@ -289,8 +289,8 @@ begin
 			  
 			ram2configed = '1' AND
 			nBGACK = '1' AND 
-			FC(2 downto 0) /= "111" AND
-			nAS = '0'
+			FC(2 downto 0) /= "111" --AND
+			--nAS = '0'
 		ELSE
 			'0';
 	
@@ -304,7 +304,7 @@ begin
 			  A(23 DOWNTO 21) = rambaseaddress3 ) AND
 			  
 			ram2configed = '1' AND 
-			nAS = '0' AND 
+			--nAS = '0' AND 
 			nBGACK = '0'
 		ELSE
 			'0';
@@ -312,7 +312,7 @@ begin
 	--QUALIFY THE ZORRO 2 MEM SPACE ACCESS WITH _MEMZ3 TO PREVENT ERRONEOUS ACCESS.
 	nMEMZ2 <= '0' 
 		WHEN
-			nMEMZ3 = '1' AND (cpuaccess = '1' OR dmaaccess = '1')
+			nAS = '0' AND nMEMZ3 = '1' AND (cpuaccess = '1' OR dmaaccess = '1')
 		ELSE
 			'1';
 			
@@ -715,32 +715,51 @@ begin
 	-- 68030 DATA TRANSFER ACK --
 	-----------------------------
 	
-	PROCESS (CPUCLK) BEGIN
+	PROCESS (CPUCLK, nRESET) BEGIN
 	
-		IF RISING_EDGE (CPUCLK) THEN
+		IF nRESET = '0' THEN
+		
+			nDSACK0 <= 'Z';
+			nDSACK1 <= 'Z';			
+			dsackdelay <= 0;
+	
+		ELSIF RISING_EDGE (CPUCLK) THEN
 			
-			IF nCSROM = '0' THEN
+			--WE ARE IN THE ONBOARD ROM ADDRESS SPACE.
+			--THE 27C256 EPROM NEEDS 40-75ns TO STABILIZE DATA.
+			--THIS DELAYS DSACK BY THE NUMBER OF CLOCKS DEFINED BY DELAYVALUE.
+			--THE NUMBER OF CLOCK CYCLES TO ACHIEVE THE NEEDED WAIT TIME IS DETERMINED
+			--BY THE CLOCK SPEED. WHEN DELAYVALUE = 1, THIS RESULTS IN A DELAY OF 
+			--3 CLOCK CYCLES. THIS SHOULD BE GOOD FOR ANY SPEED, BUT IS A COMPROMISE.
+			--SINCE THE ROM IS ONLY READ DURING INITIAL STARTUP, THIS SHOULD BE OK.
+
+			IF hirom = '1' OR lorom = '1' THEN
 				
-				--WE ARE IN THE ONBOARD ROM ADDRESS SPACE.
-				--THE 27C256 EPROM NEEDS 40-75ns TO STABILIZE DATA.
-				--THIS DELAYS DSACK BY THE NUMBER OF CLOCKS DEFINED BY DELAYVALUE.
-				--THE NUMBER OF CLOCK CYCLES TO ACHIEVE THE NEEDED WAIT TIME IS DETERMINED
-				--BY THE CLOCK SPEED. WHEN DELAYVALUE = 1, THIS RESULTS IN A DELAY OF 
-				--3 CLOCK CYCLES. THIS SHOULD BE GOOD FOR ANY SPEED, BUT IS A COMPROMISE.
-				--SINCE THE ROM IS ONLY READ DURING INITIAL STARTUP, THIS SHOULD BE OK.
+				IF nAS = '0' THEN
 			
-				IF dsackdelay(DELAYVALUE) = '1' THEN				
+					IF dsackdelay = DELAYVALUE THEN				
+						
+						nDSACK1 <= '0';
 					
-					nDSACK1 <= '0';
+					ELSE 			
+						
+						nDSACK1 <= '1';
+						
+						dsackdelay <= dsackdelay + 1;
+					
+					END IF;
 				
-				ELSIF dsackdelay(DELAYVALUE) = '0' THEN				
-					
-					nDSACK1 <= '1';
-					
-					dsackdelay(0) <= '1';
-					dsackdelay(DELAYVALUE DOWNTO 1) <= dsackdelay(DELAYVALUE-1 DOWNTO 0);
+				ELSIF nAS = '1' AND dsackdelay = DELAYVALUE THEN
 				
-				END IF;	
+					dsackdelay <= 0;				
+					nDSACK1 <= '1';	
+
+				ELSE
+				
+					nDSACK1 <= '1';	
+					
+				END IF;
+
 
 			ELSIF autoconfigspace = '1' THEN
 			
@@ -758,11 +777,21 @@ begin
 			ELSIF cpuaccess = '1' THEN
 			
 				--WE ARE IN THE SDRAM ADDRESS SPACE	AND THIS IS A 68030 ACCESS
-				IF dsacken = '1' OR nDSACK0 = '0' THEN
-			
-					--ASSERT!
-					nDSACK0 <= '0';
-					nDSACK1 <= '0';
+				IF nAS = '0' THEN
+				
+					IF dsacken = '1' OR nDSACK0 = '0' THEN
+				
+						--ASSERT!
+						nDSACK0 <= '0';
+						nDSACK1 <= '0';
+						
+					ELSE
+					
+						--DON'T ASSERT AT THIS TIME.
+						nDSACK0 <= '1';
+						nDSACK1 <= '1';
+						
+					END IF;	
 					
 				ELSE
 				
@@ -777,7 +806,7 @@ begin
 				nDSACK0 <= 'Z';
 				nDSACK1 <= 'Z';
 				
-				dsackdelay <= (OTHERS => '0');
+				dsackdelay <= 0;
 				
 			END IF;
 		
