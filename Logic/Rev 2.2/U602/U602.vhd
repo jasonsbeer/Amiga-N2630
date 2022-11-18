@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    November 15, 2022 
+-- Create Date:    November 17, 2022 
 -- Design Name:    N2630 U602 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -102,6 +102,9 @@ architecture Behavioral of U602 is
 	SIGNAL memsel : STD_LOGIC; --ARE WE IN THE ZORRO 3 MEMORY SPACE?
 	SIGNAL cs_mem : STD_LOGIC; --ARE WE IN THE UPPER SDRAM PAIR?
 	SIGNAL COUNT : INTEGER RANGE 0 TO 2 := 0; --COUNTER FOR SDRAM STARTUP ACTIVITIES
+	--SIGNAL rowad : STD_LOGIC_VECTOR (12 DOWNTO 0) := "0000000000000";
+	--SIGNAL bankad : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00";
+	--SIGNAL colad : STD_LOGIC_VECTOR (9 DOWNTO 0) := "0000000000";
 	SIGNAL datamask : STD_LOGIC_VECTOR (3 DOWNTO 0); --DATA MASK
 	SIGNAL refresh : STD_LOGIC; --SIGNALS TIME TO REFRESH
 	SIGNAL refreset : STD_LOGIC; --RESET THE REFRESH COUNTER
@@ -143,22 +146,24 @@ architecture Behavioral of U602 is
 	SIGNAL csenable : STD_LOGIC;
 	SIGNAL csaddress : STD_LOGIC;
 	SIGNAL rwenable : STD_LOGIC;
+	CONSTANT DELAYVALUE : INTEGER := 1;
+	SIGNAL dsackdelay : INTEGER RANGE 0 TO DELAYVALUE;
 	
 	--ATA STATE MACHINE SIGNALS
 	
 	--25MHz CLOCK CYCLES NEEDED TO FULFILL MODE TIMING REQUIREMENTS FOR 16 BIT CYCLES.
-	--TIME|MODE0|MODE1|MODE2|MODE3|MODE4(50MHz)
-	-------------------------------------------
-	-- t1 |  2  |  2  |  1  |  1  |  2
-	-- t2 |  5  |  4  |  3  |  2  |  4
-	-- eoc|  8  |  4  |  2  |  2  |  2
+	--TIME|MODE0|MODE1|MODE2|MODE3
+	------------------------------
+	-- t1 |  2  |  2  |  1  |  1
+	-- t2 |  5  |  4  |  3  |  2
+	-- eoc|  8  |  4  |  2  |  2
 
 	--25MHz CLOCK CYCLES NEEDED TO FULFILL MODE TIMING REQUIREMENTS FOR 8 BIT CYCLES.
-	--TIME|MODE0|MODE1|MODE2|MODE3|MODE4(50MHz)
-	-------------------------------------------
-	-- t1 |  2  |  2  |  1  |  1  |  2
-	-- t2 |  8  |  8  |  8  |  2  |  4
-	-- eoc|  5  |  1  |  1  |  2  |  2
+	--TIME|MODE0|MODE1|MODE2|MODE3
+	------------------------------
+	-- t1 |  2  |  2  |  1  |  1
+	-- t2 |  8  |  8  |  8  |  2
+	-- eoc|  5  |  1  |  1  |  2
 
 	-- eoc (end of cycle) is T2i, T9, or T0-T1-T2. Whichever is greatest.
 	
@@ -623,19 +628,28 @@ begin
 	
 		IF nRESET = '0' THEN
 		
+			dsackdelay <= 0;	
 			nDSACK0 <= 'Z';
 			nDSACK1 <= 'Z';
 	
 		ELSIF RISING_EDGE (CPUCLK) THEN
 			
-			IF memsel = '1' THEN
+			IF nMEMZ3 = '0' THEN
 			
-				--WE ARE IN THE ZORRO 3 ADDRESS SPACE WITH _AS ASSERTED.
-				IF dsacken = '1' OR nDSACK0 = '0' THEN
-			
-					nDSACK0 <= '0';
-					nDSACK1 <= '0';
+				IF nAS = '0' THEN
+					--WE ARE IN THE ZORRO 3 ADDRESS SPACE WITH _AS ASSERTED.
+					IF dsacken = '1' OR nDSACK0 = '0' THEN
 				
+						nDSACK0 <= '0';
+						nDSACK1 <= '0';
+					
+					ELSE
+					
+						nDSACK0 <= '1';
+						nDSACK1 <= '1';
+					
+					END IF;
+					
 				ELSE
 				
 					nDSACK0 <= '1';
@@ -646,28 +660,61 @@ begin
 			ELSIF ide_space = '1' THEN
 			
 				--WE ARE IN THE IDE I/0 ADDRESS SPACE WITH _AS ASSERTED.
-				IF nAS = '0' AND (idesacken = '1' OR nDSACK1 = '0') THEN
-				
-					nDSACK1 <= '0';
-					
-				ELSE
-				
-					nDSACK1 <= '1';
-			
-				END IF;
-				
-			ELSIF gayle_space = '1' THEN
-			
-				--WE ARE IN THE GAYLE REGISTER ADDRESS SPACE
 				IF nAS = '0' THEN
 				
-					nDSACK1 <= '0';
+					IF idesacken = '1' OR nDSACK1 = '0' THEN
+					
+						nDSACK1 <= '0';
+						
+					ELSE
+					
+						nDSACK1 <= '1';
+				
+					END IF;
 					
 				ELSE
-				
+					
 					nDSACK1 <= '1';
 					
+				END IF;					
+				
+			ELSIF gayle_space = '1' THEN
+				
+				IF nAS = '0' THEN
+			
+					IF dsackdelay = DELAYVALUE THEN				
+						
+						nDSACK1 <= '0';
+					
+					ELSE 			
+						
+						nDSACK1 <= '1';
+						
+						dsackdelay <= dsackdelay + 1;
+					
+					END IF;
+				
+				ELSIF nAS = '1' AND dsackdelay = DELAYVALUE THEN
+				
+					dsackdelay <= 0;				
+					nDSACK1 <= '1';	
+
+				ELSE
+				
+					nDSACK1 <= '1';	
+					
 				END IF;
+			
+				--WE ARE IN THE GAYLE REGISTER ADDRESS SPACE
+--				IF nAS = '0' THEN
+--				
+--					nDSACK1 <= '0';
+--					
+--				ELSE
+--				
+--					nDSACK1 <= '1';
+--					
+--				END IF;
 				
 			ELSE
 			
@@ -706,12 +753,12 @@ begin
 	
 	--THE GAYLE ID REGISTER IS AT $DE1000. THIS SEEMS TO BE THE ONLY ADDRESS USED
 	--IN THE $DE1XXX SPACE, SO WE CAN JUST LOOK FOR THE MOST SIGNIFICANT BITS.
-	gayleid_space <= '1' WHEN A(23 DOWNTO 15) = "110111100" AND nIDEDIS = '1' AND nMEMZ3 = '1' ELSE '0'; --110111100001000000000000
+	gayleid_space <= '1' WHEN A(23 DOWNTO 15) = "110111100" AND nIDEDIS = '1' AND nMEMZ3 <= '1' ELSE '0'; --110111100001000000000000
 	
 	--CHECKS IF THE CURRENT ADDRESS IS IN THE GAYLE REGISTER SPACE.
 	--THE GAYLE REGISTERS ARE FOUND IN $DA8XXX SPACE. WE ARE SPECIFICALLY 
 	--INTERESTED IN ANY REGISTER HAVING TO DO WITH INTERRUPT REQUESTS.
-	gaylereg_space <= '1' WHEN A(23 DOWNTO 15) = "110110101" AND nMEMZ3 = '1' ELSE '0'; --110110101000000000000000
+	gaylereg_space <= '1' WHEN A(23 DOWNTO 15) = "110110101" AND nMEMZ3 <= '1' ELSE '0'; --110110101000000000000000
 	
 	gayle_space <= '1' WHEN gaylereg_space = '1' OR gayleid_space = '1' ELSE '0';		
 	
@@ -822,7 +869,7 @@ begin
 			RnW = '0' AND 
 			nDS = '0' AND 
 			D = '0' AND 
-			nMEMZ3 = '1' 
+			nMEMZ3 <= '1' 
 		ELSE 
 			'0'; 
 	
@@ -864,7 +911,7 @@ begin
 	ide_space <= '1' 
 		WHEN 
 			A(23 DOWNTO 15) = "110110100" AND 
-			nMEMZ3 = '1' 
+			nMEMZ3 <= '1' 
 		ELSE
 			'0';
 	
