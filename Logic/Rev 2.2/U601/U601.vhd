@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    NOVEMBER 16, 2022 
+-- Create Date:    NOVEMBER 20, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC95144 144 PIN
@@ -96,8 +96,9 @@ PORT
 	nLMBE : OUT STD_LOGIC; --LOWER MIDDLE BYTE ENABLE
 	nLLBE : OUT STD_LOGIC; --LOWER LOWER BYTE ENABLE
 	nDTACK : INOUT STD_LOGIC; --68000 DTACK FOR DMA
-	nDSACK0 : INOUT STD_LOGIC; --68030 DSACK
-	nDSACK1 : OUT STD_LOGIC;
+	--nDSACK0 : OUT STD_LOGIC; --68030 DSACK
+	--nDSACK1 : OUT STD_LOGIC;
+	nDSACK : OUT STD_LOGIC_VECTOR (1 DOWNTO 0); --_DSACK1, _DSACK0
 	nOVR : OUT STD_LOGIC; --DTACK OVERRIDE
 	EMDDIR : OUT STD_LOGIC; --DIRECTION OF MEMORY DATA BUS BUFFERS
 	nEMENA : OUT STD_LOGIC; --ENABLE THE MEMORY DATA BUS BUFFERS
@@ -171,6 +172,16 @@ architecture Behavioral of U601 is
 	--ROM RELATED SIGNALS
 	CONSTANT DELAYVALUE : INTEGER := 1;
 	SIGNAL dsackdelay : INTEGER RANGE 0 TO DELAYVALUE;
+	
+	--CONSTANT dsackcycleendcount : INTEGER := 2;
+	--SIGNAL dsackcyclecount : INTEGER RANGE 0 TO dsackcycleendcount;
+	
+	--SIGNAL dsack0out : STD_LOGIC;
+	--SIGNAL dsack1out : STD_LOGIC;
+	--SIGNAL dsackcycle : STD_LOGIC;
+	SIGNAL dsack_rom : STD_LOGIC;
+	--SIGNAL dsack_autoconfig : STD_LOGIC;
+	SIGNAL dsackreset : STD_LOGIC;
 	
 begin
 
@@ -656,9 +667,9 @@ begin
 					
 						dsacken <= '1';						
 						
-					ELSE
+					--ELSE
 					
-						dsacken <= '0';
+						--dsacken <= '0';
 						
 					END IF;
 					
@@ -680,7 +691,8 @@ begin
 					IF nMEMZ2 = '1' THEN					
 											
 						CURRENT_STATE <= RUN_STATE;
-						CLKE <= '1';						
+						CLKE <= '1';
+						dsacken <= '0';
 						
 					END IF;	
 					
@@ -714,98 +726,79 @@ begin
 	-----------------------------
 	-- 68030 DATA TRANSFER ACK --
 	-----------------------------
+
+	
+	nDSACK <= 
+			"01" WHEN nAS = '0' AND ((dsack_rom = '1' AND (hirom = '1' OR lorom = '1')) OR autoconfigspace = '1') --16 BIT PORT
+		ELSE 
+			"00" WHEN nAS = '0' AND dsacken = '1' AND cpuaccess = '1' --32 BIT PORT
+		ELSE
+			"11" WHEN hirom = '1' OR lorom = '1' OR autoconfigspace = '1' OR cpuaccess = '1' --HOLD BOTH DSACKS FOR NOW
+		ELSE
+			"ZZ";	
+			
+			
+	--AT 50MHz, THE NEGATION OF _AS OFTEN FAILS TO MEET THE SETUP TIME TO BE 
+	--DETECTED AT THE NEXT RISING CLOCK EDGE. THIS WORKS VERY WELL, THOUGH.
+	
+	PROCESS (nAS, nRESET, dsack_rom) BEGIN 
+	
+		IF nRESET = '0' OR dsack_rom = '0'  THEN
+		
+			dsackreset <= '0';			
+	
+		ELSIF RISING_EDGE(nAS) THEN
+		--ELSIF (nAS'EVENT AND nAS = '1') THEN
+		--in simulation, the RISING_EDGE(nAS) does not work.
+		--seems to work in situ, though.
+		
+			dsackreset <= '1';
+			
+		END IF;
+		
+	END PROCESS;
+
+	--THE 27C256 EPROM NEEDS 40-75ns TO STABILIZE DATA.
+	--THIS DELAYS DSACK BY THE NUMBER OF CLOCKS DEFINED BY DELAYVALUE.
+	--THIS GIVES THE EPROM TIME TO PUT STABLE DATA ON THE BUS.	
 	
 	PROCESS (CPUCLK, nRESET) BEGIN
 	
 		IF nRESET = '0' THEN
 		
-			nDSACK0 <= 'Z';
-			nDSACK1 <= 'Z';			
 			dsackdelay <= 0;
+			dsack_rom <= '0';
 	
 		ELSIF RISING_EDGE (CPUCLK) THEN
-			
-			--WE ARE IN THE ONBOARD ROM ADDRESS SPACE.
-			--THE 27C256 EPROM NEEDS 40-75ns TO STABILIZE DATA.
-			--THIS DELAYS DSACK BY THE NUMBER OF CLOCKS DEFINED BY DELAYVALUE.
-			--THE NUMBER OF CLOCK CYCLES TO ACHIEVE THE NEEDED WAIT TIME IS DETERMINED
-			--BY THE CLOCK SPEED. WHEN DELAYVALUE = 1, THIS RESULTS IN A DELAY OF 
-			--3 CLOCK CYCLES. THIS SHOULD BE GOOD FOR ANY SPEED, BUT IS A COMPROMISE.
-			--SINCE THE ROM IS ONLY READ DURING INITIAL STARTUP, THIS SHOULD BE OK.
 
 			IF hirom = '1' OR lorom = '1' THEN
 				
-				IF nAS = '0' THEN
-			
-					IF dsackdelay = DELAYVALUE THEN				
-						
-						nDSACK1 <= '0';
+				IF dsackreset = '1' THEN
+				
+					dsack_rom <= '0';
+					dsackdelay <= 0;
 					
-					ELSE 			
-						
-						nDSACK1 <= '1';
-						
-						dsackdelay <= dsackdelay + 1;
+				ELSE
 					
+					IF nAS = '0' THEN
+					
+						IF dsackdelay = DELAYVALUE THEN
+						
+							dsack_rom <= '1';
+							
+						ELSE
+						
+							dsack_rom <= '0';
+							dsackdelay <= dsackdelay + 1;
+							
+						END IF;
+						
 					END IF;
-				
-				ELSIF nAS = '1' AND dsackdelay = DELAYVALUE THEN
-				
-					dsackdelay <= 0;				
-					nDSACK1 <= '1';	
-
-				ELSE
-				
-					nDSACK1 <= '1';	
-					
-				END IF;
-
-
-			ELSIF autoconfigspace = '1' THEN
-			
-				--WE ARE IN THE AUTOCONFIG ADDRESS SPACE
-				IF nAS = '0' THEN
-				
-					nDSACK1 <= '0';
-					
-				ELSE
-				
-					nDSACK1 <= '1';
-					
-				END IF;
-				
-			ELSIF cpuaccess = '1' THEN
-			
-				--WE ARE IN THE SDRAM ADDRESS SPACE	AND THIS IS A 68030 ACCESS
-				IF nAS = '0' THEN
-				
-					IF dsacken = '1' OR nDSACK0 = '0' THEN
-				
-						--ASSERT!
-						nDSACK0 <= '0';
-						nDSACK1 <= '0';
-						
-					ELSE
-					
-						--DON'T ASSERT AT THIS TIME.
-						nDSACK0 <= '1';
-						nDSACK1 <= '1';
-						
-					END IF;	
-					
-				ELSE
-				
-					--DON'T ASSERT AT THIS TIME.
-					nDSACK0 <= '1';
-					nDSACK1 <= '1';
 					
 				END IF;
 				
 			ELSE
 			
-				nDSACK0 <= 'Z';
-				nDSACK1 <= 'Z';
-				
 				dsackdelay <= 0;
 				
 			END IF;
