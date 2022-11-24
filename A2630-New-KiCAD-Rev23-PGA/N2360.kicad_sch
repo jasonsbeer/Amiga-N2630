@@ -6,7 +6,7 @@
 
   (title_block
     (title "Amiga N2630")
-    (date "2022-09-12")
+    (date "2022-11-23")
     (rev "2.3")
   )
 
@@ -901,9 +901,6 @@
     (path "/00000000-0000-0000-0000-000061d79ebc/13a73735-897c-4e8e-9e1b-7c5d6d7ddd98"
       (reference "#PWR01") (unit 1) (value "GND") (footprint "")
     )
-    (path "/00000000-0000-0000-0000-0000634ecc15/a5c222f1-0b97-4895-8edc-75b9a5fceccb"
-      (reference "#PWR02") (unit 1) (value "+5V") (footprint "")
-    )
     (path "/00000000-0000-0000-0000-0000634ecc15/526dbb65-b7f8-43a8-b7ce-e44e996560aa"
       (reference "#PWR03") (unit 1) (value "+5V") (footprint "")
     )
@@ -1155,6 +1152,9 @@
     )
     (path "/00000000-0000-0000-0000-000061fbe594/3aadd172-cf05-48d7-bcca-62b7f9b28982"
       (reference "#PWR0175") (unit 1) (value "+3.3V") (footprint "")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/043b6616-87f9-466d-ae2e-56501a5dcfe1"
+      (reference "#PWR0176") (unit 1) (value "GND") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-0000626c9dea"
       (reference "#PWR0177") (unit 1) (value "+5V") (footprint "")
