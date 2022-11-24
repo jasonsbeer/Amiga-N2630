@@ -21,12 +21,12 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    November 17, 2022 
+-- Create Date:    November 23, 2022 
 -- Design Name:    N2630 U602 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
 -- Tool versions: 
--- Description: INCLUDES LOGIC FOR ZORRO 3 SDRAM CONTROLLER AND GAYLE IDE CONTROLLER
+-- Description: INCLUDES LOGIC FOR ZORRO 3 SDRAM CONTROLLER AND PSUEDO-GAYLE IDE CONTROLLER
 --
 -- Hardware Revision: 2.2
 -- Additional Comments: 
@@ -75,8 +75,9 @@ entity U602 is
 				nIDEEN : OUT STD_LOGIC; --IDE BUFFER ENABLE
 				nIDERST : OUT STD_LOGIC; --IDE RESET
 				
-				nDSACK0 : INOUT STD_LOGIC; --68030 ASYNC DATA ACK SIGNAL
-				nDSACK1 : INOUT STD_LOGIC; --68030 ASYNC DATA ACK SIGNAL
+				--nDSACK0 : INOUT STD_LOGIC; --68030 ASYNC DATA ACK SIGNAL
+				--nDSACK1 : INOUT STD_LOGIC; --68030 ASYNC DATA ACK SIGNAL
+				nDSACK : OUT STD_LOGIC_VECTOR (1 DOWNTO 0);
 				nUUBE : OUT STD_LOGIC; --68030 DYNAMIC BUS SIZING OUTPUT
 				nUMBE : OUT STD_LOGIC; --68030 DYNAMIC BUS SIZING OUTPUT
 				nLMBE : OUT STD_LOGIC; --68030 DYNAMIC BUS SIZING OUTPUT
@@ -130,7 +131,7 @@ architecture Behavioral of U602 is
 	SIGNAL sdramstartup : STD_LOGIC;
 	
 	--GAYLE SIGNALS
-	SIGNAL gayleid : STD_LOGIC_VECTOR (3 DOWNTO 0); --THIS IS THE GAYLE ID VALUE
+	SIGNAL gayleid : STD_LOGIC_VECTOR (7 DOWNTO 0); --THIS IS THE GAYLE ID VALUE
 	SIGNAL gayle_space : STD_LOGIC; --ARE WE IN ANY OF THE GAYLE REGISTER SPACES?
 	SIGNAL gayleid_space : STD_LOGIC;
 	SIGNAL gaylereg_space : STD_LOGIC;
@@ -143,11 +144,12 @@ architecture Behavioral of U602 is
 	SIGNAL ide_space : STD_LOGIC;
 	SIGNAL idesacken : STD_LOGIC;
 	SIGNAL atacounter : INTEGER RANGE 0 TO 15;
-	SIGNAL csenable : STD_LOGIC;
-	SIGNAL csaddress : STD_LOGIC;
+	--SIGNAL csenable : STD_LOGIC;
+	--SIGNAL csaddress : STD_LOGIC;
 	SIGNAL rwenable : STD_LOGIC;
 	CONSTANT DELAYVALUE : INTEGER := 1;
-	SIGNAL dsackdelay : INTEGER RANGE 0 TO DELAYVALUE;
+	--SIGNAL dsackdelay : INTEGER RANGE 0 TO DELAYVALUE;
+	SIGNAL cycle8 : STD_LOGIC;
 	
 	--ATA STATE MACHINE SIGNALS
 	
@@ -595,19 +597,20 @@ begin
 					sdramcom <= ramstate_NOP;
 					
 					--IF _DSACKx IS NOT ENABLED FROM A 68030 WRITE CYCLE, ENABLE IT NOW.
-					IF dsacken = '0' AND COUNT = 0 THEN
+					--IF dsacken = '0' AND COUNT = 0 THEN
 					
-						dsacken <= '1';						
+					dsacken <= '1';						
 						
-					ELSE
+					--ELSE
 					
-						dsacken <= '0';
+						--dsacken <= '0';
 						
-					END IF;
+					--END IF;
 					
 					--IF WE ARE NO LONGER IN THE ZORRO 3 MEM SPACE, GO BACK TO START.
 					IF memsel = '0' THEN					
-											
+										
+						dsacken <= '0';
 						CURRENT_STATE <= RUN_STATE;		
 						
 					END IF;	
@@ -622,110 +625,18 @@ begin
 	
 	-----------------------------
 	-- 68030 DATA TRANSFER ACK --
-	-----------------------------
+	-----------------------------	
 	
-	PROCESS (CPUCLK, nRESET) BEGIN
-	
-		IF nRESET = '0' THEN
-		
-			dsackdelay <= 0;	
-			nDSACK0 <= 'Z';
-			nDSACK1 <= 'Z';
-	
-		ELSIF RISING_EDGE (CPUCLK) THEN
-			
-			IF nMEMZ3 = '0' THEN
-			
-				IF nAS = '0' THEN
-					--WE ARE IN THE ZORRO 3 ADDRESS SPACE WITH _AS ASSERTED.
-					IF dsacken = '1' OR nDSACK0 = '0' THEN
-				
-						nDSACK0 <= '0';
-						nDSACK1 <= '0';
-					
-					ELSE
-					
-						nDSACK0 <= '1';
-						nDSACK1 <= '1';
-					
-					END IF;
-					
-				ELSE
-				
-					nDSACK0 <= '1';
-					nDSACK1 <= '1';
-				
-				END IF;
-				
-			ELSIF ide_space = '1' THEN
-			
-				--WE ARE IN THE IDE I/0 ADDRESS SPACE WITH _AS ASSERTED.
-				IF nAS = '0' THEN
-				
-					IF idesacken = '1' OR nDSACK1 = '0' THEN
-					
-						nDSACK1 <= '0';
-						
-					ELSE
-					
-						nDSACK1 <= '1';
-				
-					END IF;
-					
-				ELSE
-					
-					nDSACK1 <= '1';
-					
-				END IF;					
-				
-			ELSIF gayle_space = '1' THEN
-				
-				IF nAS = '0' THEN
-			
-					IF dsackdelay = DELAYVALUE THEN				
-						
-						nDSACK1 <= '0';
-					
-					ELSE 			
-						
-						nDSACK1 <= '1';
-						
-						dsackdelay <= dsackdelay + 1;
-					
-					END IF;
-				
-				ELSIF nAS = '1' AND dsackdelay = DELAYVALUE THEN
-				
-					dsackdelay <= 0;				
-					nDSACK1 <= '1';	
-
-				ELSE
-				
-					nDSACK1 <= '1';	
-					
-				END IF;
-			
-				--WE ARE IN THE GAYLE REGISTER ADDRESS SPACE
---				IF nAS = '0' THEN
---				
---					nDSACK1 <= '0';
---					
---				ELSE
---				
---					nDSACK1 <= '1';
---					
---				END IF;
-				
-			ELSE
-			
-				nDSACK0 <= 'Z';
-				nDSACK1 <= 'Z';
-				
-			END IF;
-		
-		END IF;
-		
-	END PROCESS;
+	nDSACK <=
+			"10" WHEN (gayle_space = '1' AND nAS = '0') OR (idesacken = '1' AND nAS = '0' AND cycle8 = '1') --8 BIT PORT
+		ELSE
+			"01" WHEN idesacken = '1' AND nAS = '0' AND cycle8 = '0' --16 BIT PORT
+		ELSE
+			"00" WHEN dsacken = '1' AND nAS = '0' --32 BIT PORT
+		ELSE
+			"11" WHEN gayle_space = '1' OR ide_space = '1' OR nMEMZ3 = '0'
+		ELSE 
+			"ZZ";
 	
 	---------------------
 	-- DATA BUS OUTPUT --
@@ -753,12 +664,12 @@ begin
 	
 	--THE GAYLE ID REGISTER IS AT $DE1000. THIS SEEMS TO BE THE ONLY ADDRESS USED
 	--IN THE $DE1XXX SPACE, SO WE CAN JUST LOOK FOR THE MOST SIGNIFICANT BITS.
-	gayleid_space <= '1' WHEN A(23 DOWNTO 15) = "110111100" AND nIDEDIS = '1' AND nMEMZ3 <= '1' ELSE '0'; --110111100001000000000000
+	gayleid_space <= '1' WHEN A(23 DOWNTO 15) = "110111100" AND nIDEDIS = '1' AND nMEMZ3 = '1' ELSE '0'; --110111100001000000000000
 	
 	--CHECKS IF THE CURRENT ADDRESS IS IN THE GAYLE REGISTER SPACE.
 	--THE GAYLE REGISTERS ARE FOUND IN $DA8XXX SPACE. WE ARE SPECIFICALLY 
 	--INTERESTED IN ANY REGISTER HAVING TO DO WITH INTERRUPT REQUESTS.
-	gaylereg_space <= '1' WHEN A(23 DOWNTO 15) = "110110101" AND nMEMZ3 <= '1' ELSE '0'; --110110101000000000000000
+	gaylereg_space <= '1' WHEN A(23 DOWNTO 15) = "110110101" AND nMEMZ3 = '1' ELSE '0'; --110110101000000000000000
 	
 	gayle_space <= '1' WHEN gaylereg_space = '1' OR gayleid_space = '1' ELSE '0';		
 	
@@ -768,25 +679,29 @@ begin
 		IF nRESET = '0' THEN
 		
 			ideintenable <= '0';
-			gayleid <= "1101"; 
+			gayleid <= "11010001"; 
 	
-		ELSIF FALLING_EDGE (nDS) THEN
+		--ELSIF FALLING_EDGE (nDS) THEN
+			ELSIF (nDS'EVENT AND nDS = '0') THEN
 					
 			IF gayleid_space = '1' THEN
 			
 				--11010000 = $D0 = ECS Gayle, 11010001 = $D1 = AGA Gayle
 				--GAYLE_ID CONFIGURATION REGISTER IS AT $DE1000. WHEN ADDRESS IS $DE1000 AND R_W IS READ, BIT 7 IS READ.
-				--BELOW IS A SIMPLE SHIFT REGISTER TO LOAD THE GAYLE ID VALUE.
+				--BELOW IS A SIMPLE SHIFT REGISTER TO LOAD THE GAYLE ID VALUE. BECAUSE THIS IS A 68030 PROCESSOR, 
+				--WE USE THE AGA GAYLE SETTING AS USED IN THE A1200, A 68020 MACHINE.
 				--IF ANYTHING IS WRITTEN TO $DE1000, THAT MEANS THE REGISTER HAS BEEN RESET AND WE NEED TO RE-ESTABLISH GAYLE.
 				
-				IF RnW = '1' THEN
+				IF RnW = '1' THEN	
 					
-					dataoutgayle <= gayleid(3);
-					gayleid <= gayleid (2 DOWNTO 0) & "0";
+					--dataoutgayle <= gayleid(3);
+					--gayleid <= gayleid (2 DOWNTO 0) & "0";
+					dataoutgayle <= gayleid(7);
+					gayleid <= gayleid (6 DOWNTO 0) & gayleid(7);
 					
 				ELSE
 				
-					gayleid <= "1101";
+					gayleid <= "11010001";
 				
 				END IF;	
 				
@@ -869,7 +784,7 @@ begin
 			RnW = '0' AND 
 			nDS = '0' AND 
 			D = '0' AND 
-			nMEMZ3 <= '1' 
+			nMEMZ3 = '1' 
 		ELSE 
 			'0'; 
 	
@@ -907,11 +822,12 @@ begin
 	
 	--ARE WE IN THE ASSIGNED ADDRESS SPACE FOR THE IDE CONTROLLER?
 	--GAYLE ATA CHIP SELECT ADDRESS SPACE IS $DA0000 - $DA3FFF. 
+	--THE CHIP SELECT SPACE FROM $DA4000 - $DA7FFF IS IN THE SPECS AS NOT USED.
 	--THIS CAN BE BROKEN INTO 8 BIT AND 16 BIT COMMANDS, WHICH CHANGES THE TIME TO EXECUTE.
 	ide_space <= '1' 
 		WHEN 
-			A(23 DOWNTO 15) = "110110100" AND 
-			nMEMZ3 <= '1' 
+			A(23 DOWNTO 14) = "1101101000" AND 
+			nMEMZ3 = '1' 
 		ELSE
 			'0';
 	
@@ -937,38 +853,41 @@ begin
 	nIDERST <= nRESET;
 	
 	--GAYLE SPECS TELL US WHEN THE ATA CHIP SELECT LINES ARE ACTIVE.
-	nCS0 <= '0' WHEN csaddress = '0' AND csenable = '1' ELSE '1';
-	nCS1 <= '0' WHEN csaddress = '1' AND csenable = '1' ELSE '1';
+	--nCS0 <= '0' WHEN csaddress = '0' AND csenable = '1' ELSE '1';
+	--nCS1 <= '0' WHEN csaddress = '1' AND csenable = '1' ELSE '1';
+	nCS0 <= '0' WHEN A(12) = '0' AND ide_space = '1' ELSE '1';
+	nCS1 <= '0' WHEN A(12) = '1' AND ide_space = '1' ELSE '1';
 			
 	--GAYLE EXPECTS ATA DA2..0 TO BE CONNECTED TO A4..2	
 	--LATCH THE DATA ON ASSERTION OF _AS WHEN WE ARE IN
 	--THE ATA ADDRESS SPACE. THIS HOLDS THE ADDRESS
 	--VALID THROUGHOUT THE ENTIRE CYCLE.
-	PROCESS (nAS, nRESET) BEGIN
 	
-		IF nRESET = '0' THEN
-		
-			DA(0) <= '0';
-			DA(1) <= '0';
-			DA(2) <= '0';
+	DA(0) <= A(2);
+	DA(1) <= A(3);
+	DA(2) <= A(4);
 	
-		ELSIF FALLING_EDGE (nAS) THEN
-		
-			IF (ide_space = '1') THEN
-				
-				DA(0) <= A(2);
-				DA(1) <= A(3);
-				DA(2) <= A(4);
-
-			END IF;
-			
-		END IF;
-		
-	END PROCESS;
+--	PROCESS (nAS, nRESET) BEGIN
+--	
+--		IF nRESET = '0' THEN
+--		
+--			DA(0) <= '0';
+--			DA(1) <= '0';
+--			DA(2) <= '0';
+--	
+--		ELSIF FALLING_EDGE (nAS) THEN
+--				
+--			DA(0) <= A(2);
+--			DA(1) <= A(3);
+--			DA(2) <= A(4);
+--			
+--		END IF;
+--		
+--	END PROCESS;
 	
 	--READ/WRITE SIGNALS
-	nDIOR <= '0' WHEN RnW = '1' AND rwenable = '1' ELSE '1';
-	nDIOW <= '0' WHEN RnW = '0' AND rwenable = '1' ELSE '1';
+	nDIOR <= '0' WHEN RnW = '1' AND rwenable = '1' AND nAS = '0' ELSE '1';
+	nDIOW <= '0' WHEN RnW = '0' AND rwenable = '1' AND nAS = '0' ELSE '1';
 	
 	PROCESS (CPUCLK, nRESET) BEGIN
 	
@@ -976,10 +895,11 @@ begin
 		
 			CURRENT_ATA_STATE <= IDLE;
 			atacounter <= 0;
-			csenable <= '0';
+			--csenable <= '0';
 			rwenable <= '0';
 			idesacken <= '0';	
-			csaddress <= '1';
+			--csaddress <= '1';
+			cycle8 <= '1';
 			T2final <= 1;
 			TEOCfinal <= 1;			
 			
@@ -994,20 +914,22 @@ begin
 					
 					--SET THE DELAY COUNTS BASED ON WHETHER THIS IS AN 8 BIT OR 16 BIT ACCESS.
 					IF A(13) = '1' THEN
+						cycle8 <= '0';
 						T2final <= T2bit16;
 						TEOCfinal <= TEOCbit16;
 					ELSE
+						cycle8 <= '1';
 						T2final <= T2bit8;
 						TEOCfinal <= TEOCbit8;
 					END IF;
 					
 					--SET THE ATA CHIP SELECT ADDRESS.
-					csaddress <= A(12);
+					--csaddress <= A(12);
 					
 					IF ide_space = '1' AND nAS = '0' THEN
 					
 						--ENABLE THE ATA CHIP SELECT LINES.						
-						csenable <= '1';
+						--csenable <= '1';
 						
 						--THE NEXT STATE
 						CURRENT_ATA_STATE <= RWEN;	
@@ -1037,18 +959,18 @@ begin
 					
 					IF IORDY = '1' THEN
 					
-						IF atacounter = T2final - 3 THEN
+						IF atacounter = T2final - 2 THEN
 					
 							idesacken <= '1';							
 							atacounter <= atacounter + 1;
 						
-						ELSIF atacounter = T2final - 2 THEN
+						--ELSIF atacounter = T2final - 2 THEN
 						
-							idesacken <= '0';	
-							atacounter <= atacounter + 1;
+							--idesacken <= '0';	
+							--atacounter <= atacounter + 1;
 					
-						ELSIF atacounter = T2final THEN						
-							
+						ELSIF atacounter = T2final THEN
+								
 							rwenable <= '0';
 							--csenable <= '0';
 							CURRENT_ATA_STATE <= CSNEGATE;
@@ -1065,7 +987,9 @@ begin
 				WHEN CSNEGATE =>
 				
 					--WE NEGATE THE ATA CHIP SELECT AFTER WE HAVE NEGATED THE READ/WRITE SIGNALS.
-					csenable <= '0';
+					--csenable <= '0';
+					
+					idesacken <= '0';
 					
 					--WE ALSO COUNT OUT THE DELAY TIME NEEDED FOR THE ATA DEVICE TO 
 					--COMPLETE THE CYCLE TIME REQUIREMENT.
