@@ -6,7 +6,7 @@
 
   (title_block
     (title "Amiga N2630")
-    (date "2022-11-24")
+    (date "2022-11-26")
     (rev "3.0")
   )
 
@@ -1018,9 +1018,6 @@
     (path "/00000000-0000-0000-0000-000061df74a0/00000000-0000-0000-0000-0000621f030c"
       (reference "#PWR0130") (unit 1) (value "GND") (footprint "")
     )
-    (path "/00000000-0000-0000-0000-0000634ecc15/b240c0fd-0436-4668-8a42-e529f9a615ce"
-      (reference "#PWR0131") (unit 1) (value "+3.3V") (footprint "")
-    )
     (path "/00000000-0000-0000-0000-000061d9c8dc/00000000-0000-0000-0000-0000625c8349"
       (reference "#PWR0132") (unit 1) (value "+3.3V") (footprint "")
     )
@@ -1203,6 +1200,9 @@
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/5a2865a3-13c2-4584-8840-545b61d0ad65"
       (reference "#PWR0202") (unit 1) (value "+5V") (footprint "")
+    )
+    (path "/00000000-0000-0000-0000-0000634ecc15/de2733a9-772c-48d4-91f3-f50394f65615"
+      (reference "#PWR?") (unit 1) (value "+5V") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061d9c8dc/00000000-0000-0000-0000-000062b32a4c"
       (reference "C102") (unit 1) (value "0.1uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
@@ -1408,6 +1408,9 @@
     (path "/00000000-0000-0000-0000-000061df74a0/09626339-3bfc-4cd1-a7ca-65e3aa1d13b0"
       (reference "C719") (unit 1) (value "10uF") (footprint "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm")
     )
+    (path "/00000000-0000-0000-0000-000061df74a0/de4e2805-3bd4-4f33-8824-a6357f296148"
+      (reference "C720") (unit 1) (value "10uF") (footprint "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm")
+    )
     (path "/00000000-0000-0000-0000-0000634ecc15/30ec9d1e-2a98-4009-b845-2064a986995f"
       (reference "C800") (unit 1) (value "4.7uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
@@ -1502,16 +1505,16 @@
       (reference "J900") (unit 1) (value "IDE DISABLE") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/dc838943-763e-4fc1-ba19-b9e1d2ae3381"
-      (reference "J901") (unit 1) (value "MASTER/SLAVE") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
+      (reference "J901") (unit 1) (value "CF SEL") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/c06f2b33-cb89-480c-ac03-ef1f1e69ae3b"
-      (reference "J902") (unit 1) (value "MASTER/SLAVE") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
+      (reference "J902") (unit 1) (value "PIO0") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/5c084575-d38b-494e-8b21-50308dc612d4"
-      (reference "J903") (unit 1) (value "MASTER/SLAVE") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
+      (reference "J903") (unit 1) (value "PIO1") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/99bfc67b-1e26-4624-b546-17c71b96c8ef"
-      (reference "J904") (unit 1) (value "MASTER/SLAVE") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
+      (reference "J904") (unit 1) (value "PIO2") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
     )
     (path "/00000000-0000-0000-0000-000061fbe594/d2687972-05dd-4672-97c2-90083ae303c0"
       (reference "JT1") (unit 1) (value "MODE68K") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical")
