@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    November 23, 2022 
+-- Create Date:    November 27, 2022 
 -- Design Name:    N2630 U602 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -75,8 +75,6 @@ entity U602 is
 				nIDEEN : OUT STD_LOGIC; --IDE BUFFER ENABLE
 				nIDERST : OUT STD_LOGIC; --IDE RESET
 				
-				--nDSACK0 : INOUT STD_LOGIC; --68030 ASYNC DATA ACK SIGNAL
-				--nDSACK1 : INOUT STD_LOGIC; --68030 ASYNC DATA ACK SIGNAL
 				nDSACK : OUT STD_LOGIC_VECTOR (1 DOWNTO 0);
 				nUUBE : OUT STD_LOGIC; --68030 DYNAMIC BUS SIZING OUTPUT
 				nUMBE : OUT STD_LOGIC; --68030 DYNAMIC BUS SIZING OUTPUT
@@ -103,9 +101,6 @@ architecture Behavioral of U602 is
 	SIGNAL memsel : STD_LOGIC; --ARE WE IN THE ZORRO 3 MEMORY SPACE?
 	SIGNAL cs_mem : STD_LOGIC; --ARE WE IN THE UPPER SDRAM PAIR?
 	SIGNAL COUNT : INTEGER RANGE 0 TO 2 := 0; --COUNTER FOR SDRAM STARTUP ACTIVITIES
-	--SIGNAL rowad : STD_LOGIC_VECTOR (12 DOWNTO 0) := "0000000000000";
-	--SIGNAL bankad : STD_LOGIC_VECTOR (1 DOWNTO 0) := "00";
-	--SIGNAL colad : STD_LOGIC_VECTOR (9 DOWNTO 0) := "0000000000";
 	SIGNAL datamask : STD_LOGIC_VECTOR (3 DOWNTO 0); --DATA MASK
 	SIGNAL refresh : STD_LOGIC; --SIGNALS TIME TO REFRESH
 	SIGNAL refreset : STD_LOGIC; --RESET THE REFRESH COUNTER
@@ -143,13 +138,24 @@ architecture Behavioral of U602 is
 	SIGNAL intlast : STD_LOGIC;
 	SIGNAL ide_space : STD_LOGIC;
 	SIGNAL idesacken : STD_LOGIC;
-	SIGNAL atacounter : INTEGER RANGE 0 TO 15;
-	--SIGNAL csenable : STD_LOGIC;
-	--SIGNAL csaddress : STD_LOGIC;
-	SIGNAL rwenable : STD_LOGIC;
-	CONSTANT DELAYVALUE : INTEGER := 1;
-	--SIGNAL dsackdelay : INTEGER RANGE 0 TO DELAYVALUE;
-	SIGNAL cycle8 : STD_LOGIC;
+	
+	--IDE STATE MACHINE SIGNALS
+	SIGNAL renable : STD_LOGIC;
+	SIGNAL wenable : STD_LOGIC;
+	
+	CONSTANT PIO0_T1 : INTEGER := 1; --70ns
+	CONSTANT PIO0_T2 : INTEGER := 8; --165ns
+	CONSTANT PIO0_T4 : INTEGER := 1; --30ns
+	CONSTANT PIO0_Teoc : INTEGER := 4; --600ns
+
+	SIGNAL ata_counter : INTEGER RANGE 0 TO 30;
+	CONSTANT T0 : INTEGER := 0;
+	CONSTANT T1 : INTEGER := PIO0_T1;
+	CONSTANT T2 : INTEGER := PIO0_T1 + PIO0_T2;
+	--CONSTANT T4 : INTEGER := PIO0_T1 + PIO0_T2 + PIO0_T4;
+	--CONSTANT Tdsack_read : INTEGER := PIO0_T1 + PIO0_T2 - 2;
+	--CONSTANT Tdsack_write : INTEGER := PIO0_T1 + PIO0_T2 - 1;
+	CONSTANT Teoc : INTEGER := PIO0_T1 + PIO0_T2 + PIO0_T4 + PIO0_Teoc;
 	
 	--ATA STATE MACHINE SIGNALS
 	
@@ -168,19 +174,7 @@ architecture Behavioral of U602 is
 	-- eoc|  5  |  1  |  1  |  2
 
 	-- eoc (end of cycle) is T2i, T9, or T0-T1-T2. Whichever is greatest.
-	
-	SIGNAL T2final : INTEGER RANGE 1 TO 7;	
-	SIGNAL TEOCfinal : INTEGER RANGE 1 TO 7;
-	
-	CONSTANT T1 : INTEGER := 1; --T1 = 70ns. DELAY TWO CLOCK CYCLES AT 25MHz (80ns). 
-	CONSTANT T2bit8: INTEGER := 7; --Value = (T2/40) - 1
-	CONSTANT T2bit16 : INTEGER := 4; --Value = (T2/40) - 1	
-	CONSTANT TEOCbit8 : INTEGER := 4;
-	CONSTANT TEOCbit16 : INTEGER := 7; 
-	
-	TYPE ATA_STATE IS ( IDLE, RWEN, DATALATCH, CSNEGATE );
-	SIGNAL CURRENT_ATA_STATE : ATA_STATE;
-	
+
 	
 begin
 
@@ -546,7 +540,7 @@ begin
 				
 						--TIME TO REFRESH THE SDRAM, WHICH TAKES PRIORITY.	
 						CURRENT_STATE <= AUTO_REFRESH;					
-						EMA(12 downto 0) <= ("0010000000000"); --PRECHARGE ALL
+						--EMA(12 downto 0) <= ("0010000000000"); --PRECHARGE ALL
 						sdramcom <= ramstate_AUTOREFRESH;							
 					
 					ELSIF memsel = '1' THEN 
@@ -596,16 +590,8 @@ begin
 					--WE NOP FOR THE REMAINING CYCLES.
 					sdramcom <= ramstate_NOP;
 					
-					--IF _DSACKx IS NOT ENABLED FROM A 68030 WRITE CYCLE, ENABLE IT NOW.
-					--IF dsacken = '0' AND COUNT = 0 THEN
-					
-					dsacken <= '1';						
-						
-					--ELSE
-					
-						--dsacken <= '0';
-						
-					--END IF;
+					--IF _DSACKx IS NOT ENABLED FROM A 68030 WRITE CYCLE, ENABLE IT NOW.					
+					dsacken <= '1';		
 					
 					--IF WE ARE NO LONGER IN THE ZORRO 3 MEM SPACE, GO BACK TO START.
 					IF memsel = '0' THEN					
@@ -628,9 +614,9 @@ begin
 	-----------------------------	
 	
 	nDSACK <=
-			"10" WHEN (gayle_space = '1' AND nAS = '0') OR (idesacken = '1' AND nAS = '0' AND cycle8 = '1') --8 BIT PORT
+			"10" WHEN gayle_space = '1' AND nAS = '0' --OR (idesacken = '1' AND nAS = '0' AND A(13) = '0') --8 BIT PORT
 		ELSE
-			"01" WHEN idesacken = '1' AND nAS = '0' AND cycle8 = '0' --16 BIT PORT
+			"01" WHEN idesacken = '1' AND nAS = '0' AND ide_space = '1' --AND A(13) = '1' --16 BIT PORT
 		ELSE
 			"00" WHEN dsacken = '1' AND nAS = '0' --32 BIT PORT
 		ELSE
@@ -681,8 +667,8 @@ begin
 			ideintenable <= '0';
 			gayleid <= "11010001"; 
 	
-		--ELSIF FALLING_EDGE (nDS) THEN
-			ELSIF (nDS'EVENT AND nDS = '0') THEN
+		ELSIF FALLING_EDGE (nDS) THEN
+			--ELSIF (nDS'EVENT AND nDS = '0') THEN
 					
 			IF gayleid_space = '1' THEN
 			
@@ -697,7 +683,7 @@ begin
 					--dataoutgayle <= gayleid(3);
 					--gayleid <= gayleid (2 DOWNTO 0) & "0";
 					dataoutgayle <= gayleid(7);
-					gayleid <= gayleid (6 DOWNTO 0) & gayleid(7);
+					gayleid <= gayleid (6 downto 0) & "0";
 					
 				ELSE
 				
@@ -826,7 +812,7 @@ begin
 	--THIS CAN BE BROKEN INTO 8 BIT AND 16 BIT COMMANDS, WHICH CHANGES THE TIME TO EXECUTE.
 	ide_space <= '1' 
 		WHEN 
-			A(23 DOWNTO 14) = "1101101000" AND 
+			A(23 DOWNTO 15) = "110110100" AND 
 			nMEMZ3 = '1' 
 		ELSE
 			'0';
@@ -842,7 +828,7 @@ begin
 	--ENABLE THE IDE BUFFERS
 	nIDEEN <= '0' 
 		WHEN 
-			ide_space = '1' 
+			ide_space = '1' AND nAS = '0'
 		ELSE
 			'1';
 	
@@ -850,165 +836,82 @@ begin
 	IDEDIR <= NOT RnW;
 	
 	--WE PASS THE COMPUTER RESET SIGNAL TO THE IDE DRIVE
-	nIDERST <= nRESET;
+	nIDERST <= nRESET;	
 	
-	--GAYLE SPECS TELL US WHEN THE ATA CHIP SELECT LINES ARE ACTIVE.
-	--nCS0 <= '0' WHEN csaddress = '0' AND csenable = '1' ELSE '1';
-	--nCS1 <= '0' WHEN csaddress = '1' AND csenable = '1' ELSE '1';
-	nCS0 <= '0' WHEN A(12) = '0' AND ide_space = '1' ELSE '1';
-	nCS1 <= '0' WHEN A(12) = '1' AND ide_space = '1' ELSE '1';
-			
-	--GAYLE EXPECTS ATA DA2..0 TO BE CONNECTED TO A4..2	
-	--LATCH THE DATA ON ASSERTION OF _AS WHEN WE ARE IN
-	--THE ATA ADDRESS SPACE. THIS HOLDS THE ADDRESS
-	--VALID THROUGHOUT THE ENTIRE CYCLE.
-	
-	DA(0) <= A(2);
-	DA(1) <= A(3);
-	DA(2) <= A(4);
-	
---	PROCESS (nAS, nRESET) BEGIN
---	
---		IF nRESET = '0' THEN
---		
---			DA(0) <= '0';
---			DA(1) <= '0';
---			DA(2) <= '0';
---	
---		ELSIF FALLING_EDGE (nAS) THEN
---				
---			DA(0) <= A(2);
---			DA(1) <= A(3);
---			DA(2) <= A(4);
---			
---		END IF;
---		
---	END PROCESS;
-	
+	--ASSERT THE IDE ADDRESS SIGNALS WHEN WE ARE IN 
+	--THE IDE ADDRESS SPACE AND _AS IS ASSERTED.
+	nCS0 <= '0' WHEN nAS = '0' AND A(12) = '0' AND ide_space = '1' ELSE '1';
+	nCS1 <= '0' WHEN nAS = '0' AND A(12) = '1' AND ide_space = '1' ELSE '1';
+	DA <= A(4 DOWNTO 2) WHEN nAS = '0' AND ide_space = '1' ELSE "111";
+
 	--READ/WRITE SIGNALS
-	nDIOR <= '0' WHEN RnW = '1' AND rwenable = '1' AND nAS = '0' ELSE '1';
-	nDIOW <= '0' WHEN RnW = '0' AND rwenable = '1' AND nAS = '0' ELSE '1';
+	nDIOR <= '0' WHEN renable = '1' ELSE '1';
+	nDIOW <= '0' WHEN wenable = '1' ELSE '1';
+	
+	--THIS IS THE TIMER PROCESS FOR IDE. SINCE THIS IS AN ASYNCHRONOUS PROCESS, 
+	--WE HAVE TO COUNT CLOCK EDGES TO DETERMINE WHEN ACTIONS OCCUR. 
 	
 	PROCESS (CPUCLK, nRESET) BEGIN
 	
 		IF nRESET = '0' THEN
 		
-			CURRENT_ATA_STATE <= IDLE;
-			atacounter <= 0;
-			--csenable <= '0';
-			rwenable <= '0';
-			idesacken <= '0';	
-			--csaddress <= '1';
-			cycle8 <= '1';
-			T2final <= 1;
-			TEOCfinal <= 1;			
-			
-		ELSIF RISING_EDGE(CPUCLK) THEN
+			renable <= '0';
+			wenable <= '0';
+			idesacken <= '0';
+			ata_counter <= T0;			
 		
-			CASE CURRENT_ATA_STATE IS
+		ELSIF RISING_EDGE (CPUCLK) THEN
+		
+			--INCREMENT THE COUNTER WHEN WE ARE IN A CYCLE.
+			IF ata_counter /= 0 THEN
 			
-				WHEN IDLE =>
+				ata_counter <= ata_counter + 1;
 				
-					--THIS IS WHERE WE WAIT FOR THE ADDRESS STROBE TO ASSERT
-					--WHILE IN THE ATA ADDRESS SPACE.
-					
-					--SET THE DELAY COUNTS BASED ON WHETHER THIS IS AN 8 BIT OR 16 BIT ACCESS.
-					IF A(13) = '1' THEN
-						cycle8 <= '0';
-						T2final <= T2bit16;
-						TEOCfinal <= TEOCbit16;
-					ELSE
-						cycle8 <= '1';
-						T2final <= T2bit8;
-						TEOCfinal <= TEOCbit8;
-					END IF;
-					
-					--SET THE ATA CHIP SELECT ADDRESS.
-					--csaddress <= A(12);
-					
+			END IF;
+			
+			CASE ata_counter IS
+			
+				WHEN T0 =>
+				
 					IF ide_space = '1' AND nAS = '0' THEN
 					
-						--ENABLE THE ATA CHIP SELECT LINES.						
-						--csenable <= '1';
-						
-						--THE NEXT STATE
-						CURRENT_ATA_STATE <= RWEN;	
+						ata_counter <= 1;
 						
 					END IF;
-					
-				WHEN RWEN =>
+			
+				WHEN T1 =>
 				
-					--WAIT FOR T1 TO ELAPSE BEFORE ASSERTING READ/WRITE TO THE DEVICE.
-					if atacounter = T1 THEN
+					--T1 IS THE SETUP TIME FOR _DIOR AND _DIOW.
+					renable <= RnW;
+					wenable <= NOT RnW;
 					
-						rwenable <= '1';
-						CURRENT_ATA_STATE <= DATALATCH;
-						atacounter <= 0;
-						
-					ELSE
-					
-						atacounter <= atacounter + 1;
-						
-					END IF;
-						
-				WHEN DATALATCH =>
+				WHEN T2 - 2 =>
 				
-					--WAIT HERE FOR T2 TO ELAPSE. THIS IS THE TIME THE DATA WILL BE LATCHED.
-					--AT THIS TIME, WE CAN NEGATE THE READ/WRITE SIGNALS. _AS SHOULD NEGATE
-					--ABOUT THIS TIME, AS WELL.
+					--THIS TIMINING IS PROBABLY NOT GOOD FOR WRITE CYCLES.
+					idesacken <= '1';
 					
-					IF IORDY = '1' THEN
-					
-						IF atacounter = T2final - 2 THEN
-					
-							idesacken <= '1';							
-							atacounter <= atacounter + 1;
-						
-						--ELSIF atacounter = T2final - 2 THEN
-						
-							--idesacken <= '0';	
-							--atacounter <= atacounter + 1;
-					
-						ELSIF atacounter = T2final THEN
-								
-							rwenable <= '0';
-							--csenable <= '0';
-							CURRENT_ATA_STATE <= CSNEGATE;
-							atacounter <= 0;
-							
-						ELSE
-						
-							atacounter <= atacounter + 1;
-								
-						END IF;		
-						
-					END IF;
-					
-				WHEN CSNEGATE =>
+				WHEN T2 =>
 				
-					--WE NEGATE THE ATA CHIP SELECT AFTER WE HAVE NEGATED THE READ/WRITE SIGNALS.
-					--csenable <= '0';
-					
+					--T2 IS THE TIME _DIOR OR _DIOW IS ASSERTED.
+					--WHEN IT HAS ELAPSED, WE CAN NEGATE THOSE SIGNALS.
+					renable <= '0';
+					wenable <= '0';
 					idesacken <= '0';
 					
-					--WE ALSO COUNT OUT THE DELAY TIME NEEDED FOR THE ATA DEVICE TO 
-					--COMPLETE THE CYCLE TIME REQUIREMENT.
+				--WHEN T2 + 1 =>
+				
+					--idesacken <= '0';
 					
-					IF atacounter = TEOCfinal THEN
+				WHEN Teoc =>
 					
-						CURRENT_ATA_STATE <= IDLE;
-						atacounter <= 0;
-							
-					ELSE
+					ata_counter <= T0;					
 					
-						atacounter <= atacounter + 1;
-							
-					END IF;
-					
+				WHEN others =>		
+				
 			END CASE;
-			
-		END IF;
 		
+		END IF;	
+	
 	END PROCESS;
 	
 end Behavioral;
