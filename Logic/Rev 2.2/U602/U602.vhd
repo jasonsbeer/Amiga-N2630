@@ -21,12 +21,12 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    November 27, 2022 
+-- Create Date:    December 1, 2022 
 -- Design Name:    N2630 U602 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
 -- Tool versions: 
--- Description: INCLUDES LOGIC FOR ZORRO 3 SDRAM CONTROLLER AND PSUEDO-GAYLE IDE CONTROLLER
+-- Description: INCLUDES LOGIC FOR ZORRO 3 SDRAM CONTROLLER AND PSUEDO-GAYLE ATA CONTROLLER
 --
 -- Hardware Revision: 2.2
 -- Additional Comments: 
@@ -65,8 +65,8 @@ entity U602 is
 				nMEMZ3 : INOUT STD_LOGIC; --SIGNALS THE OTHER LOGIC THAT WE ARE RESPONDING TO THE RAM ADDRESS SPACE		
 				nIDEACCESS : INOUT STD_LOGIC; --SIGNALS THE OTHER LOGIC THAT WE ARE RESPONDING TO THE IDE ADDRESS SPACE
 				nINT2 : INOUT STD_LOGIC; --INT2 DRIVEN BY IDE INTRQ
-				nDIOR : INOUT STD_LOGIC; --IDE READ SIGNAL
-				nDIOW : INOUT STD_LOGIC; --IDE WRITE SIGNAL
+				nDIOR : OUT STD_LOGIC; --IDE READ SIGNAL
+				nDIOW : OUT STD_LOGIC; --IDE WRITE SIGNAL
 							
 				nCS0 : OUT STD_LOGIC; --IDE CHIP SELECT 0
 				nCS1 : OUT STD_LOGIC; --IDE CHIP SELECT 1
@@ -139,7 +139,7 @@ architecture Behavioral of U602 is
 	SIGNAL ide_space : STD_LOGIC;
 	SIGNAL idesacken : STD_LOGIC;
 	
-	--IDE STATE MACHINE SIGNALS
+	--ATA STATE MACHINE SIGNALS
 	SIGNAL renable : STD_LOGIC;
 	SIGNAL wenable : STD_LOGIC;
 	
@@ -148,13 +148,11 @@ architecture Behavioral of U602 is
 	CONSTANT PIO0_T4 : INTEGER := 1; --30ns
 	CONSTANT PIO0_Teoc : INTEGER := 4; --600ns
 
-	SIGNAL ata_counter : INTEGER RANGE 0 TO 30;
+	SIGNAL ata_counter : INTEGER RANGE 0 TO 30;	
+	
 	CONSTANT T0 : INTEGER := 0;
 	CONSTANT T1 : INTEGER := PIO0_T1;
 	CONSTANT T2 : INTEGER := PIO0_T1 + PIO0_T2;
-	--CONSTANT T4 : INTEGER := PIO0_T1 + PIO0_T2 + PIO0_T4;
-	--CONSTANT Tdsack_read : INTEGER := PIO0_T1 + PIO0_T2 - 2;
-	--CONSTANT Tdsack_write : INTEGER := PIO0_T1 + PIO0_T2 - 1;
 	CONSTANT Teoc : INTEGER := PIO0_T1 + PIO0_T2 + PIO0_T4 + PIO0_Teoc;
 	
 	--ATA STATE MACHINE SIGNALS
@@ -241,11 +239,9 @@ begin
 	-------------------------------
 			
 	--THIS LOGIC SUPPORTS UP TO 256MB IN THE ZORRO 3 EXPANSION SPACE.	
-	--THE ADDRESS SPACE FOR THE VARIOUS RANGES POSSIBLE ARE SPLIT IN
-	--HALF IN THE EVENT BOTH SDRAM BANKS ARE POPULATED. BOTH BANKS MUST
-	--BE POPULATED TO ACHIEVE 256MB.
+	--BOTH BANKS MUST BE POPULATED TO ACHIEVE 256MB.
 	--EXPANSION.LIBRARY IGNORES CARDS FROM $10000000 - $3FFFFFFF, SO
-	--WE START AT $40000000.
+	--WE START AT $40000000 SO WE CAN AUTOCONFIG.
 	
 	--$40000000 - $400FFFFF = 8MB
 	--$40000000 - $40FFFFFF = 16MB
@@ -293,30 +289,9 @@ begin
 				WHEN "110" => --256MB BOTH MEMORY BANKS POPULATED 32Mx16
 					cs_mem <= A(27);
 					
-				WHEN OTHERS =>
+				WHEN OTHERS => --ONLY THE LOW BANK IS POPULATED.
 				
 					cs_mem <= '0';
-					
-					--HOW ABOUT SOME NICE ASCII ART?
-					
-					--	.-----------------------------------------------------------------------------.
-					--	||Es| |F1 |F2 |F3 |F4 |F5 | |F6 |F7 |F8 |F9 |F10|                  C= AMIGA   |
-					--	||__| |___|___|___|___|___| |___|___|___|___|___|                             |
-					--	| _____________________________________________     ________    ___________   |
-					--	||~  |! |" |§ |$ |% |& |/ |( |) |= |? |` || |<-|   |Del|Help|  |{ |} |/ |* |  |
-					--	||`__|1_|2_|3_|4_|5_|6_|7_|8_|9_|0_|ß_|´_|\_|__|   |___|____|  |[ |]_|__|__|  |
-					--	||<-  |Q |W |E |R |T |Z |U |I |O |P |Ü |* |   ||               |7 |8 |9 |- |  |
-					--	||->__|__|__|__|__|__|__|__|__|__|__|__|+_|_  ||               |__|__|__|__|  |
-					--	||Ctr|oC|A |S |D |F |G |H |J |K |L |Ö |Ä |^ |<'|               |4 |5 |6 |+ |  |
-					--	||___|_L|__|__|__|__|__|__|__|__|__|__|__|#_|__|       __      |__|__|__|__|  |
-					--	||^    |> |Y |X |C |V |B |N |M |; |: |_ |^     |      |A |     |1 |2 |3 |E |  |
-					--	||_____|<_|__|__|__|__|__|__|__|,_|._|-_|______|    __||_|__   |__|__|__|n |  |
-					--	|   |Alt|A  |                       |A  |Alt|      |<-|| |->|  |0    |. |t |  |
-					--	|   |___|___|_______________________|___|___|      |__|V_|__|  |_____|__|e_|  |
-					--	|                                                                             |
-					--	`-----------------------------------------------------------------------------'
-					
-					--https://www.asciiart.eu/computers/amiga
 				
 			END CASE;
 		
@@ -435,7 +410,7 @@ begin
 	
 		IF (nRESET = '0') THEN 
 		
-				--THE AMIGA HAS BEEN RESET OR JUST POWERED UP
+				--THE AMIGA HAS BEEN RESET OR JUST POWERED UP.
 				CURRENT_STATE <= PRESTART;				
 				sdramcom <= ramstate_NOP;				
 				SDRAM_START_REFRESH_COUNT <= '0';
@@ -451,10 +426,11 @@ begin
 		
 		ELSIF ( FALLING_EDGE (CPUCLK) ) THEN			
 		
-			--PROCEED WITH SDRAM STATE MACHINE
+			--PROCEED WITH SDRAM STATE MACHINE.
 			--THE FIRST STATES ARE TO INITIALIZE THE SDRAM, WHICH WE ALWAYS DO.
-			--THE LATER STATES ARE TO UTILIZE THE SDRAM, WHICH ONLY HAPPENS IF nMEMZ2 IS ASSERTED.
-			--THIS MEANS THE ADDRESS STROBE IS ASSERTED, WE ARE IN THE ZORRO 2 ADDRESS SPACE, AND THE RAM IS AUTOCONFIGured.
+			--THE LATER STATES ARE TO UTILIZE THE SDRAM, WHICH ONLY HAPPENS IF nMEMZ3 IS ASSERTED.
+			--THIS MEANS THE ADDRESS STROBE IS ASSERTED AND WE ARE IN THE ZORRO 3 ADDRESS SPACE.
+			
 			CASE CURRENT_STATE IS
 			
 				WHEN PRESTART =>
@@ -540,12 +516,11 @@ begin
 				
 						--TIME TO REFRESH THE SDRAM, WHICH TAKES PRIORITY.	
 						CURRENT_STATE <= AUTO_REFRESH;					
-						--EMA(12 downto 0) <= ("0010000000000"); --PRECHARGE ALL
 						sdramcom <= ramstate_AUTOREFRESH;							
 					
 					ELSIF memsel = '1' THEN 
 						
-						--WE ARE IN THE Z3 MEMORY SPACE WITH THE ADDRESS AND DATA STROBES ASSERTED.
+						--WE ARE IN THE Z3 MEMORY SPACE WITH THE ADDRESS STROBE ASSERTED.
 						--SEND THE BANK ACTIVATE COMMAND. 
 						
 						CURRENT_STATE <= RAS_STATE;
@@ -567,7 +542,6 @@ begin
 					
 				WHEN RAS_STATE =>	
 					
-					--BANK ACTIVATE
 					--SET CAS STATE VALUES SO THEY LATCH ON THE NEXT CLOCK EDGE
 					CURRENT_STATE <= CAS_STATE;					
 					
@@ -614,9 +588,9 @@ begin
 	-----------------------------	
 	
 	nDSACK <=
-			"10" WHEN gayle_space = '1' AND nAS = '0' --OR (idesacken = '1' AND nAS = '0' AND A(13) = '0') --8 BIT PORT
+			"10" WHEN gayle_space = '1' AND nAS = '0' --8 BIT PORT
 		ELSE
-			"01" WHEN idesacken = '1' AND nAS = '0' AND ide_space = '1' --AND A(13) = '1' --16 BIT PORT
+			"01" WHEN idesacken = '1' --16 BIT PORT
 		ELSE
 			"00" WHEN dsacken = '1' AND nAS = '0' --32 BIT PORT
 		ELSE
@@ -639,7 +613,7 @@ begin
 	-- GAYLE REGISTERS --
 	---------------------   
 	---------------------------
-	--WE ARE USING THE AMIGA OS GAYLE IDE INTERFACE SUPPORTING PIO WITH UP TO 2 DRIVES.
+	--WE ARE USING THE AMIGA OS GAYLE ATA INTERFACE SUPPORTING PIO WITH UP TO 2 DRIVES.
 	--IT IS SIMPLE TO IMPLEMENT AND READY OUT OF THE BOX WITH KS => 37.300.
 	--COMPATABILITY CAN BE ADDED TO EARLIER KICKSTARTS BY ADDING THE APPROPRIATE SCSI.DEVICE TO ROM.
 
@@ -665,7 +639,7 @@ begin
 		IF nRESET = '0' THEN
 		
 			ideintenable <= '0';
-			gayleid <= "11010001"; 
+			gayleid <= "1101"; 
 	
 		ELSIF FALLING_EDGE (nDS) THEN
 			--ELSIF (nDS'EVENT AND nDS = '0') THEN
@@ -674,20 +648,19 @@ begin
 			
 				--11010000 = $D0 = ECS Gayle, 11010001 = $D1 = AGA Gayle
 				--GAYLE_ID CONFIGURATION REGISTER IS AT $DE1000. WHEN ADDRESS IS $DE1000 AND R_W IS READ, BIT 7 IS READ.
-				--BELOW IS A SIMPLE SHIFT REGISTER TO LOAD THE GAYLE ID VALUE. BECAUSE THIS IS A 68030 PROCESSOR, 
-				--WE USE THE AGA GAYLE SETTING AS USED IN THE A1200, A 68020 MACHINE.
+				--BELOW IS A SIMPLE SHIFT REGISTER TO LOAD THE GAYLE ID VALUE. 
 				--IF ANYTHING IS WRITTEN TO $DE1000, THAT MEANS THE REGISTER HAS BEEN RESET AND WE NEED TO RE-ESTABLISH GAYLE.
 				
 				IF RnW = '1' THEN	
 					
-					--dataoutgayle <= gayleid(3);
-					--gayleid <= gayleid (2 DOWNTO 0) & "0";
-					dataoutgayle <= gayleid(7);
-					gayleid <= gayleid (6 downto 0) & "0";
+					dataoutgayle <= gayleid(3);
+					gayleid <= gayleid (2 DOWNTO 0) & "0";
+					--dataoutgayle <= gayleid(7);
+					--gayleid <= gayleid (6 downto 0) & "0";
 					
 				ELSE
 				
-					gayleid <= "11010001";
+					gayleid <= "1101";
 				
 				END IF;	
 				
@@ -727,7 +700,12 @@ begin
 				ELSE
 				
 					--WRITE MODE
+					
 					CASE A(14 DOWNTO 12) IS
+					
+						WHEN "001" => --$9
+
+							clrint <= NOT D;
 					
 						--AFTER AMIGA OS HAS COMPLETED ITS HANDLING OF THE IDE
 						--INTERUPT, IT SIGNALS US HERE BY CLEARING THE BIT.
@@ -751,28 +729,17 @@ begin
 	-- GAYLE COMPATABLE HARD DRIVE CONTROLLER INTERFACE --
 	------------------------------------------------------
 	
-	--THE FOLLOWING LOGIC HANDLES THE IDE INTERRUPT REQEUSTS.
-	--WHEN INTRQ = '1', WE SIGNAL THE INTERRUPT REQUEST ON REGISTER $DA8000 AND $DA9000 AND ASSERT _INT2.
-	--WHEN AMIGA OS IS DONE HANDLING THE REQUEST, IT NEGATES THE IDE INT ON $DA9000 AND WE THEN NEGATE _INT2.
+	--THE FOLLOWING LOGIC HANDLES THE ATA INTERRUPT REQEUSTS.
+	--WHEN INTRQ = '1', WE SIGNAL THE INTERRUPT REQUEST ON REGISTER $DA8000 AND ASSERT _INT2.
+	--WHEN AMIGA OS IS DONE HANDLING THE REQUEST, IT NEGATES THE ATA INT BIT ON $DA9000 AND WE THEN NEGATE _INT2.
 	
-	--PASS THE IDE DEVICE INTRQ SIGNAL TO _INT2 WHEN INTERRUPTS ARE ENABLED.
+	--PASS THE ATA DEVICE INTRQ SIGNAL TO _INT2 WHEN INTERRUPTS ARE ENABLED.
 	nINT2 <= '0' 
 		WHEN 
 			intchg = '1' AND 
 			ideintenable = '1' 
 		ELSE
 			'Z'; 
-	
-	--CLEAR THE INTERUPT WHEN AMIGA OS SIGNALS TO DO SO.
-	clrint <= '1' 
-		WHEN 
-			A(23 DOWNTO 12) = "110110101001" AND --$DA9 110110101001000000000000
-			RnW = '0' AND 
-			nDS = '0' AND 
-			D = '0' AND 
-			nMEMZ3 = '1' 
-		ELSE 
-			'0'; 
 	
 	--GET THE CURRENT IDE INTERUPT STATE
 	PROCESS (CPUCLK) BEGIN
@@ -823,19 +790,19 @@ begin
 			gayle_space = '1' OR 
 			ide_space = '1' 
 		ELSE
-			'1'; --110110100000000000000000
+			'1';
 	
-	--ENABLE THE IDE BUFFERS
+	--ENABLE THE ATA BUFFERS
 	nIDEEN <= '0' 
 		WHEN 
 			ide_space = '1' AND nAS = '0'
 		ELSE
 			'1';
 	
-	--SETS THE DIRECTION OF THE IDE BUFFERS
+	--SETS THE DIRECTION OF THE ATA BUFFERS
 	IDEDIR <= NOT RnW;
 	
-	--WE PASS THE COMPUTER RESET SIGNAL TO THE IDE DRIVE
+	--WE PASS THE COMPUTER RESET SIGNAL TO THE ATA DEVICES.
 	nIDERST <= nRESET;	
 	
 	--ASSERT THE IDE ADDRESS SIGNALS WHEN WE ARE IN 
@@ -848,8 +815,8 @@ begin
 	nDIOR <= '0' WHEN renable = '1' ELSE '1';
 	nDIOW <= '0' WHEN wenable = '1' ELSE '1';
 	
-	--THIS IS THE TIMER PROCESS FOR IDE. SINCE THIS IS AN ASYNCHRONOUS PROCESS, 
-	--WE HAVE TO COUNT CLOCK EDGES TO DETERMINE WHEN ACTIONS OCCUR. 
+	--THIS IS THE TIMER PROCESS FOR ATA. SINCE THIS IS AN ASYNCHRONOUS PROCESS, 
+	--WE HAVE TO COUNT CLOCK EDGES TO DETERMINE WHEN ATA ACTIONS OCCUR. 
 	
 	PROCESS (CPUCLK, nRESET) BEGIN
 	
@@ -858,7 +825,7 @@ begin
 			renable <= '0';
 			wenable <= '0';
 			idesacken <= '0';
-			ata_counter <= T0;			
+			ata_counter <= T0;
 		
 		ELSIF RISING_EDGE (CPUCLK) THEN
 		
@@ -883,24 +850,23 @@ begin
 				
 					--T1 IS THE SETUP TIME FOR _DIOR AND _DIOW.
 					renable <= RnW;
-					wenable <= NOT RnW;
+					wenable <= NOT RnW;			
 					
-				WHEN T2 - 2 =>
+				WHEN T2 - 1 =>
 				
-					--THIS TIMINING IS PROBABLY NOT GOOD FOR WRITE CYCLES.
+					--ASSERT _DSACKx
 					idesacken <= '1';
 					
 				WHEN T2 =>
 				
-					--T2 IS THE TIME _DIOR OR _DIOW IS ASSERTED.
+					--T2 IS THE LENGTH OF TIME _DIOR OR _DIOW IS ASSERTED.
 					--WHEN IT HAS ELAPSED, WE CAN NEGATE THOSE SIGNALS.
 					renable <= '0';
 					wenable <= '0';
-					idesacken <= '0';
 					
-				--WHEN T2 + 1 =>
+				WHEN T2 + 1 =>
 				
-					--idesacken <= '0';
+					idesacken <= '0';
 					
 				WHEN Teoc =>
 					
