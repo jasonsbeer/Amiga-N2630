@@ -3,6 +3,9 @@ The N2630 is a Motorolla 68030 CPU card with additional RAM and IDE device port 
 
 <p align="center"><img src="/Images/N2630MED.png" width="750"></p>
 
+# CURRENT STATE:
+**Updated 6-Dec-2022 - This project is still under active development and is considered beta. There may be errors on the board, in the CPLD logic, or in this text and may not work in every situation. Build at your own risk. See the issues tab for more information. It is working on my test machine at 25MHz with the Zorro 2 and 3 RAM fully functional. The IDE port needs further work and testing. The FPU has not been tested.**
+
 ## Features
 1. Motorola 68030 microprocessor running at 25MHz or greater.
 2. Motorola 68882 math coprocessor running at 25MHZ or greater.
@@ -99,14 +102,12 @@ Jumper|Description|Open<sup>[A]</sup>|Shorted<sup>[B]</sup>
 -|-|-|-
 J900|IDE|Enable|Disable
 J901|CF Select|Slave|Master
-J902|PIO Mode|0|2
+J902|RESERVED||
+J903|RESERVED||
+J904|RESERVED||
 
 <sup>A</sup>No jumper.  
 <sup>B</sup>Jumper placed.  
-
-PIO Mode Jumpers
-MAYBE THIS WORKS, MAYBE NOT.
-MAYBE WE HAVE JUMPERS, MAYBE WE DON'T.
 
 ## 68882 Math Coprocessor (FPU)
 The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the 68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 3, J202). The PLCC-68 footprint is supported, which is available up to 40MHz.
@@ -138,7 +139,7 @@ J202|FPU Clock|X1<sup>[A]</sup>|X2<sup>[B]</sup>
 
 ## Acknowledgements
 Dave Haynie for sharing the A2630 technical details with the Amiga community.  
-Matt Harlum for sharing his Gayle IDE code and listening my struggles.  
+Matt Harlum for sharing his Gayle IDE code, listening my struggles, and his other contributions to this project.  
 Everyone who made the Amiga possible.  
 
 ## License
