@@ -4,7 +4,7 @@ The N2630 is a Motorolla 68030 CPU card with additional RAM and IDE device port 
 <p align="center"><img src="/Images/N2630MED.png" width="750"></p>
 
 # CURRENT STATE:
-**Updated 6-Dec-2022 - This project is still under active development and is considered beta. There may be errors on the board, in the CPLD logic, or in this text and may not work in every situation. Build at your own risk. See the issues tab for more information. It is working on my test machine at 25MHz with the Zorro 2 and 3 RAM fully functional. The IDE port needs further work and testing. The FPU has not been tested.**
+**Updated 6-Dec-2022 - This project is still under active development and is considered beta. There may be errors on the board, in the CPLD logic, or in this text, and may not work in every situation. Build at your own risk. See the issues tab for more information. It is working on my test machine at 25MHz with the Zorro 2 and 3 RAM fully functional. The IDE port needs further work and testing. The FPU has not been tested. Revision 3.0 is the current revision.**
 
 ## Features
 1. Motorola 68030 microprocessor running at 25MHz or greater.
@@ -59,7 +59,7 @@ Desired Zorro</br>3 RAM (MB)|SDRAM|Low Bank</br>(U406 and U407)|High Bank</br>(U
 256|32MX16|Populated|Populated
 
 <sup>A</sup>These SDRAM positions are populated by the SDRAM indicated.  
-<sup>B</sup>This SDARM positions are not populated.
+<sup>B</sup>This SDRAM positions are not populated.
 
 **Table 1b.** SDRAM Bank Jumper Setting.
 Zorro 3 RAM</br>Banks Populated|J400
@@ -91,13 +91,15 @@ Desired Zorro</br>3 RAM (MB)|Starting Address|Ending Address
 128|$40000000|$47FFFFFF
 256|$40000000|$4FFFFFFF
 
-## ATA/IDE Port
-The N2630 includes an AUTOBOOT<sup>[A]</sup> ATA/IDE port compatable with hard drives and ATAPI<sup>[B]</sup> devices. The port supports two devices (master and slave) and operates in PIO 0 mode. The port may be disabled by placing a jumper on J900. (Table 2) For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
+## IDE Port
+The N2630 includes a Gayle compatable AUTOBOOT<sup>[A]</sup> IDE port compatable with hard drives and ATAPI<sup>[B]</sup> devices. The IDE port supports two devices (master and slave). The IDE port may be disabled by placing a jumper on J900. (Table 2) For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
 
-<sup>A</sup>AUTOBOOT requires Kickstart v37.300 or greater or compatable SCSI.device in Kickstart.  
+The IDE cable header and the compact flash card adapter are on the same IDE port. They may be used simultaneously, but one device must be set to master, the other to slave.
+
+<sup>A</sup>AUTOBOOT requires Kickstart v37.300 or greater or compatable scsi.device in Kickstart.  
 <sup>B</sup>ATAPI support included in Kickstart 3.1.4+. Older versions of Kickstart may require installation of third party ATAPI drivers.  
 
-**Table X.** ATA Configuration Jumper Settings
+**Table 2.** ATA Configuration Jumper Settings
 Jumper|Description|Open<sup>[A]</sup>|Shorted<sup>[B]</sup>
 -|-|-|-
 J900|IDE|Enable|Disable
@@ -110,15 +112,15 @@ J904|RESERVED||
 <sup>B</sup>Jumper placed.  
 
 ## 68882 Math Coprocessor (FPU)
-The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the 68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 3, J202). The PLCC-68 footprint is supported, which is available up to 40MHz.
+The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the MC68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 3, J202). The PLCC-68 footprint is supported.
 
 ## Unix (Amix)
-The N2630 card should fully support Amiga Unix (Amix). In order to boot into a Unix environment, you must place a jumper at J304. (Table 2) Although this feature is fully supported by the A2630 ROMs, it has not been tested with the N2630 at this time.
+The N2630 card should fully support Amiga Unix (Amix). In order to boot into a Unix environment, you must place a jumper at J304. (Table 3a) Although this feature is fully supported by the A2630 ROMs, it has not been tested with the N2630 at this time.
 
 ## Other Jumper Settings
 In the following tables, OPEN indicates no jumper. Shorted indicates the presence of a jumper on the pins indicated. All jumpers must be set correctly or you may encounter unexpected bahaviors or failure to boot.
 
-**Table 2.** Configuration Jumper Settings
+**Table 3a.** Configuration Jumper Settings
 Jumper|Description|Shorted|Open<sup>[A]</sup>
 -|-|-|-
 J302|Amiga Version|A2000|B2000
@@ -129,7 +131,7 @@ J405|Zorro 3 RAM|Disable|Enable
 
 <sup>A</sup>The factory configuration for all jumpers is open (no jumper).  
 
-**Table 3.** System Clock Jumper Settings
+**Table 3b.** System Clock Jumper Settings
 Jumper|Description|1-2|2-3
 -|-|-|-
 J202|FPU Clock|X1<sup>[A]</sup>|X2<sup>[B]</sup>
