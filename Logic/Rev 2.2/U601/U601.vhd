@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    NOVEMBER 20, 2022 
+-- Create Date:    DECEMBER 5, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC95144 144 PIN
@@ -66,7 +66,6 @@ PORT
 	DROM : IN STD_LOGIC_VECTOR (20 DOWNTO 16); --THIS IS FOR THE ROM SPECIAL REGISTER
 	nMEMZ3 : IN STD_LOGIC; --ZORRO 3 RAM IS RESPONDING TO THE ADDRESS (WAS EXTSEL)
 	nSENSE : IN STD_LOGIC; --68882 SENSE
-	--Z3CONFIGED : INOUT STD_LOGIC; --IS ZORRO 3 RAM CONFIGURED?	
 	nIDEACCESS : IN STD_LOGIC; --IDE IS RESPONDING TO THE ADDRESS SPACE
 	nBOSS : IN STD_LOGIC; --BOSS SIGNAL
 	A7M : IN STD_LOGIC; --AMIGA 7MHZ CLOCK
@@ -96,8 +95,6 @@ PORT
 	nLMBE : OUT STD_LOGIC; --LOWER MIDDLE BYTE ENABLE
 	nLLBE : OUT STD_LOGIC; --LOWER LOWER BYTE ENABLE
 	nDTACK : INOUT STD_LOGIC; --68000 DTACK FOR DMA
-	--nDSACK0 : OUT STD_LOGIC; --68030 DSACK
-	--nDSACK1 : OUT STD_LOGIC;
 	nDSACK : OUT STD_LOGIC_VECTOR (1 DOWNTO 0); --_DSACK1, _DSACK0
 	nOVR : OUT STD_LOGIC; --DTACK OVERRIDE
 	EMDDIR : OUT STD_LOGIC; --DIRECTION OF MEMORY DATA BUS BUFFERS
@@ -119,8 +116,7 @@ architecture Behavioral of U601 is
 	SIGNAL sdramcom : STD_LOGIC_VECTOR (3 DOWNTO 0); --SDRAM COMMAND
 	SIGNAL refreset : STD_LOGIC; --RESET THE REFRESH COUNTER
 	SIGNAL dmastatefour : STD_LOGIC; --DMA STATE COUNTER
-	SIGNAL dtacken : STD_LOGIC;
-	--SIGNAL CLK14 : STD_LOGIC; --THE 14MHz CLOCK FOR DMA STATE MACHINE EDGES
+	SIGNAL dtacken : STD_LOGIC;	
 	
 	--THE SDRAM COMMAND CONSTANTS ARE: _CS, _RAS, _CAS, _WE
 	CONSTANT ramstate_NOP : STD_LOGIC_VECTOR (3 DOWNTO 0) := "1111"; --SDRAM NOP
@@ -136,8 +132,8 @@ architecture Behavioral of U601 is
 	SIGNAL onboard : STD_LOGIC := '0';
 	
 	--FPU SIGNALS
-	SIGNAL coppercom : STD_LOGIC:='0';
-	SIGNAL mc68881 : STD_LOGIC:='0';
+	SIGNAL cpuspace : STD_LOGIC;
+	SIGNAL fpuspace : STD_LOGIC;
 	
 	--DEFINE THE SDRAM STATE MACHINE 
 	TYPE SDRAM_STATE IS ( PRESTART, POWERUP, POWERUP_PRECHARGE, MODE_REGISTER, AUTO_REFRESH, AUTO_REFRESH_CYCLE, RUN_STATE, RAS_STATE, CAS_STATE ); --AUTO_REFRESH_PRECHARGE, 
@@ -172,15 +168,7 @@ architecture Behavioral of U601 is
 	--ROM RELATED SIGNALS
 	CONSTANT DELAYVALUE : INTEGER := 1;
 	SIGNAL dsackdelay : INTEGER RANGE 0 TO DELAYVALUE;
-	
-	--CONSTANT dsackcycleendcount : INTEGER := 2;
-	--SIGNAL dsackcyclecount : INTEGER RANGE 0 TO dsackcycleendcount;
-	
-	--SIGNAL dsack0out : STD_LOGIC;
-	--SIGNAL dsack1out : STD_LOGIC;
-	--SIGNAL dsackcycle : STD_LOGIC;
 	SIGNAL dsack_rom : STD_LOGIC;
-	--SIGNAL dsack_autoconfig : STD_LOGIC;
 	SIGNAL dsackreset : STD_LOGIC;
 	
 begin
@@ -278,17 +266,6 @@ begin
 	---------------
 
 	--EITHER THE 68030 OR DMA FROM THE ZORRO 2 BUS CAN ACCESS ZORRO 2 RAM ON OUR CARD.
-	--THE TWO MOST SIGNIFICANT ADDRESS BITS ARE USED TO DRIVE THE TWO SDRAM BANK SIGNALS.
-	
-	--THE 8MB DATA SPACE USES UP TO (AND INCLUDING) A22.
-	--4MB IS A21
-	--2MB IS A20
-	--1MB IS A19
-	
-	--THIS MEANS WHEN 8MBs ARE INSTALLED, WE RESPOND WHEN A23..21 = BASEADDRESS.
-	--WITH 4MBs INSTALLED, WE RESPOND WHEN A23..20 = BASEADDRESS.
-	--WITH 2MBs INSTALLED, WE RESPOND WHEN A23..19 = BASEADDRESS.
-	--WITH 1MB INSTALLED, WE RESPOND WHEN A23..18 = BASEADDRESS.
 	
 	--THIS DETECTS A 68030 MEMORY ACCESS.
 	cpuaccess <= '1' 
@@ -300,8 +277,7 @@ begin
 			  
 			ram2configed = '1' AND
 			nBGACK = '1' AND 
-			FC(2 downto 0) /= "111" --AND
-			--nAS = '0'
+			cpuspace = '0'
 		ELSE
 			'0';
 	
@@ -315,7 +291,6 @@ begin
 			  A(23 DOWNTO 21) = rambaseaddress3 ) AND
 			  
 			ram2configed = '1' AND 
-			--nAS = '0' AND 
 			nBGACK = '0'
 		ELSE
 			'0';
@@ -593,7 +568,7 @@ begin
 				
 						--TIME TO REFRESH THE SDRAM, WHICH TAKES PRIORITY.	
 						CURRENT_STATE <= AUTO_REFRESH;					
-						ZMA(10 downto 0) <= ("10000000000"); --PRECHARGE ALL
+						--ZMA(10 downto 0) <= ("10000000000"); --PRECHARGE ALL
 						sdramcom <= ramstate_AUTOREFRESH;							
 					
 					ELSIF nMEMZ2 = '0' THEN 
@@ -665,11 +640,7 @@ begin
 					--IF _DSACKx IS NOT ENABLED FROM A 68030 WRITE CYCLE, ENABLE IT NOW.
 					IF dsacken = '0' AND COUNT = 0 AND cpuaccess = '1' THEN
 					
-						dsacken <= '1';						
-						
-					--ELSE
-					
-						--dsacken <= '0';
+						dsacken <= '1';	
 						
 					END IF;
 					
@@ -861,8 +832,6 @@ begin
    --with the CPU.  Otherwise, the registers can only be reset with a cold
    --reset asserted.
 	
-	--THE A2630, THIS IS LATCHED ON THE INVERSE (falling edge) 7MHZ CLOCK.
-	
 	PROCESS (CPUCLK) BEGIN
 	
 		IF RISING_EDGE(CPUCLK) THEN
@@ -917,9 +886,9 @@ begin
 	----------------
 	
 	--IS EVERYTHING WE WANT CONFIGURED?
-	--THIS IS PASSED TO THE _COPCFG SIGNAL.
-	--U602 WILL ASSERT Z3CONFIGED WHEN Z3 RAM HAS BEEN AUTOCONFIGed OR IF Z3 RAM IS DISABLED.
-	--CONFIGED <= '1' WHEN Z3CONFIGED = '1' AND boardconfiged = '1' ELSE '0';
+	--THIS IS PASSED TO THE _COPCFG SIGNAL, WHICH MUST BE DONE.
+	--THIS ALLOWS THE CONFIGURATION CHAIN TO CONTINUE.
+	
 	CONFIGED <= '1' WHEN boardconfiged = '1' OR MODE68K = '1' ELSE '0';
 	
 	--We have three boards we need to autoconfig, in this order
@@ -932,13 +901,13 @@ begin
 			
 	--BOARDCONFIGED IS ASSERTED WHEN WE ARE DONE CONFIGING THE ROM AND ZORRO 2 MEMORY.
 	--WHEN THE ZORRO 2 RAM IS DISABLED BY J303, IT SETS Z2AUTO = 0.
-	--boardconfiged <= '1' WHEN (romconfiged = '1' AND Z2AUTO = '0') OR (romconfiged = '1' AND ram2configed = '1') ELSE '0';
-	--boardconfiged <= '1' WHEN romconfiged = '1' AND (Z2AUTO = '0' OR ram2configed = '1' OR MODE68K = '1') ELSE '0';
+	
 	boardconfiged <= '1' WHEN romconfiged = '1' AND (ram2configed = '1' OR Z2AUTO = '0') AND ram3configed = '1' ELSE '0';
 	
 	--WE ARE IN THE Z2 AUTOCONFIG ADDRESS SPACE ($E80000).
 	--THIS IS QUALIFIED BY BOARDCONFIGED SO WE STOP RESPONDING TO THE AUTOCONFIG 
 	--SPACE ONCE WE ARE COMPLETELY CONFIGURED.
+	
 	autoconfigspace <= '1'
 		WHEN 
 			A(23 downto 16) = x"E8" AND boardconfiged = '0'
@@ -1142,8 +1111,8 @@ begin
 		WHEN					
 			nMEMZ2 = '0' OR --Zorro 2 Memory Space
 			nMEMZ3 = '0' OR --Zorro 3 Memory Space
-			( A(23 DOWNTO 16) >= x"F0" AND A(23 DOWNTO 16) <= x"FF" ) OR --1MB ROM Space (512k ROM = $F8x - $FFx)
-			( A(23 DOWNTO 16) >= x"C0" AND A(23 DOWNTO 16) <= x"CF" ) --512k Slow/Ranger RAM Memory Space
+			A(23 DOWNTO 20) = x"F" OR --ROM SPACE
+			A(23 DOWNTO 20) = x"C" --RANGER/SLOW RAM SPACE
 		ELSE
 			'0';		
 
@@ -1151,26 +1120,19 @@ begin
 	-- 6888x CHIP SELECT --
 	-----------------------
 	
-	--This selects the 68881 or 68882 math chip (FPU chip select), as long as there's no DMA 
-	--going on.  If the chip isn't there, we want a bus error generated to 
-	--force an F-line emulation exception.  Add in AS as a qualifier here
-	--if the PAL ever turns out too slow to make FPUCS before AS. U306
+	--THE 6888x COPROCESSOR RESPONDS TO CPU SPACE CYCLES (FC = $7) AT
+	--A(19..16) = $2. A(15..13) DEFINES COPROCESSOR NUMBER IN A 
+	--MULTI-COPROCESSOR ENVIRONMENT. NO AMIGA MODELS HAD MORE THAN ONE
+	--FPU, SO WE CAN SAFELY IGNORE THAT PART OF THE ADDRESS.
 	
-	--field spacetype	= [A19..16] ;
-	--coppercom	= (spacetype:20000) ; 00100000000000000000
-	coppercom <= '1' WHEN A( 19 downto 16 ) = "0010" ELSE '0';
-	--field copperid	= [A15..13] ;	
-	--mc68881	= (copperid:2000) ; 0010000000000000
-	mc68881 <= '1' WHEN A( 15 downto 13 ) = "001" ELSE '0';
-
-	--FPUCS = cpuspace & coppercom & mc68881 & !BGACK;
-	--nFPUCS <= '0' WHEN ( FC(2 downto 0) = "111" AND coppercom = '1' AND mc68881 = '1' AND nBGACK = '1' ) ELSE '1';
-	nFPUCS <= '0' WHEN ( FC(2 downto 0) = "111" AND coppercom = '1' AND mc68881 = '1' ) ELSE '1';
-
-	--BERR		= cpuspace & coppercom & mc68881 & !SENSE & !BGACK;
-	--BERR.OE	= cpuspace & coppercom & mc68881 & !SENSE & !BGACK;
-	--nBERR <= '0' WHEN ( FC(2 downto 0) = "111" AND coppercom = '1' AND mc68881 = '1' AND nBGACK = '1' AND nSENSE = '1' ) ELSE 'Z';
-	nBERR <= '0' WHEN ( FC(2 downto 0) = "111" AND coppercom = '1' AND mc68881 = '1' AND nSENSE = '1' ) ELSE 'Z';
+	--THE FPU IS OPTIONAL, SO WE WANT TO GENERATE A BUS ERROR IN THE 
+	--EVENT IT IS NOT INSTALLED.
+	
+	cpuspace <= '1' WHEN FC(2 downto 0) = "111" ELSE '0';
+	fpuspace <= '1' WHEN A(19 downto 16) = "0010" ELSE '0';
+	
+	nFPUCS <= '0' WHEN cpuspace = '1' AND fpuspace = '1' AND nBGACK = '1' ELSE '1';
+	nBERR <= '0' WHEN cpuspace = '1' AND fpuspace = '1' AND nBGACK = '1' AND nSENSE = '1' ELSE 'Z';
 	
 	--------------------
 	-- AUTO VECTORING --
@@ -1190,6 +1152,6 @@ begin
 	--CONTROLLER WITH HIS ORIGINAL DMAC. THAT DESIGN WAS REPLACED BY THE SDMAC IN THE A3000.
 	--AGAIN, DESIGNED BY JEFF BOYER.
 	
-	nAVEC <= '0' WHEN (FC(2 downto 0) = "111" AND A( 19 downto 16 ) = "1111") ELSE '1';
+	nAVEC <= '0' WHEN cpuspace = '1' AND A(19 downto 16) = "1111" ELSE '1';
 
 end Behavioral;
