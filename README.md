@@ -4,14 +4,14 @@ The N2630 is a Motorolla 68030 CPU card with additional RAM and IDE device port 
 <p align="center"><img src="/Images/N2630MED.png" width="750"></p>
 
 # CURRENT STATE:
-**Updated 6-Dec-2022 - This project is still under active development and is considered beta. There may be errors on the board, in the CPLD logic, or in this text, and may not work in every situation. Build at your own risk. See the issues tab for more information. It is working on my test machine at 25MHz with the Zorro 2 and 3 RAM fully functional. The IDE port needs further work and testing. The FPU has not been tested. DMA has not been tested. Revision 3.0 is the current revision.**
+**Updated 6-Dec-2022 - This project is still under active development and is considered beta. There may be errors on the board, in the CPLD logic, or in this text, and may not work in every situation. Build at your own risk. See the issues tab for more information. It is working on my test machine at 25MHz with the Zorro 2 and 3 RAM fully functional. The IDE port needs further work and testing. The FPU has not been tested. DMA has not been tested. The onboard RAM is only available in 68030 mode. Revision 3.0 is the current revision.**
 
 ## Features
 1. Motorola 68030 microprocessor running at 25MHz or greater.
 2. Motorola 68882 math coprocessor running at 25MHZ or greater.
 3. Up to 8 megabytes of Zorro 2 Fast RAM.
 4. 16 to 256 megabytes of Zorro 3 Fast RAM.
-5. ATA/IDE hard drive port with 40-pin and CF card options.
+5. IDE hard drive port with 40-pin and CF card options.
 
 ## Installation Notes
 This card may be installed in any Amiga 2000 computer. Installation is simply inserting the card into the 86 pin CPU/Coprocessor slot of the Amiga computer. There are no software drivers to install.  
@@ -22,10 +22,10 @@ This card may be installed in any Amiga 2000 computer. Installation is simply in
 The N2630 is envisioned to be a natural evolution of the original A2630 accelerator card. Because it is built on the A2630 concept, it requires the A2630 ROMs to function. You will need to burn the two A2630 ROMs using 27C256 EPROMs. The ROMs can be found [here](/ROM/).
 
 ## 68030 Mode
-By default, the N2630 starts in 68030 mode. When in 68030 mode, all installed RAM and the ATA device port are active.
+By default, the N2630 starts in 68030 mode. When in 68030 mode, all installed RAM and the IDE device port are active.
 
 ## 68000 Mode
-When desired, the 68030 may be disabled during a cold or warm start. This results in the Amiga using the 68000 processor. This may be desired when software does not run correctly on the 68030 processor. To start up in 68000 mode, hold down the right mouse button during startup. Select "68000" and the Amiga will reset with the 68000 as the active processor. When in 68000 mode, the IDE/ATA port and Zorro 3 RAM are inactive. The Zorro 2 RAM continues to be available. Motorola 68000 mode is not available with A2000 motherboards.
+When desired, the 68030 may be disabled during a cold or warm start. This results in the Amiga using the 68000 processor. This may be desired when software does not run correctly on the 68030 processor. To start up in 68000 mode, hold down the right mouse button during startup. Select "68000" and the Amiga will reset with the 68000 as the active processor. When in 68000 mode, the IDE port and Zorro 3 RAM are inactive. The Zorro 2 RAM continues to be available. Motorola 68000 mode is not available with A2000 motherboards.
 
 ## FAST RAM
 The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM is the successor to Fast Page Memory found in devices such as the Amiga 3000, A2630 processor card, and other computers of the time. SDRAMs are a very cost effictive way to supply memory to older systems and are readily available either new or from unused memory modules. 
@@ -99,7 +99,7 @@ The IDE cable header and the compact flash card adapter are on the same IDE port
 <sup>A</sup>AUTOBOOT requires Kickstart v37.300 or greater or compatable scsi.device in Kickstart.  
 <sup>B</sup>ATAPI support included in Kickstart 3.1.4+. Older versions of Kickstart may require installation of third party ATAPI drivers.  
 
-**Table 2.** ATA Configuration Jumper Settings
+**Table 2.** IDE Configuration Jumper Settings
 Jumper|Description|Open<sup>[A]</sup>|Shorted<sup>[B]</sup>
 -|-|-|-
 J900|IDE|Enable|Disable
