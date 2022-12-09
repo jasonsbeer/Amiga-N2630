@@ -1,5 +1,5 @@
 <img src="/Images/n2630exp-small.png">  
-The N2630 is a Motorolla 68030 CPU card with additional RAM and IDE device port for the Amiga 2000 family of computers. It is installed in the CPU slot where it immediately upgrades the system to a 68030 processor with FPU, up to 264 megabytes of Fast RAM, and an ATA/IDE port. The N2630 is intended to be an evolution of the A2630 card.
+The N2630 is a Motorolla 68030 CPU card with additional RAM and IDE device port for the Amiga 2000 family of computers. It is installed in the CPU slot where it immediately upgrades the system to a 68030 processor with FPU, up to 264 megabytes of Fast RAM, and an IDE port. The N2630 is intended to be an evolution of the A2630 card.
 
 <p align="center"><img src="/Images/N2630MED.png" width="750"></p>
 
@@ -92,7 +92,7 @@ Desired Zorro</br>3 RAM (MB)|Starting Address|Ending Address
 256|$40000000|$4FFFFFFF
 
 ## IDE Port
-The N2630 includes a Gayle compatable AUTOBOOT<sup>[A]</sup> IDE port compatable with hard drives and ATAPI<sup>[B]</sup> devices. The IDE port supports two devices (master and slave). The IDE port may be disabled by placing a jumper on J900. (Table 2) For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
+The N2630 includes a buffered and host terminated Gayle compatable AUTOBOOT<sup>[A]</sup> IDE port compatable with hard drives and ATAPI<sup>[B]</sup> devices. The IDE port supports two devices (master and slave). The IDE port may be disabled by placing a jumper on J900. (Table 2) For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
 
 The IDE cable header and the compact flash card adapter are on the same IDE port. They may be used simultaneously, but one device must be set to master, the other to slave. The IDE port only supports two devices, so when the CF card slot is in use, only one device may be installed on the IDE cable.
 
