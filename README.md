@@ -94,7 +94,7 @@ Desired Zorro</br>3 RAM (MB)|Starting Address|Ending Address
 ## IDE Port
 The N2630 includes a Gayle compatable AUTOBOOT<sup>[A]</sup> IDE port compatable with hard drives and ATAPI<sup>[B]</sup> devices. The IDE port supports two devices (master and slave). The IDE port may be disabled by placing a jumper on J900. (Table 2) For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
 
-The IDE cable header and the compact flash card adapter are on the same IDE port. They may be used simultaneously, but one device must be set to master, the other to slave.
+The IDE cable header and the compact flash card adapter are on the same IDE port. They may be used simultaneously, but one device must be set to master, the other to slave. The IDE port only supports two devices, so when the CF card slot is in use, only one device may be installed on the IDE cable.
 
 <sup>A</sup>AUTOBOOT requires Kickstart v37.300 or greater or compatable scsi.device in Kickstart.  
 <sup>B</sup>ATAPI support included in Kickstart 3.1.4+. Older versions of Kickstart may require installation of third party ATAPI drivers.  
@@ -115,7 +115,7 @@ J904|RESERVED||
 The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the MC68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 3, J202). The PLCC-68 footprint is supported.
 
 ## Unix (Amix)
-The N2630 card should fully support Amiga Unix (Amix). In order to boot into a Unix environment, you must place a jumper at J304. (Table 3a) Although this feature is fully supported by the A2630 ROMs, it has not been tested with the N2630 at this time.
+The N2630 card should fully support Amiga Unix (Amix). In order to boot into a Unix environment, you must place a jumper at J304. (Table 3a) Although this feature is fully supported by the ROMs, it has not been tested with the N2630 at this time.
 
 ## Other Jumper Settings
 In the following tables, OPEN indicates no jumper. Shorted indicates the presence of a jumper on the pins indicated. All jumpers must be set correctly or you may encounter unexpected bahaviors or failure to boot.
