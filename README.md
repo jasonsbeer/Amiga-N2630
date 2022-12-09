@@ -108,6 +108,7 @@ J901|CF Select|Slave|Master
 J902|RESERVED||
 J903|RESERVED||
 J904|RESERVED||
+J905|Cable Select|Disable|Enable
 
 <sup>A</sup>No jumper.  
 <sup>B</sup>Jumper placed.  
