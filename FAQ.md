@@ -1,8 +1,5 @@
 # FAQs
 
-### Where can I get components to assemble my own?
-Most components to assemble the N2630 are available at any electronic supply house. The MC68030 and MC68882 will need to be obtained through a retailer that deals in legacy Motorola devices. At the time of writing this, you should expect to pay US$30 - $50 each. DO NOT buy components where you get the 5 for $20 deal. These deals are almost always counterfeit or remarked chips. Save yourself a lot of misery and just pay for the real ones.
-
 ### How do I program the EPROMs?
 Most any cheap EPROM programmer will handle the 27C256 EPROMs of the N2630. A popular one is the TL866II, but there are other options. Or, ask your friends.
 
