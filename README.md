@@ -4,7 +4,7 @@ The N2630 is a Motorolla 68030 CPU card with additional RAM and IDE device port 
 <p align="center"><img src="/Images/N2630-30med.png" width="750"></p>
 
 # CURRENT STATE:
-**Updated 6-Dec-2022 - This project is still under active development and is considered beta. There may be errors on the board, in the CPLD logic, or in this text, and may not work in every situation. Build at your own risk. See the issues tab for more information. It is working on my test machine at 25MHz with the Zorro 2 and 3 RAM fully functional. The IDE port needs further work and testing. The FPU has not been tested. DMA has not been tested. Revision 3.0 is the current revision.**
+**Updated 6-Dec-2022 - This project is still under active development and is considered beta. There may be errors on the board, in the CPLD logic, or in this text, and may not work in every situation. Build at your own risk. See the issues tab for more information. It is working on my test machine at 25MHz with the Zorro 2 and 3 RAM fully functional. Revision 3.0 is the current revision.**
 
 ## Features
 1. Motorola 68030 microprocessor.
@@ -13,8 +13,11 @@ The N2630 is a Motorolla 68030 CPU card with additional RAM and IDE device port 
 4. 16 to 256 megabytes of Zorro 3 Fast RAM.
 5. IDE port with 40-pin cable and CF card options.
 
+## Assembly Notes
+Click [here](/AssemblyNotes.md) for more information on building the N2630.
+
 ## Installation Notes
-This card may be installed in any Amiga 2000 computer. Installation is simply inserting the card into the 86 pin CPU/Coprocessor slot of the Amiga computer. There are no software drivers to install.  
+This card may be installed in any Amiga 2000 computer. Installation is simply inserting the card into the 86 pin CPU/Coprocessor slot of the Amiga computer. There are no software drivers to install.  Kickstart v37.300 and greater is recommended.
 
 **IMPORTANT:** Before installing, it is necessary to determine if you have an early, non-cost reduced motherboard. If your motherboard is marked "Made In Germany" and "(C) 1986 Commodore" on the left side of the board, you have a non-cost reduced Amiga 2000 board, designated "A2000" in this documentation. An example of a non-cost reduced Amiga 2000 motherboard can be see [here](http://amiga.resource.cx/photos/a2000,1). In the event you have an non-cost reduced "A2000" motherboard, you must remove the Motorola 68000 processor from the Amiga 2000 motherboard and place a jumper at J302 of the N2630.  All other Amiga 2000 motherboards are designated "B2000" and should leave the Motorola 68000 in place.
 
