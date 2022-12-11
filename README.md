@@ -1,8 +1,7 @@
 <img src="/Images/n2630exp-small.png">  
 The N2630 is a Motorolla 68030 CPU card with additional RAM and IDE device port for the Amiga 2000 family of computers. It is installed in the CPU slot where it immediately upgrades the system to a 68030 processor with FPU, up to 264 megabytes of Fast RAM, and an IDE port. The N2630 is intended to be an evolution of the A2630 card.  
-  <br />
 
-Look for the N2630 channel on Discord: https://discord.gg/NU7SPYfNFj  
+<br />Look for the N2630 channel on Discord: https://discord.gg/NU7SPYfNFj  
 
 <p align="center"><img src="/Images/N2630-30med.png" width="750"></p>
 
