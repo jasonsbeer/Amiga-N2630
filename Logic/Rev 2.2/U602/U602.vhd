@@ -21,12 +21,12 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    December 1, 2022 
+-- Create Date:    December 12, 2022 
 -- Design Name:    N2630 U602 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
 -- Tool versions: 
--- Description: INCLUDES LOGIC FOR ZORRO 3 SDRAM CONTROLLER AND PSUEDO-GAYLE ATA CONTROLLER
+-- Description: INCLUDES 25MHz LOGIC FOR ZORRO 3 SDRAM CONTROLLER AND PSUEDO-GAYLE ATA CONTROLLER
 --
 -- Hardware Revision: 2.2
 -- Additional Comments: 
@@ -126,7 +126,7 @@ architecture Behavioral of U602 is
 	SIGNAL sdramstartup : STD_LOGIC;
 	
 	--GAYLE SIGNALS
-	SIGNAL gayleid : STD_LOGIC_VECTOR (7 DOWNTO 0); --THIS IS THE GAYLE ID VALUE
+	SIGNAL gayleid : STD_LOGIC_VECTOR (3 DOWNTO 0); --THIS IS THE GAYLE ID VALUE
 	SIGNAL gayle_space : STD_LOGIC; --ARE WE IN ANY OF THE GAYLE REGISTER SPACES?
 	SIGNAL gayleid_space : STD_LOGIC;
 	SIGNAL gaylereg_space : STD_LOGIC;
