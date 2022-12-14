@@ -1940,13 +1940,13 @@
       (reference "U421") (unit 2) (value "74LVC245") (footprint "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
     )
     (path "/00000000-0000-0000-0000-000062089831/50916d75-ebad-4118-b0d0-00a4a40b97f8"
-      (reference "U600") (unit 1) (value "XC9572XL-VQ64") (footprint "Package_QFP:TQFP-64_10x10mm_P0.5mm")
+      (reference "U600") (unit 1) (value "XC9572XL-10VQ64") (footprint "Package_QFP:TQFP-64_10x10mm_P0.5mm")
     )
     (path "/00000000-0000-0000-0000-000062089831/6ee4b35d-9293-4d5d-93f1-f4b7a49a8dfa"
-      (reference "U601") (unit 1) (value "XC95144XL-TQ144") (footprint "Package_QFP:TQFP-144_20x20mm_P0.5mm")
+      (reference "U601") (unit 1) (value "XC95144XL-10TQ144") (footprint "Package_QFP:TQFP-144_20x20mm_P0.5mm")
     )
     (path "/00000000-0000-0000-0000-000062089831/c5b5a609-518e-4996-8057-4f1d67718341"
-      (reference "U602") (unit 1) (value "XC95144XL-TQ144") (footprint "Package_QFP:TQFP-144_20x20mm_P0.5mm")
+      (reference "U602") (unit 1) (value "XC95144XL-10TQ144") (footprint "Package_QFP:TQFP-144_20x20mm_P0.5mm")
     )
     (path "/00000000-0000-0000-0000-0000634ecc15/00000000-0000-0000-0000-0000634f09dd"
       (reference "U606") (unit 1) (value "74HCT244") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
