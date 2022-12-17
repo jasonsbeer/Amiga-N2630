@@ -26,7 +26,7 @@
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC95144 144 PIN
 -- Tool versions: 
--- Description: INCLUDES 25MHz LOGIC FOR AUTOCONFIG, ZORRO2 SDRAM CONTROLLER, AND GENERAL GLUE LOGIC
+-- Description: INCLUDES 50MHz LOGIC FOR AUTOCONFIG, ZORRO2 SDRAM CONTROLLER, AND GENERAL GLUE LOGIC
 --
 -- Hardware Revision: 3.0
 -- Additional Comments: 
