@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="2.0" >
  <header>
-  <DateModified>2022-12-12T21:12:23</DateModified>
+  <DateModified>2022-12-17T09:51:54</DateModified>
   <ModuleName>U602</ModuleName>
   <SummaryTimeStamp>2022-12-12T21:08:06</SummaryTimeStamp>
-  <SavedFilePath>/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U602/iseconfig/U602.xreport</SavedFilePath>
-  <ImplementationReportsDirectory>/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U602/</ImplementationReportsDirectory>
+  <SavedFilePath>/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U602-50MHZ/iseconfig/U602.xreport</SavedFilePath>
+  <ImplementationReportsDirectory>/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U602-50MHZ/</ImplementationReportsDirectory>
   <DateInitialized>2022-04-30T08:05:23</DateInitialized>
   <EnableMessageFiltering>false</EnableMessageFiltering>
  </header>
