@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    October 23, 2022 
+-- Create Date:    December 17, 2022 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC9572 64 PIN
@@ -396,7 +396,7 @@ begin
 		
 	nADOEH <= '0' 
 		WHEN 
-			( nBOSS = '0' AND nBGACK = '1' AND SMDIS = '0' AND nAS = '0' ) OR
+			( nBOSS = '0' AND nBGACK = '1' AND sm_enabled = '1' ) OR
 			( nBOSS = '0' AND nBGACK = '0' AND nMEMZ2 = '0' AND nAAS = '0' AND A(1) = '1' )  
 			--OR ( nBOSS = '1' AND MODE68K = '1' AND nBGACK = '1' AND nMEMZ2 = '0' AND nAAS = '0' AND A(1) = '1' ) 
 			--OR ( nBOSS = '1' AND MODE68K = '1' AND nBGACK = '1' AND nIDEACCESS AND nAAS = '0' )
