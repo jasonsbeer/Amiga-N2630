@@ -9,13 +9,13 @@
          <ClosedNodesVersion>2</ClosedNodesVersion>
       </ClosedNodes>
       <SelectedItems>
-         <SelectedItem>U601 - Behavioral (/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601/U601.vhd)</SelectedItem>
+         <SelectedItem>U601 - Behavioral (/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601-25MHz/U601.vhd)</SelectedItem>
       </SelectedItems>
       <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
       <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
       <ViewHeaderState orientation="horizontal" >000000ff000000000000000100000001000000000000000000000000000000000202000000010000000100000064000001eb000000020000000000000000000000000200000064ffffffff000000810000000300000002000001eb0000000100000003000000000000000100000003</ViewHeaderState>
       <UserChangedColumnWidths orientation="horizontal" >true</UserChangedColumnWidths>
-      <CurrentItem>U601 - Behavioral (/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601/U601.vhd)</CurrentItem>
+      <CurrentItem>U601 - Behavioral (/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601-25MHz/U601.vhd)</CurrentItem>
    </ItemView>
    <ItemView engineview="SynthesisOnly" sourcetype="" guiview="Process" >
       <ClosedNodes>
@@ -77,13 +77,13 @@
          <ClosedNode>User Constraints</ClosedNode>
       </ClosedNodes>
       <SelectedItems>
-         <SelectedItem></SelectedItem>
+         <SelectedItem/>
       </SelectedItems>
       <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
       <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
       <ViewHeaderState orientation="horizontal" >000000ff0000000000000001000000010000000000000000000000000000000000000000000000020e000000010000000100000000000000000000000064ffffffff0000008100000000000000010000020e0000000100000000</ViewHeaderState>
       <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
-      <CurrentItem></CurrentItem>
+      <CurrentItem/>
    </ItemView>
    <SourceProcessView>000000ff000000000000000200000218000002b901000000060100000002</SourceProcessView>
    <CurrentView>Implementation</CurrentView>

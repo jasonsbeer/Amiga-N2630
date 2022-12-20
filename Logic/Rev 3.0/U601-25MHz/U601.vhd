@@ -21,14 +21,14 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    DECEMBER 15, 2022 
+-- Create Date:    DECEMBER 19, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC95144 144 PIN
 -- Tool versions: 
 -- Description: INCLUDES 25MHz LOGIC FOR AUTOCONFIG, ZORRO2 SDRAM CONTROLLER, AND GENERAL GLUE LOGIC
 --
--- Hardware Revision: 3.0
+-- Revision: 2.2
 -- Additional Comments: 
 ----------------------------------------------------------------------------------
 library IEEE;
@@ -62,10 +62,9 @@ PORT
 	OSMODE : IN STD_LOGIC; --J304 UNIX/AMIGA OS
 	nCPURESET : IN STD_LOGIC; --68030 RESET SIGNAL
 	nHALT : IN STD_LOGIC; --68030 HALT
-	Z2AUTO : IN STD_LOGIC; --J303 ZORRO 2 RAM DISABLE
-	nZ3DIS : IN STD_LOGIC; --ZORRO 3 RAM DISABLE
+	Z2AUTO : IN STD_LOGIC; --J303 ZORRO 2 DISABLE
 	DROM : IN STD_LOGIC_VECTOR (20 DOWNTO 16); --THIS IS FOR THE ROM SPECIAL REGISTER
-	nMEMZ3 : IN STD_LOGIC; --ZORRO 3 RAM IS RESPONDING TO THE ADDRESS
+	nMEMZ3 : IN STD_LOGIC; --ZORRO 3 RAM IS RESPONDING TO THE ADDRESS (WAS EXTSEL)
 	nSENSE : IN STD_LOGIC; --68882 SENSE
 	nIDEACCESS : IN STD_LOGIC; --IDE IS RESPONDING TO THE ADDRESS SPACE
 	nBOSS : IN STD_LOGIC; --BOSS SIGNAL
@@ -110,7 +109,6 @@ end U601;
 architecture Behavioral of U601 is
 	
 	--MEMORY ACCESS SIGNALS
-	SIGNAL ramaccess : STD_LOGIC; --ARE WE IN THE RAM ADDRESS SPACE?
 	SIGNAL dmaaccess : STD_LOGIC; --ARE WE IN A DMA MEMORY CYCLE?
 	SIGNAL cpuaccess : STD_LOGIC; --ARE WE IN A CPU MEMORY CYCLE?
 	SIGNAL dsacken : STD_LOGIC; --FEEDS THE 68030 DSACK SIGNALS
@@ -119,6 +117,7 @@ architecture Behavioral of U601 is
 	SIGNAL refreset : STD_LOGIC; --RESET THE REFRESH COUNTER
 	SIGNAL dmastatefour : STD_LOGIC; --DMA STATE COUNTER
 	SIGNAL dtacken : STD_LOGIC;	
+	SIGNAL ramaccess : STD_LOGIC;
 	
 	--THE SDRAM COMMAND CONSTANTS ARE: _CS, _RAS, _CAS, _WE
 	CONSTANT ramstate_NOP : STD_LOGIC_VECTOR (3 DOWNTO 0) := "1111"; --SDRAM NOP
@@ -130,8 +129,8 @@ architecture Behavioral of U601 is
 	CONSTANT ramstate_MODEREGISTER : STD_LOGIC_VECTOR (3 DOWNTO 0) := "0000";
 	
 	--ADDRESS SPACES
-	SIGNAL memaccess : STD_LOGIC;
-	SIGNAL onboard : STD_LOGIC;
+	SIGNAL memaccess : STD_LOGIC := '0';
+	SIGNAL onboard : STD_LOGIC := '0';
 	
 	--FPU SIGNALS
 	SIGNAL cpuspace : STD_LOGIC;
@@ -140,7 +139,7 @@ architecture Behavioral of U601 is
 	--DEFINE THE SDRAM STATE MACHINE 
 	TYPE SDRAM_STATE IS ( PRESTART, POWERUP, POWERUP_PRECHARGE, MODE_REGISTER, AUTO_REFRESH, AUTO_REFRESH_CYCLE, RUN_STATE, RAS_STATE, CAS_STATE ); --AUTO_REFRESH_PRECHARGE, 
 	SIGNAL CURRENT_STATE : SDRAM_STATE; --CURRENT SDRAM STATE
-	SIGNAL SDRAM_START_REFRESH_COUNT : STD_LOGIC; --WE NEED TO REFRESH TWICE UPON STARTUP
+	SIGNAL SDRAM_START_REFRESH_COUNT : STD_LOGIC := '0'; --WE NEED TO REFRESH TWICE UPON STARTUP
 	SIGNAL COUNT : INTEGER RANGE 0 TO 2; --COUNTER FOR SDRAM STARTUP ACTIVITIES
 	SIGNAL refresh : STD_LOGIC; --SIGNALS TIME TO REFRESH
 	SIGNAL REFRESH_COUNTER : INTEGER RANGE 0 TO 255 := 0;
@@ -169,9 +168,8 @@ architecture Behavioral of U601 is
 	
 	--ROM RELATED SIGNALS
 	CONSTANT DELAYVALUE : INTEGER := 1;
-	SIGNAL dsackdelay : INTEGER RANGE 0 TO DELAYVALUE;
+	SIGNAL dsackdelay : INTEGER RANGE 0 TO DELAYVALUE + 2;
 	SIGNAL dsack_rom : STD_LOGIC;
-	SIGNAL dsackreset : STD_LOGIC;
 	
 begin
 
@@ -269,7 +267,7 @@ begin
 
 	--EITHER THE 68030 OR DMA FROM THE ZORRO 2 BUS CAN ACCESS ZORRO 2 RAM ON OUR CARD.
 	
-	--ARE WE IN THE RAM ADDRESS SPACE?
+		--ARE WE IN THE RAM ADDRESS SPACE?
 	ramaccess <= '1' 
 		WHEN 
 			A(23 DOWNTO 21) = rambaseaddress0 OR 
@@ -460,10 +458,10 @@ begin
 				ZBANK0 <= '0';
 				ZBANK1 <= '0';
 		
-		ELSIF ( FALLING_EDGE (CPUCLK) ) THEN		
+		ELSIF ( FALLING_EDGE (CPUCLK) ) THEN
 			
 			-- ^^^^ THIS IS FALLING_EDGE FOR 25MHz AND RISING_EDGE FOR 50MHz.
-		
+			
 			--PROCEED WITH SDRAM STATE MACHINE
 			--THE FIRST STATES ARE TO INITIALIZE THE SDRAM, WHICH WE ALWAYS DO.
 			--THE LATER STATES ARE TO UTILIZE THE SDRAM, WHICH ONLY HAPPENS IF nMEMZ2 IS ASSERTED.
@@ -568,6 +566,7 @@ begin
 				
 						--TIME TO REFRESH THE SDRAM, WHICH TAKES PRIORITY.	
 						CURRENT_STATE <= AUTO_REFRESH;					
+						--ZMA(10 downto 0) <= ("10000000000"); --PRECHARGE ALL
 						sdramcom <= ramstate_AUTOREFRESH;							
 					
 					ELSIF nMEMZ2 = '0' THEN 
@@ -696,81 +695,61 @@ begin
 	-----------------------------
 	-- 68030 DATA TRANSFER ACK --
 	-----------------------------
+
 	
 	nDSACK <= 
-			"01" WHEN nAS = '0' AND ((dsack_rom = '1' AND (hirom = '1' OR lorom = '1')) OR autoconfigspace = '1') --16 BIT PORT
+			"01" WHEN nAS = '0' AND dsack_rom = '1' AND (hirom = '1' OR lorom = '1' OR autoconfigspace = '1') --16 BIT PORT  
 		ELSE 
 			"00" WHEN nAS = '0' AND dsacken = '1' AND cpuaccess = '1' --32 BIT PORT
 		ELSE
 			"11" WHEN hirom = '1' OR lorom = '1' OR autoconfigspace = '1' OR cpuaccess = '1' --HOLD BOTH DSACKS FOR NOW
 		ELSE
-			"ZZ";		
+			"ZZ";	
 			
-	--THIS PROCESS HELPS THE SLOW -10 CPLD SIGNAL CORRECTLY AT 50MHz.
-	PROCESS (nAS, nRESET, dsack_rom) BEGIN 
-	
-		IF nRESET = '0' OR dsack_rom = '0'  THEN
-		
-			dsackreset <= '0';			
-	
-		ELSIF RISING_EDGE(nAS) THEN
-		--ELSIF (nAS'EVENT AND nAS = '1') THEN
-		--in simulation, the RISING_EDGE(nAS) does not work.
-		--seems to work in situ, though.
-		
-			dsackreset <= '1';
+	--THIS DELAY EXISTS TO HELP THE ROM AND CPLD PUT VALID DATA ON THE BUS, ESPECIALLY WHEN
+	--OPERATING AT 50MHz. THE DSACKx IS DELAYED BY THE NUMBER OF CLOCKS SPECIFIED IN THE 
+	--delayvalue SIGNAL. THAT GIVES TIME FOR THE SIGNALS FROM THESE DEVICES TO MEET SETUP TIMES.
 			
-		END IF;
-		
-	END PROCESS;
-
-	--THE 27C256 EPROM NEEDS 40-75ns TO STABILIZE DATA.
-	--THIS DELAYS DSACK BY THE NUMBER OF CLOCKS DEFINED BY DELAYVALUE.
-	--THIS GIVES THE EPROM TIME TO PUT STABLE DATA ON THE BUS.	
-	
 	PROCESS (CPUCLK, nRESET) BEGIN
-	
+
 		IF nRESET = '0' THEN
 		
 			dsackdelay <= 0;
 			dsack_rom <= '0';
-	
+			
 		ELSIF RISING_EDGE (CPUCLK) THEN
-
-			IF hirom = '1' OR lorom = '1' THEN
+		
+			IF dsackdelay /= 0 THEN
+			
+				dsackdelay <= dsackdelay + 1;
 				
-				IF dsackreset = '1' THEN
+			END IF;		
+			
+			CASE dsackdelay IS
+			
+				WHEN 0 =>
 				
-					dsack_rom <= '0';
-					dsackdelay <= 0;
+					IF nAS = '0' AND (hirom = '1' OR lorom = '1' OR autoconfigspace = '1') THEN
+			
+						dsackdelay <= 1;
 					
-				ELSE
-					
-					IF nAS = '0' THEN
-					
-						IF dsackdelay = DELAYVALUE THEN
-						
-							dsack_rom <= '1';
-							
-						ELSE
-						
-							dsack_rom <= '0';
-							dsackdelay <= dsackdelay + 1;
-							
-						END IF;
-						
 					END IF;
 					
-				END IF;
+				WHEN delayvalue =>
 				
-			ELSE
-			
-				dsackdelay <= 0;
+					dsack_rom <= '1';
+					
+				WHEN delayvalue + 2 =>
 				
-			END IF;
+					dsackdelay <= 0;
+					dsack_rom <= '0';
+					
+				WHEN others =>	
+				
+			END CASE;
 		
 		END IF;
-		
+
 	END PROCESS;
 	
 	---------------------------
@@ -886,18 +865,18 @@ begin
 	
 	CONFIGED <= '1' WHEN boardconfiged = '1' OR MODE68K = '1' ELSE '0';
 	
-	--We have three "boards" we need to autoconfig, in this order
+	--We have three boards we need to autoconfig, in this order
 	--1. The 68030 ROM. SEE ALSO SPECIAL REGISTER, ABOVE.
 	--2. The base memory (4/8MB) in the Zorro 2 space.
-	--3. The expansion memory in the Zorro 3 space.	
+	--3. The expansion memory in the Zorro 3 space. This is done in U602.	
 
 	--A good explaination of the autoconfig process is given in the Amiga Hardware Reference Manual from Commodore.
 	--https://archive.org/details/amiga-hardware-reference-manual-3rd-edition
 			
-	--BOARDCONFIGED IS ASSERTED WHEN WE ARE DONE CONFIGING THE ROM, ZORRO 2 MEMORY, AND ZORRO 3 MEMORY.
+	--BOARDCONFIGED IS ASSERTED WHEN WE ARE DONE CONFIGING THE ROM AND ZORRO 2 MEMORY.
 	--WHEN THE ZORRO 2 RAM IS DISABLED BY J303, IT SETS Z2AUTO = 0.
 	
-	boardconfiged <= '1' WHEN romconfiged = '1' AND (ram2configed = '1' OR Z2AUTO = '0') AND (ram3configed = '1' OR nZ3DIS = '0') ELSE '0';
+	boardconfiged <= '1' WHEN romconfiged = '1' AND (ram2configed = '1' OR Z2AUTO = '0') AND ram3configed = '1' ELSE '0';
 	
 	--WE ARE IN THE Z2 AUTOCONFIG ADDRESS SPACE ($E80000).
 	--THIS IS QUALIFIED BY BOARDCONFIGED SO WE STOP RESPONDING TO THE AUTOCONFIG 
@@ -921,7 +900,7 @@ begin
 				WHEN Z2AUTO = '1' AND ram2configed = '0' AND autoconfigspace = '1' AND RnW = '1' AND nAS = '0' 
 		ELSE
 			D_ZORRO3RAM 
-				WHEN nZ3DIS = '1' AND autoconfigspace = '1' AND RnW = '1' AND nAS = '0'
+				WHEN autoconfigspace = '1' AND RnW = '1' AND nAS = '0'
 		ELSE
 			"ZZZZ";		
 			
@@ -933,7 +912,7 @@ begin
 	ramsize <= "000" WHEN nRAM8 = '1' ELSE "111";
 	
 	--AUTOCONFIG SEQUENCE, IN ALL ITS GLORY!
-	PROCESS ( CPUCLK, nRESET ) BEGIN
+	PROCESS ( nDS, nRESET ) BEGIN
 	
 		IF nRESET = '0' THEN
 			
@@ -949,11 +928,11 @@ begin
 			D_ZORRO2RAM <= "0000";
 			D_ZORRO3RAM <= "0000";
 			
-		ELSIF ( RISING_EDGE (CPUCLK)) THEN
+		ELSIF FALLING_EDGE (nDS) THEN
 		
 			IF autoconfigspace = '1' THEN
 			
-				IF RnW = '1' AND nAS = '0' THEN
+				IF RnW = '1' THEN
 				
 					CASE A(6 downto 1) IS
 
@@ -1019,7 +998,7 @@ begin
 
 					END CASE;					
 
-				ELSIF RnW = '0' AND nDS = '0' AND A(6 downto 1) = "100100" THEN
+				ELSIF RnW = '0' AND A(6 downto 1) = "100100" THEN
 				
 					--WRITE REGISTER AT OFFSET $48. THIS IS WHERE THE BASE ADDRESS IS ASSIGNED.
 								
@@ -1073,9 +1052,7 @@ begin
 					ELSIF ram3configed = '0' THEN
 					
 						--ACCORDING TO THE MANUAL, Z3 BASE ADDRESS IS ASSIGNED
-						--AT $48 FOR ZORRO 3 CARDS AUTOCONFIGed AT $E80000.
-						--RAM IS THE ONLY Z3 DEVICE ON THIS BOARD, SO WE DO NOT NEED
-						--TO LATCH THE BASE ADDRESS. IT WILL ALWAYS BE $40000000.
+						--AT $48 FOR ZORRO 3 CARDS AUTOCONFIGed IN AT $E80000.
 						
 						ram3configed <= '1';
 						
