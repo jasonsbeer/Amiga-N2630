@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    DECEMBER 5, 2022 
+-- Create Date:    DECEMBER 19, 2022 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC95144 144 PIN
@@ -117,6 +117,7 @@ architecture Behavioral of U601 is
 	SIGNAL refreset : STD_LOGIC; --RESET THE REFRESH COUNTER
 	SIGNAL dmastatefour : STD_LOGIC; --DMA STATE COUNTER
 	SIGNAL dtacken : STD_LOGIC;	
+	SIGNAL ramaccess : STD_LOGIC;
 	
 	--THE SDRAM COMMAND CONSTANTS ARE: _CS, _RAS, _CAS, _WE
 	CONSTANT ramstate_NOP : STD_LOGIC_VECTOR (3 DOWNTO 0) := "1111"; --SDRAM NOP
@@ -167,9 +168,8 @@ architecture Behavioral of U601 is
 	
 	--ROM RELATED SIGNALS
 	CONSTANT DELAYVALUE : INTEGER := 1;
-	SIGNAL dsackdelay : INTEGER RANGE 0 TO DELAYVALUE;
+	SIGNAL dsackdelay : INTEGER RANGE 0 TO DELAYVALUE + 2;
 	SIGNAL dsack_rom : STD_LOGIC;
-	SIGNAL dsackreset : STD_LOGIC;
 	
 begin
 
@@ -267,14 +267,20 @@ begin
 
 	--EITHER THE 68030 OR DMA FROM THE ZORRO 2 BUS CAN ACCESS ZORRO 2 RAM ON OUR CARD.
 	
+		--ARE WE IN THE RAM ADDRESS SPACE?
+	ramaccess <= '1' 
+		WHEN 
+			A(23 DOWNTO 21) = rambaseaddress0 OR 
+			A(23 DOWNTO 21) = rambaseaddress1 OR 
+			A(23 DOWNTO 21) = rambaseaddress2 OR 
+			A(23 DOWNTO 21) = rambaseaddress3
+		ELSE
+			'0';
+	
 	--THIS DETECTS A 68030 MEMORY ACCESS.
 	cpuaccess <= '1' 
 		WHEN
-			( A(23 DOWNTO 21) = rambaseaddress0 OR 
-			  A(23 DOWNTO 21) = rambaseaddress1 OR 
-			  A(23 DOWNTO 21) = rambaseaddress2 OR 
-			  A(23 DOWNTO 21) = rambaseaddress3 ) AND
-			  
+			ramaccess = '1' AND			  
 			ram2configed = '1' AND
 			nBGACK = '1' AND 
 			cpuspace = '0'
@@ -285,11 +291,7 @@ begin
 	--ADDRESS STROBE IS CONNECTED TO _AS WHEN IN DMA MODE.
 	dmaaccess <= '1'
 		WHEN
-			( A(23 DOWNTO 21) = rambaseaddress0 OR 
-			  A(23 DOWNTO 21) = rambaseaddress1 OR 
-			  A(23 DOWNTO 21) = rambaseaddress2 OR 
-			  A(23 DOWNTO 21) = rambaseaddress3 ) AND
-			  
+			ramaccess = '1' AND
 			ram2configed = '1' AND 
 			nBGACK = '0'
 		ELSE
@@ -700,7 +702,7 @@ begin
 
 	
 	nDSACK <= 
-			"01" WHEN nAS = '0' AND ((dsack_rom = '1' AND (hirom = '1' OR lorom = '1')) OR autoconfigspace = '1') --16 BIT PORT
+			"01" WHEN nAS = '0' AND dsack_rom = '1' AND (hirom = '1' OR lorom = '1' OR autoconfigspace = '1') --16 BIT PORT  
 		ELSE 
 			"00" WHEN nAS = '0' AND dsacken = '1' AND cpuaccess = '1' --32 BIT PORT
 		ELSE
@@ -708,74 +710,50 @@ begin
 		ELSE
 			"ZZ";	
 			
+	--THIS DELAY EXISTS TO HELP THE ROM AND CPLD PUT VALID DATA ON THE BUS, ESPECIALLY WHEN
+	--OPERATING AT 50MHz. THE DSACKx IS DELAYED BY THE NUMBER OF CLOCKS SPECIFIED IN THE 
+	--delayvalue SIGNAL. THAT GIVES TIME FOR THE SIGNALS FROM THESE DEVICES TO MEET SETUP TIMES.
 			
-	--AT 50MHz, THE NEGATION OF _AS OFTEN FAILS TO MEET THE SETUP TIME TO BE 
-	--DETECTED AT THE NEXT RISING CLOCK EDGE. THIS WORKS VERY WELL, THOUGH.
-	
-	PROCESS (nAS, nRESET, dsack_rom) BEGIN 
-	
-		IF nRESET = '0' OR dsack_rom = '0'  THEN
-		
-			dsackreset <= '0';			
-	
-		ELSIF RISING_EDGE(nAS) THEN
-		--ELSIF (nAS'EVENT AND nAS = '1') THEN
-		--in simulation, the RISING_EDGE(nAS) does not work.
-		--seems to work in situ, though.
-		
-			dsackreset <= '1';
-			
-		END IF;
-		
-	END PROCESS;
-
-	--THE 27C256 EPROM NEEDS 40-75ns TO STABILIZE DATA.
-	--THIS DELAYS DSACK BY THE NUMBER OF CLOCKS DEFINED BY DELAYVALUE.
-	--THIS GIVES THE EPROM TIME TO PUT STABLE DATA ON THE BUS.	
-	
 	PROCESS (CPUCLK, nRESET) BEGIN
-	
+
 		IF nRESET = '0' THEN
 		
 			dsackdelay <= 0;
 			dsack_rom <= '0';
-	
+			
 		ELSIF RISING_EDGE (CPUCLK) THEN
-
-			IF hirom = '1' OR lorom = '1' THEN
+		
+			IF dsackdelay /= 0 THEN
+			
+				dsackdelay <= dsackdelay + 1;
 				
-				IF dsackreset = '1' THEN
+			END IF;		
+			
+			CASE dsackdelay IS
+			
+				WHEN 0 =>
 				
-					dsack_rom <= '0';
-					dsackdelay <= 0;
+					IF nAS = '0' AND (hirom = '1' OR lorom = '1' OR autoconfigspace = '1') THEN
+			
+						dsackdelay <= 1;
 					
-				ELSE
-					
-					IF nAS = '0' THEN
-					
-						IF dsackdelay = DELAYVALUE THEN
-						
-							dsack_rom <= '1';
-							
-						ELSE
-						
-							dsack_rom <= '0';
-							dsackdelay <= dsackdelay + 1;
-							
-						END IF;
-						
 					END IF;
 					
-				END IF;
+				WHEN delayvalue =>
 				
-			ELSE
-			
-				dsackdelay <= 0;
+					dsack_rom <= '1';
+					
+				WHEN delayvalue + 2 =>
 				
-			END IF;
+					dsackdelay <= 0;
+					dsack_rom <= '0';
+					
+				WHEN others =>	
+				
+			END CASE;
 		
 		END IF;
-		
+
 	END PROCESS;
 	
 	---------------------------
@@ -938,7 +916,7 @@ begin
 	ramsize <= "000" WHEN nRAM8 = '1' ELSE "111";
 	
 	--AUTOCONFIG SEQUENCE, IN ALL ITS GLORY!
-	PROCESS ( CPUCLK, nRESET ) BEGIN
+	PROCESS ( nDS, nRESET ) BEGIN
 	
 		IF nRESET = '0' THEN
 			
@@ -954,11 +932,11 @@ begin
 			D_ZORRO2RAM <= "0000";
 			D_ZORRO3RAM <= "0000";
 			
-		ELSIF ( RISING_EDGE (CPUCLK)) THEN
+		ELSIF FALLING_EDGE (nDS) THEN
 		
 			IF autoconfigspace = '1' THEN
 			
-				IF RnW = '1' AND nAS = '0' THEN
+				IF RnW = '1' THEN
 				
 					CASE A(6 downto 1) IS
 
@@ -1024,7 +1002,7 @@ begin
 
 					END CASE;					
 
-				ELSIF RnW = '0' AND nDS = '0' AND A(6 downto 1) = "100100" THEN
+				ELSIF RnW = '0' AND A(6 downto 1) = "100100" THEN
 				
 					--WRITE REGISTER AT OFFSET $48. THIS IS WHERE THE BASE ADDRESS IS ASSIGNED.
 								
