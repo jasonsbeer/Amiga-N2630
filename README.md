@@ -6,7 +6,7 @@ The N2630 is a Motorolla 68030 CPU card with additional RAM and IDE device port 
 <p align="center"><img src="/Images/N2630-30med.png" width="750"></p>
 
 # CURRENT STATE:
-**Updated 6-Dec-2022 - This project is still under active development and is considered beta. There may be errors on the board, in the CPLD logic, or in this text, and may not work in every situation. Build at your own risk. See the issues tab for more information. It is working on my test machine at 25MHz with the Zorro 2 and 3 RAM fully functional. Revision 3.0 is the current revision.**
+**Updated 19-Dec-2022 - This project is still under active development and is considered beta. There may be errors on the board, in the CPLD logic, or in this text, and may not work in every situation. Build at your own risk. See the issues tab for more information. It is working on my A2000 EATX test machine at 50MHz with the MC68882, Zorro 2 RAM, and Zorro 3 RAM fully functional. Revision 3.0 is the current revision.**
 
 ## Features
 1. Motorola 68030 microprocessor.
