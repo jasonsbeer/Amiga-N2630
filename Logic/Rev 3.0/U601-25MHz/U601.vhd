@@ -21,15 +21,16 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    DECEMBER 19, 2022 
+-- Create Date:    JANUARY 4, 2023 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC95144 144 PIN
 -- Tool versions: 
 -- Description: INCLUDES 25MHz LOGIC FOR AUTOCONFIG, ZORRO2 SDRAM CONTROLLER, AND GENERAL GLUE LOGIC
 --
--- Revision: 2.2
--- Additional Comments: 
+-- Hardware Revision: 3.x
+-- Revision History:
+-- 	Initial Production Release 04-JAN-23
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -62,9 +63,10 @@ PORT
 	OSMODE : IN STD_LOGIC; --J304 UNIX/AMIGA OS
 	nCPURESET : IN STD_LOGIC; --68030 RESET SIGNAL
 	nHALT : IN STD_LOGIC; --68030 HALT
-	Z2AUTO : IN STD_LOGIC; --J303 ZORRO 2 DISABLE
+	nZ2DIS : IN STD_LOGIC; --ZORRO 2 RAM DISABLE
+	nZ3DIS : IN STD_LOGIC; --ZORRO 3 RAM AUTOCONFIG DISABLE
 	DROM : IN STD_LOGIC_VECTOR (20 DOWNTO 16); --THIS IS FOR THE ROM SPECIAL REGISTER
-	nMEMZ3 : IN STD_LOGIC; --ZORRO 3 RAM IS RESPONDING TO THE ADDRESS (WAS EXTSEL)
+	nMEMZ3 : IN STD_LOGIC; --ZORRO 3 RAM IS RESPONDING TO THE ADDRESS
 	nSENSE : IN STD_LOGIC; --68882 SENSE
 	nIDEACCESS : IN STD_LOGIC; --IDE IS RESPONDING TO THE ADDRESS SPACE
 	nBOSS : IN STD_LOGIC; --BOSS SIGNAL
@@ -317,7 +319,7 @@ begin
 	--STATE 2, WE CAN'T DETECT IT UNTIL THE NEXT 7MHz RISING EDGE, WHICH IS STATE 4.
 	--THIS WORKS WELL AS STATE 4 IS THE ONE WE REALLY CARE ABOUT.
 	--THE SIGNAL ONLY ASSERTS WHEN _AS (_AAS) IS ASSERTED AND THE CURRENT
-	--SDRAM STATE IS RUN_STATE. THIS STOPS IT FROM ASSERRTING 
+	--SDRAM STATE IS RUN_STATE. THIS STOPS IT FROM ASSERTING 
 	--DURING A REFRESH CYCLE.
 		
 	PROCESS (A7M, dmaaccess) BEGIN
@@ -695,10 +697,9 @@ begin
 	-----------------------------
 	-- 68030 DATA TRANSFER ACK --
 	-----------------------------
-
 	
 	nDSACK <= 
-			"01" WHEN nAS = '0' AND dsack_rom = '1' AND (hirom = '1' OR lorom = '1' OR autoconfigspace = '1') --16 BIT PORT  
+			"01" WHEN nAS = '0' AND dsack_rom = '1' --AND (hirom = '1' OR lorom = '1' OR autoconfigspace = '1') --16 BIT PORT  
 		ELSE 
 			"00" WHEN nAS = '0' AND dsacken = '1' AND cpuaccess = '1' --32 BIT PORT
 		ELSE
@@ -706,8 +707,8 @@ begin
 		ELSE
 			"ZZ";	
 			
-	--THIS DELAY EXISTS TO HELP THE ROM AND CPLD PUT VALID DATA ON THE BUS, ESPECIALLY WHEN
-	--OPERATING AT 50MHz. THE DSACKx IS DELAYED BY THE NUMBER OF CLOCKS SPECIFIED IN THE 
+	--THIS DELAY EXISTS TO HELP THE 27C256 EPROM AND CPLD PUT VALID DATA ON THE BUS, ESPECIALLY WHEN
+	--OPERATING AT 50MHz. THE _DSACK1 SIGNAL IS DELAYED BY THE NUMBER OF CLOCKS SPECIFIED IN THE 
 	--delayvalue SIGNAL. THAT GIVES TIME FOR THE SIGNALS FROM THESE DEVICES TO MEET SETUP TIMES.
 			
 	PROCESS (CPUCLK, nRESET) BEGIN
@@ -828,7 +829,7 @@ begin
 	--UNTIL ROMCONFIGED IS WRITTEN HIGH. OTHERWISE, THE AUTOCONFIG PROCESS
 	--IS IDENTICAL TO ANY OTHER.
 	
-	--EVEN THOUGH THIS ISN'T WITH THE AUTOCONFIG STUFF, IT STILL
+	--EVEN THOUGH THIS ISN'T WITH THE AUTOCONFIG STUFF, IT
 	--RESPONDS IN THE AUTOCONFIG SPACE, WITH _DSACK1 HANDLED THERE.
 	
 	PROCESS (CPUCLK, regreset) BEGIN
@@ -860,15 +861,15 @@ begin
 	----------------
 	
 	--IS EVERYTHING WE WANT CONFIGURED?
-	--THIS IS PASSED TO THE _COPCFG SIGNAL, WHICH MUST BE DONE.
-	--THIS ALLOWS THE CONFIGURATION CHAIN TO CONTINUE.
+	--THIS IS PASSED TO THE _COPCFG SIGNAL, WHICH MUST BE DONE
+	--TO ALLOW THE CONFIGURATION CHAIN TO CONTINUE.
 	
 	CONFIGED <= '1' WHEN boardconfiged = '1' OR MODE68K = '1' ELSE '0';
 	
 	--We have three boards we need to autoconfig, in this order
 	--1. The 68030 ROM. SEE ALSO SPECIAL REGISTER, ABOVE.
 	--2. The base memory (4/8MB) in the Zorro 2 space.
-	--3. The expansion memory in the Zorro 3 space. This is done in U602.	
+	--3. The expansion memory in the Zorro 3 space.
 
 	--A good explaination of the autoconfig process is given in the Amiga Hardware Reference Manual from Commodore.
 	--https://archive.org/details/amiga-hardware-reference-manual-3rd-edition
@@ -876,7 +877,7 @@ begin
 	--BOARDCONFIGED IS ASSERTED WHEN WE ARE DONE CONFIGING THE ROM AND ZORRO 2 MEMORY.
 	--WHEN THE ZORRO 2 RAM IS DISABLED BY J303, IT SETS Z2AUTO = 0.
 	
-	boardconfiged <= '1' WHEN romconfiged = '1' AND (ram2configed = '1' OR Z2AUTO = '0') AND ram3configed = '1' ELSE '0';
+	boardconfiged <= '1' WHEN romconfiged = '1' AND (ram2configed = '1' OR nZ2DIS = '0') AND (ram3configed = '1' OR nZ3DIS = '0') ELSE '0';
 	
 	--WE ARE IN THE Z2 AUTOCONFIG ADDRESS SPACE ($E80000).
 	--THIS IS QUALIFIED BY BOARDCONFIGED SO WE STOP RESPONDING TO THE AUTOCONFIG 
@@ -897,7 +898,7 @@ begin
 				WHEN romconfiged = '0' AND autoconfigspace = '1' AND RnW = '1' AND nAS = '0'
 		ELSE
 			D_ZORRO2RAM 
-				WHEN Z2AUTO = '1' AND ram2configed = '0' AND autoconfigspace = '1' AND RnW = '1' AND nAS = '0' 
+				WHEN nZ2DIS = '1' AND ram2configed = '0' AND autoconfigspace = '1' AND RnW = '1' AND nAS = '0' 
 		ELSE
 			D_ZORRO3RAM 
 				WHEN autoconfigspace = '1' AND RnW = '1' AND nAS = '0'
@@ -1002,7 +1003,7 @@ begin
 				
 					--WRITE REGISTER AT OFFSET $48. THIS IS WHERE THE BASE ADDRESS IS ASSIGNED.
 								
-					IF ram2configed = '0' AND Z2AUTO = '1' THEN
+					IF ram2configed = '0' AND nZ2DIS = '1' THEN
 						
 						--THIS IS THE ZORRO 2 RAM BASE ADDRESS.
 							
