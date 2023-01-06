@@ -28,8 +28,8 @@
 -- Tool versions: 
 -- Description: BOSS, GLUE LOGIC, BUS INTERFACE, 6800/6502 STATE MACHINE, 68000 STATE MACHINE
 --
--- Hardware Revision: 3.0
--- Additional Comments: 
+-- Revision History:
+-- 	Initial Production Release xx-JAN-23
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
