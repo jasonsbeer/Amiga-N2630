@@ -28,8 +28,9 @@
 -- Tool versions: 
 -- Description: INCLUDES 50MHz LOGIC FOR ZORRO 3 SDRAM CONTROLLER AND PSUEDO-GAYLE ATA CONTROLLER
 --
--- Hardware Revision: 3.0
--- Additional Comments: 
+-- Hardware Revision: 3.x
+-- Revision History:
+-- 	Initial Production Release xx-JAN-23
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
