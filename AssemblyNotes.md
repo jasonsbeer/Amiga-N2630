@@ -45,9 +45,9 @@ Step|Expected Function|Possible Failure
 4|MC68000 negates bus grant (_BG)|
 5a|N2630 _CSROM begins oscillating|Bad solder joint on A(23..16) or _CSROM to U601. No power to U601.
 5b|Concurrent with 5a, SMDIS begins oscillating|Bad solder joint at U600 or U601. No power to U601.
-5c|Concurrent with 5a and 5b, N2630 drives MC68000/A2000 data and address buses to read A2000 chip registers|Bad solder joint or no power at U701, U702, U703, U704, U705, U706, U707. Bad solder joint signals _AAENA, AADIR, DRSEL, _ADOEH, _ADOEL, ADDIR.
+5c|Concurrent with 5a and 5b, N2630 drives MC68000/A2000 data and address buses to read A2000 chip registers|Bad solder joint or no power at U701, U702, U703, U704, U705, U706, U707. Bad solder joint signals _AAENA, AADIR, DRSEL, _ADOEH, _ADOEL, ADDIR, _AAS, _LDS, _UDS, AR_W, etc...
 6|N2630 negates _CSROM|Bad solder joints on A(15..1) or D(31..16) at U102, U103, or MC68030.
-7|N2630 drives MC68000/A2000 data and address buses|Bad solder joint or no power at U701, U702, U703, U704, U705, U706, U707. Bad solder joint signals _AAENA, AADIR, DRSEL, _ADOEH, _ADOEL, ADDIR.
+7|N2630 drives MC68000/A2000 data and address buses|Bad solder joint or no power at U701, U702, U703, U704, U705, U706, U707. Bad solder joint signals _AAENA, AADIR, DRSEL, _ADOEH, _ADOEL, ADDIR, _AAS, _LDS, _UDS, AR_W, etc...
 8|Kickstart screen appears|
 
 ## Ramblings
