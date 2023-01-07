@@ -38,7 +38,7 @@ Most cheap EPROM programmers will handle the 27C256 EPROMs of the N2630. A popul
 Black screen troubleshooting order of operations.
 Step|Expected Function|Possible Failure
 -|-|-
-1|N2630 asserts bus request (_BR)|Bad solder joint. No power to U600.
+1|N2630 asserts bus request (_BR at MC68000)|Bad solder joint. No power to U600.
 2|MC68000 asserts bus grant (_BG)|
 3|N2630 asserts _BOSS (_BGACK at MC68000) and negates bus request (_BR)|Bad solder joint. No power to U600.
 4|MC68000 negates bus grant (_BG)|
