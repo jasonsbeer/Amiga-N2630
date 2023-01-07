@@ -35,7 +35,8 @@ Most cheap EPROM programmers will handle the 27C256 EPROMs of the N2630. A popul
 2) Double check the jumpers. It is critical the jumpers be set correctly for proper and reliable function.
 3) Disable the Zorro 2 RAM, Zorro 3 RAM, and the IDE port. The Amiga 2000 will boot without these and it may help narrow down where the issue lies.
 
-Black screen troubleshooting order of operations.
+Follow these troubleshooting order of operations if your Amiga 2000 fails to start in 68030 mode or starts to a black screen. If these steps are executing correctly, you should start in 68030 mode and see the Kickstart screen.
+
 Step|Expected Function|Possible Failure
 -|-|-
 1|N2630 asserts bus request (_BR at MC68000)|Bad solder joint. No power to U600.
