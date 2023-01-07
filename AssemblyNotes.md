@@ -28,7 +28,7 @@ The three CPLDs (U600, U601, and U602) must be programmed before the N2630 will 
 Discussion programming CPLDs is not in the scope of this document, but many resources are available on the internet. I have been using a Raspberry Pi 2 with xc3sprog. Xilinx programming dongles are also available.
 
 ## Programming the ROMs
-Most cheap EPROM programmers will handle the 27C256 EPROMs of the N2630. A popular one is the TL866II, but there are other options. There are a lot of these in the community. Someone may be able to assist if you do not wish to purchase a programmer. The EPROMs can be programmed independently of the N2630.
+Most cheap EPROM programmers will handle the 27C256 EPROMs of the N2630. A popular one is the TL866II, but there are other options. There are a lot of these in the community. Someone may be able to assist if you do not wish to purchase a programmer. The EPROMs are programmed independently of the N2630. The ROMs can be found [here](/ROM/).
 
 ## Troubleshooting
 1) Check for solder bridges or bad solder joints. These are likely to be the most likely cause of failure.
