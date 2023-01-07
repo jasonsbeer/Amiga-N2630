@@ -31,9 +31,23 @@ Discussion programming CPLDs is not in the scope of this document, but many reso
 Most cheap EPROM programmers will handle the 27C256 EPROMs of the N2630. A popular one is the TL866II, but there are other options. There are a lot of these in the community. Someone may be able to assist if you do not wish to purchase a programmer. The EPROMs can be programmed independently of the N2630.
 
 ## Troubleshooting
-1) Double check the jumpers. It is critical the jumpers be set correctly for proper and reliable function.
-2) Check for solder bridges or bad solder joints.
+1) Check for solder bridges or bad solder joints. These are likely to be the most likely cause of failure.
+2) Double check the jumpers. It is critical the jumpers be set correctly for proper and reliable function.
 3) Disable the Zorro 2 RAM, Zorro 3 RAM, and the IDE port. The Amiga 2000 will boot without these and it may help narrow down where the issue lies.
+
+Black screen troubleshooting order of operations.
+Step|Expected Function|Possible Failure
+-|-|-
+1|N2630 asserts bus request (_BR)|Bad solder joint. No power to U600.
+2|MC68000 asserts bus grant (_BG)|
+3|N2630 asserts _BOSS (_BGACK at MC68000) and negates bus request (_BR)|Bad solder joint. No power to U600.
+4|MC68000 negates bus grant (_BG)|
+5a|N2630 _CSROM begins oscillating|Bad solder joint on A(23..16) or _CSROM to U601. No power to U601.
+5b|Concurrent with 5a, SMDIS begins oscillating|Bad solder joint at U600 or U601. No power to U601.
+5c|Concurrent with 5a and 5b, N2630 drives MC68000/A2000 data and address buses to read A2000 chip registers|Bad solder joint or no power at U701, U702, U703, U704, U705, U706, U707. Bad solder joint signals _AAENA, AADIR, DRSEL, _ADOEH, _ADOEL, ADDIR.
+6|N2630 negates _CSROM|Bad solder joints on A(15..1) or D(31..16) at U102, U103, or MC68030.
+7|N2630 drives MC68000/A2000 data and address buses|Bad solder joint or no power at U701, U702, U703, U704, U705, U706, U707. Bad solder joint signals _AAENA, AADIR, DRSEL, _ADOEH, _ADOEL, ADDIR.
+8|Kickstart screen appears|
 
 ## Ramblings
 The Zorro 3 RAM, IDE Port, and MC68882 are all optional. If you choose not to install the Zorro 3 RAM and/or IDE port, you can omit the associated logic and passives. If you do this, be sure to disable these by properly setting the matching jumper. The MC68882 is auto-detected and has no enable/disable jumper.
