@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    December 17, 2022 
+-- Create Date:    JANUARY 8, 2023 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC9572 64 PIN
@@ -104,8 +104,6 @@ architecture Behavioral of U600 is
 	SIGNAL CURRENT_STATE : STATE68K;	
 	
 	--68000 STATE MACHINE SIGNALS
-	SIGNAL ldsout : STD_LOGIC := '1'; --VALUE FOR _LDS
-	SIGNAL udsout : STD_LOGIC := '1'; --VALUE FOR _UDS
 	SIGNAL sm_enabled : STD_LOGIC := '0'; --ARE WE ACCESSING THE AMIGA 2000 BOARD?
 	SIGNAL eclk_counter : INTEGER RANGE 0 TO 15 := 0; --4 BIT NUMBER E COUNTER
 	SIGNAL vmacount : INTEGER RANGE 0 TO 15 := 0; --COUNTER FOR E VMA
@@ -389,10 +387,10 @@ begin
 		--NOT DMA AND ACCESSING IDE IN 68000 MODE (BOSS=1, MODE68K =1) NOTE: NOT IMPLEMENTED
 		
 	--SMDIS (STATE MACHINE DISABLED) IS ASSERTED (=1) WHEN USING RESOURCES ON THE 2630 CARD
-		--IDE MEMORY SPACE
-		--ZORRO 3 MEMORY SPACE
-		--ZORRO 2 MEMORY SPACE
-		--ROM MEMORY SPACE
+		--IDE ADDRESS SPACE
+		--ZORRO 3 MEMORY ADDRESS SPACE
+		--ZORRO 2 MEMORY ADDRESS SPACE
+		--ROM ADDRESS SPACE
 		
 	nADOEH <= '0' 
 		WHEN 
@@ -466,7 +464,7 @@ begin
 	--SMDIS (STATE MACHINE DISABLE) IS USED TO INDICATE ROM, CPU SPACE, 
 	--ZORRO 2 RAM, ZORRO 3 RAM, AND IDE ACCESS ACTIVITIES.
 	
-	--sm_enabled (STATE MACHINE ENABLED) IS '1' WHEN WE ARE NOT USING ANY 
+	--sm_enabled (STATE MACHINE ENABLED) IS '1' WHEN WE ARE NOT ADDRESSING 
 	--RESOURCES ON OUR CARD. WE ARE GOING AFTER SOMETHING ON THE AMIGA 2000.
 	
 	sm_enabled <= '1' 
@@ -515,13 +513,48 @@ begin
 	END PROCESS;
 
 	--DATA TRANSFER SIGNALS
-	nUDS <= udsout WHEN writecycle = '1' OR readcycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	nLDS <= ldsout WHEN writecycle = '1' OR readcycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	nAAS <= '0' WHEN ascycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	--nAAS <= nAS WHEN ascycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	ARnW <= RnW WHEN rwcycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	nVMA <= '0' WHEN vmacycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
-	nDSACK1 <= '0' WHEN dsackcycle = '1' ELSE '1' WHEN sm_enabled = '1' ELSE 'Z';
+	
+	nUDS <= 
+			'0' WHEN A(0) = '0' AND (writecycle = '1' OR readcycle = '1') AND sm_enabled = '1'
+		ELSE 
+			'1' WHEN sm_enabled = '1' 
+		ELSE
+			'Z';
+			
+	nLDS <= 
+			'0' WHEN (SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1') AND (writecycle = '1' OR readcycle = '1') AND sm_enabled = '1'
+		ELSE 
+			'1' WHEN sm_enabled = '1' 
+		ELSE
+			'Z';
+	
+	nAAS <= 
+			'0' WHEN ascycle = '1' 
+		ELSE 
+			'1' WHEN sm_enabled = '1' 
+		ELSE 
+			'Z';
+			
+	ARnW <= 
+			RnW WHEN rwcycle = '1' 
+		ELSE 
+			'1' WHEN sm_enabled = '1' 
+		ELSE
+			'Z';
+			
+	nVMA <= 
+			'0' WHEN vmacycle = '1' 
+		ELSE 
+			'1' WHEN sm_enabled = '1' 
+		ELSE
+			'Z';
+			
+	nDSACK1 <= 
+			'0' WHEN nAS = '0' AND dsackcycle = '1' 
+		ELSE
+			'1' WHEN sm_enabled = '1' 
+		ELSE
+			'Z';
 		 
 	--68000 STATE MACHINE PROCESS
 
@@ -533,9 +566,6 @@ begin
 
 			CURRENT_STATE <= S0;
 			
-			ldsout <= '1';
-			udsout <= '1';
-			
 			ascycle <= '0';
 			rwcycle <= '0';
 			readcycle <= '0';
@@ -545,19 +575,6 @@ begin
 		ELSIF RISING_EDGE (CLK14) THEN
 		
 			--BEGIN 68000 STATE MACHINE--
-			
-			--PREP THE DATA STROBES--
-			IF A(0) = '0' THEN
-				udsout <= '0';
-			ELSE
-				udsout <= '1';
-			END IF;
-
-			IF SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1' THEN
-				ldsout <= '0';
-			ELSE
-				ldsout <= '1';
-			END IF;	
 		 
 			CASE (CURRENT_STATE) IS
 
