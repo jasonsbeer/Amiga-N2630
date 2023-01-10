@@ -21,12 +21,12 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JANUARY 8, 2023 
+-- Create Date:    JANUARY 9, 2023 
 -- Design Name:    N2630 U600 CPLD
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC9572 64 PIN
 -- Tool versions: 
--- Description: BOSS, GLUE LOGIC, BUS INTERFACE, 6800/6502 STATE MACHINE, 68000 STATE MACHINE
+-- Description: BOSS, BUS INTERFACE, 6800/6502 STATE MACHINE, 68000 STATE MACHINE
 --
 -- Revision History:
 -- 	Initial Production Release xx-JAN-23
@@ -103,13 +103,14 @@ architecture Behavioral of U600 is
 	TYPE STATE68K IS ( S0, S1, S2, S3, S4, S5, S6, S7 );
 	SIGNAL CURRENT_STATE : STATE68K;	
 	
-	--68000 STATE MACHINE SIGNALS
+	--68000 STATE MACHINE SIGNALS	
 	SIGNAL sm_enabled : STD_LOGIC := '0'; --ARE WE ACCESSING THE AMIGA 2000 BOARD?
 	SIGNAL eclk_counter : INTEGER RANGE 0 TO 15 := 0; --4 BIT NUMBER E COUNTER
 	SIGNAL vmacount : INTEGER RANGE 0 TO 15 := 0; --COUNTER FOR E VMA
 	SIGNAL eclk : STD_LOGIC := '0'; --E SIGNAL FOR "A2000"
 	SIGNAL esync : STD_LOGIC := '0'; --ONE CLOCK DELAY OF E
-	SIGNAL DSACKEN : STD_LOGIC := '0'; --ENABLE _DSACK1
+	SIGNAL dsacken : STD_LOGIC := '0'; --ENABLE _DSACK1
+	SIGNAL dsackcount : INTEGER RANGE 0 TO 2; --STATE MACHINE DSACK1 PROCESS
 	SIGNAL ascycle : STD_LOGIC := '0'; --ENABLE AMIGA ADDRESS STROBE SIGNAL
 	SIGNAL rwcycle : STD_LOGIC := '0'; --ENABLE AMIGA READ/WRITE SIGNAL
 	SIGNAL writecycle : STD_LOGIC := '0';
@@ -480,36 +481,46 @@ begin
 	-------------------------
 	-- 68000 STATE MACHINE --
 	-------------------------
-
-	--DSACK1 PROCESS
-	PROCESS (CPUCLK, nRESET) BEGIN
 	
-		IF nRESET = '0' THEN
+	--THE _DSACK1 PROCESS ASSERTS _DSACK1 DURING STATE 7 OF 
+	--THE 6800/68000 STATE MACHINE. WE HOLD IT FOR TWO CLOCK CYCLES
+	--AND THEN NEGATE. THIS HOLDS IT LONG ENOUGH FOR THE 68030 TO 
+	--LATCH THE SIGNAL. THIS ALSO WORKS BETTER AT 50MHz WHEN
+	--COMPARED TO NEGATING _DSACK1 IN RESPONSE TO THE NEGATION OF _AS.
+	
+	PROCESS (CPUCLK, nAS) BEGIN
+	
+		IF nAS = '1' THEN
 		
 			dsackcycle <= '0';
-	  
-		ELSIF RISING_EDGE (CPUCLK) THEN
-		 
-			IF sm_enabled = '1' THEN
-				 
-				IF nAS = '0' AND (dsacken = '1' OR nDSACK1 = '0') THEN
-					 
-					dsackcycle <= '1';
-
-				ELSE
-				 
-					dsackcycle <= '0';
-				 
-				END IF;
-				 
-			ELSE
-				 
-				 dsackcycle <= '0';
-			 
-			END IF;
+			dsackcount <= 0;
 			
-		END IF;
-		
+		ELSIF FALLING_EDGE (CPUCLK) THEN
+		    --^^^^^^^^^^^^ 50MHZ IS FALLING EDGE.
+			
+			CASE dsackcount IS
+			
+				WHEN 0 =>
+				
+					IF dsacken = '1' THEN
+					
+						dsackcount <= 1;
+						dsackcycle <= '1';
+						
+					END IF;
+					
+				WHEN 2 =>
+				
+					dsackcycle <= '0';
+					
+				WHEN others =>
+				
+					dsackcount <= dsackcount + 1;
+				
+			END CASE;
+			
+		END IF;	
+	
 	END PROCESS;
 
 	--DATA TRANSFER SIGNALS
@@ -529,28 +540,28 @@ begin
 			'Z';
 	
 	nAAS <= 
-			'0' WHEN ascycle = '1' 
+			'0' WHEN ascycle = '1' AND sm_enabled = '1'
 		ELSE 
 			'1' WHEN sm_enabled = '1' 
 		ELSE 
 			'Z';
-			
+
 	ARnW <= 
-			RnW WHEN rwcycle = '1' 
+			'0' WHEN rwcycle = '1' AND sm_enabled = '1' AND RnW = '0'
 		ELSE 
 			'1' WHEN sm_enabled = '1' 
 		ELSE
 			'Z';
 			
 	nVMA <= 
-			'0' WHEN vmacycle = '1' 
+			'0' WHEN vmacycle = '1' AND sm_enabled = '1'
 		ELSE 
 			'1' WHEN sm_enabled = '1' 
 		ELSE
 			'Z';
 			
 	nDSACK1 <= 
-			'0' WHEN nAS = '0' AND dsackcycle = '1' 
+			'0' WHEN dsackcycle = '1' AND sm_enabled = '1'
 		ELSE
 			'1' WHEN sm_enabled = '1' 
 		ELSE
@@ -603,7 +614,7 @@ begin
 					
 					ascycle <= '1';
 					rwcycle <= '1';
-						
+					
 					IF RnW = '1' THEN
 						readcycle <= '1';
 					ELSE
@@ -624,6 +635,7 @@ begin
 					--DURING WRITE CYCLES, _LDS AND _UDS ARE ASSERTED ON THE RISING EDGE OF STATE 4.
 
 					CURRENT_STATE <= S4;
+					
 					IF RnW = '0' THEN 
 						writecycle <= '1'; 
 					ELSE 
