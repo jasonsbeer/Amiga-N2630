@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    JANUARY 4, 2023 
+-- Create Date:    JANUARY 12, 2023 
 -- Design Name:    N2630 U601 CPLD
 -- Project Name:   N2630 https://github.com/jasonsbeer/Amiga-N2630
 -- Target Devices: XC95144 144 PIN
@@ -30,7 +30,7 @@
 --
 -- Hardware Revision: 3.x
 -- Revision History:
--- 	Initial Production Release 04-JAN-23
+-- 	Initial Production Release xx-JAN-23
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -180,7 +180,8 @@ begin
 	---------------------------
 	
 	--THIS SETS THE DIRECTION OF THE LVC DATA BUFFERS BETWEEN THE 680X0 AND THE SDRAM.
-	EMDDIR <= NOT RnW;
+	--EMDDIR <= NOT RnW;
+	EMDDIR <= '0' WHEN RnW = '1' ELSE '1';
 	
 	--ENABLE/DISABLE THE SDRAM BUFFERS
 	nEMENA <= '0' WHEN nMEMZ3 = '0' OR nMEMZ2 = '0' ELSE '1';
@@ -196,14 +197,16 @@ begin
 	
 	--THE ADDRESS BUFFER DIRECTION
 	--AADIR <= '1' WHEN (nBOSS = '0' AND nBGACK = '1') ELSE '0';
-	AADIR <= nBGACK;
+	--AADIR <= nBGACK;
+	AADIR <= '0' WHEN nBGACK = '0' ELSE '1';
 	--AADIR <= '1';
 	
 	--ENABLE THE ADDRESS BUFFERS WHEN WE ARE BOSS OR WHEN WE ARE IN 68K MODE.
 	--LOOKING AT THE LOGIC BELOW, WE BASICALLY NEVER DISABLE THE BUFFERS.
 	--THIS MEANS WE COULD TIE IT TO GROUND?
 	--nAAENA <= '0' WHEN nBOSS = '0' OR MODE68K = '1' ELSE '1'; 
-	nAAENA <= nBOSS;
+	--nAAENA <= nBOSS;
+	nAAENA <= '0' WHEN nBOSS = '0' ELSE '1';
 	
 	---------------------------
 	-- SDRAM REFRESH COUNTER --
@@ -269,7 +272,7 @@ begin
 
 	--EITHER THE 68030 OR DMA FROM THE ZORRO 2 BUS CAN ACCESS ZORRO 2 RAM ON OUR CARD.
 	
-		--ARE WE IN THE RAM ADDRESS SPACE?
+	--ARE WE IN THE RAM ADDRESS SPACE?
 	ramaccess <= '1' 
 		WHEN 
 			A(23 DOWNTO 21) = rambaseaddress0 OR 
@@ -638,7 +641,7 @@ begin
 					sdramcom <= ramstate_NOP;
 					
 					--IF _DSACKx IS NOT ENABLED FROM A 68030 WRITE CYCLE, ENABLE IT NOW.
-					IF dsacken = '0' AND COUNT = 0 AND cpuaccess = '1' THEN
+					IF dsacken = '0' AND COUNT = 1 AND cpuaccess = '1' THEN
 					
 						dsacken <= '1';	
 						
@@ -699,7 +702,7 @@ begin
 	-----------------------------
 	
 	nDSACK <= 
-			"01" WHEN nAS = '0' AND dsack_rom = '1' --AND (hirom = '1' OR lorom = '1' OR autoconfigspace = '1') --16 BIT PORT  
+			"01" WHEN nAS = '0' AND dsack_rom = '1' AND (hirom = '1' OR lorom = '1' OR autoconfigspace = '1') --16 BIT PORT  
 		ELSE 
 			"00" WHEN nAS = '0' AND dsacken = '1' AND cpuaccess = '1' --32 BIT PORT
 		ELSE
