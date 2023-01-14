@@ -1,1 +1,1 @@
-CPLD logic for hardware revision 3.0.
+CPLD logic for hardware revision 3.x.
