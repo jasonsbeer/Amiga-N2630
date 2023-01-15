@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="2.0" >
  <header>
-  <DateModified>2023-01-13T21:16:27</DateModified>
+  <DateModified>2023-01-14T22:30:38</DateModified>
   <ModuleName>U602</ModuleName>
-  <SummaryTimeStamp>2023-01-13T21:16:01</SummaryTimeStamp>
+  <SummaryTimeStamp>2023-01-14T21:56:51</SummaryTimeStamp>
   <SavedFilePath>/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U602-50MHZ/iseconfig/U602.xreport</SavedFilePath>
   <ImplementationReportsDirectory>/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U602-50MHZ/</ImplementationReportsDirectory>
   <DateInitialized>2022-04-30T08:05:23</DateInitialized>

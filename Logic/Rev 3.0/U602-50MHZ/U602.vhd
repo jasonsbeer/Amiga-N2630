@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    January 13, 2023
+-- Create Date:    January 14, 2023
 -- Design Name:    N2630 U602 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -140,24 +140,41 @@ architecture Behavioral of U602 is
 	SIGNAL intlast : STD_LOGIC;
 	SIGNAL ide_space : STD_LOGIC;
 	SIGNAL idesacken : STD_LOGIC;
+	SIGNAL access16 : STD_LOGIC;
+	SIGNAL cs0en : STD_LOGIC;
+	SIGNAL cs1en : STD_LOGIC;
 	
 	--ATA STATE MACHINE SIGNALS
 	SIGNAL renable : STD_LOGIC;
 	SIGNAL wenable : STD_LOGIC;
 	
-	CONSTANT PIO0_T1 : INTEGER := 1; --70ns
-	CONSTANT PIO0_T2 : INTEGER := 8; --165ns
-	CONSTANT PIO0_T4 : INTEGER := 1; --30ns
-	CONSTANT PIO0_Teoc : INTEGER := 4; --600ns
-
 	SIGNAL ata_counter : INTEGER RANGE 0 TO 30;	
 	
+	--ATA TIMINGS
+	--THESE TIMINGS ARE THE SAME FOR BOTH 8 AND 16 BIT CYCLES
 	CONSTANT T0 : INTEGER := 0;
-	CONSTANT T1 : INTEGER := PIO0_T1;
-	CONSTANT T2 : INTEGER := PIO0_T1 + PIO0_T2;
-	CONSTANT Teoc : INTEGER := PIO0_T1 + PIO0_T2 + PIO0_T4 + PIO0_Teoc;
+	CONSTANT T1 : INTEGER := 6; --70ns
+	CONSTANT T4 : INTEGER := 2; --30ns T4 IS THE HOLD TIME FOR WRITES AND MUST BE GREATER THAN T9.
 	
-	--ATA STATE MACHINE SIGNALS
+	--8 BIT TIMINGS
+	CONSTANT T2_8 : INTEGER := 16; --290ns	
+	CONSTANT Teoc_8 : INTEGER := 5; --600ns
+
+	--16 BIT TIMINGS
+	CONSTANT T2_16 : INTEGER := 10; --165ns
+	CONSTANT Teoc_16 : INTEGER := 12; --600ns
+	
+	--FINAL 8 BIT TIMINGS
+	CONSTANT PIO0_T1_8 : INTEGER := T1;
+	CONSTANT PIO0_T2_8 : INTEGER := T1 + T2_8;
+	CONSTANT PIO0_T4_8 : INTEGER := T1 + T2_8 + T4;
+	CONSTANT PIO0_Teoc_8 : INTEGER := T1 + T2_8 + T4 + Teoc_8;
+	
+	--FINAL 16 BIT TIMINGS
+	CONSTANT PIO0_T1_16 : INTEGER := T1;
+	CONSTANT PIO0_T2_16 : INTEGER := T1 + T2_16;
+	CONSTANT PIO0_T4_16 : INTEGER := T1 + T2_16 + T4;
+	CONSTANT PIO0_Teoc_16 : INTEGER := T1 + T2_16 + T4 + Teoc_16;
 	
 	--25MHz CLOCK CYCLES NEEDED TO FULFILL MODE TIMING REQUIREMENTS FOR 16 BIT CYCLES.
 	--TIME|MODE0|MODE1|MODE2|MODE3
@@ -174,7 +191,6 @@ architecture Behavioral of U602 is
 	-- eoc|  5  |  1  |  1  |  2
 
 	-- eoc (end of cycle) is T2i, T9, or T0-T1-T2. Whichever is greatest.
-
 	
 begin
 
@@ -261,18 +277,6 @@ begin
 			'1';
 	
 	memsel <= '1' WHEN nMEMZ3 = '0' AND nAS = '0' ELSE '0';
-	
-	--THE NUMBER OF ADDRESS PINS AVAILABLE FOR THE ROW ADDRESS IS AS FOLLOWS:
-	-- 4Mx16 - A11-A0 (16MB PER PAIR)
-	-- 8Mx16 - A11-A0 (32MB PER PAIR)
-	--16Mx16 - A12-A0 (64MB PER PAIR)
-	--32Mx16 - A12-A0 (128MB PER PAIR)
-	
-	--THE NUMBER OF ADDRESS PINS AVAILABLE FOR THE COLUMN ADDRESS IS AS FOLLOWS:
-	-- 4Mx16 - A7-A0 (16MB PER PAIR)
-	-- 8Mx16 - A8-A0 (32MB PER PAIR)
-	--16Mx16 - A8-A0 (64MB PER PAIR)
-	--32Mx16 - A9-A0 (128MB PER PAIR)
 	
 	cs_mem <= 
 			'0' WHEN RAMSIZE (2 DOWNTO 0) = "010" AND A(24) = '0' ELSE '1' WHEN RAMSIZE (2 DOWNTO 0) = "010" AND A(24) = '1' 
@@ -381,7 +385,19 @@ begin
 	--BECAUSE WE ALLOW ONE OR TWO BANKS OF 32-BIT SDRAM, WE MUST DIRECT THE CHIP
 	--SELECT SIGNAL TO THE CORRECT BANK, OR BOTH BANKS, DEPENDING ON THE DESIRED FUNCTION.
 	--BOTH BANKS ARE SELECTED FOR PROGRAMMING AND REFRESHING.
-	--DURING MEMORY ACCESS BY THE CPU, ONLY ONE BANK IS SELECTED.
+	--DURING MEMORY ACCESS BY THE CPU, ONLY ONE BANK IS SELECTED.	
+		
+	--THE NUMBER OF ADDRESS PINS AVAILABLE FOR THE ROW ADDRESS IS AS FOLLOWS:
+	-- 4Mx16 - A11-A0 (16MB PER PAIR)
+	-- 8Mx16 - A11-A0 (32MB PER PAIR)
+	--16Mx16 - A12-A0 (64MB PER PAIR)
+	--32Mx16 - A12-A0 (128MB PER PAIR)
+	
+	--THE NUMBER OF ADDRESS PINS AVAILABLE FOR THE COLUMN ADDRESS IS AS FOLLOWS:
+	-- 4Mx16 - A7-A0 (16MB PER PAIR)
+	-- 8Mx16 - A8-A0 (32MB PER PAIR)
+	--16Mx16 - A8-A0 (64MB PER PAIR)
+	--32Mx16 - A9-A0 (128MB PER PAIR)
 	
 	chipselected <= '1' WHEN sdramstartup = '1' OR CURRENT_STATE = AUTO_REFRESH ELSE '0';
 	
@@ -578,9 +594,9 @@ begin
 	-----------------------------	
 	
 	nDSACK <=
-			"10" WHEN gayle_space = '1' AND nAS = '0' --8 BIT PORT
-		ELSE
-			"01" WHEN idesacken = '1' --16 BIT PORT
+			--"10" WHEN gayle_space = '1' AND nAS = '0' --OR (idesacken = '1' AND access16 = '0') --8 BIT PORT
+		--ELSE
+			"01" WHEN idesacken = '1' OR (gayle_space = '1' AND nAS = '0') --AND access16 = '1' --16 BIT PORT
 		ELSE
 			"00" WHEN dsacken = '1' AND nAS = '0' --32 BIT PORT
 		ELSE
@@ -774,6 +790,9 @@ begin
 			nMEMZ3 = '1' 
 		ELSE
 			'0';
+			
+	--IS THIS A 16-BIT ACCESS?
+	access16 <= '1' WHEN A(13) = '1' ELSE '0';
 	
 	--SIGNAL U601 TO DISABLE THE 6800/68000 STATE MACHINES.
 	nIDEACCESS <= '0' 
@@ -800,8 +819,9 @@ begin
 	
 	--ASSERT THE IDE ADDRESS SIGNALS WHEN WE ARE IN 
 	--THE IDE ADDRESS SPACE AND _AS IS ASSERTED.
-	nCS0 <= '0' WHEN nAS = '0' AND A(12) = '0' AND ide_space = '1' ELSE '1';
-	nCS1 <= '0' WHEN nAS = '0' AND A(12) = '1' AND ide_space = '1' ELSE '1';
+	nCS0 <= '0' WHEN CS0EN = '1' ELSE '1';
+	nCS1 <= '0' WHEN CS1EN = '1' ELSE '1';
+	
 	DA <= A(4 DOWNTO 2) WHEN nAS = '0' AND ide_space = '1' ELSE "111";
 
 	--READ/WRITE SIGNALS
@@ -818,6 +838,8 @@ begin
 			renable <= '0';
 			wenable <= '0';
 			idesacken <= '0';
+			cs0en <= '0';
+			cs1en <= '0';
 			ata_counter <= T0;
 		
 		ELSIF RISING_EDGE (CPUCLK) THEN
@@ -829,45 +851,140 @@ begin
 				
 			END IF;
 			
-			CASE ata_counter IS
+			CASE access16 IS
 			
-				WHEN T0 =>
+				WHEN '0' =>
 				
-					IF ide_space = '1' AND nAS = '0' THEN
+					--8 BIT CYCLE.
+			
+					CASE ata_counter IS
 					
-						ata_counter <= 1;
+						WHEN T0 =>
 						
-					END IF;
-			
-				WHEN T1 =>
+							IF ide_space = '1' AND nAS = '0' THEN
+							
+								ata_counter <= 1;
+								
+								IF A(12) = '0' THEN
+									cs0en <= '1';
+								ELSE
+									cs1en <= '1';
+								END IF;
+								
+							END IF;
+					
+						WHEN PIO0_T1_8 =>
+						
+							--T1 IS THE SETUP TIME FOR _DIOR AND _DIOW.
+							IF RnW = '1' THEN
+								renable <= '1';
+							ELSE
+								wenable <= '1';
+							END IF;
+								
+						WHEN PIO0_T2_8 - 2 =>
+						
+							--ASSERT _DSACKx
+							IF RnW = '1' THEN
+								idesacken <= '1';
+							END IF;
+							
+						WHEN PIO0_T2_8 =>
+						
+							--T2 IS THE LENGTH OF TIME _DIOR OR _DIOW IS ASSERTED.
+							--WHEN IT HAS ELAPSED, WE CAN NEGATE THOSE SIGNALS.
+							renable <= '0';
+							wenable <= '0';
+							
+							IF RnW = '1' THEN
+								idesacken <= '0';
+							ELSE
+								idesacken <= '1';
+							END IF;
+							
+						WHEN PIO0_T4_8 =>
+						
+							--T4 IS THE HOLD TIME FOR WRITES.
+							idesacken <= '0';
+							cs0en <= '0';
+							cs1en <= '0';
+							
+						WHEN PIO0_Teoc_8 =>
+							
+							ata_counter <= T0;					
+							
+						WHEN others =>		
+						
+					END CASE;
+					
+				WHEN '1' =>
+					
+					--16 BIT CYCLE.
+					
+					CASE ata_counter IS
+						
+						WHEN T0 =>
+						
+							IF ide_space = '1' AND nAS = '0' THEN
+							
+								ata_counter <= 1;
+								
+								IF A(12) = '0' THEN
+									cs0en <= '1';
+								ELSE
+									cs1en <= '1';
+								END IF;
+								
+							END IF;
+					
+						WHEN PIO0_T1_16 =>
+						
+							--T1 IS THE SETUP TIME FOR _DIOR AND _DIOW.
+							
+							IF RnW = '1' THEN
+								renable <= '1';
+							ELSE
+								wenable <= '1';
+							END IF;
+							
+						WHEN PIO0_T2_16 - 2 =>
+						
+							--ASSERT _DSACKx
+							IF RnW = '1' THEN
+								idesacken <= '1';
+							END IF;
+							
+						WHEN PIO0_T2_16 =>
+						
+							--T2 IS THE LENGTH OF TIME _DIOR OR _DIOW IS ASSERTED.
+							--WHEN IT HAS ELAPSED, WE CAN NEGATE THOSE SIGNALS.
+							renable <= '0';
+							wenable <= '0';
+							
+							IF RnW = '1' THEN
+								idesacken <= '0';
+							ELSE
+								idesacken <= '1';
+							END IF;
+							
+						WHEN PIO0_T4_16 =>
+						
+							--T4 IS THE HOLD TIME FOR WRITES.
+							idesacken <= '0';
+							cs0en <= '0';
+							cs1en <= '0';
+							
+						WHEN PIO0_Teoc_16 =>
+							
+							ata_counter <= T0;					
+							
+						WHEN others =>		
+						
+					END CASE;
+					
+				WHEN others =>
 				
-					--T1 IS THE SETUP TIME FOR _DIOR AND _DIOW.
-					renable <= RnW;
-					wenable <= NOT RnW;			
-					
-				WHEN T2 - 1 =>
-				
-					--ASSERT _DSACKx
-					idesacken <= '1';
-					
-				WHEN T2 =>
-				
-					--T2 IS THE LENGTH OF TIME _DIOR OR _DIOW IS ASSERTED.
-					--WHEN IT HAS ELAPSED, WE CAN NEGATE THOSE SIGNALS.
-					renable <= '0';
-					wenable <= '0';
-					
-				WHEN T2 + 1 =>
-				
-					idesacken <= '0';
-					
-				WHEN Teoc =>
-					
-					ata_counter <= T0;					
-					
-				WHEN others =>		
-				
-			END CASE;
+			END CASE;				
 		
 		END IF;	
 	
