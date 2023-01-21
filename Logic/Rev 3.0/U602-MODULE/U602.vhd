@@ -21,7 +21,7 @@
 ----------------------------------------------------------------------------------
 -- Engineer:       JASON NEUS
 -- 
--- Create Date:    January 20, 2023
+-- Create Date:    January 21, 2023
 -- Design Name:    N2630 U602 CPLD
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
@@ -71,8 +71,7 @@ PORT (
 		IDEDIR : OUT STD_LOGIC;
 		nINT2 : OUT STD_LOGIC;
 		nDSACK : OUT STD_LOGIC_VECTOR (1 DOWNTO 0);
-		nIDEEN : OUT STD_LOGIC;
-		
+		nIDEEN : OUT STD_LOGIC;		
 		
 		--MEM SIGNALS
 		A7M : IN STD_LOGIC; --7MHz AMIGA CLOCK
@@ -105,6 +104,9 @@ architecture Behavioral of U602 is
 
 	SIGNAL idesack : STD_LOGIC;
 	SIGNAL memsack : STD_LOGIC;
+	SIGNAL cpu_space : STD_LOGIC;
+	SIGNAL dsackcycle : STD_LOGIC;
+	SIGNAL dsackcount : INTEGER RANGE 0 TO 2;
 
 begin
 
@@ -121,7 +123,6 @@ begin
 			INTRQ => INTRQ,
 			CPUCLK => CPUCLK,
 			RnW => RnW,
-			FC => FC,
 			nIDEDIS => nIDEDIS,
 			D => D,
 			nIDEACCESS => nIDEACCESS,
@@ -134,7 +135,9 @@ begin
 			IDEDIR => IDEDIR,
 			nINT2 => nINT2,
 			DSACK => idesack,
-			nIDEEN => nIDEEN
+			nIDEEN => nIDEEN,
+			CPU_SPACE => cpu_space,
+			nMEMZ3 => nMEMZ3
 		);
 		
 	-----------------------------------------------
@@ -149,7 +152,6 @@ begin
 			CPUCLK => CPUCLK,
 			A7M => A7M,
 			nGRESET => nGRESET,
-			FC => FC,
 			SIZ => SIZ,
 			RAMSIZE => RAMSIZE,
 			nMEMZ3 => nMEMZ3,
@@ -166,41 +168,60 @@ begin
 			nEMWE => nEMWE,
 			EMCLKE => EMCLKE,
 			nEMCS0 => nEMCS0,
-			nEMCS1 => nEMCS1
+			nEMCS1 => nEMCS1,
+			CPU_SPACE => cpu_space
 		);
+		
+	-----------------------
+	-- CPU SPACE DECODER --
+	-----------------------
+	
+	cpu_space <= '1' WHEN FC(2 downto 0) = "111" ELSE '0';
 
 	-----------------------
 	-- DATA TRANSFER ACK --
 	-----------------------
 	
-	PROCESS (CPUCLK, nGRESET) BEGIN
+	nDSACK <= "00" 
+			WHEN dsackcycle = '1' AND memsack = '1'
+		ELSE "01"
+			WHEN dsackcycle = '1' AND idesack = '1'
+		ELSE "11" 
+			WHEN dsackcycle = '0' AND (nMEMZ3 = '0' OR nIDEACCESS = '0')
+		ELSE "ZZ";
 	
-		IF nGRESET = '0' THEN
+	PROCESS (CPUCLK, nAS, nGRESET) BEGIN
+	
+		IF nAS = '1' OR nGRESET = '0' THEN
 		
-			nDSACK <= "ZZ";
+			dsackcycle <= '0';
+			dsackcount <= 0;
 			
-		ELSIF RISING_EDGE (CPUCLK) THEN
-		
-			IF idesack = '1' THEN
+		ELSIF FALLING_EDGE (CPUCLK) THEN
 			
-				nDSACK <= "01";
+			CASE dsackcount IS
+			
+				WHEN 0 =>
 				
-			ELSIF memsack = '1' THEN
-			
-				nDSACK <= "00";
+					IF memsack = '1' OR idesack = '1' THEN
+					
+						dsackcount <= 1;
+						dsackcycle <= '1';
+						
+					END IF;
+					
+				WHEN 2 =>
 				
-			ELSIF nIDEACCESS = '0' OR nMEMZ3 = '0' THEN
-			
-				nDSACK <= "11";
-			
-			ELSE
-			
-				nDSACK <= "ZZ";
+					dsackcycle <= '0';
+					
+				WHEN others =>
 				
-			END IF;
+					dsackcount <= dsackcount + 1;
+				
+			END CASE;
 			
-		END IF;
-		
+		END IF;	
+	
 	END PROCESS;
 
 end Behavioral;

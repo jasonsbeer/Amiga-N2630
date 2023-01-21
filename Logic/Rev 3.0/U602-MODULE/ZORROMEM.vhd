@@ -40,7 +40,8 @@ entity ZORROMEM is
 		A7M : IN STD_LOGIC; --7MHz AMIGA CLOCK
 		nGRESET : IN STD_LOGIC; --68030 ONLY RESET SIGNAL
 		--nDS : IN STD_LOGIC; --68030 DATA STROBE
-		FC : IN STD_LOGIC_VECTOR (2 DOWNTO 0); --68030 FUNCTION CODES
+		--FC : IN STD_LOGIC_VECTOR (2 DOWNTO 0); --68030 FUNCTION CODES
+		CPU_SPACE : IN STD_LOGIC;
 		SIZ : IN STD_LOGIC_VECTOR (1 DOWNTO 0); --68030 TRANSFER SIZE SIGNALS
 		RAMSIZE : IN STD_LOGIC_VECTOR (2 DOWNTO 0); --RAM SIZE JUMPERS
 		--nCBREQ : IN STD_LOGIC; --68030 CACHE BURST REQUEST
@@ -83,7 +84,7 @@ architecture Behavioral of ZORROMEM is
 	SIGNAL sdramcom : STD_LOGIC_VECTOR (3 DOWNTO 0); --SDRAM COMMAND
 	SIGNAL dsacken : STD_LOGIC;
 	SIGNAL chipselected : STD_LOGIC;
-	SIGNAL cpuspace : STD_LOGIC;
+	--SIGNAL cpuspace : STD_LOGIC;
 	
 	--THE SDRAM COMMAND CONSTANTS ARE: _CS, _RAS, _CAS, _WE
 	CONSTANT ramstate_NOP : STD_LOGIC_VECTOR (3 DOWNTO 0) := "1111"; --SDRAM NOP
@@ -176,11 +177,11 @@ begin
 	--$40000000 - $47FFFFFF = 128MB
 	--$40000000 - $4FFFFFFF = 256MB
 	
-	cpuspace <= '1' WHEN FC(2 DOWNTO 0) = "111" ELSE '0';
+	--cpuspace <= '1' WHEN FC(2 DOWNTO 0) = "111" ELSE '0';
 
 	nMEMZ3 <= '0'
 		WHEN
-			cpuspace = '0' AND A(31 DOWNTO 28) = "0100"
+			CPU_SPACE = '0' AND A(31 DOWNTO 28) = "0100"
 		ELSE 			 
 			'1';
 	
@@ -500,19 +501,8 @@ begin
 	-----------------------------
 	-- 68030 DATA TRANSFER ACK --
 	-----------------------------	
-	
---	nDSACK <=
---			--"10" WHEN gayle_space = '1' AND nAS = '0' --OR (idesacken = '1' AND access16 = '0') --8 BIT PORT
---		--ELSE
---			"01" WHEN idesacken = '1' OR (gayle_space = '1' AND nAS = '0') --AND access16 = '1' --16 BIT PORT
---		ELSE
---			"00" WHEN dsacken = '1' AND nAS = '0' --32 BIT PORT
---		ELSE
---			"11" WHEN gayle_space = '1' OR ide_space = '1' OR nMEMZ3 = '0'
---		ELSE 
---			"ZZ";
 
-	DSACK <= '1' WHEN dsacken = '1' AND nAS = '0' ELSE '0';
+	DSACK <= '1' WHEN dsacken = '1' ELSE '0';
 
 end Behavioral;
 

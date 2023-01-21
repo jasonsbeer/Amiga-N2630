@@ -41,12 +41,13 @@ entity IDE is
 		INTRQ : IN STD_LOGIC;
 		CPUCLK : IN STD_LOGIC;
 		RnW : IN STD_LOGIC;
-		FC : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
-		nIDEDIS : IN STD_LOGIC;
-
+		nIDEDIS : IN STD_LOGIC;		
+		CPU_SPACE : IN STD_LOGIC;
+		nMEMZ3 : IN STD_LOGIC;
+		
 		D : INOUT STD_LOGIC;
-
-		nIDEACCESS : INOUT STD_LOGIC;
+		
+		nIDEACCESS : OUT STD_LOGIC;
 		nDIOW : OUT STD_LOGIC;
 		nDIOR : OUT STD_LOGIC;
 		nCS0 : OUT STD_LOGIC;
@@ -56,7 +57,7 @@ entity IDE is
 		IDEDIR : OUT STD_LOGIC;
 		nINT2 : OUT STD_LOGIC;
 		DSACK : OUT STD_LOGIC;
-		nIDEEN : OUT STD_LOGIC
+		nIDEEN : OUT STD_LOGIC		
 	
 	);
 
@@ -78,7 +79,7 @@ architecture Behavioral of IDE is
 	SIGNAL wenable : STD_LOGIC;
 	SIGNAL idesacken : STD_LOGIC;
 	SIGNAL access16 : STD_LOGIC;
-	SIGNAL cpu_space : STD_LOGIC;
+	SIGNAL readcycle : STD_LOGIC;
 	
 	SIGNAL ata_counter : INTEGER RANGE 0 TO 30;	
 	
@@ -113,11 +114,10 @@ begin
 	---------------------
 	-- ADDRESS DECODES --
 	---------------------
-
-	cpu_space <= '1' WHEN FC(2 downto 0) = "111" ELSE '0';
-	ide_space <= '1' WHEN A(23 DOWNTO 15) = "110110100" AND cpu_space = '0' ELSE	'0';		
-	gayleid_space <= '1' WHEN A(23 DOWNTO 15) = "110111100" AND cpu_space = '0' AND nIDEDIS = '1' ELSE '0';
-	gaylereg_space <= '1' WHEN A(23 DOWNTO 15) = "110110101" AND cpu_space = '0' ELSE '0';
+	
+	ide_space <= '1' WHEN A(23 DOWNTO 15) = "110110100" AND CPU_SPACE = '0' AND nMEMZ3 = '1' ELSE '0';		
+	gayleid_space <= '1' WHEN A(23 DOWNTO 15) = "110111100" AND CPU_SPACE = '0' AND nMEMZ3 = '1' AND nIDEDIS = '1' ELSE '0';
+	gaylereg_space <= '1' WHEN A(23 DOWNTO 15) = "110110101" AND CPU_SPACE = '0' AND nMEMZ3 = '1' ELSE '0';
 
 	-------------------------------
 	-- ADDRESS DECODE SIGNALLING --
@@ -131,15 +131,7 @@ begin
 	-- DATA TRANSFER ACK --
 	-----------------------
 	
-	--nDSACK1 <= '0' 
-	--		WHEN (gayle_space = '1' AND nDS = '0') OR idesacken = '1' 
-	--	ELSE '1' 
-	--		WHEN (ide_space = '1' AND idesacken = '0') OR gayle_space = '1'
-	--	ELSE 'Z';
-
 	DSACK <= '1' WHEN (gayle_space = '1' AND nDS = '0') OR idesacken = '1' ELSE '0';
-	--DSACK <= '1' WHEN idesacken = '1' ELSE '0';
-	--GSACK <= '1' WHEN gayle_space = '1' AND nDS = '0' ELSE '0';
 	
 	------------------------------------------------------
 	-- GAYLE COMPATABLE HARD DRIVE CONTROLLER INTERFACE --
@@ -169,6 +161,8 @@ begin
 	------------------------------------
 	
 	D <= dataoutgayle WHEN (gayleid_space = '1' OR gaylereg_space = '1') AND RnW = '1' ELSE 'Z';
+	
+	readcycle <= '1' WHEN RnW = '1' ELSE '0';
 
 	PROCESS (nDS, nGRESET) BEGIN
 	
@@ -186,7 +180,8 @@ begin
 				--BELOW IS A SIMPLE SHIFT REGISTER TO LOAD THE GAYLE ID VALUE. 
 				--IF ANYTHING IS WRITTEN TO $DE1000, THAT MEANS THE REGISTER HAS BEEN RESET AND WE NEED TO RE-ESTABLISH GAYLE.
 		
-				IF RnW = '1' THEN
+				--IF RnW = '1' THEN
+				IF readcycle = '1' THEN
 				
 					dataoutgayle <= gayleid(3);
 					gayleid <= gayleid (2 DOWNTO 0) & "0";
@@ -199,7 +194,8 @@ begin
 				
 			ELSIF gaylereg_space = '1' THEN
 			
-				IF RnW = '1' THEN
+				--IF RnW = '1' THEN
+				IF readcycle = '1' THEN
 				
 					--READ MODE
 					
@@ -241,8 +237,7 @@ begin
 							
 					END CASE;				
 				
-				END IF;
-				
+				END IF;				
 			
 			END IF;
 			
