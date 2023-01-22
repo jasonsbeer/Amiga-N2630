@@ -1,18 +1,18 @@
 # Assembly Notes, BOM, and Ramblings
 
-IMPORTANT INFORMATION. It is highly recommended you read this entire page before committing to assemble the N2630. You must also review any postings in the [Issues](/issues) tab to fully understand any limitations or issues.
+IMPORTANT INFORMATION. It is highly recommended you read this entire page before committing to assemble the N2630. You must also review any postings in the [Issues]([/issues](https://github.com/jasonsbeer/Amiga-N2630/issues) tab to fully understand any limitations or issues.
 
 **Disclaimer:** This project is free and open source. It is a very complex project and should only be undertaken by individuals experienced in SMD assembly techniques. It requires knowledge and tools for programming complex logic devices and EPROMs. No warranty or guarantee is offered that it will work for your particular situation. You assume all risk should you choose to build it.
 
 ## Ordering PCBs
 
-The N2630 PCB is a full-size Amiga 2000 CPU card with 4 layers. I have been working with JLCPCB for some time and have been happy with the results. You can find the Gerber files [here](/Gerber). These are set up for JLCPCB, but should be acceptable to most fabs. When ordering, it is recommended you choose the ENIG surface finish and chamfer the card edge. Here are the production options I choose when ordering the N2630 PCB. Defining the layer stackup is optional, but I recommend you define the order (Specify Layer Sequence). Of course, you can choose the solder mask color you prefer, but that may add time and cost to the order.
+The N2630 PCB is a full-size Amiga 2000 CPU card with 4 layers. I have been working with JLCPCB for some time and have been happy with the results. You can find the Gerber files [here](/Gerber). These are set up for JLCPCB, but should be acceptable to most fabs. When ordering, it is recommended you choose the ENIG surface finish and chamfer the card edge. Here are the production options I choose when ordering the N2630 PCB. Defining the layer stackup is optional, but I recommend you define the order (Specify Layer Sequence). Of course, you can choose the solder mask color you prefer. Be aware, non-green solder masks may add time and cost to the order.
 
 <img src="/Images/jlcpcb1a.jpg" width = "600">
 
 <img src="/Images/jlcpcb2a.jpg" width = "600">
 
-<img src="/Images/jlcpcb3a.jpg" width = "600">
+<img src="/Images/jlcpcb3a.jpg" width = "400">
 
 ## Bill of Materials  
 
