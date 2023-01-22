@@ -6,11 +6,11 @@ The N2630 is a Motorolla 68030 CPU card with additional RAM and IDE device port 
 <p align="center"><img src="/Images/N2630-30med.png" width="750"></p>
 
 # CURRENT STATE:
-**Updated 19-Dec-2022 - This project is still under active development and is considered beta. There may be errors on the board, in the CPLD logic, or in this text, and may not work in every situation. Build at your own risk. See the issues tab for more information. It is working on my A2000 EATX test machine at 50MHz with the MC68882, Zorro 2 RAM, and Zorro 3 RAM fully functional. Revision 3.0 is the current revision.**
+Revision 3.0 is first production release. See the [issues]/issues/ tab for known issues.
 
 ## Features
-1. Motorola 68030 microprocessor.
-2. Motorola 68882 math coprocessor.
+1. Motorola 68030 microprocessor running at 50MHz.
+2. Motorola 68882 math coprocessor running up to 50MHz.
 3. 4 or 8 megabytes of Zorro 2 Fast RAM.
 4. 16 to 256 megabytes of Zorro 3 Fast RAM.
 5. IDE port with 40-pin cable and CF card options.
@@ -27,7 +27,7 @@ This card may be installed in any Amiga 2000 computer. Installation is simply in
 By default, the N2630 starts in 68030 mode. When in 68030 mode, all installed RAM and the IDE device port are active.
 
 ## 68000 Mode
-When desired, the 68030 may be disabled during a cold or warm start. This results in the Amiga using the 68000 processor. This may be desired when software does not run correctly on the 68030 processor. To start up in 68000 mode, hold down the right mouse button during startup. Select "68000" and the Amiga will reset with the 68000 as the active processor. When in 68000 mode, the IDE port and Zorro 3 RAM are inactive. The Zorro 2 RAM continues to be available. Motorola 68000 mode is not available with A2000 motherboards.
+When desired, the 68030 may be disabled during a cold or warm start. This results in the Amiga falling back to the 68000 processor. This may be desired when software does not run correctly on the 68030 processor. To start up in 68000 mode, hold down the right mouse button during startup. Select "68000" and the Amiga will reset with the 68000 as the active processor. When in 68000 mode, the IDE port and on-board RAM are inactive. Motorola 68000 mode is not available with A2000 motherboards.
 
 ## 68882 Math Coprocessor (FPU)
 The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the MC68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 3, J202). The PLCC-68 footprint is supported.
@@ -98,7 +98,7 @@ Desired Zorro</br>3 RAM (MB)|Starting Address|Ending Address
 256|$40000000|$4FFFFFFF
 
 ## IDE Port
-The N2630 includes a buffered and host terminated Gayle compatable AUTOBOOT<sup>[A]</sup> IDE port compatable with hard drives and ATAPI<sup>[B]</sup> devices. The IDE port supports two devices (master and slave). For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
+The N2630 includes a buffered, host terminated Gayle compatable AUTOBOOT<sup>[A]</sup> IDE port compatable with hard drives and ATAPI<sup>[B]</sup> devices. The IDE port supports two devices (master and slave). For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
 
 The IDE cable header and the compact flash card adapter are on the same IDE port. They may be used simultaneously, but one device must be set to master, the other to slave. The IDE port only supports two devices, so when the CF card slot is in use, only one device may be installed on the IDE cable.
 
