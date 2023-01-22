@@ -1,4 +1,4 @@
-These are the logic equations for U601, which includes the Zorro 2 RAM controller, AUTOCONFIG, and ROM select logic.
+These are the logic equations for U601, which includes the Zorro 2 RAM and DMA controller, AUTOCONFIG, and ROM select logic.
 
 Revision History
 Version|Release Date|Comments
