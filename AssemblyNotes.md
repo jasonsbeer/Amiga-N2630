@@ -1,6 +1,6 @@
 # Assembly Notes, BOM, and Ramblings
 
-IMPORTANT INFORMATION. It is highly recommended you read this entire page before committing to assemble the N2630. You must also review any postings in the [Issues]([/issues](https://github.com/jasonsbeer/Amiga-N2630/issues) tab to fully understand any limitations or issues.
+IMPORTANT INFORMATION. It is highly recommended you read this entire page before committing to assemble the N2630. You must also review any postings in the [Issues](https://github.com/jasonsbeer/Amiga-N2630/issues) tab to fully understand any limitations or issues.
 
 **Disclaimer:** This project is free and open source. It is a very complex project and should only be undertaken by individuals experienced in SMD assembly techniques. It requires knowledge and tools for programming complex logic devices and EPROMs. No warranty or guarantee is offered that it will work for your particular situation. You assume all risk should you choose to build it.
 
