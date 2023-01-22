@@ -1,8 +1,18 @@
 # Assembly Notes, BOM, and Ramblings
 
-IMPORTANT INFORMATION. It is highly recommended you read this entire page before committing to assemble the N2630.
+IMPORTANT INFORMATION. It is highly recommended you read this entire page before committing to assemble the N2630. You must also review any postings in the [Issues](/issues) tab to fully understand any limitations or issues.
 
-**Disclaimer:** This project is free and open source. It is a complex project and should only be undertaken by individuals experienced in SMD assembly techniques. No warranty or guarantee is offered that it will work for your particular situation. You assume all risk should you choose to build it.
+**Disclaimer:** This project is free and open source. It is a very complex project and should only be undertaken by individuals experienced in SMD assembly techniques. It requires knowledge and tools for programming complex logic devices and EPROMs. No warranty or guarantee is offered that it will work for your particular situation. You assume all risk should you choose to build it.
+
+## Ordering PCBs
+
+The N2630 PCB is a full-size Amiga 2000 CPU card with 4 layers. I have been working with JLCPCB for some time and have been happy with the results. You can find the Gerber files [here](/Gerber). These are set up for JLCPCB, but should be acceptable to most fabs. When ordering, it is recommended you choose the ENIG surface finish and chamfer the card edge. Here are the production options I choose when ordering the N2630 PCB. Defining the layer stackup is optional, but I recommend you define the order (Specify Layer Sequence). Of course, you can choose the solder mask color you prefer, but that may add time and cost to the order.
+
+<img src="/Images/jlcpcb1a.jpg" width = "600">
+
+<img src="/Images/jlcpcb2a.jpg" width = "600">
+
+<img src="/Images/jlcpcb3a.jpg" width = "600">
 
 ## Bill of Materials  
 
@@ -31,12 +41,13 @@ Discussion programming CPLDs is not in the scope of this document, but many reso
 Most cheap EPROM programmers will handle the 27C256 EPROMs of the N2630. A popular one is the TL866II, but there are other options. There are a lot of these in the community. Someone may be able to assist if you do not wish to purchase a programmer. The EPROMs are programmed independently of the N2630. The ROMs can be found [here](/ROM/).
 
 ## Troubleshooting
-1) Check for solder bridges or bad solder joints. These are likely to be the most likely cause of failure.
+1) Check for solder bridges or bad solder joints.
 2) Double check the jumpers. It is critical the jumpers be set correctly for proper and reliable function.
 3) Disable the Zorro 2 RAM, Zorro 3 RAM, and the IDE port. The Amiga 2000 will boot without these and it may help narrow down where the issue lies.
 
-Follow these troubleshooting order of operations if your Amiga 2000 fails to start in 68030 mode or starts to a black screen. If these steps are executing correctly, you should start in 68030 mode and see the Kickstart screen.
+Follow these troubleshooting order of operations if your Amiga 2000 fails to start in 68030 mode or starts to a black screen. If these steps are executing correctly, you should start in 68030 mode and see the Kickstart screen. There a test points that can be used to help in troubleshooting process.
 
+Table 1. N2630 startup order of operations.
 Step|Expected Function|Possible Failure
 -|-|-
 1|N2630 asserts bus request (_BR at MC68000)|Bad solder joint. No power to U600.
@@ -49,6 +60,14 @@ Step|Expected Function|Possible Failure
 6|N2630 negates _CSROM|Bad solder joints on A(15..1) or D(31..16) at U102, U103, or MC68030.
 7|N2630 drives MC68000/A2000 data and address buses|Bad solder joint or no power at U701, U702, U703, U704, U705, U706, U707. Bad solder joint signals _AAENA, AADIR, DRSEL, _ADOEH, _ADOEL, ADDIR, _AAS, _LDS, _UDS, AR_W, etc...
 8|Kickstart screen appears|
+
+Table 2. N2630 test points.
+Test Point|Meaning|Purpose
+-|-|-
+SMDIS|State Machine Disable|This signal is HIGH when onboard ROM, RAM, or IDE address spaces are active.
+_MEMZ2|Zorro 2 Memory Access|This signal is LOW when onboard Zorro 2 RAM address space is active.
+_MEMZ3|Zorro 3 Memory Access|This signal is LOW when onboard Zorro 3 RAM address space is active.
+_IDEACCESS|IDE Access|This signal is LOW when onboard IDE address space is active.
 
 ## Ramblings
 The Zorro 3 RAM, IDE Port, and MC68882 are all optional. If you choose not to install the Zorro 3 RAM and/or IDE port, you can omit the associated logic and passives. If you do this, be sure to disable these by properly setting the matching jumper. The MC68882 is auto-detected and has no enable/disable jumper.
