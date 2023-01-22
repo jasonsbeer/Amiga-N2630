@@ -5,8 +5,8 @@ The N2630 is a Motorolla 68030 CPU card with additional RAM and IDE device port 
 
 <p align="center"><img src="/Images/N2630-30med.png" width="750"></p>
 
-# CURRENT STATE:
-Revision 3.0 is first production release. See the [issues]/issues/ tab for known issues.
+## CURRENT STATUS:
+Revision 3.0 is first production release. See the [issues](https://github.com/jasonsbeer/Amiga-N2630/issues) tab for known issues.
 
 ## Features
 1. Motorola 68030 microprocessor running at 50MHz.
@@ -142,6 +142,9 @@ J202|FPU Clock|X1<sup>[A]</sup>|X2<sup>[B]</sup>
 
 <sup>A</sup>FPU clock from X1. Factory default.  
 <sup>B</sup>FPU clock from X2.
+
+## Revision History
+Revision 3.0 - Initial production release.
 
 ## Acknowledgements
 Dave Haynie for sharing the A2630 technical details with the Amiga community.  
