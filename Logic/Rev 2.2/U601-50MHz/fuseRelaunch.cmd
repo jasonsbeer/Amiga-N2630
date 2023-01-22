@@ -1,1 +1,0 @@
--intstyle "ise" -incremental -o "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/Rev22/U601-50MHz/U601_isim_beh.exe" -prj "/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/Rev22/U601-50MHz/U601_beh.prj" "work.U601" 
