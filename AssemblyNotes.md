@@ -16,11 +16,13 @@ The N2630 PCB is a full-size Amiga 2000 CPU card with 4 layers. I have been work
 
 ## Bill of Materials  
 
-The BOM is found [here](/N2630-REV30-BOM.csv). An interactive BOM can be found [here](/N2630-REV30-ibom.html). This can be used to locate components on the board. Download the file and open it your browser.
+The official BOM is found [here](/N2630-REV30-BOM.csv) and should be used for ordering parts. An interactive BOM can be found [here](/N2630-REV30-ibom.html). This can be used to locate components on the board. Download the file and open it your browser.
 
-Most components to assemble the N2630 are available at any good electronic supply house. The MC68030 and MC68882 will need to be obtained through a retailer that deals in legacy Motorola devices. At the time of writing this, you should expect to pay US$30 - $50 each. DO NOT buy components where you get five chips for $20. These are almost always counterfeit or remarked chips. Save yourself a lot of misery and pay for the real ones.
+The MC68030 and MC68882 need to be obtained through a retailer that handles legacy Motorola devices. At the time of writing this, you should expect to pay US$30 - $50 each. DO NOT buy components where you get five chips for $20. These are likely counterfeit or remarked chips. Save yourself the misery and pay for the real ones.
 
-Most compents in the BOM are general purpose passive and logic parts with many compatable alternatives. It is difficult to keep a list of part numbers that remains valid, even for a short period of time. Because of this, only the part type, value, and footprint is listed. For some parts, to avoid ambiguity, I have listed Digikey part numbers to help you understand what is needed. You can cross reference the Digikey part number should it ever go out of stock.
+Most compents in the BOM are general purpose passive and logic parts with many compatable alternatives. Due to availability of parts, it is difficult to keep a list of part numbers that remains valid even for a short period of time. I have listed Digikey part numbers I used in my most recent order to help you understand what is needed. You can cross reference the Digikey part number should these go out of stock.
+
+**It is important to use the -10 speed rated Xilinx CPLDs in this project. The logic equations are designed for that speed. Going to faster rated CPLDs may break the timings and result in erratic behavior.**
 
 PGA-128 sockets are very difficult to find and can be very expensive. A good alternative is to use machine pin strips to make your own socket. It is not pretty, but it works well. The Motorola parts you obtain may be pulls and have bent pins, which makes it very difficult to line up to the socket. I recommend adding the machine pin socket strips to the MC68030 one row at a time. You can then install the entire assembly for soldering. This greatly simplifies installation of the MC68030 on the board.
 
