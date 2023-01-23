@@ -31,6 +31,7 @@ PGA-128 sockets are very difficult to find and can be very expensive. A good alt
 1) Be sure to select 166MHz SDRAM. Slower SDRAM may not work at 50MHz.
 2) Sockets are NOT listed in the BOM. I prefer 3M sockets for my projects.
 3) Components not listed on the BOM are reserved for future use and do not need to be populated.
+4) I recommend you do not install the 68882 (or socket) until everything is known to work. The through holes here are very convienient for connecting probes in the event troublshooting is required.
 
 ## Programming the CPLDs
 The three CPLDs (U600, U601, and U602) must be programmed before the N2630 will function. Each CPLD has a dedicated programming port, CN600, CN601, and CN602. The best way to program these is to plug the card into the Amiga, power it on, and program it while in circuit with power coming from the Amiga 2000. The JED files can be found [here](/Logic/JED). Make certain to program each CPLD with the matching JED file for your hardware revision. 
