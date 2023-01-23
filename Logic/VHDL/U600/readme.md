@@ -3,4 +3,4 @@ These are the logic equations for U600, which includes the Motorolla 68000 and 6
 Revision History
 Version|Release Date|Comments
 -|-|-
-1.0.0|January xx, 2023|Initial Release
+1.0.0|January 21, 2023|Initial Release
