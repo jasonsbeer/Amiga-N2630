@@ -8,6 +8,11 @@ The N2630 is a 50MHz Motorolla 68030 CPU card with additional RAM and IDE device
 ## CURRENT STATUS:
 Revision 3.0 is first production release. See the [issues](https://github.com/jasonsbeer/Amiga-N2630/issues) tab for known issues.
 
+<p align="center">
+<img src="/Images/N2630REV30.jpg" width="400">
+<img src="/Images/workbench.jpg" width="400">
+</p>
+
 ## Features
 1. Motorola 68030 microprocessor running at 50MHz.
 2. Motorola 68882 math coprocessor running up to 50MHz.
