@@ -71,6 +71,7 @@ SMDIS|State Machine Disable|This signal is HIGH when onboard ROM, RAM, or IDE ad
 _MEMZ2|Zorro 2 Memory Access|This signal is LOW when onboard Zorro 2 RAM address space is active.
 _MEMZ3|Zorro 3 Memory Access|This signal is LOW when onboard Zorro 3 RAM address space is active.
 _IDEACCESS|IDE Access|This signal is LOW when onboard IDE address space is active.
+MODE68K|68000 Mode|This signal is HIGH when the N2630 is operating in Motorola 68000 mode. Low when in Motorola 68030 mode.
 
 ## Ramblings
 The Zorro 3 RAM, IDE Port, and MC68882 are all optional. If you choose not to install the Zorro 3 RAM and/or IDE port, you can omit the associated logic and passives. If you do this, be sure to disable these by properly setting the matching jumper. The MC68882 is auto-detected and has no enable/disable jumper.
