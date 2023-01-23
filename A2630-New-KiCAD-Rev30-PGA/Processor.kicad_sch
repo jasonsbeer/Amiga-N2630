@@ -6,7 +6,7 @@
 
   (title_block
     (title "Amiga N2630")
-    (date "2022-12-04")
+    (date "2023-01-23")
     (rev "3.0")
   )
 
@@ -7015,7 +7015,7 @@
     (property "Reference" "X2" (id 0) (at 33.02 233.045 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "25MHz" (id 1) (at 33.02 234.95 0)
+    (property "Value" "50MHz" (id 1) (at 33.02 234.95 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "Oscillator:Oscillator_DIP-8" (id 2) (at 55.245 250.825 0)

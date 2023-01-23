@@ -6,7 +6,7 @@
 
   (title_block
     (title "Amiga N2630")
-    (date "2022-12-04")
+    (date "2023-01-23")
     (rev "3.0")
   )
 
@@ -4879,7 +4879,7 @@
   )
 
   (symbol (lib_id "Device:R") (at 355.346 194.31 0) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid 64be4f9a-0d3b-4e55-bca4-feee592b3dc8)
     (property "Reference" "R601" (id 0) (at 356.616 191.77 90)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -5328,7 +5328,7 @@
   )
 
   (symbol (lib_id "Switch:SW_SPDT") (at 336.55 204.724 0) (unit 1)
-    (in_bom yes) (on_board yes) (fields_autoplaced)
+    (in_bom no) (on_board yes) (fields_autoplaced)
     (uuid bb005ae7-d652-43da-a50e-9284b169f881)
     (property "Reference" "SW1" (id 0) (at 336.55 198.1032 0))
     (property "Value" "MODE" (id 1) (at 336.55 200.6401 0))
@@ -5576,7 +5576,7 @@
   )
 
   (symbol (lib_id "Device:R") (at 350.266 194.31 0) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid eca625e1-ae69-4eab-96b7-87c1d8b222d8)
     (property "Reference" "R600" (id 0) (at 351.536 191.77 90)
       (effects (font (size 1.27 1.27)) (justify left))

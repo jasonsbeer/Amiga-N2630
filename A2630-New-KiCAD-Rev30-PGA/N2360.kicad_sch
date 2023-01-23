@@ -6,7 +6,7 @@
 
   (title_block
     (title "Amiga N2630")
-    (date "2022-12-04")
+    (date "2023-01-23")
     (rev "3.0")
   )
 
@@ -2045,7 +2045,7 @@
       (reference "X1") (unit 1) (value "25MHz") (footprint "Oscillator:Oscillator_DIP-8")
     )
     (path "/00000000-0000-0000-0000-000061d79ebc/00000000-0000-0000-0000-000062d87b55"
-      (reference "X2") (unit 1) (value "25MHz") (footprint "Oscillator:Oscillator_DIP-8")
+      (reference "X2") (unit 1) (value "50MHz") (footprint "Oscillator:Oscillator_DIP-8")
     )
   )
 )

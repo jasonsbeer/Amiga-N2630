@@ -6,7 +6,7 @@
 
   (title_block
     (title "Amiga N2630")
-    (date "2022-12-04")
+    (date "2023-01-23")
     (rev "3.0")
   )
 
@@ -6621,7 +6621,7 @@
   )
 
   (symbol (lib_id "Device:R") (at 146.05 192.278 0) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid 08d3dda2-fa22-4dc0-8f7c-ef6e3f2bb6f4)
     (property "Reference" "R934" (id 0) (at 147.32 189.738 90)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -6797,7 +6797,7 @@
   )
 
   (symbol (lib_id "Device:R") (at 139.954 192.278 0) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid 2972519f-aa67-439d-a9aa-ef6d437697a0)
     (property "Reference" "R932" (id 0) (at 141.224 189.738 90)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -7269,7 +7269,7 @@
   )
 
   (symbol (lib_id "Jumper:Jumper_2_Open") (at 131.826 213.614 0) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid 5c084575-d38b-494e-8b21-50308dc612d4)
     (property "Reference" "J903" (id 0) (at 131.826 211.074 0))
     (property "Value" "PIO1" (id 1) (at 135.636 216.154 0)
@@ -7465,7 +7465,7 @@
   )
 
   (symbol (lib_id "Device:R") (at 143.002 192.278 0) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid 83a29c70-79f5-4899-9956-adf6417042c1)
     (property "Reference" "R933" (id 0) (at 144.272 189.738 90)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -7791,7 +7791,7 @@
   )
 
   (symbol (lib_id "Jumper:Jumper_2_Open") (at 131.826 218.694 0) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid 99bfc67b-1e26-4624-b546-17c71b96c8ef)
     (property "Reference" "J904" (id 0) (at 131.826 216.154 0))
     (property "Value" "PIO2" (id 1) (at 135.636 221.234 0)
@@ -7927,7 +7927,7 @@
   )
 
   (symbol (lib_id "Jumper:Jumper_2_Open") (at 131.826 208.534 0) (unit 1)
-    (in_bom yes) (on_board yes)
+    (in_bom no) (on_board yes)
     (uuid c06f2b33-cb89-480c-ac03-ef1f1e69ae3b)
     (property "Reference" "J902" (id 0) (at 131.826 205.994 0))
     (property "Value" "PIO0" (id 1) (at 135.636 211.074 0)
