@@ -6,13 +6,15 @@ IMPORTANT INFORMATION. It is highly recommended you read this entire page before
 
 ## Ordering PCBs
 
-The N2630 PCB is a full-size Amiga 2000 CPU card with 4 layers. I have been working with JLCPCB for some time and have been happy with the results. You can find the Gerber files [here](/Gerber). These are set up for JLCPCB, but should be acceptable to most fabs. When ordering, it is recommended you choose the ENIG surface finish and chamfer the card edge. Here are the production options I choose when ordering the N2630 PCB. Defining the layer stackup is optional, but I recommend you define the order (Specify Layer Sequence). Of course, you can choose the solder mask color you prefer. Be aware, non-green solder masks may add time and cost to the order.
+The N2630 PCB is a full-size Amiga 2000 CPU card with 4 layers. You can find the Gerber files [here](/Gerber). When ordering, it is recommended you choose the ENIG surface finish and chamfer the card edge. The layer stackup is shown below, in the event you need to define it as part of your order.
 
-<img src="/Images/jlcpcb1a.jpg" width = "600">
+<!--<img src="/Images/jlcpcb1a.jpg" width = "600">
 
-<img src="/Images/jlcpcb2a.jpg" width = "600">
+<img src="/Images/jlcpcb2a.jpg" width = "600">-->
 
 <img src="/Images/jlcpcb3a.jpg" width = "400">
+
+JLCPCB recently changed their production capabilites and will reject the N2630 PCB due to trace clearance.
 
 ## Bill of Materials  
 
