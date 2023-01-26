@@ -9,7 +9,7 @@ IMPORTANT INFORMATION. It is highly recommended you read this entire page before
 The N2630 PCB is a full-size Amiga 2000 CPU card with 4 layers. You can find the Gerber files [here](/Gerber). When ordering, it is recommended you choose the ENIG surface finish and chamfer the card edge. The layer stackup is shown below, in the event you need to define it as part of your order.
 
 Board dimensions = 124.5mm x 318.4mm  
-Track Spacing = 4/4mil  
+Track/Spacing = 4/4mil  
 Min Hole Size = 0.3mm  
 
 <!--<img src="/Images/jlcpcb1a.jpg" width = "600">
