@@ -155,7 +155,7 @@ J202|FPU Clock|X1<sup>[A]</sup>|X2<sup>[B]</sup>
 <sup>B</sup>FPU clock from X2.
 
 ## Revision History
-Revision 3.0 - Initial production release.
+Revision 3.0 - Initial production release.  
 Revision 3.0.1 - Added copper thieving areas to top and bottom layers.
 
 ## Acknowledgements
