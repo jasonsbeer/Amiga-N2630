@@ -32,6 +32,8 @@ This card may be installed in any Amiga 2000 computer. Installation is simply in
 
 **IMPORTANT:** Before installing, it is necessary to determine if you have an early, non-cost reduced motherboard. If your motherboard is marked "Made In Germany" and "(C) 1986 Commodore" on the left side of the board, you have a non-cost reduced Amiga 2000 board, designated "A2000" in this documentation. An example of a non-cost reduced Amiga 2000 motherboard can be see [here](http://amiga.resource.cx/photos/a2000,1). In the event you have an non-cost reduced "A2000" motherboard, you must remove the Motorola 68000 processor from the Amiga 2000 motherboard and place a jumper at J302 of the N2630.  All other Amiga 2000 motherboards are designated "B2000" and should leave the Motorola 68000 in place.
 
+**NOTE: The revision 3.x.x cards will not work on an original Germal A2000.**
+
 ## 68030 Mode
 By default, the N2630 starts in 68030 mode. When in 68030 mode, all installed RAM and the IDE device port are active.
 
