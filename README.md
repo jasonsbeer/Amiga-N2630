@@ -3,7 +3,7 @@ The N2630 is a 50MHz Motorolla 68030 CPU card with additional RAM and IDE device
 
 <br />Look for the N2630 channel on Discord: https://discord.gg/NU7SPYfNFj  
 
-<p align="center"><img src="/Images/N2630-30med.png" width="750"></p>
+<p align="center"><img src="/Images/N2630-30-a.jpg" width="750"></p>
 
 ## CURRENT STATUS:
 Revision 3.0.1 is the current production release. See the [issues](https://github.com/jasonsbeer/Amiga-N2630/issues) tab for known issues.
