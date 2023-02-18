@@ -1,0 +1,45 @@
+ Quantity,Value,Footprint,Digikey Part,Comments
+61,0.1uF,Capacitor_SMD:C_0805_2012Metric,1276-1003-1-ND,
+1,330pF,Capacitor_SMD:C_0805_2012Metric,732-7855-1-ND,
+1,0.22uF,Capacitor_SMD:C_0805_2012Metric,732-7675-1-ND,
+4,22pF,Capacitor_SMD:C_0805_2012Metric,732-7848-1-ND,
+8,10uF,Capacitor_THT:CP_Radial_D5.0mm_P2.00mm,732-9316-1-ND,
+2,47uF,Capacitor_THT:CP_Radial_D5.0mm_P2.00mm,732-9168-1-ND,
+2,4.7uF,Capacitor_SMD:C_0805_2012Metric,732-7619-1-ND,
+2,0.01uF,Capacitor_SMD:C_0805_2012Metric,732-8074-1-ND,
+1,ATA/IDE,N2630:ATA_Header_2x20_P2.54mm,S9175-ND,
+1,LED,Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical,-,2.54mm pitch.
+1,COMPACT FLASH ATA,N2630 Libraries:COMPACT-FLASH-SLOT,732-693120035011CT-ND,
+1,25/FPU,Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical,-,2.54mm pitch.
+7,Jumper_NO_Small,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,-,2.54mm pitch.
+1,Z3 DISABLE,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,-,2.54mm pitch.
+1,IDE DISABLE,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,-,2.54mm pitch.
+1,CF SEL,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,-,2.54mm pitch.
+1,CABLE SELECT,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,-,2.54mm pitch.
+39,1K,Resistor_SMD:R_0805_2012Metric,RMCF0805FT1K00CT-ND,
+11,68,Resistor_SMD:R_0805_2012Metric,RMCF0805JT68R0CT-ND,
+10,3.3K,Resistor_SMD:R_0805_2012Metric,RMCF0805JT3K30CT-ND,
+1,2.7K,Resistor_SMD:R_0805_2012Metric,RMCF0805FT2K70CT-ND,
+1,4.7K,Resistor_SMD:R_0805_2012Metric,RMCF0805FT4K70CT-ND,
+23,22,Resistor_SMD:R_0805_2012Metric,RMCF0805FT22R0CT-ND,
+1,82,Resistor_SMD:R_0805_2012Metric,RMCF0805JT82R0CT-ND,
+7,1K,Resistor_THT:R_Array_SIP9,4609X-101-102LF-ND,
+4,3.3K,Resistor_THT:R_Array_SIP9,4609X-101-332LF-ND,
+2,27C256,Package_DIP:DIP-28_W15.24mm,-,
+1,MC68030,PGA-128 Socket,-,
+1,MC68882,PLCC-68 Socket,3M6811B1-ND,
+1,74AHCT04,Package_SO:SOIC-14_3.9x8.7mm_P1.27mm,296-31832-1-ND,
+1,74HCT05,Package_SO:SOIC-14_3.9x8.7mm_P1.27mm,MM74HCT05MXCT-ND,
+2,SDRAM(4Mx16),Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm,W9864G6KH-6-ND,
+4,SDRAM(16Mx16),Package_SO:TSOP-II-54_22.2x10.16mm_P0.8mm,W9825G6KH-6-ND,
+4,74LVC245,Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm,1727-3105-1-ND,
+1,XC9572XL-10VQ64,Package_QFP:TQFP-64_10x10mm_P0.5mm,-,
+2,XC95144XL-10TQ144,Package_QFP:TQFP-144_20x20mm_P0.5mm,-,
+1,74HCT244,Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm,74HCT244DCT-ND,
+1,74HCT174,Package_SO:SOIC-16_3.9x9.9mm_P1.27mm,1727-3383-ND,
+2,74FCT646,Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm,296-33244-5-ND,
+5,74HCT245,Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm,74HCT245DCT-ND,
+1,AP7361C-33ER,Package_TO_SOT_SMD:SOT-223-3_TabPin2,AP7361C-33ER-13DICT-ND,
+3,74HCT245,Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm,296-8404-1-ND,
+1,50MHz,Oscillator:Oscillator_DIP-8,535-9183-5-ND,
+1,Up To 50MHz,Oscillator:Oscillator_DIP-8,,Optional if you do not clock 68882 at 50MHz.
