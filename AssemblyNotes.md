@@ -50,9 +50,10 @@ Discussion programming CPLDs is not in the scope of this document, but many reso
 Most cheap EPROM programmers will handle the 27C256 EPROMs of the N2630. A popular one is the TL866II, but there are other options. There are a lot of these in the community. Someone may be able to assist if you do not wish to purchase a programmer. The EPROMs are programmed independently of the N2630. The ROMs can be found [here](/ROM/).
 
 ## Troubleshooting
-1) Check for solder bridges or bad solder joints.
-2) Double check the jumpers. It is critical the jumpers be set correctly for proper and reliable function.
-3) Disable the Zorro 2 RAM, Zorro 3 RAM, and the IDE port. The Amiga 2000 will boot without these and it may help narrow down where the issue lies.
+1) Make sure you have the newest firmware logic installed.
+2) Check for solder bridges or bad solder joints.
+4) Double check the jumpers. It is critical the jumpers be set correctly for proper and reliable function.
+5) Disable the Zorro 2 RAM, Zorro 3 RAM, and the IDE port. The Amiga 2000 will boot without these and it may help narrow down where the issue lies.
 
 Follow these troubleshooting order of operations if your Amiga 2000 fails to start in 68030 mode or starts to a black screen. If these steps are executing correctly, you should start in 68030 mode and see the Kickstart screen. There a test points that can be used to help in troubleshooting process.
 
