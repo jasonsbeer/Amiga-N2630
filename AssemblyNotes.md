@@ -49,6 +49,9 @@ Discussion programming CPLDs is not in the scope of this document, but many reso
 ## Programming the ROMs
 Most cheap EPROM programmers will handle the 27C256 EPROMs of the N2630. A popular one is the TL866II, but there are other options. There are a lot of these in the community. Someone may be able to assist if you do not wish to purchase a programmer. The EPROMs are programmed independently of the N2630. The ROMs can be found [here](/ROM/).
 
+## Mounting Brackets
+There are mounting brackets for the A2000 EATX and Commodore Amiga 2000. The bracket matching your setup can be 3D printed and used for a clean installation. The files are found [here](/Brackets).
+
 ## Troubleshooting
 1) Check for solder bridges or bad solder joints.
 2) Double check the jumpers. It is critical the jumpers be set correctly for proper and reliable function.
