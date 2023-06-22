@@ -18,8 +18,6 @@ Min Hole Size = 0.3mm
 
 <img src="/Images/jlcpcb3a.jpg" width = "400">
 
-JLCPCB recently changed their production capabilites and will reject the N2630 PCB due to trace clearance.
-
 ## Bill of Materials  
 
 The official BOM is found [here](/N2630-REV30-BOM.csv) and should be used for ordering parts. An interactive BOM can be found [here](/N2630-REV30-ibom.html). This can be used to locate components on the board. Download the file and open it your browser.
