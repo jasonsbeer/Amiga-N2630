@@ -10,6 +10,8 @@ Revision 3.0.1 is the current production release. See the [issues](https://githu
 
 NOTE: The A2091 hard drive card will not operate correctly when using Kickstart 1.x on a revision 6.2 or newer Amiga 2000* with the N2630 or A2630 CPU cards. You must use Kickstart 2.04 or newer.
 
+[Click here](https://github.com/jasonsbeer/Amiga-N2630/wiki) to see a list of devices tested with the N2630 in the Wiki.
+
 *Includes the Amiga 2000 EATX.
 
 <p align="center">
