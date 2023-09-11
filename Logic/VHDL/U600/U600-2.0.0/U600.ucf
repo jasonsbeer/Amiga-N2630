@@ -10,8 +10,8 @@ NET "nC1"			LOC = "P11" ;
 NET "nC3"			LOC = "P12" ;
 NET "nADOEL"		LOC = "P13" ;
 
-//NET "CPUCLK"		LOC = "P15" ;
-//NET "CPUCLK"		BUFG = CLK ;
+NET "CPUCLK"		LOC = "P15" ;
+NET "CPUCLK"		BUFG = CLK ;
 
 NET "nAAS"			LOC = "P16" ;
 NET "nVMA"			LOC = "P17" ;
@@ -24,8 +24,7 @@ NET "nRESET"		LOC = "P24" ;
 NET "E"				LOC = "P25" ;
 NET "nVPA"			LOC = "P27" ;
 NET "ADDIR"			LOC = "P31" ;
-
-//NET "A7M"			LOC = "P32"; 
+NET "A7M"			LOC = "P32" ; 
 
 NET "B2000"			LOC = "P33" ;
 NET "nBGACK"		LOC = "P34" ;
@@ -36,6 +35,7 @@ NET "nMEMZ2"		LOC = "P39" ;
 NET "CLK7"			LOC = "P40" ;
 NET "nCLK7"			LOC = "P42" ;
 NET "SMDIS"			LOC = "P43" ;
+//NET "nIDEACCESS"		LOC = "P45" ;
 NET "nAS"			LOC = "P46" ;
 NET "RnW"			LOC = "P47" ;
 NET "FC<2>"			LOC = "P48" ;	
