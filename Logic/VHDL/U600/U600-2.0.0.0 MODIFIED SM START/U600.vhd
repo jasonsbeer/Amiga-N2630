@@ -278,31 +278,13 @@ begin
 	--THIS IS OUR E SYNC SIGNAL AND IS ONE 7MHz CLOCK BEHIND E. THIS GIVES US
 	--A WAY TO DETECT THE E FALLING EDGE, WHICH TELLS US WHEN A NEW E CYCLE STARTS.	
 	
-	PROCESS (CLK7, nRESET) BEGIN
+	PROCESS (CLK7) BEGIN
 		
-		IF nRESET = '0' THEN
-		
-			esync <= '0';
-		
-		ELSIF FALLING_EDGE (CLK7) THEN
-			
+		IF FALLING_EDGE (CLK7) THEN
 			esync <= E;
-		
 		END IF;
 		
 	END PROCESS;
-	
---	PROCESS (E, nVMA, nRESET) BEGIN
---	
---		IF nRESET = '0' THEN
---		
---		ELSIF FALLING_EDGE (E) THEN
---		
---			
---		
---		END IF;
---	
---	END PROCESS;
 	
 	--VMA (VALID MEMORY ADDRESS) IS A 6800 SIGNAL DRIVEN IN RESPONSE TO VPA (VALID PERIPHERAL ADDRESS).
 	--VMA IS TO BE ASSERTED WHEN THE PROCESSOR IS SYNCED TO THE E CLOCK. THIS IS DONE IN THE 68000
@@ -310,15 +292,12 @@ begin
 	--WE USE THIS COUNTER SO WE KNOW WHEN TO ASSERT _VMA AS IT TRACKS WHERE WE ARE IN THE E CYCLE.
 	--THE COUNTER GOES FROM 0 TO 9 TO ACCOUNT FOR THE 10 TOTAL CLOCKS IN AN E CYCLE, BUT IS ONE CLOCK BEHIND.
 	
-	--THERE IS A TIMING CASE WHERE GARY NEGATES _VPA TOO EARLY. WE NEED TO HOLD _VMA UNTIL THE CYCLE IS COMPLETE.
-	
 	PROCESS (CLK7, nRESET) BEGIN	
 		
 		IF nRESET = '0' THEN
 		
 			vmacycle <= '0';
 			edsack <= '0';
-			vmacount <= 0;	
 
 		ELSIF FALLING_EDGE (CLK7) THEN
 		
@@ -333,91 +312,24 @@ begin
 			--RESPOND TO _VPA IN 6800 CYCLES
 			--THIS FEEDS INTO THE 68000 STATE MACHINE TO 
 			--SIGNAL THE END OF THE CYCLE.
+			IF nVPA = '0' THEN
 			
-			CASE vmacount IS
+				IF vmacount = 1 THEN
+				
+					vmacycle <= '1';
+					
+				ELSIF nVMA = '0' AND vmacount = 7 THEN
+				
+					edsack <= '1';
+					
+				END IF;
+				
+			ELSE
 			
-				WHEN 1 =>
+				vmacycle <= '0';
+				edsack <= '0';
 				
-					vmacycle <= NOT nVPA;
-					--edsack <= '0';
-				
-				WHEN 7 =>
-				
-					edsack <= vmacycle;
-					--vmacycle <= '0';					
-				
-				WHEN 9 =>
-				
-					vmacycle <= '0';
-					edsack <= '0';
-				
-				WHEN OTHERS =>
-			
-			END CASE;
-			
---			
---			CASE ESM IS
---			
---				WHEN ESM_IDLE =>
---				
---					IF nVPA = '0' AND vmacount = 1 THEN 
---						vmacycle <= '1'; 
---						ESM <= ESM_CYCLE;
---					END IF;
---					
---					vmacycle <= '0'
---				
---				WHEN ESM_CYCLE =>
---				
---					IF vmacount = 7 THEN 
---						edsack <= '1'; 
---						ESM <= ESM_IDLE;					
---					END IF;
---					
---			END CASE;
-				
-				
-			
---			IF vmacycle = '0' THEN		
---			
---				IF nVPA = '0' AND vmacount = 1 THEN 
---				
---					vmacycle <= '1';
---					
---				ELSE
---			
---					--vmacycle <= '0';
---					edsack <= '0';	
---					
---				END IF;			
---			
---			ELSE 
---			
---				IF vmacount = 7 THEN edsack <= '1'; END IF;
---			
---				IF vmacount = 9 THEN	vmacycle <= '0'; END IF;
---				
---			END IF;
-						
-			
---			IF nVPA = '0' THEN
---			
---				IF vmacount = 1 THEN
---				
---					vmacycle <= '1';
---					
---				ELSIF nVMA = '0' AND vmacount = 7 THEN
---				
---					edsack <= '1';
---					
---				END IF;
---				
---			ELSE
---			
---				vmacycle <= '0';
---				edsack <= '0';
---				
---			END IF;
+			END IF;
 			
 		END IF;
 		
