@@ -33,8 +33,8 @@
 --		v1.1.0 02-FEB-23 Removed floating signals from 68k state machine while BOSS - JN
 --                     Added bus grant delay to help accomodate Buster. -JN
 --    v1.1.1 08-FEB-23 Hardened bus grant logic. -JN
---    v2.0.0 05-SEP-23 Changed CLK7 logic to support all Amiga 2000 revisions
---                     Added edge check on 68000 State 4 to prevent responding on wrong edge with delayed assertion of _DTACK.
+--    v2.0.3 01-OCT-23 Added edge check on 68000 state machine state 4 to prevent responding on wrong edge with delayed assertion of _DTACK. -JN
+--                     Added synchronizer to 68000 state machine start. -JN
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -106,7 +106,7 @@ end U600;
 architecture Behavioral of U600 is
 
 	--DEFINE THE 68000 STATE MACHINE STATES
-	TYPE STATE68K IS ( S0, S1, S2, S3, S4, S5, S6, S7 );
+	TYPE STATE68K IS ( S0, S1, S2, S3, S4, S6, S7 ); --, S5
 	SIGNAL CURRENT_STATE : STATE68K;	
 	
 	--68000 STATE MACHINE SIGNALS	
@@ -145,7 +145,7 @@ begin
 	--SEE PAGE 78 A500/A2000 TECHNICAL REFERENCE MANUAL.
 		
 	--CLK7 <= '1' WHEN ( B2000 = '1' AND A7M = '1' ) OR ( B2000 = '0' AND (nC1 = '1' XOR nC3 = '0' )) ELSE '0';	
-	--CLK7 <= NOT nC1 XNOR NOT nC3; 
+	--CLK7 <= nC1 XNOR nC3; 
 	CLK7 <= A7M;
 	
 	--This clock is used to latch the interrupt lines between the motherboard
@@ -692,13 +692,14 @@ begin
 					--IF THIS IS A 68000 CYCLE, LOOK FOR ASSERTION OF _DTACK.
 					--IF THIS IS A 68000 WRITE CYCLE, ASSERT THE DATA STROBES HERE (SET PREVIOUSLY).
 
-					IF nDTACK = '0' OR nBERR = '0' OR edsack = '1' THEN
+					IF CDAC = '0' AND (nDTACK = '0' OR nBERR = '0' OR edsack = '1') THEN
 
 						--WHEN THE TARGET DEVICE HAS ASSERTED _DTACK OR _BERR, WE CONTINUE ON.
 						--IF THIS IS A 6800 (CIA) CYCLE, WE WAIT UNTIL E IS HIGH TO PROCEED.
 						--OTHERWISE, INSERT WAIT STATES UNTIL ONE OF THESE CONDITIONS IS SATISFIED.
 
-						CURRENT_STATE <= S5;
+						CURRENT_STATE <= S6;
+						--CURRENT_STATE <= S5;
 						
 					ELSE
 						
@@ -706,11 +707,11 @@ begin
 
 					END IF;
 
-				WHEN S5 =>
+				--WHEN S5 =>
 
 					--NOTHING HAPPENS HERE. GO TO STATE 6.
 
-					CURRENT_STATE <= S6;
+					--CURRENT_STATE <= S6;
 
 				WHEN S6 =>
 
