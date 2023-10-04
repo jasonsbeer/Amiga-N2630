@@ -157,8 +157,17 @@ J202|FPU Clock|X1<sup>[A]</sup>|X2<sup>[B]</sup>
 <sup>B</sup>FPU clock from X2.
 
 ## Revision History
-Revision 3.0 - Initial production release.  
-Revision 3.0.1 - Added copper thieving areas to top and bottom layers.
+Revision 4.0.1  
+   Changed jumper footprint to increase ease of assembly.  
+   Added routing to better support possible future enhancements.  
+   Added order number location for JLCPCB.  
+   
+Revision 3.0.1  
+   Added copper thieving areas to top and bottom layers.  
+   
+Revision 3.0  
+   Initial production release.  
+
 
 ## Acknowledgements
 Dave Haynie for sharing the A2630 technical details with the Amiga community.  
