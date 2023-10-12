@@ -1,0 +1,1 @@
+vhdtdtfi -prj U602-MODULE -o /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U602-MODULE/IDE.vhi -module IDE -template /mnt/work/ISE/14.7/ISE_DS/ISE//data/vhdlinst.tft -deleteonerror -lib work IDE.vhd 
