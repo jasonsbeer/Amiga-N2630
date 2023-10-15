@@ -40,6 +40,7 @@
 --    v2.0.5 12-OCT-23 Added _DTACK FF to finally fix delayed _DTACK. -JN
 --                     Fixed 68000 State 4 CDAC phase. -JN
 --    v2.0.6 13-OCT-23 Tweaked 68000 state machine timing. -JN
+--    v2.0.7 14-OCT-23 Changed 68000 state machine to be driven by 50MHz clock.
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -58,7 +59,6 @@ entity U600 is
 PORT 
 (
 	A7M : IN STD_LOGIC; --AMIGA 7MHZ CLOCK	
-	CDAC : IN STD_LOGIC; --CDAC CLOCK
 	CPUCLK : IN STD_LOGIC; --68030 CLOCK
 	nVPA : IN STD_LOGIC; --6800 VPA SIGNAL
 	B2000 : IN STD_LOGIC; --IS THIS AN A2000 OR B2000
@@ -99,8 +99,8 @@ PORT
 	DRSEL : OUT STD_LOGIC; --DIRECTION SELECTION FOR U701 U702
 	nADOEL : OUT STD_LOGIC; --BUS DIRECTION CONTROL
 	nADOEH : OUT STD_LOGIC; --BUS DIRECTION CONTROL
-	nLDS : OUT STD_LOGIC; --68000 _LDS
-	nUDS : OUT STD_LOGIC; --68000 _UDS
+	nLDS : INOUT STD_LOGIC; --68000 _LDS
+	nUDS : INOUT STD_LOGIC; --68000 _UDS
 	nCLK7 : OUT STD_LOGIC --INVERTED 7MHZ OUT FOR 74HCT646 DATA LATCH
 	
 );
@@ -121,22 +121,13 @@ architecture Behavioral of U600 is
 	SIGNAL esync : STD_LOGIC; --ONE CLOCK DELAY OF E
 	SIGNAL dsacken : STD_LOGIC; --ENABLE _DSACK1
 	SIGNAL dsackcount : INTEGER RANGE 0 TO 2; --STATE MACHINE DSACK1 PROCESS
-	SIGNAL ascycle : STD_LOGIC; --ENABLE AMIGA ADDRESS STROBE SIGNAL
-	SIGNAL wcycle : STD_LOGIC;
-	SIGNAL writecycle : STD_LOGIC;
-	SIGNAL readcycle : STD_LOGIC;
-	--SIGNAL datacycle : STD_LOGIC;
 	SIGNAL dsackcycle : STD_LOGIC; --ENABLE THE 68030 _DSACK1 SIGNAL
 	SIGNAL vmacycle :STD_LOGIC; --ENABLE THE AMIGA _VMA SIGNAL
 	SIGNAL edsack : STD_LOGIC;
 	SIGNAL abg_delay : STD_LOGIC_VECTOR (1 DOWNTO 0);
 	SIGNAL abg_disable : STD_LOGIC;
-	SIGNAL SM_START : STD_LOGIC;
+	SIGNAL CLK7_EDGE : STD_LOGIC_VECTOR(1 DOWNTO 0);
 	
-	--CLOCK SIGNALS
-	SIGNAL CLK14 : STD_LOGIC := '0';
-	SIGNAL CLK7_RISING_EDGE : STD_LOGIC;
-	SIGNAL CLK7_FALLING_EDGE : STD_LOGIC;
 
 begin
 
@@ -161,10 +152,6 @@ begin
 	--IT IS AN INVERTED VERSION OF THE AMIGA 7MHz CLOCK.
 	
 	nCLK7 <= NOT CLK7;
-	
-	--THIS IS A 14MHz CLOCK FOR THE 68000 STATE MACHINE
-	
-	CLK14 <= CLK7 XOR CDAC;
 
 	---------------------
 	-- REQUEST THE BUS --
@@ -293,6 +280,13 @@ begin
 	--STATE MACHINE AND IS DISCUSSED IN APPENDIX B OF THE 68000 MANUAL.	
 	--WE USE THIS COUNTER SO WE KNOW WHEN TO ASSERT _VMA AS IT TRACKS WHERE WE ARE IN THE E CYCLE.
 	--THE COUNTER GOES FROM 0 TO 9 TO ACCOUNT FOR THE 10 TOTAL CLOCKS IN AN E CYCLE, BUT IS ONE CLOCK BEHIND.
+	
+	nVMA <= 
+		'0' WHEN vmacycle = '1' AND TRISTATE = '0'
+	ELSE 
+		'1' WHEN TRISTATE = '0'
+	ELSE
+		'Z';
 	
 	PROCESS (CLK7, nRESET) BEGIN	
 		
@@ -548,250 +542,104 @@ begin
 		END IF;	
 	
 	END PROCESS;
-
-	---------------------------
-	--  68000 STATE MACHINE  --
-	-- DATA TRANSFER SIGNALS --
-	---------------------------	
 	
---	PROCESS (CLK14, nRESET) BEGIN
---	
---		IF nRESET = '0' THEN
---		
---			nUDS <= 'Z';
---	
---		ELSIF FALLING_EDGE(CLK14) THEN
---		
---			IF TRISTATE = '0' THEN
---			
---				nUDS <= NOT (NOT A(0) AND (writecycle OR readcycle));
---			
---			ELSE
---			
---				nUDS <= 'Z';
---			
---			END IF;
---			
---		END IF;
---		
---	END PROCESS;
-
---	nUDS <= 
---			'0' WHEN A(0) = '0' AND datacycle = '1' AND TRISTATE = '0'
---		ELSE 
---			'1' WHEN TRISTATE = '0'
---		ELSE
---			'Z';
---			
---	nLDS <= 
---			'0' WHEN (SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1') AND datacycle = '1' AND TRISTATE = '0'
---		ELSE 
---			'1' WHEN TRISTATE = '0'
---		ELSE
---			'Z';
-			
 	
-	nUDS <= 
-			'0' WHEN A(0) = '0' AND (writecycle = '1' OR readcycle = '1') AND TRISTATE = '0'
-		ELSE 
-			'1' WHEN TRISTATE = '0'
-		ELSE
-			'Z';
-			
-	nLDS <= 
-			'0' WHEN (SIZ(1) = '1' OR SIZ(0) = '0' OR A(0) = '1') AND (writecycle = '1' OR readcycle = '1') AND TRISTATE = '0'
-		ELSE 
-			'1' WHEN TRISTATE = '0'
-		ELSE
-			'Z';
+	-----------------------------
+	-- MC68000 STATE MACHINE --
+	-----------------------------
 	
-	nAAS <= 
-			'0' WHEN ascycle = '1' AND TRISTATE = '0'
-		ELSE 
-			'1' WHEN TRISTATE = '0' 
-		ELSE 
-			'Z';
+	--7MHz CLOCK EDGE DETECT
+	PROCESS (CPUCLK, nRESET) BEGIN
 	
-	ARnW <=
-			'0' WHEN wcycle = '1' AND TRISTATE = '0'
-		ELSE
-			'1' WHEN TRISTATE = '0'
-		ELSE
-			'Z';
-			
-	nVMA <= 
-			'0' WHEN vmacycle = '1' AND TRISTATE = '0'
-		ELSE 
-			'1' WHEN TRISTATE = '0'
-		ELSE
-			'Z';
-
-
-	-------------------------
-	-- 7MHz EDGE DETECTION --
-	-------------------------
-	
-	PROCESS (CLK14) BEGIN
-	
-		IF FALLING_EDGE(CLK14) THEN
-		--IF CLK14'EVENT AND CLK14 = '0' THEN
+		IF nRESET = '0' THEN
 		
-			CLK7_RISING_EDGE <= NOT CLK7;
-			CLK7_FALLING_EDGE <= CLK7;
+			CLK7_EDGE <= "00";
+		
+		ELSIF FALLING_EDGE (CPUCLK) THEN
+		
+			CLK7_EDGE <= CLK7_EDGE(0) & CLK7;
 			
 		END IF;
 		
-	END PROCESS;		 
-		 
-	---------------------------
-	--  68000 STATE MACHINE  --
-	-- STATE MACHINE PROCESS --
-	---------------------------	
-
-	PROCESS (CLK14, nRESET, sm_enabled) BEGIN
-
-		IF nRESET = '0' OR sm_enabled = '0' THEN		
-
+	END PROCESS;
+	
+	--THE STATE MACHINE
+	PROCESS (CPUCLK, sm_enabled, nRESET) BEGIN
+	
+		IF sm_enabled = '0' OR nRESET = '0' THEN
+		
 			CURRENT_STATE <= S0;
-			SM_START <= '0';
-			
-			ascycle <= '0';
-			wcycle <= '0';
-			readcycle <= '0';
-			writecycle <= '0';
-			--datacycle <= '0';
+			nAAS <= 'Z';
+			nUDS <= 'Z';
+			nLDS <= 'Z';
+			ARnW <= 'Z';
 			dsacken <= '0';
-
-		ELSIF RISING_EDGE (CLK14) THEN
 		
-			--BEGIN 68000 STATE MACHINE--
-		 
-			CASE (CURRENT_STATE) IS
-
-				WHEN S0 =>
-
-					--STATE 0 IS THE START OF A CYCLE. 
-					--WE MAKE SURE TO START ON THE CORRECT EDGE BY SAMPLING CDAC.					
-
-					IF CDAC = '1' AND SM_START = '1' THEN
-
-						CURRENT_STATE <= S1;
-						  
-					ELSE
-						
-						CURRENT_STATE <= S0;
-						SM_START <= NOT nAS;
-
-					END IF;
-
-				WHEN S1 =>            
-
-					--PROCESSOR DRIVES A VALID ADDRESS ON THE BUS IN STATE 1. 
-					--NOTHING MUCH FOR US TO DO.
-					--SET UP FOR STATE 2.
-				
-					CURRENT_STATE <= S2;
-					
-					ascycle <= '1';
-					
-					IF RnW = '1' THEN
-						readcycle <= '1';
-						--datacycle <= '1';
-					ELSE
-						readcycle <= '0';
-						wcycle <= '1';
-					END IF;
-
-				WHEN S2 =>
-
-					--ASSERT _AAS FOR ALL CYCLES
-					--ASSERT _LDS, AND _UDS FOR READ CYCLES
-					--GO TO STATE 3
-
-					CURRENT_STATE <= S3; 
-
-				WHEN S3 =>
-
-					--PROCEED TO STATE 4.
-					--DURING WRITE CYCLES, _LDS AND _UDS ARE ASSERTED ON THE RISING EDGE OF STATE 4.
-				
-					CURRENT_STATE <= S4;
-					--datacycle <= '1';
-					
-					IF RnW = '0' THEN 
-						writecycle <= '1'; 
-					ELSE 
-						writecycle <= '0'; 
-					END IF;
-
-				WHEN S4 =>
-
-					--SOME IMPORTANT STUFF HAPPENS AT S4.
-					--IF THIS IS A 6800 CYCLE, ASSERT _VMA IF WE ARE IN SYNC WITH E. SEE 6800 STATE MACHINE.
-					--IF THIS IS A 68000 CYCLE, LOOK FOR ASSERTION OF _DTACK.
-					--IF THIS IS A 68000 WRITE CYCLE, ASSERT THE DATA STROBES HERE (SET PREVIOUSLY).
-					--WE WANT TO ONLY LATCH DTACK ON THE FALLING EDGE OF STATE 4, SO WE CHECK THE STATE OF CDAC TO DO THAT.
-
-					IF CLK7_FALLING_EDGE = '1' AND (nDTACK = '0' OR nBERR = '0' OR edsack = '1') THEN
-
-						--WHEN THE TARGET DEVICE HAS ASSERTED _DTACK OR _BERR, WE CONTINUE ON.
-						--IF THIS IS A 6800 (CIA) CYCLE, WE WAIT UNTIL E IS HIGH TO PROCEED.
-						--OTHERWISE, INSERT WAIT STATES UNTIL ONE OF THESE CONDITIONS IS SATISFIED.
-
-						CURRENT_STATE <= S5;
-						
-					ELSE
-						
-						CURRENT_STATE <= S4;
-
-					END IF;
-
-				WHEN S5 =>
-
-					--NOTHING HAPPENS HERE. GO TO STATE 6.
-
-					--IF CDAC = '0' THEN --1 WORKS GREAT, 0 WILL EVENTUALLY CRASH.
-					IF CLK7_RISING_EDGE = '1' THEN
-					
-						CURRENT_STATE <= S6; 
-						
-					END IF;
-
-				WHEN S6 =>
-
-					--DURING READ CYCLES, THE DATA IS DRIVEN ON TO THE BUS DURING STATE 6.
-					--THE 68000 NORMALLY LATCHES DATA ON THE FALLING EDGE OF STATE 7.
-					--FOR 6800 CYCLES, E FALLS WITH THE FALLING EDGE OF STATE 7.
-
-					IF CLK7_FALLING_EDGE = '1' THEN
-					
-						CURRENT_STATE <= S7;
-						dsacken <= '1';
-
-						--FOR ALL CYCLES, WE NEGATE _AAS, _LDS, AND _UDS IN STATE 7.
-						ascycle <= '0';					
-						writecycle <= '0';
-						readcycle <= '0';
-						--datacycle <= '0';
-						
-					END IF;
-					
-				WHEN S7 =>
-
-					--ONCE WE ARE IN STATE 7, WE NEGATE dsacken AND ALLOW THE _DSACK1 PROCESSS
-					--TO DO IT'S THING.
-					
-					dsacken <= '0';
-
-					--READ/WRITE AND _VMA ARE HELD UNTIL THE RISING EDGE OF STATE 0.
-					wcycle <= '0';
-					SM_START <= '0';
-					CURRENT_STATE <= S0;
-
-			END CASE;
-				
-		END IF;
+		ELSIF RISING_EDGE (CPUCLK) THEN
+		
+			CASE CURRENT_STATE IS
 			
+				WHEN S0 =>
+				
+					nAAS <= '1';
+					nUDS <= '1';
+					nLDS <= '1';
+					ARnW <= '1';
+					
+					IF nAS = '0' AND CLK7_EDGE = "10" THEN CURRENT_STATE <= S1; END IF;
+				
+				WHEN S1 =>
+				
+					IF CLK7_EDGE = "01" THEN
+						nAAS <= '0';
+						nUDS <= NOT (NOT A(0) AND RnW);	
+						nLDS <= NOT ((SIZ(1) OR NOT SIZ(0) OR A(0)) AND RnW);
+						ARnW <= RnW;
+						CURRENT_STATE <= S2;
+					END IF;
+					
+				WHEN S2 =>				
+				
+					IF CLK7_EDGE = "10" THEN CURRENT_STATE <= S3; END IF;
+				
+				WHEN S3 =>
+				
+					IF CLK7_EDGE = "01" THEN
+						nUDS <= NOT (NOT A(0) AND (NOT RnW OR NOT nUDS));
+						nLDS <= NOT ((SIZ(1) OR NOT SIZ(0) OR A(0)) AND (NOT RnW OR NOT nLDS));
+						CURRENT_STATE <= S4;
+					END IF;
+					
+				WHEN S4 =>
+				
+					IF CLK7_EDGE = "10" AND (nDTACK = '0' OR nBERR = '0' OR edsack = '1') THEN CURRENT_STATE <= S5; END IF;
+				
+				WHEN S5 =>
+				
+					IF CLK7_EDGE = "01" THEN CURRENT_STATE <= S6; END IF;
+				
+				WHEN S6 =>
+				
+					IF CLK7_EDGE = "10" THEN
+						nAAS <= '1';
+						nUDS <= '1';
+						nLDS <= '1';
+						dsacken <= '1';
+						CURRENT_STATE <= S7;
+					END IF;
+				
+				WHEN S7 =>
+				
+					IF CLK7_EDGE = "01" THEN
+						ARnW <= '1';
+						dsacken <= '0';
+						CURRENT_STATE <= S0;
+					END IF;			
+			
+			END CASE;
+		
+		END IF;	
+	
 	END PROCESS;
 
 END Behavioral;
