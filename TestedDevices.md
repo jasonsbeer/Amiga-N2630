@@ -5,7 +5,7 @@ Device|Working|Hardware Revision*|ROM Revision*|Notes**|Date Reported
 Supra WordSync SCSI|Yes|Unknown|AMAB6||March 2023
 GottaGoFastRAM2000|Yes|Unknown|Unknown||March 2023
 A2091 SCSI|Yes|Rev 4.0 Modified|7.0|U600 Rev 2.0.4|October 2023
-Oktagon 2008|No|Rev 5|6.10||September 2023
+Oktagon 2008|No|Rev 5|6.10|RETEST WITH NEWEST FIRMWARE|September 2023
 AT Emulator (Bridgeboard)|No|Rev 6|Unknown||September 2023
 X-Surf 100 Network Card|No|Unknown|||September 2023
 Plipbox|Yes|Unknown (Purchased from Sordan)|0.6|Roadshow,<br>plipbox.device 020,<br>U600 Rev 2.0.4|October 2023
