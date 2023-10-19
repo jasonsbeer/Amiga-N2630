@@ -3,9 +3,13 @@ These are the logic equations for U600, which includes the Motorolla 68000 and 6
 Revision History
 Version|Release Date|Hardware Rev 3.x.x|Hardware Rev 4.x.x|Comments
 -|-|-|-|-
-2.0.7|October 12, 2023|Yes|Yes|Increased speed of MC68000 state machine.
+2.0.7-SE*|October 19, 2023|Yes|Yes|Increased speed of MC6800 (E) state machine.
+2.0.7*|October 12, 2023|Yes|Yes|Increased speed of MC68000 state machine.
+2.0.5|October 12, 2023|Yes|Yes|Finally fixed delayed _DTACK?
 2.0.4|October 10, 2023|Yes|Yes|Support for Rev 4.x.x hardware. Improved state machines.
 1.1.1|February 9, 2023|Yes|No|Hardened bus grant logic.
 1.1.0|February 2, 2023|Yes|No|Fixed bus grant and cleaned up state machine edges.
 1.0.0|January 21, 2023|Yes|No|Initial Release
+
+*SE Version - This version disregards the E cycle timing specification as defined in the MC68000 user manual. Instead, it relies on the CIA timing specification from the 8520A data sheet, which will allow much faster CIA cycles. Under most circumstances, this is the preferred logic version. If you have an add-on device that relies on the E clock, you should use the non-SE version. 
 
