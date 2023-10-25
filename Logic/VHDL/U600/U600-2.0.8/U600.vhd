@@ -133,6 +133,11 @@ architecture Behavioral of U600 is
 	SIGNAL abg_delay : STD_LOGIC_VECTOR (1 DOWNTO 0);
 	SIGNAL abg_disable : STD_LOGIC;
 	
+--	SIGNAL nAAS_000 : STD_LOGIC;
+--	SIGNAL nAAS_000 : STD_LOGIC;
+--	SIGNAL nAAS_000 : STD_LOGIC;
+--	SIGNAL nAAS_000 : STD_LOGIC;
+	
 	--CLOCK SIGNALS
 	SIGNAL CLK7_EDGE : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
@@ -594,6 +599,9 @@ begin
 				
 				WHEN S0 =>
 				
+					nAAS <= '1'; 
+					ARnW <= '1';
+				
 					IF CLK7_EDGE = "10" THEN CURRENT_STATE <= S1; END IF;
 				
 				WHEN S1 =>
@@ -607,8 +615,8 @@ begin
 					ELSE
 						nAAS <= '1'; 
 						ARnW <= '1';
-						nLDS <= '1';
-						nUDS <= '1';
+						--nLDS <= '1';
+						--nUDS <= '1';
 					END IF;
 					
 				WHEN S2 =>				
