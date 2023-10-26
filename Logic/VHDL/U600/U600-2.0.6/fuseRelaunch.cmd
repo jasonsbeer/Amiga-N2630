@@ -1,1 +1,0 @@
--intstyle "ise" -incremental -o "/home/jason/Documents/GitHub/Amiga-N2630/Logic/VHDL/U600/U600-2.0.5/U600_isim_beh.exe" -prj "/home/jason/Documents/GitHub/Amiga-N2630/Logic/VHDL/U600/U600-2.0.5/U600_beh.prj" "work.U600" 
