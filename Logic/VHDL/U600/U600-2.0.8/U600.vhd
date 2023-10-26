@@ -42,7 +42,8 @@
 --    v2.0.6 13-OCT-23 Tweaked 68000 state machine timing. -JN
 --    v2.0.7 14-OCT-23 Changed 68000 state machine to be driven by 50MHz clock. --JN
 --                     Removed State 0 from 68000 state machine. -JN
---    v2.0.8 24-OCT-23 Fixed state machine with Rev 4.4 B2000. -JN
+--    v2.0.8 26-OCT-23 Changed DSACK1 process to work with new 50MHz state machine. -JN
+--                     Changed 6800/68000 State Machine signal outputs to clean up glitches. -JN/MH
 --                     Removed _DTACK FF. -JN
 
 --                     The "SE" version ignores the E spec in favor of the 8520A data sheet timings.
@@ -118,6 +119,8 @@ architecture Behavioral of U600 is
 	--DEFINE THE 68000 STATE MACHINE STATES
 	TYPE STATE68K IS ( S0, S1, S2, S3, S4, S5, S6, S7 );
 	SIGNAL CURRENT_STATE : STATE68K;	
+	--ATTRIBUTE fsm_encoding: string;
+   --ATTRIBUTE fsm_encoding OF CURRENT_STATE : SIGNAL IS "one-hot";
 	
 	--68000 STATE MACHINE SIGNALS	
 	SIGNAL sm_enabled : STD_LOGIC; --ARE WE ACCESSING THE AMIGA 2000 BOARD?
@@ -125,20 +128,16 @@ architecture Behavioral of U600 is
 	SIGNAL vmacount : INTEGER RANGE 0 TO 15; --COUNTER FOR E VMA
 	SIGNAL eclk : STD_LOGIC; --E SIGNAL FOR "A2000"
 	SIGNAL esync : STD_LOGIC; --ONE CLOCK DELAY OF E
-	SIGNAL dsacken : STD_LOGIC; --ENABLE _DSACK1
-	SIGNAL dsackcount : INTEGER RANGE 0 TO 2; --STATE MACHINE DSACK1 PROCESS
-	SIGNAL dsackcycle : STD_LOGIC; --ENABLE THE 68030 _DSACK1 SIGNAL
 	SIGNAL vmacycle :STD_LOGIC; --ENABLE THE AMIGA _VMA SIGNAL
 	SIGNAL edsack : STD_LOGIC;
 	SIGNAL abg_delay : STD_LOGIC_VECTOR (1 DOWNTO 0);
 	SIGNAL abg_disable : STD_LOGIC;
 	
---	SIGNAL nAAS_000 : STD_LOGIC;
---	SIGNAL nAAS_000 : STD_LOGIC;
---	SIGNAL nAAS_000 : STD_LOGIC;
---	SIGNAL nAAS_000 : STD_LOGIC;
-	
-	--CLOCK SIGNALS
+	SIGNAL nAAS_000 : STD_LOGIC;
+	SIGNAL nLDS_000 : STD_LOGIC;
+	SIGNAL nUDS_000 : STD_LOGIC;
+	SIGNAL ARnW_000 : STD_LOGIC;	
+	SIGNAL DSACK_ENABLE : STD_LOGIC_VECTOR (1 DOWNTO 0); --THE SHIFT REGISTER TO HOLD _DSACK1 ASSERTED.
 	SIGNAL CLK7_EDGE : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
 begin
@@ -150,7 +149,6 @@ begin
 	--THE 7MHz CLOCK CAN BE PULLED FROM THE CPU SLOT OF THE B2000, BUT MUST BE RECREATED
 	--FROM C1 AND C2 ON THE A2000.
 		
-	--CLK7 <= '1' WHEN ( B2000 = '1' AND A7M = '1' ) OR ( B2000 = '0' AND (nC1 = '1' XOR nC3 = '0' )) ELSE '0';	
 	CLK7 <= A7M WHEN B2000 = '1' ELSE nC1 XNOR nC3;
 	
 	--This clock is used to latch the interrupt lines between the motherboard
@@ -502,55 +500,40 @@ begin
 		ELSE 
 			'0';
 			
-	-----------------------
-	-- DATA TRANSFER ACK --
-	-----------------------
+	-------------------------------
+	-- DATA TRANSFER ACK PROCESS --
+	-------------------------------
 	
-	--THE _DSACK1 PROCESS ASSERTS _DSACK1 DURING STATE 7 OF 
-	--THE 6800/68000 STATE MACHINE. WE HOLD IT FOR TWO CLOCK CYCLES
-	--AND THEN NEGATE. THIS HOLDS IT LONG ENOUGH FOR THE 68030 TO 
-	--LATCH THE SIGNAL. THIS ALSO WORKS BETTER AT 50MHz WHEN
-	--COMPARED TO NEGATING _DSACK1 IN RESPONSE TO THE NEGATION OF _AS.
+	--ALL 6800/68000 STATE MACHINE CYCLES ARE TERMINATED BY ASSERTION OF _DSACK1.
+	--NORMALLY, _DSACK1 IS ASSERTED AND HELD UNTIL THE 68030 NEGATES _AS. IN THIS PROCESS,
+	--WE ASSERT _DSACK1 AND HOLD IT FOR TWO CLOCK CYCLES USING A SHIFT REGISTER. THIS HOLDS 
+	--IT ASSERTED TO THE POINT WHERE THE 68030 WOULD NORMALLY NEGATE _AS. 
 	
-	nDSACK1 <= 
-		'0' WHEN dsackcycle = '1' AND sm_enabled = '1'
-	ELSE
-		'1' WHEN sm_enabled = '1' 
-	ELSE
-		'Z';
+	PROCESS (CPUCLK, nRESET, sm_enabled) BEGIN
 	
-	PROCESS (CPUCLK, nRESET, dsacken) BEGIN
-	
-		IF dsacken = '0' OR nRESET = '0' THEN
+		IF nRESET = '0' OR sm_enabled = '0' THEN
 		
-			dsackcycle <= '0';
-			dsackcount <= 0;
-			
-		ELSIF FALLING_EDGE (CPUCLK) THEN
-			
-			CASE dsackcount IS
-			
-				WHEN 0 =>
+			nDSACK1 <= 'Z';
+			DSACK_ENABLE <= "11";
+		
+		ELSIF FALLING_EDGE (CPUCLK) THEN		
+		
+			CASE CURRENT_STATE IS				
 				
-					IF dsacken = '1' THEN
+				WHEN S7 =>
 					
-						dsackcount <= 1;
-						dsackcycle <= '1';
-						
-					END IF;
+					nDSACK1 <= NOT DSACK_ENABLE(1);
+					DSACK_ENABLE <= DSACK_ENABLE(0) & '0';
+				
+				WHEN OTHERS =>
+				
+					nDSACK1 <= '1';
+					DSACK_ENABLE <= "11";
 					
-				WHEN 2 =>
-				
-					dsackcycle <= '0';
-					
-				WHEN others =>
-				
-					dsackcount <= dsackcount + 1;
-				
 			END CASE;
-			
-		END IF;	
-	
+		
+		END IF;
+		
 	END PROCESS;
 
 	---------------------------
@@ -571,52 +554,40 @@ begin
 		END IF;
 		
 	END PROCESS;
+
+	--MC68000 SIGNALS
+	nAAS <= nAAS_000 WHEN TRISTATE = '0' ELSE 'Z';
+	nUDS <= nUDS_000 WHEN TRISTATE = '0' ELSE 'Z';
+	nLDS <= nLDS_000 WHEN TRISTATE = '0' ELSE 'Z';
+	ARnW <= ARnW_000 WHEN TRISTATE = '0' ELSE 'Z';
 	
 	--THE STATE MACHINE
-	PROCESS (CPUCLK, sm_enabled, TRISTATE, nRESET) BEGIN
+	PROCESS (CPUCLK, sm_enabled, nRESET) BEGIN
 	
-		IF (sm_enabled = '0' AND TRISTATE = '1') OR nRESET = '0' THEN
+		IF sm_enabled = '0' OR nRESET = '0' THEN
 		
 			CURRENT_STATE <= S0;
-			nAAS <= 'Z';
-			nUDS <= 'Z';
-			nLDS <= 'Z';
-			ARnW <= 'Z';
-			dsacken <= '0';
-			
-		ELSIF sm_enabled = '0' AND TRISTATE = '0' THEN
+			nAAS_000 <= '1';
+			nUDS_000 <= '1';
+			nLDS_000 <= '1';
+			ARnW_000 <= '1';
 		
-			CURRENT_STATE <= S0;
-			nAAS <= '1';
-			nUDS <= '1';
-			nLDS <= '1';
-			ARnW <= '1';
-			dsacken <= '0';
-		
-		ELSIF RISING_EDGE (CPUCLK) THEN			
+		ELSIF RISING_EDGE (CPUCLK) THEN	
 		
 			CASE CURRENT_STATE IS				
 				
 				WHEN S0 =>
-				
-					nAAS <= '1'; 
-					ARnW <= '1';
 				
 					IF CLK7_EDGE = "10" THEN CURRENT_STATE <= S1; END IF;
 				
 				WHEN S1 =>
 				
 					IF CLK7_EDGE = "01" THEN
-						nAAS <= '0';
-						nUDS <= NOT (NOT A(0) AND RnW);
-						nLDS <= NOT ((SIZ(1) OR NOT SIZ(0) OR A(0)) AND RnW);
-						ARnW <= RnW;
+						nAAS_000 <= '0';
+						nUDS_000 <= NOT (NOT A(0) AND RnW);
+						nLDS_000 <= NOT ((SIZ(1) OR NOT SIZ(0) OR A(0)) AND RnW);
+						ARnW_000 <= RnW;
 						CURRENT_STATE <= S2;
-					ELSE
-						nAAS <= '1'; 
-						ARnW <= '1';
-						--nLDS <= '1';
-						--nUDS <= '1';
 					END IF;
 					
 				WHEN S2 =>				
@@ -626,8 +597,8 @@ begin
 				WHEN S3 =>
 				
 					IF CLK7_EDGE = "01" THEN
-						nUDS <= NOT (NOT A(0) AND (NOT RnW OR NOT nUDS));
-						nLDS <= NOT ((SIZ(1) OR NOT SIZ(0) OR A(0)) AND (NOT RnW OR NOT nLDS));
+						nUDS_000 <= NOT (NOT nUDS_000 OR (NOT A(0) AND NOT RnW));
+						nLDS_000 <= NOT (NOT nLDS_000 OR ((SIZ(1) OR NOT SIZ(0) OR A(0)) AND NOT RnW));
 						CURRENT_STATE <= S4;
 					END IF;
 					
@@ -642,18 +613,16 @@ begin
 				WHEN S6 =>
 				
 					IF CLK7_EDGE = "10" THEN
-						nAAS <= '1';
-						nUDS <= '1';
-						nLDS <= '1';
-						dsacken <= '1';
+						nAAS_000 <= '1';
+						nUDS_000 <= '1';
+						nLDS_000 <= '1';
 						CURRENT_STATE <= S7;
 					END IF;
 				
 				WHEN S7 =>
 				
 					IF CLK7_EDGE = "01" THEN
-						ARnW <= '1';
-						dsacken <= '0';
+						ARnW_000 <= '1';
 						CURRENT_STATE <= S0;
 					END IF;			
 			
