@@ -35,7 +35,7 @@
 --    v1.2.0 16-FEB-23 AUTOCONFIG DSACK timings were preventing the CPU menu from working. Fixed. - JN
 --    v1.2.1 25-FEB-23 Added additional delay to ROM _DSACK1 to accomodate 200ns EPROMS. - JN
 --    v1.2.2 26-FEB-23 Fixed _DSACKx contention with Zorro 3 cycles.
---    v1.2.3 27-FEB-23 Moved _RESET to U601 and fixed reset glitch. -MH
+--    v1.2.3 27-OCT-23 Moved _RESET to U601 and fixed reset glitch. -MH
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
