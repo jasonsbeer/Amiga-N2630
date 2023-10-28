@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="2.0" >
  <header>
-  <DateModified>2023-02-26T10:18:22</DateModified>
+  <DateModified>2023-10-28T14:02:30</DateModified>
   <ModuleName>U601</ModuleName>
   <SummaryTimeStamp>2023-02-26T10:13:43</SummaryTimeStamp>
-  <SavedFilePath>/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601-1.2.2/iseconfig/U601.xreport</SavedFilePath>
-  <ImplementationReportsDirectory>/mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601-1.2.2/</ImplementationReportsDirectory>
+  <SavedFilePath>/home/jason/Documents/GitHub/Amiga-N2630/Logic/VHDL/U601/U601-1.2.3/iseconfig/U601.xreport</SavedFilePath>
+  <ImplementationReportsDirectory>/home/jason/Documents/GitHub/Amiga-N2630/Logic/VHDL/U601/U601-1.2.3/</ImplementationReportsDirectory>
   <DateInitialized>2022-05-22T21:04:43</DateInitialized>
   <EnableMessageFiltering>false</EnableMessageFiltering>
  </header>
