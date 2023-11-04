@@ -1,0 +1,5 @@
+vhdtdtfi -prj U601 -o /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601-1.1.0/ZORRO2RAM.vhi -module ZORRO2RAM -template /mnt/work/ISE/14.7/ISE_DS/ISE//data/vhdlinst.tft -deleteonerror -lib work ZORRO2RAM.vhd 
+vhdtdtfi -prj U601 -o /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601-1.1.0/ZORRO2RAM.vhi -module ZORRO2RAM -template /mnt/work/ISE/14.7/ISE_DS/ISE//data/vhdlinst.tft -deleteonerror -lib work ZORRO2RAM.vhd 
+vhdtdtfi -prj U601 -o /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601-1.1.0/ZORRO2RAM.vhi -module ZORRO2RAM -template /mnt/work/ISE/14.7/ISE_DS/ISE//data/vhdlinst.tft -deleteonerror -lib work ZORRO2RAM.vhd 
+vhdtdtfi -prj U601 -o /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601-1.1.0/ZORRO2RAM.vhi -module ZORRO2RAM -template /mnt/work/ISE/14.7/ISE_DS/ISE//data/vhdlinst.tft -deleteonerror -lib work ZORRO2RAM.vhd 
+vhdtdtfi -prj U601 -o /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601-1.1.0/ZORRO2RAM.vhi -module ZORRO2RAM -template /mnt/work/ISE/14.7/ISE_DS/ISE//data/vhdlinst.tft -deleteonerror -lib work ZORRO2RAM.vhd 
