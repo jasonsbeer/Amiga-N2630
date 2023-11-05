@@ -1,0 +1,119 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP 74HC245
+D Octal BUS Transceivers, 3-State outputs
+K HCMOS BUS 3State
+F http://www.ti.com/lit/gpn/sn74HC245
+$ENDCMP
+#
+$CMP 74HCT245
+D Octal BUS Transceivers, 3-State outputs
+K TTL BUS 3State
+F http://www.ti.com/lit/gpn/sn74LS245
+$ENDCMP
+#
+$CMP 74HCT574
+D 8-bit Register, 3-state outputs
+K TTL REG DFF DFF8 3State
+F http://www.ti.com/lit/gpn/sn74HCT574
+$ENDCMP
+#
+$CMP CXO_DIP8
+D CMOS Crystal Clock Oscillator, DIP8-style metal package
+K Crystal Clock Oscillator
+F https://abracon.com/Oscillators/ACH.pdf
+$ENDCMP
+#
+$CMP CY74FCT821T
+D 10-BIT Bit Bus Interface
+F https://www.ti.com/lit/ds/symlink/cy74fct821t.pdf?HQS=dis-dk-null-digikeymode-dsf-pf-null-wwe&ts=1616853456129
+$ENDCMP
+#
+$CMP DELAYLINE
+D 14 Pin DIP 5 Tap TTL Compatible High Speed Delay Line
+F https://www.datasheets360.com/pdf/6416540649265052105
+$ENDCMP
+#
+$CMP LM1117-2.5
+D 800mA Low-Dropout Linear Regulator, 2.5V fixed output, TO-220/TO-252/TO-263/SOT-223
+K linear regulator ldo fixed positive
+F http://www.ti.com/lit/ds/symlink/lm1117.pdf
+$ENDCMP
+#
+$CMP LM1117-3.3
+D 800mA Low-Dropout Linear Regulator, 3.3V fixed output, TO-220/TO-252/TO-263/SOT-223
+K linear regulator ldo fixed positive
+F http://www.ti.com/lit/ds/symlink/lm1117.pdf
+$ENDCMP
+#
+$CMP LM1117-5.0
+D 800mA Low-Dropout Linear Regulator, 5.0V fixed output, TO-220/TO-252/TO-263/SOT-223
+K linear regulator ldo fixed positive
+F http://www.ti.com/lit/ds/symlink/lm1117.pdf
+$ENDCMP
+#
+$CMP MC68030FE
+D Motorola 68030 32 bit microprocessor
+F https://www.alldatasheet.com/datasheet-pdf/pdf/122371/MOTOROLA/MC68030FE25.html
+$ENDCMP
+#
+$CMP MC68882
+D HCMOS Floating Point Co-processor
+F http://bitsavers.trailing-edge.com/components/motorola/68000/MC68881_MC68882_Floating-Point_Coprocessor_Users_Manual_1ed_1987.pdf
+$ENDCMP
+#
+$CMP SDRAM_128MB(8Mx16)
+D 64M – (4M x 16 bit) Synchronous DRAM (SDRAM), TSOP II 54pin
+K SDRAM Synchronus DRAM PC166 PC143 64Mb 16Mbx4 MEMORY
+F https://www.alliancememory.com/wp-content/uploads/pdf/dram/64M-AS4C4M16SA-CI_v3.0_March%202015.pdf
+$ENDCMP
+#
+$CMP SDRAM_256MB(16Mx16)
+D 256Mb – (16M x 16 bit) Synchronous DRAM (SDRAM), TSOP II 54pin
+$ENDCMP
+#
+$CMP SDRAM_256Mb(8Mx32)
+D 512 Megabit SDRAM (16Mx32)
+$ENDCMP
+#
+$CMP SDRAM_512Mb(16Mx32)
+D 512 Megabit SDRAM (16Mx32)
+$ENDCMP
+#
+$CMP TFT660
+D Crystal Clock Oscillator, DIP8-style metal package
+K Crystal Clock Oscillator
+F http://cdn-reichelt.de/documents/datenblatt/B400/OSZI.pdf
+$ENDCMP
+#
+$CMP TLV1117-15
+D 800mA Low-Dropout Linear Regulator, 1.5V fixed output, TO-220/TO-252/TO-263/SOT-223
+K linear regulator ldo fixed positive
+F http://www.ti.com/lit/ds/symlink/tlv1117.pdf
+$ENDCMP
+#
+$CMP TLV1117-18
+D 800mA Low-Dropout Linear Regulator, 1.8V fixed output, TO-220/TO-252/TO-263/SOT-223
+K linear regulator ldo fixed positive
+F http://www.ti.com/lit/ds/symlink/tlv1117.pdf
+$ENDCMP
+#
+$CMP TLV1117-25
+D 800mA Low-Dropout Linear Regulator, 2.5V fixed output, TO-220/TO-252/TO-263/SOT-223
+K linear regulator ldo fixed positive
+F http://www.ti.com/lit/ds/symlink/tlv1117.pdf
+$ENDCMP
+#
+$CMP TLV1117-33
+D 800mA Low-Dropout Linear Regulator, 3.3V fixed output, TO-220/TO-252/TO-263/SOT-223
+K linear regulator ldo fixed positive
+F http://www.ti.com/lit/ds/symlink/tlv1117.pdf
+$ENDCMP
+#
+$CMP TLV1117-50
+D 800mA Low-Dropout Linear Regulator, 5.0V fixed output, TO-220/TO-252/TO-263/SOT-223
+K linear regulator ldo fixed positive
+F http://www.ti.com/lit/ds/symlink/tlv1117.pdf
+$ENDCMP
+#
+#End Doc Library

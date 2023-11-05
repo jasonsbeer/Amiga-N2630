@@ -1,7 +1,4 @@
-These are Gerber files for the N2630.
+These are Gerber files for the Rev 4.0.1 N2630.  
 
-Revision History
-Version|Release Date|Comments
--|-|-
-3.0.1|February 5, 2023|Added copper pours on top and bottom layers for copper theiving.
-3.0.0|January 21, 2023|Initial Release
+There are two versions of the N2630 card. One for the PLCC footprint MC68882 coprocessor and one for the PGA footprint MC68882 coprocessor. The two sub-revisions are otherwise identical. Choose the one that best meets your needs. 
+
