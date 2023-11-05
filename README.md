@@ -32,9 +32,9 @@ Click [here](/AssemblyNotes.md) for more information on building the N2630.
 ## Installation Notes
 This card may be installed in any Amiga 2000 computer. Installation is simply inserting the card into the 86 pin CPU/Coprocessor slot of the Amiga computer. There are no software drivers to install.  Kickstart v37.300 and greater is recommended.
 
-**IMPORTANT:** Before installing, it is necessary to determine if you have an early, non-cost reduced motherboard. If your motherboard is marked "Made In Germany" and "(C) 1986 Commodore" on the left side of the board, you have a non-cost reduced Amiga 2000 board, designated "A2000" in this documentation. An example of a non-cost reduced Amiga 2000 motherboard can be see [here](http://amiga.resource.cx/photos/a2000,1). In the event you have an non-cost reduced "A2000" motherboard, you must remove the Motorola 68000 processor from the Amiga 2000 motherboard and place a jumper at J302 of the N2630.  All other Amiga 2000 motherboards are designated "B2000" and should leave the Motorola 68000 in place.
+**IMPORTANT:** Before installing a Revision 4.0.1 or greater N2630, it is necessary to determine if you have an early, non-cost reduced motherboard. If your motherboard is marked "Made In Germany" and "(C) 1986 Commodore" on the left side of the board, you have a non-cost reduced Amiga 2000 board, designated "A2000" in this documentation. An example of a non-cost reduced Amiga 2000 motherboard can be see [here](http://amiga.resource.cx/photos/a2000,1). In the event you have an non-cost reduced "A2000" motherboard, you must remove the Motorola 68000 processor from the Amiga 2000 motherboard and place a jumper at J302 of the N2630.  All other Amiga 2000 motherboards are designated "B2000" and should leave the Motorola 68000 in place. Revision 3.0.x cards do not support the original German A2000. 
 
-**NOTE: The revision 3.x.x cards will not work on an original German A2000.**
+**NOTE: Hardware revision 4.0.1 supports the original Germal A2000, but is untested.**
 
 ## 68030 Mode
 By default, the N2630 starts in 68030 mode. When in 68030 mode, all installed RAM and the IDE device port are active.
@@ -157,10 +157,11 @@ J202|FPU Clock|X1<sup>[A]</sup>|X2<sup>[B]</sup>
 <sup>B</sup>FPU clock from X2.
 
 ## Revision History
-Revision 4.0.1  
+Revision 4.0.1a/b  
+   Sub-revision 'a' supports OLCC MC68882, sub-revision 'b' supports the PGA MC68882.
    Changed jumper footprint to increase ease of assembly.  
-   Added routing to better support possible future enhancements.  
    Added order number location for JLCPCB.  
+   Added support for original German A2000 machines.
    
 Revision 3.0.1  
    Added copper thieving areas to top and bottom layers.  
@@ -168,11 +169,12 @@ Revision 3.0.1
 Revision 3.0  
    Initial production release.  
 
-
 ## Acknowledgements
 Dave Haynie for sharing the A2630 technical details with the Amiga community.  
-Matt Harlum for sharing his Gayle IDE code, listening my struggles, and his numerous other contributions to this project.  
-Everyone who made the Amiga possible.
+Matt Harlum for (LIV2) sharing his Gayle IDE code, submitting code improvements, listening my struggles, and his numerous other contributions to this project.  
+Stephen Durham (steveed) for loaning me his ethernet cards.  
+Members of the Discord testing group: LIV2, steeveed, Chrissy, Pillock.  
+Everyone who made the Amiga possible.  
 
 ## License
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
