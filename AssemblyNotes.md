@@ -6,25 +6,21 @@ IMPORTANT INFORMATION. It is highly recommended you read this entire page before
 
 ## Ordering PCBs
 
-The N2630 PCB is a full-size Amiga 2000 CPU card with 4 layers. You can find the Gerber files [here](/Gerber). When ordering, it is recommended you choose the ENIG surface finish and chamfer the card edge. The layer stackup is shown below, in the event you need to define it as part of your order.
+The N2630 PCB is a full-size Amiga 2000 CPU card with 4 layers. You can find the Gerber files [here](/Gerber). The recommended order settings for JLCPCB are included below. When ordering, it is recommended you choose the ENIG surface finish and chamfer the card edge. You should define the layer stackup as part of the order, which is shown below. If you choose "specify location", the order number will be placed under the CF card socket, making it invisible once assembled. Order the solder mask color of your choice.
 
-Board dimensions = 124.5mm x 318.4mm  
-Track/Spacing = 4/4mil  
-Min Hole Size = 0.3mm  
+<img src="/Images/jlcpcb2a.png" width = "600">
 
-<!--<img src="/Images/jlcpcb1a.jpg" width = "600">
-
-<img src="/Images/jlcpcb2a.jpg" width = "600">-->
+<img src="/Images/jlcpcb1a.png" width = "600">
 
 <img src="/Images/jlcpcb3a.jpg" width = "400">
 
 ## Bill of Materials  
 
-The official BOM is found [here](/N2630-REV30-BOM.csv) and should be used for ordering parts. An interactive BOM can be found [here](/N2630-REV30-ibom.html). This can be used to locate components on the board. Download the file and open it your browser.
+The official IBOM is found [here](/BOM) and should be used for ordering parts. You can copy the BOM from the IBOM HTML page. The IBOM can also be used to locate components on the board. Download the file and open it your browser.
 
 The MC68030 and MC68882 need to be obtained through a retailer that handles legacy Motorola devices. At the time of writing this, you should expect to pay US$30 - $50 each. DO NOT buy components where you get five chips for $20. These are likely counterfeit or remarked chips. Save yourself the misery and pay for the real ones.
 
-Most compents in the BOM are general purpose passive and logic parts with many compatable alternatives. Due to availability of parts, it is difficult to keep a list of part numbers that remains valid even for a short period of time. I have listed Digikey part numbers I used in my most recent order to help you understand what is needed. You can cross reference the Digikey part number should these go out of stock.
+Most compents in the BOM are general purpose passive and logic parts with many compatable alternatives. Due to availability of parts, it is difficult to keep a list of part numbers that remains valid even for a short period of time. Thus, I have not supplied a list of part numbers. When ordering, be sure the value and footprint of the part is correct, and you should be good.
 
 **It is important to use the -10 speed rated Xilinx CPLDs in this project. The logic equations are designed for that speed. Going to faster rated CPLDs may break the timings and result in erratic behavior.**
 
@@ -80,6 +76,3 @@ _MEMZ2|Zorro 2 Memory Access|This signal is LOW when onboard Zorro 2 RAM address
 _MEMZ3|Zorro 3 Memory Access|This signal is LOW when onboard Zorro 3 RAM address space is active.
 _IDEACCESS|IDE Access|This signal is LOW when onboard IDE address space is active.
 MODE68K|68000 Mode|This signal is HIGH when the N2630 is operating in Motorola 68000 mode. Low when in Motorola 68030 mode.
-
-## Ramblings
-The Zorro 3 RAM, IDE Port, and MC68882 are all optional. If you choose not to install the Zorro 3 RAM and/or IDE port, you can omit the associated logic and passives. If you do this, be sure to disable these by properly setting the matching jumper. The MC68882 is auto-detected and has no enable/disable jumper.
