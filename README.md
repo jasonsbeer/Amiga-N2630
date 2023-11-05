@@ -15,7 +15,7 @@ NOTE: The A2091 hard drive card will not operate correctly when using Kickstart 
 *Includes the Amiga 2000 EATX.
 
 <p align="center">
-<img src="/Images/N2630REV30.jpg" width="400">
+<img src="/Images/n2630-401-med.jpg" width="400">
 <img src="/Images/workbench.jpg" width="400">
 </p>
 
