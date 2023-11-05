@@ -6,7 +6,7 @@ The N2630 is a 50MHz Motorolla 68030 CPU card with additional RAM and IDE device
 <p align="center"><img src="/Images/N2630-30-a.jpg" width="750"></p>
 
 ## CURRENT STATUS:
-Revision 3.0.1 is the current production release. See the [issues](https://github.com/jasonsbeer/Amiga-N2630/issues) tab for known issues.
+Revision 4.0.1a/b is the current production release. Subrevision 4.0.1a supports the PLCC footprint MC68882. Sub-revision 4.0.1b supports the PGA footprint MC68882. They are otherwise identical. See the [issues](https://github.com/jasonsbeer/Amiga-N2630/issues) tab for known issues.
 
 NOTE: The A2091 hard drive card will not operate correctly when using Kickstart 1.x on a revision 6.2 or newer Amiga 2000* with the N2630 or A2630 CPU cards. You must use Kickstart 2.04 or newer.
 
