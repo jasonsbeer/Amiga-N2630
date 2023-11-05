@@ -1,4 +1,0 @@
-vhdtdtfi -prj U601 -o /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601-1.1.0/AUTOCONFIG.vhi -module AUTOCONFIG -template /mnt/work/ISE/14.7/ISE_DS/ISE//data/vhdlinst.tft -deleteonerror -lib work AUTOCONFIG.vhd 
-vhdtdtfi -prj U601 -o /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601-1.1.0/AUTOCONFIG.vhi -module AUTOCONFIG -template /mnt/work/ISE/14.7/ISE_DS/ISE//data/vhdlinst.tft -deleteonerror -lib work AUTOCONFIG.vhd 
-vhdtdtfi -prj U601 -o /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601-1.1.0/AUTOCONFIG.vhi -module AUTOCONFIG -template /mnt/work/ISE/14.7/ISE_DS/ISE//data/vhdlinst.tft -deleteonerror -lib work AUTOCONFIG.vhd 
-vhdtdtfi -prj U601 -o /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U601-1.1.0/AUTOCONFIG.vhi -module AUTOCONFIG -template /mnt/work/ISE/14.7/ISE_DS/ISE//data/vhdlinst.tft -deleteonerror -lib work AUTOCONFIG.vhd 

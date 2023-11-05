@@ -1,0 +1,2 @@
+vhdtdtfi -prj U602-MODULE -o /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U602-MODULE/ZORROMEM.vhi -module ZORROMEM -template /mnt/work/ISE/14.7/ISE_DS/ISE//data/vhdlinst.tft -deleteonerror -lib work ZORROMEM.vhd 
+vhdtdtfi -prj U602-MODULE -o /mnt/work/amiga/Peripherals/A2630/Recreate/Logic/U602-MODULE/ZORROMEM.vhi -module ZORROMEM -template /mnt/work/ISE/14.7/ISE_DS/ISE//data/vhdlinst.tft -deleteonerror -lib work ZORROMEM.vhd 
