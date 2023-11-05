@@ -46,7 +46,7 @@ When desired, the 68030 may be disabled during a cold or warm start. This result
 The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the MC68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 3, J202). The PLCC-68 footprint is supported.
 
 ## ROMs
-The N2630 is envisioned to be a natural evolution of the original A2630 accelerator card. Because it is built on the A2630 concept, it requires those ROMs to function. You will need to burn two 27C256 EPROMs. The ROMs can be found [here](/ROM/).
+The N2630 is envisioned to be a natural evolution of the original A2630 accelerator card. Because it is built on the A2630 concept, it requires the A2630 ROMs to function. You will need to burn two 27C256 EPROMs. The ROMs can be found [here](/ROM/).
 
 ## FAST RAM
 The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM is the successor to Fast Page Memory found in devices such as the Amiga 3000, A2630 processor card, and other computers of the time. SDRAMs are a cost effective way to supply memory to older systems and are readily available either new or from unused memory modules. 
