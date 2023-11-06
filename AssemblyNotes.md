@@ -12,7 +12,7 @@ The N2630 PCB is a full-size Amiga 2000 CPU card with 4 layers. You can find the
 
 <img src="/Images/jlcpcb1a.png" width = "600">
 
-<img src="/Images/jlcpcb3a.jpg" width = "400">
+<img src="/Images/jlcpcb3a.jpg" width = "600">
 
 ## Bill of Materials  
 
