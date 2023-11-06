@@ -158,7 +158,7 @@ J202|FPU Clock|X1<sup>[A]</sup>|X2<sup>[B]</sup>
 
 ## Revision History
 Revision 4.0.1a/b  
-   Sub-revision 'a' supports OLCC MC68882, sub-revision 'b' supports the PGA MC68882.
+   Sub-revision 'a' supports OLCC MC68882, sub-revision 'b' supports the PGA MC68882.  
    Changed jumper footprint to increase ease of assembly.  
    Added order number location for JLCPCB.  
    Added support for original German A2000 machines.
