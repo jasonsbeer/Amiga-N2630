@@ -6,7 +6,7 @@ The N2630 is a 50MHz Motorolla 68030 CPU card with additional RAM and IDE device
 <p align="center"><img src="/Images/N2630-30-a.jpg" width="750"></p>
 
 ## CURRENT STATUS:
-Revision 4.0.1a/b is the current production release. Subrevision 4.0.1a supports the PLCC footprint MC68882. Sub-revision 4.0.1b supports the PGA footprint MC68882. They are otherwise identical. See the [issues](https://github.com/jasonsbeer/Amiga-N2630/issues) tab for known issues.
+Revision 4.0.1a/b is the current production release. Sub-revision 4.0.1a supports the PLCC footprint MC68882. Sub-revision 4.0.1b supports the PGA footprint MC68882. They are otherwise identical. See the [issues](https://github.com/jasonsbeer/Amiga-N2630/issues) tab for known issues.
 
 NOTE: The A2091 hard drive card will not operate correctly when using Kickstart 1.x on a revision 6.2 or newer Amiga 2000* with the N2630 or A2630 CPU cards. You must use Kickstart 2.04 or newer.
 
@@ -43,10 +43,10 @@ By default, the N2630 starts in 68030 mode. When in 68030 mode, all installed RA
 When desired, the 68030 may be disabled during a cold or warm start. This results in the Amiga falling back to the 68000 processor. This may be desired when software does not run correctly on the 68030 processor. To start up in 68000 mode, hold down the right mouse button during startup. Select "68000" and the Amiga will reset with the 68000 as the active processor. When in 68000 mode, the IDE port and on-board RAM are inactive. Motorola 68000 mode is not available with A2000 motherboards.
 
 ## 68882 Math Coprocessor (FPU)
-The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the MC68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 3, J202). The PLCC-68 footprint is supported.
+The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the MC68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 3, J202).
 
 ## ROMs
-The N2630 is envisioned to be a natural evolution of the original A2630 accelerator card. Because it is built on the A2630 concept, it requires the A2630 ROMs to function. You will need to burn two 27C256 EPROMs. The ROMs can be found [here](/ROM/).
+The N2630 is envisioned to be a natural evolution of the original A2630 accelerator card. Because it is built on the A2630 concept, it requires the A2630 ROMs to function. You will need to burn the two 27C256 EPROMs. The ROMs can be found [here](/ROM/).
 
 ## FAST RAM
 The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM is the successor to Fast Page Memory found in devices such as the Amiga 3000, A2630 processor card, and other computers of the time. SDRAMs are a cost effective way to supply memory to older systems and are readily available either new or from unused memory modules. 
