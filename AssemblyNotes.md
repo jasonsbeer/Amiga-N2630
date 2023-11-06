@@ -36,9 +36,9 @@ PGA-128 sockets are very difficult to find and can be very expensive. A good alt
 4) I recommend you do not install the 68882 (or socket) until everything is known to work. The through holes here are very convienient for connecting probes in the event troublshooting is required.
 
 ## Programming the CPLDs
-The three CPLDs (U600, U601, and U602) must be programmed before the N2630 will function. Each CPLD has a dedicated programming port, CN600, CN601, and CN602. The best way to program these is to plug the card into the Amiga, power it on, and program it while in circuit with power coming from the Amiga 2000. The JED files can be found [here](/Logic/JED). Make certain to program each CPLD with the matching JED file for your hardware revision. 
+The three CPLDs (U600, U601, and U602) must be programmed before the N2630 will function. Each CPLD has a dedicated programming port, CN600, CN601, and CN602. The best way to program these is to plug the card into the Amiga, power it on, and program it while in circuit with power coming from the Amiga 2000. The JED files can be found [here](/Logic/JED). Make certain to program each CPLD with the matching JED file. 
 
-Discussion programming CPLDs is not in the scope of this document, but many resources are available on the internet. I have been using a Raspberry Pi 2 with xc3sprog. Xilinx programming dongles are also available.
+Discussion of CPLD programming is not in the scope of this document, but many resources are available on the internet. I recommend a Xilinx (real or generic) programming dongle.
 
 ## Programming the ROMs
 Most cheap EPROM programmers will handle the 27C256 EPROMs of the N2630. A popular one is the TL866II, but there are other options. There are a lot of these in the community. Someone may be able to assist if you do not wish to purchase a programmer. The EPROMs are programmed independently of the N2630. The ROMs can be found [here](/ROM/).
