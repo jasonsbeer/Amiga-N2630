@@ -6,13 +6,11 @@ The N2630 is a 50MHz Motorolla 68030 CPU card with additional RAM and IDE device
 <p align="center"><img src="/Images/N2630-30-a.jpg" width="750"></p>
 
 ## CURRENT STATUS:
-Revision 4.0.1a/b is the current production release. Sub-revision 4.0.1a supports the PLCC footprint MC68882. Sub-revision 4.0.1b supports the PGA footprint MC68882. They are otherwise identical. See the [issues](https://github.com/jasonsbeer/Amiga-N2630/issues) tab for known issues.
+**Revision 4.0.1a/b is the current production release.**  
 
-NOTE: The A2091 hard drive card will not operate correctly when using Kickstart 1.x on a revision 6.2 or newer Amiga 2000* with the N2630 or A2630 CPU cards. You must use Kickstart 2.04 or newer.
+Sub-revision 4.0.1a supports the PLCC footprint MC68882. Sub-revision 4.0.1b supports the PGA footprint MC68882. They are otherwise identical.  
 
-[Click here](/TestedDevices.md) to see a list of devices tested with the N2630.
-
-*Includes the Amiga 2000 EATX.
+See the [issues](https://github.com/jasonsbeer/Amiga-N2630/issues) tab for known issues. [Click here](/TestedDevices.md) to see a list of devices tested with the N2630.
 
 <p align="center">
 <img src="/Images/n2630-401-med.jpg" width="400">
@@ -24,7 +22,7 @@ NOTE: The A2091 hard drive card will not operate correctly when using Kickstart 
 2. Motorola 68882 math coprocessor running up to 50MHz.
 3. 4 or 8 megabytes of Zorro 2 Fast RAM.
 4. 16 to 256 megabytes of Zorro 3 Fast RAM.
-5. IDE port with 40-pin cable and CF card options.
+5. IDE port with 40-pin cable and compact flash card options.
 
 ## Assembly Notes
 Click [here](/AssemblyNotes.md) for more information on building the N2630.
@@ -34,7 +32,9 @@ This card may be installed in any Amiga 2000 computer. Installation is simply in
 
 **IMPORTANT:** Before installing a Revision 4.0.1 or greater N2630, it is necessary to determine if you have an early, non-cost reduced motherboard. If your motherboard is marked "Made In Germany" and "(C) 1986 Commodore" on the left side of the board, you have a non-cost reduced Amiga 2000 board, designated "A2000" in this documentation. An example of a non-cost reduced Amiga 2000 motherboard can be see [here](http://amiga.resource.cx/photos/a2000,1). In the event you have an non-cost reduced "A2000" motherboard, you must remove the Motorola 68000 processor from the Amiga 2000 motherboard and place a jumper at J302 of the N2630.  All other Amiga 2000 motherboards are designated "B2000" and should leave the Motorola 68000 in place. Revision 3.0.x cards do not support the original German A2000. 
 
-**NOTE: Hardware revision 4.0.1 supports the original Germal A2000, but is untested.**
+**NOTES:**  
+**1) Hardware revision 4.0.1 supports the original Germal A2000, but is untested.**  
+**2) The A2091 hard drive card will not operate correctly when using Kickstart 1.x on a revision 6.2 or newer Amiga 2000 with the N2630 or A2630 CPU cards. You must use Kickstart 2.04 or newer.**
 
 ## 68030 Mode
 By default, the N2630 starts in 68030 mode. When in 68030 mode, all installed RAM and the IDE device port are active.
@@ -111,9 +111,11 @@ Desired Zorro</br>3 RAM (MB)|Starting Address|Ending Address
 256|$40000000|$4FFFFFFF
 
 ## IDE Port
-The N2630 includes a buffered, host terminated Gayle compatible AUTOBOOT<sup>[A]</sup> IDE port for hard drives and ATAPI<sup>[B]</sup> devices. The IDE port supports two devices (master and slave). For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices.
+The N2630 includes a buffered, host terminated Gayle compatible AUTOBOOT<sup>[A]</sup> IDE port for hard drives and ATAPI<sup>[B]</sup> devices. The IDE port may be accessed via the 40-pin IDE header and the compact flash card slot. There are a few different ways to combine devices on the port, but the total number of IDE devices on the N2630 cannot exceed two (master and slave). For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices. 
 
-The IDE cable header and the compact flash card adapter are on the same IDE port. They may be used simultaneously, but one device must be set to master, the other to slave. The IDE port only supports two devices, so when the CF card slot is in use, only one device may be installed on the IDE cable.
+Each IDE device must be set as slave or master. Devices present on the 40 pin IDE port may use cable select by shorting J905 when using a proper cable select IDE cable. See the manual for each device to determine the how to designate the device's master or slave setting. Master and slave for the compact flash device are set via J901 on the N2630.
+
+**NOTE:** The compact flash card slot is not effected by the cable select jumper (J905).  Thus, J905 should only be used when a proper cable select IDE cable is implemented on the 40 pin IDE port.
 
 <sup>A</sup>AUTOBOOT requires Kickstart v37.300 or greater or compatible scsi.device in Kickstart.  
 <sup>B</sup>ATAPI support included in Kickstart 3.1.4+. Older versions of Kickstart may require installation of third party ATAPI drivers.  
@@ -122,7 +124,7 @@ The IDE cable header and the compact flash card adapter are on the same IDE port
 Jumper|Description|Open<sup>[A]</sup>|Shorted<sup>[B]</sup>
 -|-|-|-
 J900|IDE|Enable|Disable
-J901|CF Select|Slave|Master
+J901|Compact Flash Select|Slave|Master
 J902|RESERVED||
 J903|RESERVED||
 J904|RESERVED||
@@ -133,6 +135,8 @@ J905|Cable Select|Disable|Enable
 
 ## Amix (Amiga UNIX)
 The N2630 card should fully support Amiga Unix (Amix). In order to boot into a Unix environment, you must place a jumper at J304. (Table 3a) Although this feature is fully supported by the ROMs, it has not been tested with the N2630 at this time.
+
+**NOTE:** The A2090/A2091 SCSI controller board is required by AMIX for drive functions with the Amiga 2000. See https://amigaunix.com/doku.php/home for more information.
 
 ## Other Jumper Settings
 In the following tables, OPEN indicates no jumper. Shorted indicates the presence of a jumper on the pins indicated. All jumpers must be set correctly or you may encounter unexpected behaviors or failure to boot.
@@ -175,6 +179,8 @@ Matt Harlum for (LIV2) sharing his Gayle IDE code, submitting code improvements,
 Stephen Durham (steveed) for loaning me his ethernet cards.  
 Members of the Discord testing group: LIV2, steeveed, Chrissy, Pillock.  
 Everyone who made the Amiga possible.  
+
+Last Updated: November 15, 2023
 
 ## License
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
