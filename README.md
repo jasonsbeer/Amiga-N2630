@@ -138,6 +138,10 @@ The N2630 card should fully support Amiga Unix (Amix). In order to boot into a U
 
 **NOTE:** The A2090/A2091 SCSI controller board is required by AMIX for drive functions with the Amiga 2000. See https://amigaunix.com/doku.php/home for more information.
 
+## NetBSD
+
+An alternative UNIX-like operating system for the Amiga is NetBSD. According to the NetBSD specifications, it should work with the N2630, but is not specifically tested at this time. See https://wiki.netbsd.org/ports/amiga/ for more information.
+
 ## Other Jumper Settings
 In the following tables, OPEN indicates no jumper. Shorted indicates the presence of a jumper on the pins indicated. All jumpers must be set correctly or you may encounter unexpected behaviors or failure to boot.
 
