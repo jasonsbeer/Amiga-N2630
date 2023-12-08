@@ -13,7 +13,7 @@ Before burning, you must acquire the following files:
 ## Burning
 You must combine the two HIGH ROM and two LOW ROM files together before burning. Instructions are given here to combine the ROM files with the XGecu Pro software for the TL866II (and successor) programmers. Other programmers should have similar functionality, but are outside the scope of this document.
 
-The A2630 ROM occupies $0000 - $3FFF oF each EPROM. The LIDE.device occupies $4000 - $7FFF oF each EPROM.  
+The A2630 ROM occupies $0000 - $3FFF of each EPROM. The LIDE.device occupies $4000 - $7FFF of each EPROM.  
 
 From the XGecu software:  
 
