@@ -46,7 +46,7 @@ When desired, the 68030 may be disabled during a cold or warm start. This result
 The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the MC68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 3, J202).
 
 ## ROMs
-The N2630 is envisioned to be a natural evolution of the original A2630 accelerator card. Because it is built on the A2630 concept, it requires the A2630 ROMs to function. You will need to burn the two 27C256 EPROMs. The ROMs can be found [here](/ROM/).
+The N2630 requires two 27C256 EPROMs (burned by the user) to function. The ROMs handle the system startup for CPU selection and contain the LIDE.device AUTOBOOT ROM from [LIV2](https://github.com/LIV2). See the instructions [here](/ROMs/) for burning the N2630 ROMs.
 
 ## FAST RAM
 The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM is the successor to Fast Page Memory found in devices such as the Amiga 3000, A2630 processor card, and other computers of the time. SDRAMs are a cost effective way to supply memory to older systems and are readily available either new or from unused memory modules. 
@@ -59,7 +59,7 @@ Using expansion memory on the Zorro 2 bus is not recommended, as this will negat
 NOTE: Any SDRAM at least 2Mx16 in capacity in the 54-TSOP II footprint may be placed. However, it is not possible to achieve more than 8 megabytes of Zorro 2 RAM capacity. 
 
 ### Zorro 3
-Zorro 3 RAM is the Amiga RAM found in the 32-bit address space of the Motorola 68030 processor. Both Zorro 2 and Zorro 3 RAM are used together on the N2630 card. Thus, the total memory available to the system will be the sum of the Zorro 2 and Zorro 3 RAM. 
+Zorro 3 RAM is the Amiga RAM found in the 32-bit address space of the Motorola 68030 processor. The Zorro 3 RAM on the N2630 supports the cache burst mode of the 68030 processor. Both Zorro 2 and Zorro 3 RAM are used together on the N2630 card. Thus, the total memory available to the system will be the sum of the Zorro 2 and Zorro 3 RAM. 
 
 Zorro 3 SDRAMs may be installed in different configurations to achieve a specific amount of final RAM (Table 1a). SDRAM must be installed in pairs, or banks, to achieve the needed 32 bit data path. Positions U406 and U407 represent the "low" bank and positions U408 and U409 represent the "high" bank. The banks must be populated as the low bank only or both low and high banks. The high bank will not function without the low bank populated. The SDRAM footprint is 54-TSOP II. The indicated jumpers must be set as shown or your system may not function correctly. When installing both banks, jumpers J400 and J401 must be set as shown in tables 1b and 1c. If only the low bank is populated, these jumpers are not used.
 
@@ -111,36 +111,39 @@ Desired Zorro</br>3 RAM (MB)|Starting Address|Ending Address
 256|$40000000|$4FFFFFFF
 
 ## IDE Port
-The N2630 includes a buffered, host terminated Gayle compatible AUTOBOOT<sup>[A]</sup> IDE port for hard drives and ATAPI<sup>[B]</sup> devices. The IDE port may be accessed via the 40-pin IDE header and the compact flash card slot. There are a few different ways to combine devices on the port, but the total number of IDE devices on the N2630 cannot exceed two (master and slave). For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices. 
+The N2630 includes a buffered, host terminated AUTOBOOT IDE port for hard drives and ATAPI<sup>[B]</sup> devices. The N2630 implements [LIDE.device](https://github.com/LIV2/lide.device) as the IDE driver. The driver must be present on the N2630 ROMs for the IDE port to function. See [ROMs](#ROMs) for more details. The IDE port may be accessed via the 40-pin IDE header and the compact flash card slot. There are a few different ways to combine devices on the port, but the total number of IDE devices on the N2630 cannot exceed two (master and slave). For instructions on installing a new hard drive on Amiga computers, refer to the [Commodore Hard Drive User's Guide](DataSheet/Hard_Drive_Users_Guide.pdf). This includes the HDToolBox user guide and other useful information for setting up both IDE and SCSI devices. 
+
+The IDE logic supports four speed modes: PIO0, PIO2, PIO4, and SanDisk Ultra 2 (see Table 2B). The modes PIO0, PIO2, and PIO4 follow the published timing specifications of those modes, with PIO0 being the slowest. The SanDisk Ultra 2 mode was developed for the SanDisk Ultra 2 compact flash card and is capable of 7.4M/s transfer rate. The SanDisk Ultra 2 mode is an undocumented IDE timing and may not work with other compact flash devices. The speed mode you select will be determined by the slowest IDE device on your system. To determine what speed your devices support, it is recommended to start with the slowest setting (PIO0) and adjust one setting higher at a time until your device(s) stop working. The mode you choose should be the fastest mode where all devices function correctly. Jumpers should only be changed while the system is off.
 
 Each IDE device must be set as slave or master. Devices present on the 40 pin IDE port may use cable select by shorting J905 when using a proper cable select IDE cable. See the manual for each device to determine the how to designate the device's master or slave setting. Master and slave for the compact flash device are set via J901 on the N2630.
 
 **NOTE:** The compact flash card slot is not effected by the cable select jumper (J905).  Thus, J905 should only be used when a proper cable select IDE cable is implemented on the 40 pin IDE port.
 
-<sup>A</sup>AUTOBOOT requires Kickstart v37.300 or greater or compatible scsi.device in Kickstart.  
-<sup>B</sup>ATAPI support included in Kickstart 3.1.4+. Older versions of Kickstart may require installation of third party ATAPI drivers.  
+<sup>A</sup>ATAPI support included in Kickstart 3.1.4+. Older versions of Kickstart may require installation of third party ATAPI drivers.  
 
-**Table 2.** IDE Configuration Jumper Settings
+**Table 2A.** IDE Configuration Jumper Settings.
 Jumper|Description|Open<sup>[A]</sup>|Shorted<sup>[B]</sup>
 -|-|-|-
-J900|IDE|Enable|Disable
+J900|RESERVED||
 J901|Compact Flash Select|Slave|Master
-J902|RESERVED||
-J903|RESERVED||
+J902|PIO MODE||
+J903|PIO MODE||
 J904|RESERVED||
 J905|Cable Select|Disable|Enable
 
 <sup>A</sup>No jumper.  
-<sup>B</sup>Jumper placed.  
+<sup>B</sup>Jumper placed. 
 
-## Amix (Amiga UNIX)
-The N2630 card should fully support Amiga Unix (Amix). In order to boot into a Unix environment, you must place a jumper at J304. (Table 3a) Although this feature is fully supported by the ROMs, it has not been tested with the N2630 at this time.
+**Table 2B.** IDE PIO Mode.
+Jumper|J902|J903
+-|-|-
+PIO0|Shorted[B]|Shorted|
+PIO2|Shorted|Open[A]|
+PIO4|Open|Shorted|
+SanDisk Ultra 2|Open|Open|
 
-**NOTE:** The A2090/A2091 SCSI controller board is required by AMIX for drive functions with the Amiga 2000. See https://amigaunix.com/doku.php/home for more information.
-
-## NetBSD
-
-An alternative UNIX-like operating system for the Amiga is NetBSD. According to the NetBSD specifications, it should work with the N2630, but is not specifically tested at this time. See https://wiki.netbsd.org/ports/amiga/ for more information.
+<sup>A</sup>No jumper.  
+<sup>B</sup>Jumper placed.
 
 ## Other Jumper Settings
 In the following tables, OPEN indicates no jumper. Shorted indicates the presence of a jumper on the pins indicated. All jumpers must be set correctly or you may encounter unexpected behaviors or failure to boot.
@@ -179,12 +182,12 @@ Revision 3.0
 
 ## Acknowledgements
 Dave Haynie for sharing the A2630 technical details with the Amiga community.  
-Matt Harlum for (LIV2) sharing his Gayle IDE code, submitting code improvements, listening my struggles, and his numerous other contributions to this project.  
+Matt Harlum for (LIV2) sharing his Gayle IDE code, LIDE.device, submitting code improvements, listening my struggles, and his numerous other contributions to this project.  
 Stephen Durham (steveed) for loaning me his ethernet cards.  
 Members of the Discord testing group: LIV2, steeveed, Chrissy, Pillock.  
 Everyone who made the Amiga possible.  
 
-Last Updated: November 15, 2023
+Last Updated: December 8, 2023
 
 ## License
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
