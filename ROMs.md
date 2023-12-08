@@ -13,7 +13,7 @@ Before burning, you must acquire the following files:
 ## Burning
 You must combine the two HIGH ROM and two LOW ROM files together before burning. Instructions are given here to combine the ROM files with the XGecu Pro software for the TL866II (and successor) programmers. Other programmers should have similar functionality, but are outside the scope of this document.
 
-The A2630 ROM occupies $0000 - $3FFF on each EPROM. The LIDE.device occupies $4000 - $7FFF on each EPROM.  
+The A2630 ROM occupies $0000 - $3FFF oF each EPROM. The LIDE.device occupies $4000 - $7FFF oF each EPROM.  
 
 From the XGecu software:  
 
@@ -21,12 +21,15 @@ From the XGecu software:
 2. Import the LIDE.device Low ROM: Select the file and change the import settings as follows:
    2a. Starting address = $4000  
    2b. Overwrite existing data = NOT CHECKED.  
-   2c. Click OK to import the file.  
-3. You should now see the LIDE.device data has occupied the $4000 - $7FFF address range.  
-4. The A2630 data should still occupy the $0000 - $3FFF range. If not, repeat from step 1.  
-5. Burn the EPROM as per programmer user manual.
-6. Label the EPROM.
-7. Repeat steps 1 - 6 with the HIGH ROM files.  
+   2c. Click OK to import the file.
+
+ADD PICTURE(S)!  
+   
+4. You should now see the LIDE.device data has occupied the $4000 - $7FFF address range.  
+5. The A2630 data should still occupy the $0000 - $3FFF range. If not, repeat from step 1.  
+6. Burn the EPROM as per programmer user manual.
+7. Label the EPROM.
+8. Repeat steps 1 - 6 with the HIGH ROM files.  
 
 You should now have two ROMS, low and high, for the N2630.
    
