@@ -26,7 +26,7 @@
 -- Project Name:   N2630
 -- Target Devices: XC95144 144 PIN
 -- Tool versions: 
--- Description: INCLUDES 50MHz LOGIC FOR ZORRO 3 SDRAM CONTROLLER AND PSUEDO-GAYLE IDE CONTROLLER
+-- Description: INCLUDES 50MHz LOGIC FOR ZORRO 3 SDRAM CONTROLLER AND IDE CONTROLLER
 --
 -- Hardware Revision: 3.x/4.x
 -- Revision History:
@@ -35,6 +35,7 @@
 --                       Fixed IDE Disable Jumper -JN
 --    V1.1.1 26-OCT-2023 Fixed Gayle register after soft reset. -JN
 --    v2.0.0 07-DEC-2023 Replaced Gayle IDE with LIDE.DEVICE. -JN
+--                       LIDE.device from LIV2 : https://github.com/LIV2/lide.device
 --                       Added PIO 0, 2, 4, and SanDisk timing modes. -JN
 --                       Added burst cache mode to Zorro 3 RAM. -JN
 ----------------------------------------------------------------------------------
