@@ -18,7 +18,7 @@ The A2630 ROM occupies $0000 - $3FFF of each EPROM. The LIDE.device occupies $40
 From the XGecu software:  
 
 1. Import the A2630 Low ROM: Use the default import settings. After importing, you should see data in the $0000 - $3FFF address range. The bytes in last few lines are all $FF, which is normal.  
-2. Import the LIDE.device Low ROM: Select the file and change the import settings as follows:
+2. Import the LIDE.device Low ROM: Select the file and change the import settings as follows:  
    2a. Starting address = $4000  
    2b. Overwrite existing data = NOT CHECKED.  
    2c. Click OK to import the file.
