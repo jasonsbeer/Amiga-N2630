@@ -11,7 +11,7 @@ Before burning, you must acquire the following files:
 [LIDE.device Low ROM](https://github.com/LIV2/lide.device/releases/latest/download/lide-N2630-low.rom)  
 
 ## Burning
-You must combine the two HIGH ROM and two LOW ROM files together. Instructions are given here to combine the ROM files with the XGecu Pro software for the TL866II (and successor) programmers. Other programmers should have similar functionality, but are outside the scope of this document.
+You must combine the two HIGH ROM and two LOW ROM files together before burning. Instructions are given here to combine the ROM files with the XGecu Pro software for the TL866II (and successor) programmers. Other programmers should have similar functionality, but are outside the scope of this document.
 
 The A2630 ROM occupies $0000 - $3FFF on each EPROM. The LIDE.device occupies $4000 - $7FFF on each EPROM.  
 
