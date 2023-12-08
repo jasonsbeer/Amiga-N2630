@@ -46,7 +46,7 @@ When desired, the 68030 may be disabled during a cold or warm start. This result
 The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the MC68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 3, J202).
 
 ## ROMs
-The N2630 requires two 27C256 EPROMs (burned by the user) to function. The ROMs handle the system startup for CPU selection and contain the LIDE.device AUTOBOOT ROM from [LIV2](https://github.com/LIV2). See the instructions [here](/ROMs/) for burning the N2630 ROMs.
+The N2630 requires two 27C256 EPROMs (burned by the user) to function. The ROMs handle the system startup for CPU selection and contains the [LIDE.device](https://github.com/LIV2/lide.device) AUTOBOOT ROM. See the instructions [here](/ROMs.md) for burning the N2630 ROMs.
 
 ## FAST RAM
 The N2630 uses SDRAM to provide the necessary memory for the Amiga system. SDRAM is the successor to Fast Page Memory found in devices such as the Amiga 3000, A2630 processor card, and other computers of the time. SDRAMs are a cost effective way to supply memory to older systems and are readily available either new or from unused memory modules. 
