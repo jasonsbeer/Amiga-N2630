@@ -41,10 +41,10 @@ The three CPLDs (U600, U601, and U602) must be programmed before the N2630 will 
 Discussion of CPLD programming is not in the scope of this document, but many resources are available on the internet. I recommend a Xilinx (real or generic) programming dongle.
 
 ## Programming the ROMs
-Most cheap EPROM programmers will handle the 27C256 EPROMs of the N2630. A popular one is the TL866II, but there are other options. There are a lot of these in the community. Someone may be able to assist if you do not wish to purchase a programmer. The EPROMs are programmed independently of the N2630. The ROMs can be found [here](/ROM/).
+Most cheap EPROM programmers will handle the 27C256 EPROMs of the N2630. A popular one is the TL866II, but there are other options. There are a lot of these in the community. Someone may be able to assist if you do not wish to purchase a programmer. The EPROMs are programmed independently of the N2630. Instructions for programming the ROMs can be found [here](/ROMs.md).
 
 ## Mounting Brackets
-There are mounting brackets for the A2000 EATX and Commodore Amiga 2000. The bracket matching your setup can be 3D printed and used for a clean installation. The files are found [here](/Bracket).
+There are mounting brackets for the Amiga A2000 EATX and Commodore Amiga 2000. The bracket matching your setup can be 3D printed and used for a clean installation. The files are found [here](/Bracket).
 
 ## Troubleshooting
 1) Make sure you have the newest firmware logic installed.
