@@ -37,7 +37,8 @@
 --    v1.2.2 26-FEB-23 Fixed _DSACKx contention with Zorro 3 cycles. -JN
 --    v1.2.3 27-OCT-23 Moved _RESET to U601 and fixed reset glitch. -MH
 --    v1.2.4 04-NOV-23 Fixed DSACK glitch during ROM select. -MH
---    v2.0.0 26-NOV-23 Convert to LIDE device. -JN
+--    v2.0.0 26-NOV-23 Added AUTOCONFIG LIDE device for IDE and related changes. -JN
+--                     LIDE from LIV2 : https://github.com/LIV2/lide.device
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
