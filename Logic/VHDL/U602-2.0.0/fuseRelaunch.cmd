@@ -1,0 +1,1 @@
+-intstyle "ise" -incremental -o "/home/jason/Documents/U602-SMALLBURSTWORKING/U602_isim_beh.exe" -prj "/home/jason/Documents/U602-SMALLBURSTWORKING/U602_beh.prj" "work.U602" 
