@@ -39,6 +39,7 @@
 --    v1.2.4 04-NOV-23 Fixed DSACK glitch during ROM select. -MH
 --    v2.0.0 26-NOV-23 Added AUTOCONFIG LIDE device for IDE and related changes. -JN
 --                     LIDE from LIV2 : https://github.com/LIV2/lide.device
+--    v2.0.1 11-DEC-23 Fixed LIDE base address assignment when Zorro 2 RAM is disabled.
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;

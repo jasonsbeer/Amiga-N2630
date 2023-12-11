@@ -9,13 +9,13 @@
          <ClosedNodesVersion>2</ClosedNodesVersion>
       </ClosedNodes>
       <SelectedItems>
-         <SelectedItem>AUTOCONFIG - AUTOCONFIG - Behavioral (/home/jason/Documents/Amiga-N2630-LIDE/Logic/VHDL/U601-LIDE/AUTOCONFIG.vhd)</SelectedItem>
+         <SelectedItem>U601 - Behavioral (/home/jason/Documents/U601-2.0.0/U601.vhd)</SelectedItem>
       </SelectedItems>
       <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
       <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
       <ViewHeaderState orientation="horizontal" >000000ff000000000000000100000001000000000000000000000000000000000202000000010000000100000064000001e7000000020000000000000000000000000200000064ffffffff000000810000000300000002000001e70000000100000003000000000000000100000003</ViewHeaderState>
       <UserChangedColumnWidths orientation="horizontal" >true</UserChangedColumnWidths>
-      <CurrentItem>AUTOCONFIG - AUTOCONFIG - Behavioral (/home/jason/Documents/Amiga-N2630-LIDE/Logic/VHDL/U601-LIDE/AUTOCONFIG.vhd)</CurrentItem>
+      <CurrentItem>U601 - Behavioral (/home/jason/Documents/U601-2.0.0/U601.vhd)</CurrentItem>
    </ItemView>
    <ItemView engineview="SynthesisOnly" sourcetype="" guiview="Process" >
       <ClosedNodes>

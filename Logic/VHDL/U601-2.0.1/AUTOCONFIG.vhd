@@ -385,7 +385,7 @@ begin
 
 				ELSE
 				
-					IF A(7 DOWNTO 0) = x"4A" AND ram2configed = '1' AND lide_configed = '0' THEN					
+					IF A(7 DOWNTO 0) = x"4A" AND (ram2configed = '1' OR nZ2DIS = '0') AND lide_configed = '0' THEN					
 					
 						--WE CONFIGURE THE LIDE DRIVER HERE BECUASE WE NEED
 						--THE SECOND NIBBLE FOR THE BASE ADDRESS. FIRST NIBBLE IS ALWAYS $E.
