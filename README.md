@@ -43,7 +43,7 @@ By default, the N2630 starts in 68030 mode. When in 68030 mode, all installed RA
 When desired, the 68030 may be disabled during a cold or warm start. This results in the Amiga falling back to the 68000 processor. This may be desired when software does not run correctly on the 68030 processor. To start up in 68000 mode, hold down the right mouse button during startup. Select "68000" and the Amiga will reset with the 68000 as the active processor. When in 68000 mode, the IDE port and on-board RAM are inactive. Motorola 68000 mode is not available with A2000 motherboards.
 
 ## 68882 Math Coprocessor (FPU)
-The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock freuqency as the MC68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 3, J202).
+The Motorolla MC68882 (or MC68881) floating point unit may be optionally added to the N2630. The FPU is typically driven at the same clock frequency as the MC68030 via the X1 oscillator, but may be clocked independently via the X2 oscillator (see Table 3, J202).
 
 ## ROMs
 The N2630 requires two 27C256 EPROMs (burned by the user) to function. The ROMs handle the system startup for CPU selection and contains the [LIDE.device](https://github.com/LIV2/lide.device) AUTOBOOT ROM. See the instructions [here](/ROMs.md) for burning the N2630 ROMs.
