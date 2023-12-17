@@ -117,7 +117,7 @@ The IDE logic supports four speed modes: PIO0, PIO2, PIO4, and SanDisk Ultra 2 (
 
 Each IDE device must be set as slave or master. Devices present on the 40 pin IDE port may use cable select by shorting J905 when using a proper cable select IDE cable. See the manual for each device on how to designate the device's master or slave setting. Master and slave for the compact flash device are set via J901 on the N2630.
 
-**NOTE:** The compact flash card slot is not effected by the cable select jumper (J905).  Thus, J905 should only be used when a proper cable select IDE cable is implemented on the 40 pin IDE port.
+**NOTE:** The compact flash card slot is not affected by the cable select jumper (J905).  Thus, J905 should only be used when a proper cable select IDE cable is implemented on the 40 pin IDE port.
 
 **Table 2A.** IDE Configuration Jumper Settings.
 Jumper|Description|Open<sup>[A]</sup>|Shorted<sup>[B]</sup>
