@@ -180,7 +180,7 @@ Revision 3.0
 
 ## Acknowledgements
 Dave Haynie for sharing the A2630 technical details with the Amiga community.  
-Matt Harlum for (LIV2) sharing his Gayle IDE code, LIDE.device, submitting code improvements, listening my struggles, and his numerous other contributions to this project.  
+Matt Harlum (LIV2) for sharing his Gayle IDE code, LIDE.device, submitting code improvements, listening my struggles, and his numerous other contributions to this project.  
 Stephen Durham (steveed) for loaning me his ethernet cards.  
 Members of the Discord testing group: LIV2, steeveed, Chrissy, Pillock.  
 Everyone who made the Amiga possible.  
