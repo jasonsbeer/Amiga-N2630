@@ -1,12 +1,12 @@
 <img src="/Images/n2630exp-small.png">  
-The N2630 is a 50MHz Motorolla 68030 CPU card with additional RAM and ATA device port for the Amiga 2000 family of computers. It is installed in the CPU slot where it immediately upgrades the system to a 68030 processor with FPU, up to 264 megabytes of Fast RAM, and an ATA port. The N2630 is intended to be an evolution of the A2630 card.  
+The N2630 is a 50MHz Motorolla MC68030 CPU card with additional RAM and ATA device port for the Amiga 2000 family of computers. It is installed in the CPU slot where it immediately upgrades the system to the MC68030 processor with FPU, up to 264 megabytes of Fast RAM, and an ATA port. The N2630 is intended to be an evolution of the A2630 card.  
 
 <br />Look for the N2630 channel on Discord: https://discord.gg/NU7SPYfNFj  
 
 <p align="center"><img src="/Images/N2630-30-a.jpg" width="750"></p>
 
 ## CURRENT STATUS:
-**Revision 4.0.1a/b is the current production release.**  
+**Revision 4.1.0a/b is the current production release.**  
 
 Sub-revision "a" supports the PLCC footprint MC68882. Sub-revision "b" supports the PGA footprint MC68882. They are otherwise identical.  
 
@@ -30,10 +30,10 @@ Click [here](/AssemblyNotes.md) for more information on building the N2630.
 ## Installation Notes
 This card may be installed in any Amiga 2000 computer. Installation is simply inserting the card into the 86 pin CPU/Coprocessor slot of the Amiga computer. There are no software drivers to install.  Kickstart v37.300 and greater is recommended.
 
-**IMPORTANT:** Before installing a Revision 4.0.1 or greater N2630, it is necessary to determine if you have an early, non-cost reduced motherboard. If your motherboard is marked "Made In Germany" and "(C) 1986 Commodore" on the left side of the board, you have a non-cost reduced Amiga 2000 board, designated "A2000" in this documentation. An example of a non-cost reduced Amiga 2000 motherboard can be see [here](http://amiga.resource.cx/photos/a2000,1). In the event you have an non-cost reduced "A2000" motherboard, you must remove the Motorola 68000 processor from the Amiga 2000 motherboard and place a jumper at J302 of the N2630.  All other Amiga 2000 motherboards are designated "B2000" and should leave the Motorola 68000 in place. Revision 3.0.x cards do not support the original German A2000. 
+**IMPORTANT:** Before installing a Revision 4.x.x or greater N2630, it is necessary to determine if you have an early, non-cost reduced motherboard. If your motherboard is marked "Made In Germany" and "(C) 1986 Commodore" on the left side of the board, you have a non-cost reduced Amiga 2000 board, designated "A2000" in this documentation. An example of a non-cost reduced Amiga 2000 motherboard can be see [here](http://amiga.resource.cx/photos/a2000,1). In the event you have an non-cost reduced "A2000" motherboard, you must remove the Motorola 68000 processor from the Amiga 2000 motherboard and place a jumper at J302 of the N2630.  All other Amiga 2000 motherboards are designated "B2000" and should leave the Motorola 68000 in place. Revision 3.0.x cards do not support the original German A2000. 
 
 **NOTES:**  
-**1) Hardware revision 4.0.1 supports the original Germal A2000, but is untested.**  
+**1) Hardware revision 4.x.x supports the original Germal A2000, but is untested.**  
 **2) The A2091 hard drive card will not operate correctly when using Kickstart 1.x on a revision 6.2 or newer Amiga 2000 with the N2630 or A2630 CPU cards. You must use Kickstart 2.04 or newer.**
 
 ## 68030 Mode
@@ -166,19 +166,20 @@ J202|FPU Clock|X1<sup>[A]</sup>|X2<sup>[B]</sup>
 <sup>B</sup>FPU clock from X2.
 
 ## Revision History
-Revision 4.1.0a/b
-   Added ATA activity light buffer to address to address config issues with some ATA devices.
+<strong>Revision 4.1.0a/b</strong>  
+   Added ATA activity light buffer to address config issues with some ATA devices.  
+   Changed polarity of the ATA LED header.  
    
-Revision 4.0.1a/b  
+<strong>Revision 4.0.1a/b</strong>  
    Sub-revision 'a' supports PLCC MC68882, sub-revision 'b' supports the PGA MC68882.  
    Changed jumper footprint to increase ease of assembly.  
    Added order number location for JLCPCB.  
    Added support for original German A2000 machines.
    
-Revision 3.0.1  
+<strong>Revision 3.0.1</strong>  
    Added copper thieving areas to top and bottom layers.  
    
-Revision 3.0  
+<strong>Revision 3.0</strong>  
    Initial production release.  
 
 ## Acknowledgements
