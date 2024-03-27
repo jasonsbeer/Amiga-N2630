@@ -167,7 +167,7 @@ J202|FPU Clock|X1<sup>[A]</sup>|X2<sup>[B]</sup>
 
 ## Revision History
 <strong>Revision 4.1.0a/b</strong>  
-   Added ATA activity light buffer to address to address config issues with some ATA devices.  
+   Added ATA activity light buffer to address config issues with some ATA devices.  
    Changed polarity of the ATA LED header.  
    
 <strong>Revision 4.0.1a/b</strong>  
