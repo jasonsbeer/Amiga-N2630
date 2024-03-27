@@ -1,12 +1,12 @@
 <img src="/Images/n2630exp-small.png">  
-The N2630 is a 50MHz Motorolla 68030 CPU card with additional RAM and ATA device port for the Amiga 2000 family of computers. It is installed in the CPU slot where it immediately upgrades the system to a 68030 processor with FPU, up to 264 megabytes of Fast RAM, and an ATA port. The N2630 is intended to be an evolution of the A2630 card.  
+The N2630 is a 50MHz Motorolla MC68030 CPU card with additional RAM and ATA device port for the Amiga 2000 family of computers. It is installed in the CPU slot where it immediately upgrades the system to the MC68030 processor with FPU, up to 264 megabytes of Fast RAM, and an ATA port. The N2630 is intended to be an evolution of the A2630 card.  
 
 <br />Look for the N2630 channel on Discord: https://discord.gg/NU7SPYfNFj  
 
 <p align="center"><img src="/Images/N2630-30-a.jpg" width="750"></p>
 
 ## CURRENT STATUS:
-**Revision 4.0.1a/b is the current production release.**  
+**Revision 4.1.0a/b is the current production release.**  
 
 Sub-revision "a" supports the PLCC footprint MC68882. Sub-revision "b" supports the PGA footprint MC68882. They are otherwise identical.  
 
